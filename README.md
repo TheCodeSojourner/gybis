@@ -33,7 +33,7 @@ The goal of **gybis** is to make it easy for developers to set up, utilize, and 
 
 - **AI base context**: mathematical notation engages
   the AI model's structured reasoning rather than its conversational defaults. Its inherent precision means significantly fewer hallucinations. Its inherent density means significantly fewer tokens to convey the same context.
-- **Architecture model**: an AI generated and maintained 5-layer architectural specification that AI keeps up to date as projects evolve.
+- **Architecture model**: an AI generated and maintained 5-layer architectural specification, stored in a file, that AI keeps up to date as projects evolve.
 - **Behavioral Domain Specific Language (DSL)**: a behavioral specification language the AI can read and write precisely, not
   pseudocode, not free-form prose, but a structured DSL with rules, triggers, surfaces, and transition graphs that AI can reason about directly and minimize hallucinations. Behavioral specifications are saved in files, typically one per feature or module (e.g., orders, payments).
-- **Persistent memory**: decisions, patterns, and insights are stored and recalled during AI sessions, so previous context is available between sessions.
+- **Persistent memory**: decisions, patterns, and insights are stored in files and recalled during AI sessions, so previous context is available between sessions.
