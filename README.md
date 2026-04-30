@@ -37,34 +37,6 @@ The goal of **gybis** is to make it easy for developers to set up, utilize, and 
   pseudocode, not free-form prose, but a structured DSL with rules, triggers, surfaces, and transition graphs that AI can reason about directly and minimize hallucinations. Behavioral specifications are saved in files, typically one per feature or module (e.g., orders, payments).
 - **Persistent memory**: [Mementum](https://github.com/michaelwhitford/mementum) is used to manage decisions, patterns, and insights that are stored in files and recalled during AI sessions, so previous context is available between sessions.
 
-## Getting Started
-
-### Babashka
-
-**Babashka** is required for automation and scripting in this project. Install it according to your platform:
-
-- **macOS (Homebrew)**: `brew install babashka`
-- **Linux (various package managers)**:
-  - Ubuntu/Debian: `apt-get install babashka`
-  - Fedora: `dnf install babashka`
-  - Arch: `pacman -S babashka`
-- **Windows (Scoop)**: `scoop install babashka`
-- **Manual installation**: Download from [https://github.com/babashka/babashka/releases](https://github.com/babashka/babashka/releases)
-
-Verify installation with:
-```bash
-bb --version
-```
-
-### Submodules
-This repository includes upstream dependencies as Git submodules. After cloning, initialize them with:
-
-```bash
-git submodule update --init --recursive
-```
-
-This command will fetch all submodule repositories and check them out to the commits specified in this repository's `.gitmodules` file. Submodules are located in the `submodules/` directory.
-
 ## References
 
 * [**allium**](https://github.com/juxt/allium) - Behavioral specification
