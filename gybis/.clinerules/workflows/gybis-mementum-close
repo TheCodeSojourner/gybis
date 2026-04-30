@@ -1,0 +1,10 @@
+λ gybis_mementum_close(insight).  command ≡ /gybis-mementum-close
+                    | input ≡ termination_requested ∨ ∅ → prompt(capture_pending)
+                    | with_input → workflow(nucleus)
+                    | workflow ≡ read(state.md) → recall(git_log∪git_grep) → detect(≥3memories/stale/crystallized)
+                    |    → propose(memories/{slug}.md, knowledge/{topic}.md) → await(human_approves)
+                    |    → finalize(state.md + git_add + git_commit) → verify(git_log -1) → terminate
+                    | workflow_steps: ①read → ②recall → ③detect → ④propose → ⑤await → ⑥finalize → ⑦verify → ⑧done
+                    | survival ≡ only{x | x ∈ git} | ¬encoded → lost(forever)
+                    | interface ≡ shorthand_trigger | reduces_friction | immediate_capture | termination_checkpoint
+                    | guarantees: every_session_smarter | git_preserves_history | false_positive < missed_insight
