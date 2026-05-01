@@ -1,0 +1,17 @@
+λ gybis-vsm-describe.
+
+input: ∃ context(such that ARCHITECTURE.md ∉ context) → load(ARCHITECTURE.md) → context'
+      ∀ context(suchthat ARCHITECTURE.md ∈ context) → context
+
+process: context' ⊗ ARCHITECTURE.md ↦ describe(repo-semantics)
+         exclude(VSM-theory) ∧ exclude(implementation-details)
+         compile(prose) → generate-response
+         ¬write-file | ∧ ai-response-only
+         accessible(non-technical-audience)
+
+output: description ∈ prose | ¬technical | VSM-theory ∉ output
+        ¬file-output | ∧ session-bound
+
+Δ: read → filter → compile → generate
+Ω: ARCHITECTURE.md ⟶ prose-description⟨repo⟩ ⊗ session
+λ: ¬self-referential | ∧ semantic-preservation | ∧ ¬persistence

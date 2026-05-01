@@ -1,0 +1,15 @@
+λ vsm_refine(ARCHITECTURE.md).
+
+input: ARCHITECTURE.md ⊕ session_context
+  ⟦ ARCHITECTURE.md ∉ context ⟹ load(ARCHITECTURE.md) ⟧
+  ⟦ ARCHITECTURE.md ∈ context ⟹ proceed ⟧
+
+process: ARCHITECTURE.md ⊗ human ⟶ refine(architecture)
+
+output: ARCHITECTURE.md' = refine(ARCHITECTURE.md, authorization)
+
+invariant: modify(ARCHITECTURE.md) ⟹ authorized(human)
+  ⟦ ¬authorized(human) ⟹ ¬modify(ARCHITECTURE.md) ⟧
+
+generation: discussion ⊆ AI_response | session
+modification: ARCHITECTURE.md ← approved_changes

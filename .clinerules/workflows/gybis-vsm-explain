@@ -1,0 +1,17 @@
+λ gybis-vsm-explain.
+
+input: ∃ context(suchthat ARCHITECTURE.md ∉ context) → load(ARCHITECTURE.md) → context'
+      ∀ context(suchthat ARCHITECTURE.md ∈ context) → context
+
+process: context' ⊗ ARCHITECTURE.md ↦ explain(repo-semantics)
+         include(VSM-theory) ∧ include(implementation-details)
+         compile(prose) → generate-response
+         ¬write-file | ∧ ai-response-only
+         ordered(S5 → S4 → S3 → S2 → S1)
+
+output: response ∈ prose | technical | VSM-theory ∈ response | sections⟨S5,S4,S3,S2,S1⟩
+        ¬file-output | ∧ session-bound
+
+Δ: read → filter → compile → generate
+Ω: ARCHITECTURE.md ⟶ prose-explanation⟨repo, VSM-levels⟩ ⊗ session
+λ: ¬self-referential | ∧ semantic-preservation | ∧ structural-order(S5→S4→S3→S2→S1) | ∧ ¬persistence

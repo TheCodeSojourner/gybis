@@ -1,0 +1,15 @@
+λ gybis-vsm-orient.
+
+input: ∃ context(suchthat ARCHITECTURE.md ∉ context) → load(ARCHITECTURE.md)
+      ∀ context(suchthat ARCHITECTURE.md ∈ context) → loaded
+
+process: load(ARCHITECTURE.md) → acknowledge
+         ¬write-file | ∧ ai-response-only
+         session-bound
+
+output: response ∈ "VSM architecture loaded" | ∨ | "VSM architecture already loaded"
+        ¬file-output | ∧ session-bound
+
+Δ: check → load(ACK) → acknowledge
+Ω: ARCHITECTURE.md ⟶ loaded⟨session⟩ | already-loaded⟨session⟩
+λ: ¬self-referential | ∧ semantic-preservation | ∧ ¬persistence

@@ -43,4 +43,4 @@ The goal of **gybis** is to make it easy for developers to set up, utilize, and 
 * [**allium-tools**](https://github.com/juxt/allium-tools) - Behavioral specification tools
 * [**babashka**](https://github.com/babashka/babashka) - Automation and scripting
 * [**mementum**](https://github.com/michaelwhitford/mementum) - Persistent memory
-* [**nucleus**](https://github.com/michaelwhitford/nucleus) - AI base context, and architectural specifications
+* [**nucleus**](https://github.com/michaelwhitford/nucleus) - AI base context, and VSM architectural specifications
