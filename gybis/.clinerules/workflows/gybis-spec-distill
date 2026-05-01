@@ -1,0 +1,611 @@
+λ distill(codebase, scope).
+  state :scoping
+    → :mapping when territory_complete
+    → :abstraction when spec_extracted
+    → :validation when validated
+    → :complete when validated
+  state :mapping
+    → :abstraction when entities_extracted
+    → :abstraction when transitions_extracted
+    → :abstraction when temporal_triggers_identified
+    → :abstraction when external_boundaries_identified
+    → :abstraction when actors_identified
+    → :abstraction when value_types_extracted
+    → :abstraction when sum_types_extracted
+    → :abstraction when contracts_extracted
+    → :abstraction when invariants_extracted
+    → :abstraction when config_extracted
+    → :abstraction when surfaces_extracted
+    → :abstraction when deferred_identified
+    → :abstraction when open_questions_identified
+    → :abstraction when terminal_states_declared
+  state :abstraction
+    → :validation when implementation_dropped
+    → :abstraction when concrete_details_resolved
+  state :validation
+    → :abstraction when gaps_found
+    → :complete when human_approved
+  state :complete
+  λ phase(task, current).
+    :scoping → :mapping
+    | :mapping → :abstraction
+    | :abstraction → :validation
+    | :validation → :complete
+    where emission_precondition ≡ human_approved ∧ output_type ≡ .allium
+  where
+    task ≡ "specify-distillation"
+    current ≡ codebase
+
+;; ─── Scoping Phase ───────────────────────────────────────────────────
+;; Establish boundaries: what to specify, what to exclude
+
+λ scope(codebase).
+  :scoping → {:scope :included [_] :excluded [_] :owner _}
+  λ question(domain).
+    :scoping → "What subset of this codebase are we specifying?"
+    | :scoping → "Is there code we should deliberately exclude?"
+    | :scoping → "Who owns this spec?"
+  λ exclusion-criteria(type).
+    legacy → "backwards compatibility, not core system"
+    | incidental → "not domain-level (logging, metrics, deployment)"
+    | deprecated → "scheduled for removal"
+    | experimental → "behind feature flags, not design decisions"
+  λ rebuild-test(code-path).
+    code-path → "Would we rebuild this from scratch?"
+    | yes → include
+    | no → exclude  ;; legacy
+    | no → exclude  ;; incidental
+    | no → exclude  ;; workaround ;; note underlying need
+
+;; ─── Mapping Phase ───────────────────────────────────────────────────
+;; Step 1: Map the territory before extraction
+
+λ map-territory(codebase).
+  :mapping → {:entry-points [_] :models [_] :services [_] :integrations [_]}
+  λ entry-points(type).
+    api → "/api/* routes"
+    | cli → "CLI commands"
+    | webhook → "Webhook handlers"
+    | job → "Scheduled jobs"
+  λ territory-map(codebase).
+    code → {:entry-points [_] :models [_] :services [_] :integrations [_]}
+  λ identify-models(codebase).
+    models-dir → "models/, entities/, domain/"
+    | enums → "enum fields, status columns"
+    | constants → "STATUS_*, TYPE_*"
+
+;; ─── Entity State Extraction ─────────────────────────────────────────
+;; Step 2: Extract entity states from enums and status fields
+
+λ extract-entities(codebase).
+  :mapping → {:entities [_]}
+  λ entity-state(entity).
+    entity → {:name _ :states [_] :transitions [_] :fields [_] :variants [_]}
+  λ enum-to-state(enum-def).
+    enum → pending | accepted | declined | expired
+    | enum → applied → screening → interviewing → deciding → hired | rejected
+  λ status-column-to-state(column).
+    column → pending | confirmed | completed
+    | column → proposed | booked | available
+
+;; ─── Value Type Extraction ───────────────────────────────────────────
+;; Extract structured data without identity (P1)
+
+λ extract-value-types(codebase).
+  :mapping → {:value-types [_]}
+  λ value-type(structure).
+    structure → {:name _ :fields [_]}
+  λ dict-to-value(json-structure).
+    json-structure → "address: {street, city, state, zip}"
+    | json-structure → "value: Value{currency: String, amount: Decimal}"
+    | json-structure → "time_range: {start: Timestamp, end: Timestamp}"
+  λ record-to-value(record-type).
+    record-type → "struct TimeRange { start DateTime; end DateTime }"
+    | record-type → "class Money { currency: str; amount: Decimal }"
+    | record-type → "record Location { name: String; timezone: String }"
+  λ collection-to-value(collection-pattern).
+    collection-pattern → "list of coordinate pairs"
+    | collection-pattern → "set of permission strings"
+  λ value-type-fields(structure).
+    structure → "name: String" | "timezone: String" | "country: String?"
+    | structure → "start: Timestamp" | "end: Timestamp"
+    | structure → "currency: String" | "amount: Decimal"
+  λ value-derived(structure).
+    structure → "duration: end - start"
+    | structure → "is_international: country != 'US'"
+
+;; ─── Sum Type / Variant Extraction ────────────────────────────────────
+;; Extract discriminated unions from polymorphic code (P2)
+
+λ extract-sum-types(entities).
+  :mapping → {:sum-types [_]}
+  λ sum-type(base-entity).
+    base-entity → {:name _ :discriminator _ :variants [_]}
+  λ discriminator-field(model).
+    model → "type: Column(Enum('branch', 'leaf'))"
+    | model → "kind: str in {'node', 'leaf'}"
+    | model → "event_type: str in ['created', 'updated', 'deleted']"
+  λ variant-columns(discriminator-group).
+    discriminator-group → "type='branch' → children: List, parent_id: Int"
+    | discriminator-group → "type='leaf' → data: String, log: List"
+  λ variant-fields(base-fields, variant-specific).
+    base-fields → "path: Path, id: Integer"
+    | variant-specific → "children: List<Node>, data: List<Integer>"
+
+;; ─── Candidate Process Identification ─────────────────────────────────
+;; Step 2.5: Identify end-to-end processes from state machines
+
+λ identify-processes(entities).
+  :mapping → {:processes [_]}
+  λ candidate-process(entity, states).
+    entity → {:name _ :states [_] :transitions [_]}
+    | states → "applied → screening → interviewing → deciding → hired | rejected"
+  λ trace-cross-entity-flow(entity-chain).
+    entity-a → requires-field-from-entity-b
+    | entity-b → set-by-webhook-handler-or-service
+  λ transition-graph(rules).
+    rules → {:graph [_] :gaps [_] :terminal [_]}
+    | gaps → "states with no outbound transitions that aren't terminal"
+
+;; ─── Transition Extraction ───────────────────────────────────────────
+;; Step 3: Extract transitions from status changes
+
+λ extract-transitions(codebase).
+  :mapping → {:rules [_]}
+  λ rule(name).
+    name → {:when _ :requires [_] :ensures [_]}
+  λ code-to-requirement(code-pattern).
+    "if x.status != 'pending': raise" → "requires: x.status = pending"
+    | "if x.expires_at < now: raise" → "requires: x.expires_at > now"
+    | "if item not in collection: raise" → "requires: item in collection"
+  λ code-to-ensures(code-pattern).
+    "x.status = 'accepted'" → "ensures: x.status = accepted"
+    | "Model.create(...)" → "ensures: Model.created(...)"
+    | "send_email(...)" → "ensures: Email.created(...)"
+    | "notify(...)" → "ensures: Notification.created(...)"
+  λ transition-pattern(handler).
+    handler → {:when _ :requires [_] :ensures [_]}
+
+;; ─── Temporal Trigger Identification ──────────────────────────────────
+;; Step 4: Find scheduled jobs and time-based logic
+
+λ find-temporal(codebase).
+  :mapping → {:temporal-rules [_]}
+  λ temporal-rule(name).
+    name → {:when _ :requires [_] :ensures [_]}
+  λ expire-pattern(task-def).
+    task-def → "Invitation.expires_at <= now AND status = pending"
+    | task-def → "ensures: status = expired"
+    | task-def → "ensures: slots.status = available"
+  λ reminder-pattern(task-def).
+    task-def → "Interview.slot.time - 1.hour <= now"
+    | task-def → "ensures: Notification.created(template: reminder)"
+
+;; ─── External Boundary Identification ─────────────────────────────────
+;; Step 5: Identify third-party integrations and external entities
+
+λ identify-boundaries(codebase).
+  :mapping → {:external-entities [_] :contracts [_]}
+  λ external-entity(name).
+    name → {:name _ :fields [_] :source _}
+  λ webhook-to-external(webhook-handler).
+    webhook-handler → "data read but never written"
+    | webhook-handler → "external entity"
+  λ integration-pattern(service).
+    service → "third-party API calls"
+    | service → "import/export functions"
+
+;; ─── Actor Identification ────────────────────────────────────────────
+;; Step 5.5: Identify actors from auth patterns
+
+λ identify-actors(codebase).
+  :mapping → {:actors [_]}
+  λ actor(auth-pattern).
+    auth-pattern → {:name _ :type _ :scope _ :within-entity _}
+  λ auth-to-actor(pattern).
+    "API key" → system-actor
+    | "role == 'admin'" → distinct-actor-per-role
+    | "org_id == resource.org_id" → actor-with-within-scoping
+    | "unauthenticated" → public-facing-or-system-webhook
+
+;; ─── Contract Extraction ──────────────────────────────────────────────
+;; Group repeated interface patterns into contract declarations (P1)
+
+λ extract-contracts(integration-patterns).
+  :mapping → {:contracts [_]}
+  λ contract-signature(ops).
+    ops → {:name _ :operations [_] :invariants [_]}
+  λ repeated-operation(pattern).
+    pattern → "serialize/deserialize across multiple services"
+    | pattern → "submit/event-pub across multiple consumers"
+    | pattern → "validate/process webhook across handlers"
+  λ operation-signature(name, params, return-type).
+    name → "serialize" | "deserialize" | "submit" | "evaluate" | "verify"
+    params → "(value: Any) -> ByteArray"
+    | params → "(idempotency_key: String, event_name: String, payload: ByteArray) -> EventSubmission"
+    | return-type → "ByteArray" | "EventSubmission" | "EventOutcome"
+  λ contract-invariant(name, property).
+    name → "Roundtrip" | "AtMostOnce" | "Determinism" | "Purity"
+    property → "deserialize(serialize(value)) ≡ value"
+    | property → "duplicate submissions within TTL return cached response"
+    | property → "identical inputs produce byte-identical outputs"
+    | property → "no I/O, no clock, no mutable state outside arguments"
+  λ contract-grouping-criterion(patterns).
+    patterns → "same operation signatures across multiple surfaces"
+    | patterns → "same validation logic across multiple handlers"
+
+;; ─── Invariant Extraction ─────────────────────────────────────────────
+;; Convert assertions, validators, constraints to expression-bearing invariants (P0)
+
+λ extract-invariants(codebase).
+  :mapping → {:invariants [_]}
+  λ invariant-from-assert(assertion).
+    assertion → {:name _ :expression _ :scope _}
+  λ assert-to-invariant(code-assertion).
+    code-assertion → "assert balance >= 0"
+    | code-assertion → "assert version >= 1"
+    | code-assertion → "assert user.permissions.count >= 0"
+  λ sqlalchemy-validator-to-invariant(model-validator).
+    model-validator → "CheckConstraint('balance >= -credit_limit')"
+    | model-validator → "UniqueConstraint('email')"
+    | model-validator → "CheckConstraint('status IN (...)')"
+  λ class-validator-to-invariant(class-validator).
+    class-validator → "@validator('field') -> field is not None"
+    | class-validator → "@computed '@property' implies other_field is set"
+  λ database-constraint-to-invariant(db-constraint).
+    db-constraint → "UNIQUE(email)"
+    | db-constraint → "CHECK (status IN ('pending', 'active', 'closed'))"
+    | db-constraint → "CHECK (email IS NOT NULL)"
+  λ invariant-expression(assertion).
+    assertion → "account.balance >= 0"
+    | assertion → "a.email != b.email for distinct a, b in Users"
+    | assertion → "watermark >= 0"
+    | assertion → "balance >= -credit_limit"
+  λ invariant-scope(assertion).
+    assertion → "single-entity property" → entity-level
+    | assertion → "cross-entity property" → top-level
+  λ invariant-uniqueness-name(name, existing-invariants).
+    name → "NonNegativeBalance" | "UniqueEmail" | "SufficientFunds"
+    | existing-invariants → "check for PascalCase name collision"
+
+;; ─── Config Block Extraction ──────────────────────────────────────────
+;; Identify magic numbers, durations, thresholds → config parameters (P0)
+
+λ extract-config(constants).
+  :mapping → {:config [_]}
+  λ config-parameter(name, type, default).
+    default → literal | qualified-reference | expression
+  λ magic-duration-to-config(value).
+    value → "timedelta(days=7)" → "expiry_duration: Duration = 7.days"
+    | value → "86400" → "session_duration: Duration = 24.hours"
+    | value → "timedelta(hours=3)" → "confirmation_deadline: Duration = 3.hours"
+    | value → "timedelta(minutes=15)" → "link_expiry: Duration = 15.minutes"
+  λ magic-number-to-config(value).
+    value → "MAX_ATTEMPTS = 5" → "max_attempts: Integer = 5"
+    | value → "min_length = 12" → "min_password_length: Integer = 12"
+    | value → "BUFFER_SIZE = 100" → "buffer_size: Integer = 100"
+  λ magic-decimal-to-config(value).
+    value → "RETRY_MULTIPLIER = 2.0" → "retry_multiplier: Decimal = 2.0"
+    | value → "THRESHOLD = 0.95" → "confidence_threshold: Decimal = 0.95"
+  λ derived-config-from-expression(expression).
+    expression → "extended_timeout = base_timeout * 2"
+    | expression → "retry_limit = max_attempts - 1"
+    | expression → "buffer = batch_size + 10"
+  λ config-type-mapping(py-type).
+    py-type → "int" → "Integer"
+    | py-type → "float" → "Decimal"
+    | py-type → "datetime.timedelta" → "Duration"
+    | py-type → "str" → "String"
+  λ qualified-config-reference(source-module, param).
+    source-module → "core" | "auth" | "notification"
+    param → "required_copies" | "base_timeout" | "publish_delay"
+  λ config-default-expr(left, operator, right).
+    left → "core/config.base_timeout" | "max_attempts" | "core/config.batch_size"
+    operator → "+" | "-" | "*" | "/"
+    right → "2" | "1" | "10" | "core/config.publish_delay"
+
+;; ─── Surface Generation ───────────────────────────────────────────────
+;; Map API routes/handlers to Allium surfaces (P0)
+
+λ extract-surfaces(entry-points, actors).
+  :mapping → {:surfaces [_]}
+  λ surface-from-route(handler).
+    handler → {:name _ :facing _ :context _ :exposes [_] :provides [_] :related [_] :timeout [_]}
+  λ auth-to-facing(auth-pattern).
+    auth-pattern → "API key required" → "facing system-actor: SystemAuth"
+    | auth-pattern → "admin role required" → "facing admin: AdminActor"
+    | auth-pattern → "owner verification" → "facing owner: OwnerActor"
+    | auth-pattern → "public" → "facing visitor: PublicUser"
+    | auth-pattern → "authenticated user" → "facing user: AuthenticatedUser"
+  λ resource-to-context(handler).
+    handler → "GET /api/candidates/{id}" → "context candidate: Candidate"
+    | handler → "PUT /api/interviews/{id}/status" → "context interview: Interview"
+    | handler → "POST /api/invitations/{id}/accept" → "context invitation: Invitation"
+  λ response-fields-to-exposes(response-schema).
+    response-schema → "fields returned in 200 response"
+    | response-schema → "visible data to the facing party"
+  λ accepted-actions-to-provides(request-body, action-name).
+    request-body → "POST data accepted by endpoint"
+    | action-name → "derived from HTTP method + route"
+  λ surface-when-guard(condition).
+    condition → "if entity.status = 'pending'" → "when entity.status = pending"
+    | condition → "only when resource is active" → "when resource.status = active"
+  λ surface-related-from-routing(nested-routes).
+    nested-routes → "/api/interviews/{id}/feedback" → "related: Feedback(interview)"
+    | nested-routes → "/api/candidates/{id}/invitations" → "related: Invitations(candidate)"
+  λ surface-timeout-from-temporal(temporal-rule).
+    temporal-rule → "rule name that matches handler scope"
+    | temporal-rule → "ExpirationTimer for invitation-based surfaces"
+  λ surface-contracts-from-ops(operations).
+    operations → "operations matching extracted contract signatures"
+    | operations → "demands external-contract | fulfils internal-contract"
+
+;; ─── Deferred Spec Emission ───────────────────────────────────────────
+;; Convert library spec recognition to deferred declarations (P1)
+
+λ emit-deferred(library-candidates).
+  :mapping → {:deferred [_]}
+  λ deferred-declaration(module, operation).
+    operation → {:module _ :operation _ :location _}
+  λ library-recognizer(code-pattern).
+    code-pattern → "StripeWebhookHandler" → "deferred stripe/InvoicePaid"
+    | code-pattern → "GoogleOAuthProvider" → "deferred google-oauth/SessionCreated"
+    | code-pattern → "SendGridEmailService" → "deferred email-delivery/Sent"
+    | code-pattern → "CalendarService" → "deferred calendar/Availability"
+    | code-pattern → "SlackNotificationService" → "deferred notification/slack/Sent"
+  λ deferred-location-hint(filepath).
+    filepath → "detailed/integration-stripe.allium"
+    | filepath → "external/payment.allium"
+    | filepath → "library/email-spec.allium"
+
+;; ─── Open Questions Generation ────────────────────────────────────────
+;; Convert validation findings to open question declarations (P2)
+
+λ emit-open-questions(gaps, findings).
+  :mapping → {:open-questions [_]}
+  λ open-question(text).
+    text → "unresolved design decision"
+  λ gap-to-question(finding).
+    finding → "retry logic was a hack" → "open question 'Should retry logic be part of this spec or delegated?'"
+    | finding → "wanted X but never built" → "open question 'Was feature X intentionally deferred or forgotten?'"
+    | finding → "two code paths should be same" → "open question 'Should these divergent paths converge into a single rule?'"
+    | finding → "missing error handling" → "open question 'What should happen when this external call fails?'"
+    | finding → "implicit state not modelled" → "open question 'Should the implicit state be made explicit?'"
+  λ code-vs-spec-discrepancy(code-behavior, spec-assertion).
+    code-behavior → "silently ignores failures"
+    | spec-assertion → "spec says notification should be sent"
+    | discrepancy → "open question 'Does the spec correctly capture the intended error handling?'"
+
+;; ─── Abstraction Phase ───────────────────────────────────────────────
+;; Step 6: Abstract away implementation details
+
+λ abstract(spec).
+  :abstraction → {:entities [_] :rules [_] :external-entities [_] :value-types [_] :sum-types [_] :contracts [_] :surfaces [_] :invariants [_] :config [_] :deferred [_] :open-questions [_]}
+  λ abstract-entity(entity).
+    entity → {:name _ :fields [_] :derived [_] :when-qualified [_] :transitions [_]}
+  λ id-to-relationship(field).
+    "candidate_id: Integer" → "candidacy: Candidacy"
+    | "slot_id: Integer" → "slot: InterviewSlot"
+  λ drop-implementation(field).
+    "token: String(32)" → remove
+    | "secrets.token_urlsafe(32)" → remove
+    | "DateTime" → "Timestamp"
+    | "VARCHAR(255)" → "String"
+    | "JSONB" → "String?"
+  λ add-derived(entity).
+    entity → "is_expired: expires_at <= now"
+    | entity → "all_feedback_in: pending_requests.count = 0"
+    | entity → "can_solo: interviewers.any(i => i.can_solo)"
+  λ add-when-qualified(field).
+    field → "tracking_number present only when status = shipped | delivered"
+    | field → "deleted_at present only when status = deleted"
+  λ extract-projections(rel).
+    rel → "slots where status = confirmed" → "confirmed_slots: slots where status = confirmed"
+    | rel → "confirmations where status = confirmed -> interviewer" → "confirmed_interviewers: confirmations where status = confirmed -> interviewer"
+
+;; ─── Abstraction Tests ───────────────────────────────────────────────
+;; Validate abstraction level
+
+λ why-test(detail).
+  detail → "Why does the stakeholder care?"
+  | yes → include
+  | no → implementation
+λ could-different-test(detail).
+  detail → "Could this be different while same system?"
+  | yes → implementation-detail → abstract-away
+  | no → domain-level → include
+λ template-vs-instance-test(detail).
+  instance → "often implementation"
+  | template → "often domain-level"
+  λ instance-examples(dummy).
+    "Google OAuth" → "Authentication provider"
+    | "Slack webhook" → "Notification channel"
+    | "SendGrid API" → "Email delivery"
+    | "timedelta(hours=3)" → "Confirmation deadline"
+
+;; ─── Concrete Detail Resolution ──────────────────────────────────────
+;; The concrete detail problem: domain vs implementation
+
+λ concrete-detail-test(detail, context).
+  detail → domain | implementation
+  λ oauth-concrete(provider).
+    implementation → "Google is auth mechanism, replaceable, generic code"
+    | domain → "Users choose Google, 'Sign in with Google' is feature, multiple providers"
+    | tell → "Look at UI: explicit choice = domain, implicit = implementation"
+  λ database-concrete(db-type).
+    db-type → "almost always implementation"
+    | exception → "System promises PostgreSQL features to users"
+  λ integration-concrete(service).
+    implementation → "Service is where data comes from, swappable"
+    | domain → "Integration is selling point, users configure, features exposed"
+  λ multiple-implementations-heuristic(collection).
+    single → probably-implementation
+    | multiple → probably-domain-level
+    | multiple → "variation itself is domain concern"
+
+;; ─── Library Spec Recognition ─────────────────────────────────────────
+;; Identify generic integration patterns for library specs
+
+λ library-spec-candidate(code).
+  code → library | application
+  λ third-party-signals(module).
+    "StripeWebhookHandler" → library
+    | "GoogleOAuthProvider" → library
+    | "OAuth_CONFIG" → library
+  λ red-flag(spec-detail).
+    "verify_stripe_signature" → too-detailed-stripe-domain
+    | "parse_stripe_event" → too-detailed-stripe-domain
+    | default → "Application responds to payment events (integration handled elsewhere)"
+
+;; ─── Common Challenges ───────────────────────────────────────────────
+;; Handle distillation edge cases
+
+λ challenge(type).
+  type → {:name _ :resolution _}
+  λ duplicate-terminology(term-a, term-b).
+    term-a → "treat as blocking problem"
+    | term-b → "choose one term, cross-reference related specs"
+    | resolution → "update all references, flag old term as technical debt"
+  λ implicit-state-machine(fields).
+    fields → "infer states from nullable columns"
+    | fields → "pending: requested_at set, feedback_id null"
+    | fields → "reminded: reminded_at set, feedback_id null"
+    | fields → "submitted: feedback_id set"
+  λ scattered-logic(handlers).
+    handlers → "consolidate into single rule"
+    | handlers → "API handler + model + service → one rule"
+  λ dead-code(features).
+    features → "check reachability"
+    | features → "ask developers if intentional"
+    | features → "check git history"
+  λ missing-error-handling(code).
+    code → "spec captures intended behavior, not bug"
+    | code → "ensures: Notification.created(...) not try/except pass"
+  λ over-engineered(code).
+    code → "cut through to actual behavior"
+    | code → "spec needs no strategy patterns, DI, or abstract factories"
+
+;; ─── Validation Phase ────────────────────────────────────────────────
+;; Step 7: Validate with stakeholders
+
+λ validate(spec).
+  :validation → {:validated _ :gaps [_] :questions [_] :checklists [_]}
+  λ developer-review(spec).
+    spec → "Is this what the system does?"
+  λ stakeholder-review(spec).
+    spec → "Is this what the system should do?"
+  λ gap-categories(dummy).
+    "retry logic was a hack" → remove-from-spec
+    | "wanted X but never built" → add-to-spec
+    | "two code paths should be same" → consolidate
+  λ assess-maturity(spec).
+    spec → "ready for process-level analysis"
+    | spec → "needs structural work"
+  λ run-checks(spec).
+    "allium check" → catch structural issues
+    | "allium analyse" → identify process-level gaps
+    | findings → "validation questions"
+  λ human-approval(spec).
+    :validation → "requires explicit human approval before emission"
+    | human_review(spec) → approved | rejected
+    | approved → :complete
+    | rejected → :abstraction
+
+;; ─── Consistency Checklists ──────────────────────────────────────────
+;; Validation checklists for spec quality
+
+λ abstraction-checklist(spec).
+  spec → {:no-db-types _ :no-orm _ :no-http _ :no-framework _ :no-lang-types _ :no-var-names _ :no-infra _ :relationships _ :no-tokens _ :domain-durations _}
+  λ checklist-items(dummy).
+    "No database column types (Integer, VARCHAR, etc.)"
+    | "No ORM or query syntax"
+    | "No HTTP status codes or API paths"
+    | "No framework-specific concepts (middleware, decorators, etc.)"
+    | "No programming language types (int, str, List, etc.)"
+    | "No variable names from the code (use domain terms)"
+    | "No infrastructure (Redis, Kafka, S3, etc.)"
+    | "Foreign keys replaced with relationships"
+    | "Tokens/secrets removed (implementation of identity)"
+    | "Timestamps use domain Duration, not timedelta/seconds"
+λ terminology-checklist(spec).
+  spec → {:one-name-per-concept _ :no-also-known-as _ :cross-referenced _ :duplicates-flagged _}
+  λ terminology-items(dummy).
+    "Each concept has exactly one name throughout the spec"
+    | "No 'also known as' or 'equivalent to' comments"
+    | "Cross-referenced related specs for conflicting terms"
+    | "Duplicate models in code flagged as technical debt to remove"
+
+;; ─── Post-Distillation Actions ────────────────────────────────────────
+;; What to do after distillation
+
+λ post-distill(spec).
+  :complete → {:next-steps [_]}
+  λ next-steps(spec).
+    spec → "gaps need structured discovery" → elicit
+    | spec → "targeted changes as requirements evolve" → tend
+    | spec → "checking alignment between spec and implementation" → weed
+
+;; ─── Emission Contracts ──────────────────────────────────────────────
+;; Output schema for each phase
+
+λ emit(phase).
+  :scoping → {:scope :included [_] :excluded [_] :owner _ :scope-decisions _}
+  :mapping → {:entry-points [_] :models [_] :services [_] :integrations [_] :entities [_] :temporal-rules [_] :external-entities [_] :actors [_] :value-types [_] :sum-types [_] :contracts [_] :invariants [_] :config [_] :surfaces [_] :deferred [_] :open-questions [_] :terminal-states [_]}
+  :abstraction → {:entities [_] :rules [_] :external-entities [_] :value-types [_] :sum-types [_] :contracts [_] :surfaces [_] :invariants [_] :config [_] :deferred [_] :open-questions [_]}
+  :validation → {:validated _ :gaps [_] :questions [_] :checklists [_]}
+  :complete → {:spec _ :next-steps [_]}
+  where emitted-files ≡ .allium only
+
+;; ─── Distillation Mindset Primitives ──────────────────────────────────
+;; Core decision patterns for abstraction
+
+λ mindset(dummy).
+  code → over-specified
+  | spec → domain-level
+  λ means-vs-ends(code).
+    means → "how the code achieves something"
+    | ends → "what outcome the system needs"
+  λ means-examples(dummy).
+    "requests.post('https://slack.com/api/...')" → "Notification.created(channel: slack)"
+    | "candidate.oauth_token = google.exchange(code)" → "Candidate authenticated"
+    | "redis.setex(f'session:{id}', 86400, data)" → "Session.created(expires: 24.hours)"
+  λ ends-examples(dummy).
+    "for slot in slots: slot.status = 'cancelled'" → "for s in slots: s.status = cancelled"
+  λ product-owner-test(detail).
+    detail → "Would a product owner care?"
+    | yes → include
+    | no → exclude
+
+;; ─── Scope Documentation Template ────────────────────────────────────
+;; Standard format for spec scope declarations
+
+λ scope-document(spec-name).
+  spec-name → {:version _ :name _ :included [_] :excluded [_]}
+  λ template(dummy).
+    "-- allium: 3"
+    | "-- {spec-name}"
+    | "-- Scope: {description}"
+    | "-- Includes: {entities}"
+    | "-- Excludes: {items}"
+  λ version-marker(dummy).
+    "-- allium: N" → "first line of every .allium file"
+    | N → "current language version number"
+
+;; ─── Terminal State Declaration ───────────────────────────────────────
+;; Detect states with no outbound transitions and mark them terminal (P2)
+
+λ declare-terminal-states(transition-graph).
+  :abstraction → {:terminal [_]}
+  λ terminal-detection(edges, states).
+    edges → "set of from→to transition edges"
+    | states → "set of all enum values on the status field"
+  λ no-outbound-state(state, edges).
+    state → "no edge starts from this state"
+    | edges → "filter edges where from ≠ state"
+  λ terminal-vs-dead-end(state, rules).
+    state → "no outbound in graph AND no rule can produce outbound" → "true terminal, declare terminal:"
+    | state → "no outbound in graph BUT rules exist" → "gap: missing graph edge or missing rule"
+  λ terminal-declaration(states).
+    states → "terminal: delivered, cancelled"
+    | states → "terminal: archived, rejected"
+    | states → "terminal: closed"
