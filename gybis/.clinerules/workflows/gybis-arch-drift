@@ -1,0 +1,64 @@
+# /gybis-arch-drift — Detect Architecture Drift
+
+> References: `../../reference/vsm-guide.md`
+
+Compare `<root>/architecture.md` (architectural intent) against the current `<root>/specs/` directory and report drift.
+
+## Objective
+
+Surface divergences between what `<root>/architecture.md` says the system should be and what the `<root>/specs/` directory
+actually describes as system behaviors. Present a drift report and proposed fixes — human decides whether to update
+the `<root>/specs/` or the `<root>/architecture.md`.
+
+## Pre-Flight Check
+- If `<root>/specs/` directory does not exist, or is present but empty, output a message indicating that and suggest running `/gybis-spec-elicit` or `/gybis-spec-distill` to set it up.
+- If `<root>/architecture.md` is not initialized, or is present but empty, output a message indicating that and suggest running `/gybis-arch-init` to set it up.
+
+## Step 1: Read architecture.md
+
+Read the full `<root>/architecture.md`. Extract all lambda expressions per layer. Build a model of
+the stated architectural intent at each VSM level.
+
+## Step 2: Read the Specs
+
+Read all files in the `<root>/specs/` directory, recursively. Focus on patterns that relate to `<root>/architecture.md` claims. Prioritize files most likely to reflect each VSM layer — be efficient
+with context window.
+
+## Step 3: Drift Analysis (Silent)
+
+For each lambda in `<root>/architecture.md`, determine alignment:
+
+- **Aligned** — `<root>/specs/` directory reflects the principle, policy, or pattern
+- **Partial** — `<root>/specs/` directory partially implements it; gaps exist
+- **Drifted** — `<root>/specs/` directory contradicts or ignores the statement
+- **Unimplemented** — principle exists in `<root>/architecture.md` but has no `<root>/specs/` expression yet
+- **Unspecified** — principle does not exists in `<root>/architecture.md` but has a `<root>/specs/` expression
+
+## Step 4: Drift Report
+
+Present findings organized by VSM layer:
+
+```
+## S5 — Identity
+✅ λ error(x): errors surface as signals — confirmed across all error handlers
+⚠️ λ observable(x): "observable over opaque" stated — logging present but unstructured
+
+## S3 — Control
+❌ λ timeout(x): "all HTTP calls have 30s timeout" — no timeout found in `<root>/specs/`
+```
+
+For each drift item, propose one of:
+- Fix `<root>/specs/` to match `<root>/architecture.md`
+- Update `<root>/architecture.md` to reflect the current `<root>/specs/` reality
+
+## Step 5: Human Decision and Write
+
+Human chooses direction for each drift item. AI applies approved changes to `<root>/specs/` or
+`<root>/architecture.md`. Never apply both simultaneously without explicit instruction.
+
+## Key Rules
+
+- Report drift, don't silently fix it — every change requires human decision
+- Distinguish drift from evolution — `<root>/specs/` may have intentionally moved ahead of a stale `<root>/architecture.md`
+- Surface unimplemented principles/specifications as opportunities, not failures
+- After fixes, offer to re-run drift check to confirm resolution

@@ -1,0 +1,72 @@
+# /gybis-memory-orient — Orient a New Session from Saved State
+
+Recall everything stored by mementum to bring a new AI session up to speed with the
+last saved state of this project. Run this at the start of any session.
+
+## Objective
+
+Read and synthesize all persistent session context so the AI can continue work exactly
+where the previous session left off, without re-deriving decisions already made.
+
+## Step 1: Read `<root>/mementum/state.md`
+
+Read `<root>/mementum/state.md` in full. This is the primary orientation document:
+- **Now** — what was in progress when the last session ended
+- **Next** — the specific action to take next
+- **Blocking** — anything that was preventing progress
+- **Recent** — last significant actions taken
+
+Report the contents to the human before proceeding.
+
+## Step 2: Check for Session Knowledge Pages
+
+List files in `mementum/knowledge/` matching `session-*.md`:
+
+```bash
+ls -t mementum/knowledge/session-*.md 2>/dev/null | head -3
+```
+
+Read the most recent session knowledge page if it exists. This gives:
+- What was built last session
+- Key decisions made
+- Open threads
+- The exact resume point
+
+## Step 3: Recall Relevant Memories
+
+Search for memories related to the current focus (from `<root>/mementum/state.md` → **Now**):
+
+```bash
+git grep -i "<topic-from-Now>" -- mementum/memories/
+git log -n 5 --oneline -- mementum/memories/ mementum/knowledge/
+```
+
+Read any matching memory files. Flag memories that may be stale based on recent
+commits or `<root>/mementum/state.md` changes.
+
+## Step 4: Synthesize Orientation
+
+Produce a concise orientation summary:
+
+```
+## Session Orientation
+
+**Resuming:** [what was in progress]
+**Next action:** [exact next step from `<root>/mementum/state.md` or session knowledge page]
+**Active decisions:** [decisions from memories that bear on the current work]
+**Watch out for:** [any blockers, stale knowledge, or open questions]
+```
+
+## Step 5: Confirm and Proceed
+
+Ask: "Does this match where you left off, or is there anything to update in `<root>/mementum/state.md`
+before we begin?"
+
+If the human updates `<root>/mementum/state.md` → commit the update before starting work.
+
+## Key Rules
+
+- Read `<root>/mementum/state.md` first — always, without exception
+- Orient before exploring code — prior synthesis > re-derivation
+- Flag stale memories rather than presenting them as current
+- This workflow does not write any files (except a `<root>/mementum/state.md` update if the human requests one)

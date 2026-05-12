@@ -1,0 +1,61 @@
+# /gybis-arch-distill [path] — Distill Architecture from Specs
+
+> References: `../../reference/vsm-guide.md`
+
+Read existing specs form the `<root>/specs/` directory and extract VSM layer assignments as lambda expressions
+for `<root>/architecture.md`.
+
+## Objective
+
+Produce draft lambda expressions organized by VSM layer (S5..S1) that capture the
+architectural knowledge embedded in the `<root>/specs/` directory.
+
+## Pre-Flight Check
+- If `<root>/specs/` directory does not exist, or is empty, output a message indicating that and suggest running `/gybis-spec-elicit` or `/gybis-spec-distill` to set it up.
+- If `<root>/architecture.md` exists, or exists but is not empty, output a message indicating that and request approval to proceed, since this workflow may propose changes to the existing architecture.
+
+## Step 1: Read the Specs
+
+Read all files in the `<root>/specs/` directory. Read recursively.
+
+## Step 2: Silent Analysis
+
+Analyze without commentary. Map observations to VSM layers:
+
+- **S5 signals:** error handling philosophy, data ownership invariants, security boundaries,
+  non-negotiable behaviors
+- **S4 signals:** abstraction boundaries, extension points, feature flags, migration patterns,
+  how the system evolves
+- **S3 signals:** timeouts, retry logic, rate limits, quality gates, resource constraints,
+  circuit breakers
+- **S2 signals:** inter-service calls, event schemas, shared state patterns, sync mechanisms,
+  conflict prevention
+- **S1 signals:** build commands, test runners, deployment scripts, tool configurations,
+  concrete recipes
+
+## Step 3: Draft Lambdas
+
+For each VSM layer, propose 2–4 lambda expressions with plain-English explanations.
+Flag uncertain assignments explicitly:
+
+> "I inferred this is S3 (control policy) because it enforces a resource limit —
+> is that the right layer, or is this more of an S5 identity constraint?"
+
+## Step 4: Diff Against Existing architecture.md
+
+If `<root>/architecture.md` exists, compare distilled lambdas against it:
+- New lambdas not in architecture.md → propose additions
+- Existing lambdas contradicted by code → surface as drift
+- architecture.md principles not reflected in code → surface as unimplemented intent
+
+## Step 5: Human Review and Write
+
+Present proposed additions and changes. Human approves before any write to `<root>/architecture.md`.
+
+## Key Rules
+
+- Distill what IS, not what should be
+- Flag every uncertain inference — the human knows their system
+- Never overwrite/update `<root>/architecture.md` without explicit human confirmation
+- For each domain (i.e., `<root>/specs/<domain>/`), distill incrementally: one domain at a time
+- 

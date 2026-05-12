@@ -1,0 +1,58 @@
+# /gybis-spec-check [file | domain | specs] — Static Analysis of Allium Spec(s)
+
+> References: `../../reference/allium-actioning-findings.md`
+
+Analyze `[file]` or `[domain]` `[specs]` for structural and process-level problems and return a prioritized
+issue list with suggested fixes.
+
+## Objective
+
+Catch contradictions, gaps, and structural errors in an Allium spec, domain or specs before they
+propagate into architecture, tests or code.
+
+## Step 1: Read the Spec(s)
+
+- If a `[file]` is specified (i.e., `<root>/specs/<domain>/<name>.allium`) read it in full to understand context before interpreting CLI output.
+- If a `[domain]` is specified (i.e., `<root>/specs/<domain>/`) read all of the `*.allium` files in the domain directory in full to understand context before interpreting CLI output(s).
+- If `[specs]` is specified (i.e., `<root>/specs/` or `specs` or no argument) read all of the `*.allium` files in the `<root>/specs` directory in full to understand context before interpreting CLI output(s).
+
+## Step 2: Structural Validation
+
+Execute the following command to validate the spec(s) for structural issues, for all files from `Step 1`:
+
+```bash
+allium check [files]
+```
+
+Note: `allium check` can be called with a single file, multiple files, or a directory. It will return an exit code and output diagnostics for any issues found.
+
+Read the output(s). Group by severity (`error` > `warning` > `info`). For each diagnostic, apply the
+interpretation templates from `allium-actioning-findings.md` to produce a human-readable description and suggested fix.
+
+If exit code is `0`: report clean and proceed to Step 3.
+If exit code is `1`: proceed to Step 3.
+If exit code is `2`: report that at least one `.allium` file was not found at its given path.
+
+## Step 3: Present Issue List
+
+Return a numbered list ordered by `<domain>/<name>.allium` then priority (errors, then findings, then warnings, then info).
+
+Ask the human which issues to address. Apply approved fixes.
+
+## Step 5: Re-validate
+
+After all approved fixes are applied:
+
+```bash
+allium check [files]
+```
+
+Must exit 0 before declaring the spec clean.
+
+## Key Rules
+
+- CLI is the primary source; AI semantic check supplements only if CLI is unavailable
+- Present all issues; human decides which to fix
+- Errors block write; warnings and findings require human decision
+- Always re-run full sequence after fixes to confirm no regressions
+

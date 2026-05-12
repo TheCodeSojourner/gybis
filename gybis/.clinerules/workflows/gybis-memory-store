@@ -1,0 +1,58 @@
+# /gybis-memory-store [insight] — Store a Memory
+
+Deliberately capture a specific insight, decision, or pattern from a human as a mementum memory.
+
+## Objective
+
+Apply the mementum storage gates to `[insight]` and commit it as a structured memory
+in `<root>/mementum/memories/`.
+
+## Step 1: Apply Storage Gates
+
+**Gate 1:** Does this help a future AI session? Is it relevant to the project (not
+personal, not off-topic)?
+
+**Gate 2:** Did this require effort to discover (more than one attempt)? Is it likely
+to recur?
+
+If both gates pass → proceed. If a gate fails → explain why and ask if the human still
+wants to store it.
+
+## Step 2: Propose Memory
+
+Propose:
+- **Symbol:** one of 💡 insight | 🔄 shift | 🎯 decision | 🌀 meta | ❌ mistake | ✅ win | 🔁 pattern
+- **Slug:** kebab-case identifier (e.g., `auth-token-expiry-design`)
+- **Content:** under 200 words, beginning with the symbol, capturing the insight precisely
+
+Example:
+```
+🎯 session-expiry-silent-refresh
+
+When tokens expire, the UX requires silent refresh rather than redirect. This affects
+the session surface contract — the UserFacing surface must expose a refresh endpoint
+and the SessionCreated rule must include an expiry field. Decided to keep expiry in
+the spec and implement refresh as a separate rule rather than complicating SessionCreated.
+```
+
+## Step 3: Human Approval and Commit
+
+Human approves symbol, slug, and content. AI writes to `mementum/memories/{slug}.md`
+and commits:
+
+```bash
+git add mementum/memories/{slug}.md
+git commit -m "{symbol} {slug}"
+```
+
+## Step 4: Update state.md
+
+Add a brief note to `## Recent` in `<root>/mementum/state.md` referencing the new memory.
+Commit alongside or separately.
+
+## Key Rules
+
+- Memories are under 200 words — synthesize, don't dump
+- Symbol in file content enables `git grep "💡"` semantic filtering
+- Human approves before any commit
+- When uncertain, prefer storing (false positive < missed insight)

@@ -1,0 +1,57 @@
+# /gybis-memory-synthesize [topic] — Synthesize Knowledge Page
+
+Consolidate memories about `[topic]` into a durable knowledge page.
+
+## Objective
+
+Produce `<root>/mementum/knowledge/[topic].md` — a synthesized document that future AI sessions
+can read to understand this topic without replaying all individual memories.
+
+## Step 1: Gather Memories
+
+```bash
+git grep -i "[topic]" -- mementum/memories/
+git log -n 13 --oneline -- mementum/memories/
+```
+
+Read all matching memory files.
+
+## Step 2: Check for Existing Knowledge Page
+
+If `<root>/mementum/knowledge/[topic].md` exists, read it. The synthesis updates rather than
+replaces — stale content is the primary signal that an update is needed.
+
+## Step 3: Draft Knowledge Page
+
+Write with frontmatter:
+
+```markdown
+---
+title: [Topic Title]
+status: open
+category: [arch | spec | memory | dev]
+tags: [relevant-tags]
+related: []
+depends-on: []
+---
+
+[Synthesized content — written for a future AI session, not for humans to approve]
+```
+
+Status values: `open → designing → active → done`
+
+## Step 4: Human Approval and Commit
+
+Present the draft to the human. Human approves. AI commits:
+
+```bash
+git add mementum/knowledge/[topic].md
+git commit -m "💡 synthesize: [topic]"
+```
+
+## Key Rules
+
+- Write for a future AI session, not for human review (though humans review before commit)
+- Completeness is not required at creation — `open` status is fine
+- Knowledge pages are updated in place; memories accumulate as breadcrumbs
+- Human approves before any commit

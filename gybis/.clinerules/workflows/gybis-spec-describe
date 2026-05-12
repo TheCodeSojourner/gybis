@@ -1,0 +1,59 @@
+# /gybis-spec-describe [domain | file] — Non-Technical Description of a Spec or Domain
+
+> References: `../../reference/allium-language-reference.md`
+
+Generate a non-technical, product-manager-level description of one 
+Allium `<root>/specs/<domain>/<name>.allium` behavioral specification file or an entire `<root>/specs/<domain>/` behavioral specification domain folder.
+
+## Argument Resolution
+
+- If one `<root>/specs/<domain>/<name>.allium` is specified → read that single file
+- If a `<root>/specs/<domain>/` domain directory is specified → read all `<root>/specs/<domain>/*.allium` files
+- If ambiguous, ask the human to clarify before proceeding
+
+## Objective
+
+Produce an explanation a product manager or stakeholder can use to understand what behavior(s) are specified in this area, what rules govern the behavior(s), and what the behavior(s) guarantee.
+
+## Step 1: Read the Target
+
+Only read the resolved file(s) in full.
+
+## Step 2: Shape as Product Narrative
+
+Using only non-technical terms that a product manager or stakeholder would understand, describe the behavioral specification(s) in this area.
+
+**What things exist in this part of the product?**
+- Key concepts and their purpose in plain language
+- No entity names from the spec — use user-facing or business-domain language
+
+**What can users do?**
+- User-visible actions and their outcomes
+- What triggers each behavior and what the user experiences as a result
+
+**What rules apply?**
+- Business rules expressed as product constraints or commitments
+- What the product explicitly prevents or requires
+- Edge cases that matter to users (what happens at boundaries)
+
+**What does the product guarantee?**
+- Invariants expressed as user-facing promises (e.g., "an order can never be shipped before payment is confirmed")
+- Terminal states expressed as lifecycle endpoints (e.g., "once cancelled, an order cannot be reactivated")
+
+**How does this connect to other parts of the product?** (domain mode only)
+- How the specs in this domain relate from a user journey perspective
+
+## Step 3: Output
+
+Present as flowing prose with light headings. No code, no technical syntax, no entity/rule jargon, no technical implementation details.
+
+Target audience: a product manager or stakeholder who understands the product domain but does not write code.
+
+## Key Rules
+
+- Every user-visible behavior in the spec must appear in the output — omit nothing
+- If multiple files are read (domain mode), integrate into a coherent product narrative
+- Surface gaps or ambiguities found during translation as product questions for the human
+- Output is read-only — this workflow does not write any files
+- If either `<root>/specs/<domain>/` is empty or the directory does not exist, or `<root>/specs/<domain>/<name>.allium` is empty or the file does not exist, say so clearly
+ 

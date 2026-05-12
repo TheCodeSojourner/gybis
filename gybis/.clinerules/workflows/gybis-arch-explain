@@ -1,0 +1,68 @@
+# /gybis-arch-explain — Technical Explanation of System Architecture
+
+Generate a technical, developer-level explanation of this system's architecture as
+captured in `<root>/architecture.md`.
+
+## Objective
+
+Produce an explanation a developer can use to understand how the system is structured,
+why it is structured that way, and what it means for building, changing, or debugging it.
+
+## Pre-Flight Check
+- If `<root>/architecture.md` is not initialized, or is present but empty, output a message indicating that and suggest running `/gybis-arch-init` to set it up.
+
+## Step 1: Read the Architecture
+
+Read `<root>/architecture.md` in full. If the file references other sources read those too for completeness.
+
+## Step 2: Layer-by-Layer Technical Breakdown
+
+For each VSM layer (S5 → S1), explain:
+
+**S5 — Identity**
+- What are the non-negotiable principles?
+- What does each principle mean for implementation decisions?
+- What behaviors or designs would violate them?
+
+**S4 — Intelligence**
+- What change patterns are anticipated?
+- What extension points exist and how are they used?
+- What learning or adaptation mechanisms are built in?
+
+**S3 — Control**
+- What resource constraints exist and how are they enforced?
+- What policies govern behavior under load or failure?
+- What quality gates exist and when do they trigger?
+
+**S2 — Coordination**
+- What subsystems exist and how do they interact?
+- What protocols govern data flow between subsystems?
+- What shared state exists and how is consistency maintained?
+
+**S1 — Operations**
+- What technologies are used and why those specifically?
+- What are the key developer commands?
+- What are the build, test, and deploy recipes?
+
+## Step 3: Cross-Layer Analysis
+
+After the layer-by-layer breakdown, surface:
+- **Critical paths** — which sequences of layers a request or event passes through
+- **Seams** — where the system can be split, replaced, or extended
+- **Invariants** — what must remain true across all layers for the system to function
+- **Drift risk** — where S5 principles are most likely to be eroded under pressure
+
+## Step 4: Output
+
+Present as structured prose with headings. No technical syntax, no lambda expressions in
+the output — translate all notation to plain technical English.
+
+Target audience: a developer joining the project who already knows software architecture
+patterns but knows nothing about this specific system.
+
+## Key Rules
+
+- Do not invent content not present in `<root>/architecture.md` or referenced files
+- Flag any layer that is empty or underdeveloped — this is useful signal
+- If `<root>/architecture.md` has not been initialized, say so and suggest `/gybis-arch-init`
+- Output is read-only — this workflow does not write any files
