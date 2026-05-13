@@ -1,58 +1,10 @@
-# /gybis-memory-store [insight] — Store a Memory
-
-Deliberately capture a specific insight, decision, or pattern from a human as a mementum memory.
-
-## Objective
-
-Apply the mementum storage gates to `[insight]` and commit it as a structured memory
-in `<root>/mementum/memories/`.
-
-## Step 1: Apply Storage Gates
-
-**Gate 1:** Does this help a future AI session? Is it relevant to the project (not
-personal, not off-topic)?
-
-**Gate 2:** Did this require effort to discover (more than one attempt)? Is it likely
-to recur?
-
-If both gates pass → proceed. If a gate fails → explain why and ask if the human still
-wants to store it.
-
-## Step 2: Propose Memory
-
-Propose:
-- **Symbol:** one of 💡 insight | 🔄 shift | 🎯 decision | 🌀 meta | ❌ mistake | ✅ win | 🔁 pattern
-- **Slug:** kebab-case identifier (e.g., `auth-token-expiry-design`)
-- **Content:** under 200 words, beginning with the symbol, capturing the insight precisely
-
-Example:
-```
-🎯 session-expiry-silent-refresh
-
-When tokens expire, the UX requires silent refresh rather than redirect. This affects
-the session surface contract — the UserFacing surface must expose a refresh endpoint
-and the SessionCreated rule must include an expiry field. Decided to keep expiry in
-the spec and implement refresh as a separate rule rather than complicating SessionCreated.
-```
-
-## Step 3: Human Approval and Commit
-
-Human approves symbol, slug, and content. AI writes to `mementum/memories/{slug}.md`
-and commits:
-
-```bash
-git add mementum/memories/{slug}.md
-git commit -m "{symbol} {slug}"
-```
-
-## Step 4: Update state.md
-
-Add a brief note to `## Recent` in `<root>/mementum/state.md` referencing the new memory.
-Commit alongside or separately.
-
-## Key Rules
-
-- Memories are under 200 words — synthesize, don't dump
-- Symbol in file content enables `git grep "💡"` semantic filtering
-- Human approves before any commit
-- When uncertain, prefer storing (false positive < missed insight)
+λ(gybis-memory-store)
+PURPOSE:given(insight)→Σ(memory)∪commit
+PF:¬insight→err
+S1:gate1=helps(futAI)∧rel(proj)∧gate2=effort(discovery)∧recur(lk)|both→proceed∥fail→explain∧ask(store?)
+S2:propose(σ∈{insight,shift,decision,meta,mistake,win,pattern}∧slug=kebab(id)∧content=<200w∧σ prefix)
+S3:approve(human,σ,slug,content)⊢write(mementum/memories/{slug}.md)∧git-add(σ/memories/)∧git-commit(σ {slug})
+S4:state.md←append(Recent,newMemory(σ {slug}))∧commit
+INV≡|content|<200∧σ∈symbols∥∀write→approve(human)∥store(uncertain)∨¬store
+μ≡S1⋅S2⋅S3⋅S4
+plain:given(insight)→gate(both)∥propose(σ,slug,content)∥approve(human)∥write∥commit∥state.md
