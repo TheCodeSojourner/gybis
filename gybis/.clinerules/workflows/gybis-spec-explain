@@ -1,62 +1,16 @@
-# /gybis-spec-explain [domain | file] — Technical Description of a Spec or Domain
-
-> References: `../../reference/allium-language-reference.md`
-
-Generate a technical, developer-level description of one Allium `<root>/specs/<domain>/<name>.allium` behavioral specification file or an entire `<root>/specs/<domain>/` behavioral specification domain folder.
-
-## Argument Resolution
-
-- If one `<root>/specs/<domain>/<name>.allium` is specified → read that single file
-- If a `<root>/specs/<domain>/` domain directory is specified → read all `<root>/specs/<domain>/*.allium` files
-- If ambiguous, ask the human to clarify before proceeding
-
-## Objective
-
-Produce a technical, developer-level explanation of the behavior(s) specified in this area, the rules that govern them, and the guarantees they provide.
-
-## Step 1: Read the Target
-
-Only read the resolved file(s) in full.
-
-## Step 2: Shape as Developer Narrative
-
-Using technical terms that a developer would understand, explain the behavioral specification(s) in this area.
-
-**What structures and concepts are defined in this specification area?**
-- Core domain concepts, responsibilities, and boundaries
-- Use the specification’s actual conceptual terminology where it improves precision
-- Clarify how each concept participates in the modeled behavior
-
-**What behaviors are supported?**
-- Actions, events, and state transitions described by the specification
-- What conditions initiate each behavior and what resulting changes the specification defines
-- The observable outcomes and side effects that follow from each allowed flow
-
-**What constraints and rules govern the behavior?**
-- Preconditions, validation rules, and state-dependent constraints
-- What the specification permits, requires, or rejects
-- Boundary conditions, exceptional cases, and invalid transitions that must be handled explicitly
-
-**What guarantees and invariants are enforced?**
-- Conditions that must always remain true across all valid executions
-- Ordering guarantees, consistency rules, and irreversible lifecycle transitions
-- Terminal or locked states and the conditions under which they can no longer change
-
-**How does this relate to adjacent specifications?** (domain mode only)
-- Behavioral relationships across files in the domain
-- Shared concepts, handoffs, dependencies, and lifecycle continuity between specifications
-- 
-## Step 3: Output
-
-Present as clear technical prose with light headings. Use precise behavioral and domain terminology where it improves accuracy. Do not include implementation code, pseudocode, or speculative internal design details beyond what the specification establishes.
-
-Target audience: a developer, technical lead, or architect who needs to understand the specified behavior, constraints, and guarantees without reading the source specification syntax directly.
-
-## Key Rules
-
-- Every behavior, state transition, constraint, and guarantee expressed in the specification must be reflected in the output; do not omit any materially defined behavior
-- If multiple files are read (domain mode), synthesize them into a single coherent technical narrative that explains how the specified behaviors relate across the domain
-- Surface gaps, ambiguities, or underspecified areas as technical questions or specification review concerns for the human
-- Output is read-only; this workflow does not create or modify files
-- If `<root>/specs/<domain>/` does not exist, is empty, or contains no readable specification files, or if `<root>/specs/<domain>/<name>.allium` does not exist or is empty, state that explicitly 
-  
+λ(gybis-spec-explain)
+REF:../../reference/allium-language-reference.md
+PURPOSE:given(file|domain)→prose(technical,developer)∪readOnly
+PF:¬alliumFiles→say(emptyOrMissing)
+S0:files←parse(input)|file→read(single)∥domain→read(all,<root>/specs/{domain}/*.allium)∥noArg→read(all,<root>/specs/**/*.allium)∥ambiguous→ask(human,clarify)
+S1:narrative←Σ{
+  structures:domainConcepts(responsibilities,boundaries)∧specTerminology(precision)∥conceptParticipation(modeledBehavior),
+  behaviors:actions∪events∪stateTransitions∥conditions∥observableOutcomes∪sideEffects,
+  constraints:preconditions∪validationRules∪stateDependentConstraints∥permits∪requires∪rejects∥boundaryConditions∪exceptions∪invalidTransitions,
+  guarantees:invariants(alwaysTrue)∥ordering∪consistencyRules∪irreversibleTransitions∥terminalLockedStates,
+  domainMode:adjacentSpecs(relations)∥sharedConcepts∪handoffs∪dependencies∪lifecycleContinuity
+}
+S2:output(technicalProse,lightHeadings,preciseDomainTerminology,¬implCode,¬pseudocode,¬speculativeDesign)
+INV≡∀behaviors∪stateTransitions∪constraints∪guarantees→output∥¬omit∥multiFile→coherentTechnicalNarrative∥gaps→technicalQuestions(human)∥readOnly∥empty→saySo∥audience=developer(techLead,architect)
+μ≡S0⋅S1⋅S2
+plain:given(scope)→resolve(files)∥read(inFull)∥translate(technicalNarrative)∥output(prose,lightHeadings,specTerminology)∥surface(gaps)
