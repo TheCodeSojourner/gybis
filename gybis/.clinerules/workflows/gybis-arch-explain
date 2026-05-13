@@ -1,68 +1,60 @@
-# /gybis-arch-explain — Technical Explanation of System Architecture
+λ(gybis-arch-explain) ≡ λ(root).
 
-Generate a technical, developer-level explanation of this system's architecture as
-captured in `<root>/architecture.md`.
+  preflight ≡ ¬initialized(root/architecture.md) ∨ empty(root/architecture.md)
+    → "not initialized — run /gybis-arch-init"
+    │ ¬∅ → proceed
 
-## Objective
+  read ≡ ∫(root/architecture.md) ∪ {ref | ref ↦ architecture.md}
 
-Produce an explanation a developer can use to understand how the system is structured,
-why it is structured that way, and what it means for building, changing, or debugging it.
+  vsm ≡ {S5, S4, S3, S2, S1}
 
-## Pre-Flight Check
-- If `<root>/architecture.md` is not initialized, or is present but empty, output a message indicating that and suggest running `/gybis-arch-init` to set it up.
+  breakdown(layer) ≡
+    case layer of
+      S5 → Identity:
+        principles ≡ {p | p ∈ nonNegotiable}
+        impl(p) ≡ p → decision
+        violation(d) ≡ ¬compatible(d, principles)
 
-## Step 1: Read the Architecture
+      S4 → Intelligence:
+        patterns ≡ {π | π is anticipatedChange}
+        extensionPoints ≡ {e | e is extensible}
+        adaptation ≡ {m | m is learningMechanism}
 
-Read `<root>/architecture.md` in full. If the file references other sources read those too for completeness.
+      S3 → Control:
+        constraints ≡ {c | c enforces resourceLimit}
+        policies ≡ {pol | pol handles load ∨ failure}
+        qualityGates ≡ {g | g triggers on condition(g)}
 
-## Step 2: Layer-by-Layer Technical Breakdown
+      S2 → Coordination:
+        subsystems ≡ {s | s is component}
+        protocols ≡ {pr | pr governs dataFlow(s_i, s_j)}
+        sharedState ≡ σ | consistency ≡ consistencyProtocol(σ)
 
-For each VSM layer (S5 → S1), explain:
+      S1 → Operations:
+        tech ≡ {t | t is deployedTechnology, reason(t) ∈ justification}
+        commands ≡ {cmd | cmd is developerExecutable}
+        recipes ≡ {build, test, deploy}
 
-**S5 — Identity**
-- What are the non-negotiable principles?
-- What does each principle mean for implementation decisions?
-- What behaviors or designs would violate them?
+  crossLayer ≡
+    criticalPaths ≡ seq(layers) where request ∨ event traverses
+    │ seams ≡ {split ∨ replace ∨ extend}
+    │ invariants ≡ {inv | ∀l ∈ vsm : inv(l) = true}
+    │ driftRisk ≡ {l | ∃pressure : erode(l:S5, principles)}
 
-**S4 — Intelligence**
-- What change patterns are anticipated?
-- What extension points exist and how are they used?
-- What learning or adaptation mechanisms are built in?
+  output ≡ structuredProse(headings)
+    ¬technicalSyntax
+    ¬λ-expr-in-output
+    translate(λ → plainEnglish)
 
-**S3 — Control**
-- What resource constraints exist and how are they enforced?
-- What policies govern behavior under load or failure?
-- What quality gates exist and when do they trigger?
+  audience ≡ developer{
+    knows: softwareArchitecturePatterns
+    knows: ¬thisSystem
+  }
 
-**S2 — Coordination**
-- What subsystems exist and how do they interact?
-- What protocols govern data flow between subsystems?
-- What shared state exists and how is consistency maintained?
+  invariants:
+    ¬invent ∉ architecture.md
+    ¬invent ∉ referencedFiles
+    flag(∅ ∨ underdeveloped) → signal
+    ¬write → readOnly
 
-**S1 — Operations**
-- What technologies are used and why those specifically?
-- What are the key developer commands?
-- What are the build, test, and deploy recipes?
-
-## Step 3: Cross-Layer Analysis
-
-After the layer-by-layer breakdown, surface:
-- **Critical paths** — which sequences of layers a request or event passes through
-- **Seams** — where the system can be split, replaced, or extended
-- **Invariants** — what must remain true across all layers for the system to function
-- **Drift risk** — where S5 principles are most likely to be eroded under pressure
-
-## Step 4: Output
-
-Present as structured prose with headings. No technical syntax, no lambda expressions in
-the output — translate all notation to plain technical English.
-
-Target audience: a developer joining the project who already knows software architecture
-patterns but knows nothing about this specific system.
-
-## Key Rules
-
-- Do not invent content not present in `<root>/architecture.md` or referenced files
-- Flag any layer that is empty or underdeveloped — this is useful signal
-- If `<root>/architecture.md` has not been initialized, say so and suggest `/gybis-arch-init`
-- Output is read-only — this workflow does not write any files
+λ(compile) ≡ preflight ⊢ read ⊢ breakdown ⊗ crossLayer ⊢ output
