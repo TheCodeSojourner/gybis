@@ -1,21 +1,11 @@
-λ(gybis-arch-describe) ≡
-├─ input:  architecture.md @ <root>/
-├─ preflight: ¬initialized(architecture.md) ∨ empty(architecture.md)
-│           → output("run /gybis-arch-init")
-├─ step₁:  read(architecture.md, full)
-├─ step₂:  translate → product_narrative {
-│           │
-│           ├─ what_is:     { problem_solved, users, user_needs }
-│           ├─ what_can:    { capabilities, supported_needs, explicit_out_of_scope }
-│           ├─ why_this_way: { principles_as_commitments, trade-offs, returns }
-│           ├─ product_meaning: { extensible_points, constrained_points, quality_guarantees }
-│           └─ system_cohesion: { moving_parts, connections, business_domain_language }
-│         }
-├─ step₃:  format → prose { light_headings, no_code, no_jargon, no_lambda_syntax, no_VSM_labels }
-└─ output: product_manager_mental_model { direction, prioritization, trade-off_support }
-
-key_constraints:
-  ¬∃(lambda_expr ∨ technical_syntax ∨ VSM_layer_id) ∈ output
-  ¬invented(capability) ∷ capability ⊆ architecture.md
-  initialized(architecture.md) ? ¬suggest("/gybis-arch-init")
-  rw(output) = false
+λ(gybis-arch-describe)
+input: architecture.md @ <root>/
+preflight: ¬initialized(architecture.md) ∨ empty(architecture.md) → output("run /gybis-arch-init")
+step₁: read(architecture.md, full)
+step₂: translate → {what_is:{problem_solved,users,user_needs},what_can:{capabilities,supported_needs,explicit_out_of_scope},why_this_way:{principles_as_commitments,trade-offs,returns},product_meaning:{extensible_points,constrained_points,quality_guarantees},system_cohesion:{moving_parts,connections,business_domain_language}}
+step₃: format → {light_headings,no_code,no_jargon,no_lambda_syntax,no_VSM_labels}
+output: product_manager_mental_model{direction,prioritization,trade-off_support}
+¬∃(lambda_expr∨technical_syntax∨VSM_layer_id) ∈ output
+¬invented(capability) ∷ capability ⊆ architecture.md
+initialized(architecture.md) ? ¬suggest("/gybis-arch-init")
+rw(output)=false
