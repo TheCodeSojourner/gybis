@@ -1,65 +1,13 @@
-# /gybis-spec-tend [file] [constraint] — Targeted Spec Edits
-
-> References: `../../reference/allium-language-reference.md`
-
-Make minimal, targeted changes to `[file]` to satisfy `[constraint]` without disrupting
-the rest of the spec.
-
-## Objective
-
-Apply a focused change to an existing Allium spec — adding a rule, modifying a
-precondition, extending a lifecycle — while preserving overall structure and catching
-any new inconsistencies introduced.
-
-## Step 1: Read the Spec
-
-Read `[file]` in full. Understand its current structure, entities, rules, and transition
-graphs before proposing any changes.
-
-## Step 2: Analyze the Constraint
-
-Parse `[constraint]`:
-- Is this adding a new rule? Modifying an existing one? Extending an entity?
-- Which layers of the spec are affected (entities, rules, transitions, config)?
-- What new `requires:`, `ensures:`, or transition edges are implied?
-- Does this constraint conflict with anything already in the spec?
-
-Reference `allium-language-reference.md` for correct syntax for any new constructs
-(especially `when`-clause obligations, transition graph rules, and collection types).
-
-## Step 3: Activate Eliciting Mode (Targeted)
-
-Invoke the Allium compiler (loaded in `02-allium.md`) with command `elicit`, constrained
-to the specific change. Ask clarifying questions only about the targeted change — do not
-re-elicit the whole spec.
-
-## Step 4: Draft Minimal Changes
-
-Produce a focused diff:
-- New rules use VerbNoun naming
-- New fields use `when` clauses if lifecycle-dependent
-- New transitions appear in the transitions block
-- When-clause obligations are satisfied (entering/exiting when-sets)
-- Existing rules are not modified unless the constraint requires it
-- Add or update `traces:` if implementation files are known
-
-## Step 5: Validate
-
-```bash
-allium check [file]
-allium analyse [file]
-```
-
-Both must exit 0. If issues arise, apply `allium-actioning-findings.md` to translate
-diagnostics and findings before presenting to human.
-
-## Step 6: Present Diff and Write
-
-Present the proposed changes clearly as a diff. Human approves before any write.
-
-## Key Rules
-
-- Minimal change — do not refactor unrelated parts of the spec
-- Check for new inconsistencies introduced by the change before presenting
-- Human approves the diff before any write
-- After write, re-run `allium check [file] && allium analyse [file]` to confirm overall spec health
+λ(gybis-spec-tend)
+REF:../../reference/allium-language-reference.md
+PURPOSE:given(specFile,constraint)→diff(minimal)∪write(specFile)
+PF:¬(alliumSpec∧constraint)→err
+S0:read(specFile,inFull)∥understand(entities,rules,transitionGraphs,config)
+S1:analyze(constraint)|adding(newRule)∥modifying(existing)∥extending(entity/lifecycle)∥affectedLayers(entities∪rules∪transitions∪config)∥implied(requires,ensures,transitionEdges)∥conflictCheck(¬existingSpec)
+S2:targetedElicit|invoke(elicit,constrainedToChange)∥ask(clarifyingQuestions→changeOnly,¬reEllicitWholeSpec)
+S3:diff|newRules(verbNoun)∥newFields(when-clauses)∥newTransitions(→transitionsBlock)∥whenObligations(satisfied)∥¬modify(existing,unlessRequired)∥update(traces:if implFiles known)
+S4:validate|allium-check(specFile)→exit0∥allium-analyse(specFile)→exit0∥apply(actioning-findings)∥translate(diagnostics→fixes)
+S5:presentDiff∧human(approve)∥write(specFile)∥allium-check(specFile)∧allium-analyse(specFile)→confirm(health)
+INV≡minimalChange(¬refactorUnrelated)∥newInconsistencies→catchBeforePresent∥humanApproves∀writes∥postWrite→revalidate∥verbNoun(rules)∥when-clauses(fields)∥transitionGraph(updated)
+μ≡S0⋅S1⋅S2⋅S3⋅S4⋅S5
+plain:given(file,constraint)→read∥analyze(constraint)∥elicit(targeted)∥draft(diff)∥validate(check+analyse)∥present∧approve∥write∥revalidate
