@@ -35,11 +35,11 @@ The goal of **gybis** is to make it easy for developers to set up, utilize, and 
 - **Architecture model**: A derivative of the [Nucleus VSM](https://github.com/michaelwhitford/nucleus/blob/main/VSM.md) allows an AI to generate and maintain a 5-layer architectural specification, stored in a `architecture.md` file, that AI keeps up to date as projects evolve.
 - **Behavioral Domain Specific Language (DSL)**: The [Allium](https://github.com/juxt/allium) DSL is a behavioral specification language the AI can read and write precisely, not
   pseudocode, not free-form prose, but a structured DSL with rules, triggers, surfaces, and transition graphs that AI can reason about directly and minimize hallucinations. Behavioral specifications are saved in one or more files per domain (e.g., orders, payments).
-- **Persistent memory**: [Mementum](https://github.com/michaelwhitford/mementum) is used to manage decisions, patterns, and insights that are stored in files and recalled during AI sessions, so previous context is available between sessions.
+- **AI Session Persistent memory**: [Mementum](https://github.com/michaelwhitford/mementum) is used to manage decisions, patterns, and insights that are stored in files and recalled during AI sessions, so previous context is available between sessions.
 
 ## References
 
-* [**allium**](https://github.com/juxt/allium) - Behavioral specification
-* [**allium-tools**](https://github.com/juxt/allium-tools) - Behavioral specification tools
-* [**mementum**](https://github.com/michaelwhitford/mementum) - Persistent memory
-* [**nucleus**](https://github.com/michaelwhitford/nucleus) - AI base context, and VSM architectural specifications
+* [**allium**](https://github.com/juxt/allium) [Commit 82da292] - Behavioral specification
+* [**allium-tools**](https://github.com/juxt/allium-tools) [Commit d368771] - Behavioral specification CLI tools
+* [**mementum**](https://github.com/michaelwhitford/mementum) [Commit ac2eadb] - AI Session Persistent memory
+* [**nucleus**](https://github.com/michaelwhitford/nucleus) [Commit 93c171a] - AI base context, and VSM architectural specifications
