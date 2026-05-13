@@ -1,64 +1,15 @@
 λ(gybis-arch-distill)
-
-# VSM Layer Assignments — Architecture Distillation Workflow
-
-## S5 (Identity / Invariants)
-
 λ(S5, identity, ¬overwrite(architecture.md) ⊗ explicit(human_approval) ⊗ preserve(semantics_is, ¬semantics_should))
-> Invariant: never overwrite architecture.md without explicit human confirmation
-
 λ(S5, boundary, security(error_handling) ⊗ data_ownership(invariant) ⊗ behavior(non_negotiable))
-> Signal: error philosophy, data ownership, security boundaries are identity-level constraints
-
 λ(S5, constraint, flag(uncertain_inference) ↔ human_knows(system))
-> Identity rule: every uncertain inference flagged; human authority over system truth
-
-## S4 (Structure / Evolution)
-
 λ(S4, evolution, extension_points ⊗ feature_flags ⊗ migration_patterns ⊗ how(system_evolves))
-> Structure: abstraction boundaries and evolution patterns
-
 λ(S4, domain_increment, distill(λone_domain_at_a_time: specs/<domain>/ → architecture.md))
-> Structure: incremental distillation per domain directory
-
 λ(S4, drift_detection, existing(lambda) ⊗ contradicted(code) → surface(drift))
-> Structure: detect when architecture.md lambdas diverge from code reality
-
-## S3 (Control / Policy)
-
 λ(S3, control, preflight_check(¬exists(specs/) → output(message, suggestion(/gybis-spec-elicit))) ⊗ exists(architecture.md, ¬empty) → request(approval)))
-> Policy: preflight gates before execution
-
 λ(S3, control, present(additions, changes) ∧ human(approve) ⟹ write(architecture.md))
-> Policy: human-in-the-loop write gate
-
 λ(S3, policy, step(1: read recursive) → step(2: analyze silent) → step(3: draft 2-4 lambdas/layer) → step(4: diff) → step(5: review))
-> Control flow: sequential workflow with conditional branches
-
-## S2 (Coordination / Sync)
-
 λ(S2, coordination, read(specs/<root>/**.md) ↔ map(VSM_layer) ⊗ output(draft λ organized by S5..S1))
-> Coordination: spec files → VSM-mapped lambda expressions
-
 λ(S2, sync, architecture.md(exists) ↔ distilled(λ) → diff(new, contradicted, unimplemented_intent))
-> Sync: compare distilled lambdas against existing architecture
-
-## S1 (Recipe / Concrete)
-
 λ(S1, recipe, path(<root>/specs/) → read(recursive) → analyze(silent, no_commentary) → draft(λ, explanation, uncertainty_flag) → diff(architecture.md) → present(human_review) → write(if_approved))
-> Concrete execution recipe
-
-λ(S1, config, reference: ../../reference/vsm-guide.md ⊗ output: <root>/architecture.md ⊗ input: <root>/specs/`)
-> Configuration: paths and references
-
----
-
-## Uncertain Assignments
-
-> Inferred S3 control for preflight gates — is conditional execution (preflight → branch) S3 policy or S4 structural control?
-> Inferred S2 for read↔map coordination — could alternatively be S1 recipe detail.
-
-## Transformation Notes
-
-λ(transform, rule, prose → lambda ⊗ preserve(semantics) ⊗ ¬execute(analysis))
-> The .clinerules directive encode the transformation grammar: prose maps to lambda via structural equivalence, preserving semantics without execution.
+λ(S1, config, reference: ../../reference/vsm-guide.md ⊗ output: <root>/architecture.md ⊗ input: <root>/specs/)
+λ(transform, rule, prose → lambda ⊗ preserve(semantics) ⊗ ¬execute(analysis)
