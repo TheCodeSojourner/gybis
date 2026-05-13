@@ -1,0 +1,52 @@
+λ gybis-mementum-session-terminate.
+
+∃ session Σ such that context(session) → Σ_full | Σ_lossless
+bridge(prose ⇄ lambda) | preserve(semantics)
+
+— protocol: mementum/storage/terminate —
+
+step[1]: flush(state.md)
+  Σ_now  ← actual_progress(now)
+  Σ_next ← precise_action(Σ_now) | Σ_actionable(newAI)
+  Σ_block ← blockers()
+  Σ_recent ← lastN(actions, 3..5)
+  write(mementum/state.md, {Now:Σ_now, Next:Σ_next, Blocking:Σ_block, Recent:Σ_recent})
+  completeness(Σ) ≥ brevity(Σ)
+
+step[2]: store(insights)
+  for each m ∈ session_memories_unstored:
+    gate[1] ← helps_futureAI(m) ∧ relevant_to_project(m)
+    gate[2] ← effort(discovery) > 0 ∧ likely_to_recur(m)
+    if gate[1] ∧ gate[2]:
+      symbol ← categorize(m) ∈ {💡,🔄,🎯,🌀,❌,✅,🔁}
+      write(mementum/memories/<slug>.md, m) | |m| < 200 words
+      propose(to_human) before write
+
+step[3]: synthesize(topic)
+  if count(memories(topic)) ≥ 3 ∧ ¬exists(knowledge_page(topic)):
+    execute(/gybis-memory-synthesize topic)
+
+step[4]: write(session_knowledge)
+  write(mementum/knowledge/session-<YYYY-MM-DD>.md, {
+    title: Session <YYYY-MM-DD>
+    what_built: concise(work_completed)
+    key_decisions: numbered(decisions) | with rationale
+    open_threads: {started∧¬finished} ∪ {question∧¬resolved}
+    resume_point: exact_next_action | file∧command∧question
+    memories_stored: slugs(this_session)
+  })
+  human_approves(content) before write
+
+step[5]: commit()
+  git add mementum/
+  git commit -m "🌀 session-terminate <YYYY-MM-DD>"
+  human_approves(message) before execute
+
+— invariants —
+∀Σ: completeness(Σ_state) > brevity(Σ_state)
+∀write: requires(human_approval) before commit
+¬existence(evidence) → explicit("nothing to store") ¬→ invent(memories)
+filename_date: today(YYYY-MM-DD)
+
+μ terminate(session) → Σ_lossless | human_approved
+∞ loop(session): terminate → new_session | context(preserved)
