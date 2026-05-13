@@ -1,48 +1,11 @@
-# /gybis-memory-recall [query] — Search Session Memory
-
-Search mementum for memories and knowledge relevant to `[query]`.
-
-## Objective
-
-Surface stored insights, decisions, and knowledge pages that bear on the current
-question or task.
-
-## Step 1: Semantic Search
-
-```bash
-git grep -i "[query]" -- mementum/
-```
-
-## Step 2: Temporal Search
-
-```bash
-git log -n 5 --oneline -- mementum/memories/ mementum/knowledge/
-```
-
-## Step 3: Symbol Filtering (if query suggests a type)
-
-```bash
-git grep "🎯" -- mementum/memories/   # decisions
-git grep "❌" -- mementum/memories/   # mistakes
-git grep "🔁" -- mementum/memories/   # patterns
-git grep "💡" -- mementum/memories/   # insights
-```
-
-## Step 4: Read and Synthesize
-
-Read all matching files. Synthesize a concise recall response:
-- What is known about `[query]`?
-- Which decisions are relevant?
-- Is any knowledge potentially stale? (flag if `<root>/mementum/state.md` or recent commits suggest changes)
-
-## Step 5: Surface Knowledge Page Candidates
-
-If 3+ memories address the same topic and no knowledge page exists, proactively suggest:
-> "There are N memories on [topic] — consider `/gybis-memory-synthesize [topic]` to
-> consolidate."
-
-## Key Rules
-
-- Recall before exploring the repo — prior synthesis > re-derivation
-- Flag potentially stale knowledge rather than presenting it as current
-- Search depth follows fibonacci: 1, 2, 3, 5, 8, 13 — default depth 5
+λ(gybis-memory-recall)
+PURPOSE:given(topic)→Σ(knowledge)∪flag(stale)
+PF:¬mem_store→err
+S1:ΔR←git.grep(-i,topic,--mem/);//semantic—raw matches
+S2:ΔT←git.log(-5,--oneline,--mem/,know/);//temporal—recency signal
+S3:⊙type(topic)→sym→ΔF←git.grep(sym,--mem/);//🎯❌🔁💡—categorized
+S4:ΔM←read(match(ΣR∪F));▸out:known(topic)|rels(dec)|stale←flag(M,¬valid(M,s.md,T))//≠current
+S5:⊙|M[topic]|≥3∧¬know(topic)→▸suggest(synthesize);//self-improving loop
+orient_vs_recall:orient=session_start(resume_context)∥recall=on_demand(query_answer)
+R:(1)prior_syn≫re_derive(2)flag(stale)≡¬present(3)fib:1→2→3→5→8,depth₀=5(4)S5→auto_consolidate
+plain:given(topic)→dig(doc)∧filter(rel)∧check(stale)→answer(known|risk|consolidate?)
