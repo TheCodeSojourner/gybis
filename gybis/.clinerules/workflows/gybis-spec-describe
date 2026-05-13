@@ -2,7 +2,7 @@
 REF:../../reference/allium-language-reference.md
 PURPOSE:given(file|domain)→prose(non-technical)∪readOnly
 PF:¬alliumFiles→say(emptyOrMissing)
-S0:files←parse(input)|file→read(single)∥domain→read(all,<root>/specs/{domain}/*.allium)∥ambiguous→ask(human,clarify)
+S0:files←parse(input)|file→read(single)∥domain→read(all,<root>/specs/{domain}/*.allium)∥noArg→read(all,<root>/specs/**/*.allium)∥ambiguous→ask(human,clarify)
 S1:prose←Σ{
   whatExists:concepts(purpose,plainLang)∧¬entityNames,
   userCanDo:actions(outcomes)∧triggers∧userExperience,
