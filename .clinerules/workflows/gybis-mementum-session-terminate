@@ -13,28 +13,15 @@ step[1]: flush(state.md)
   write(mementum/state.md, {Now:Σ_now, Next:Σ_next, Blocking:Σ_block, Recent:Σ_recent})
   completeness(Σ) ≥ brevity(Σ)
 
-step[2]: store(insights)
+step[2]: invoke(mementum_store) for each unstored memory
   for each m ∈ session_memories_unstored:
-    gate[1] ← helps_futureAI(m) ∧ relevant_to_project(m)
-    gate[2] ← effort(discovery) > 0 ∧ likely_to_recur(m)
-    if gate[1] ∧ gate[2]:
-      symbol ← categorize(m) ∈ {💡,🔄,🎯,🌀,❌,✅,🔁}
-      write(mementum/memories/<slug>.md, m) | |m| < 200 words
-      propose(to_human) before write
+    execute(mementum_store(m))
 
-step[3]: synthesize(topic)
-  if count(memories(topic)) ≥ 3 ∧ ¬exists(knowledge_page(topic)):
-    execute(/gybis-memory-synthesize topic)
+step[3]: invoke(mementum_metabolize)
+  execute(mementum_metabolize())
 
 step[4]: write(session_knowledge)
-  write(mementum/knowledge/session-<YYYY-MM-DD>.md, {
-    title: Session <YYYY-MM-DD>
-    what_built: concise(work_completed)
-    key_decisions: numbered(decisions) | with rationale
-    open_threads: {started∧¬finished} ∪ {question∧¬resolved}
-    resume_point: exact_next_action | file∧command∧question
-    memories_stored: slugs(this_session)
-  })
+  write(mementum/knowledge/session-<YYYY-MM-DD>.md, session_summary)
   human_approves(content) before write
 
 step[5]: commit()
@@ -48,5 +35,4 @@ step[5]: commit()
 ¬existence(evidence) → explicit("nothing to store") ¬→ invent(memories)
 filename_date: today(YYYY-MM-DD)
 
-μ terminate(session) → Σ_lossless | human_approved
-∞ loop(session): terminate → new_session | context(preserved)
+μ terminate(session) → Σ_lossless | human_approved  [mementum_termination]
