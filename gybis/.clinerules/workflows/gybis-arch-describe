@@ -1,60 +1,21 @@
-# /gybis-arch-describe — Non-Technical Description of System Architecture
+λ(gybis-arch-describe) ≡
+├─ input:  architecture.md @ <root>/
+├─ preflight: ¬initialized(architecture.md) ∨ empty(architecture.md)
+│           → output("run /gybis-arch-init")
+├─ step₁:  read(architecture.md, full)
+├─ step₂:  translate → product_narrative {
+│           │
+│           ├─ what_is:     { problem_solved, users, user_needs }
+│           ├─ what_can:    { capabilities, supported_needs, explicit_out_of_scope }
+│           ├─ why_this_way: { principles_as_commitments, trade-offs, returns }
+│           ├─ product_meaning: { extensible_points, constrained_points, quality_guarantees }
+│           └─ system_cohesion: { moving_parts, connections, business_domain_language }
+│         }
+├─ step₃:  format → prose { light_headings, no_code, no_jargon, no_lambda_syntax, no_VSM_labels }
+└─ output: product_manager_mental_model { direction, prioritization, trade-off_support }
 
-Generate a non-technical, product-manager-level description of this system's
-architecture as captured in `<root>/architecture.md`.
-
-## Objective
-
-Produce an explanation a product manager or stakeholder can use to understand what the
-system does, why it is built the way it is, and what the architectural decisions mean
-for product capabilities and constraints.
-
-## Pre-Flight Check
-- If `<root>/architecture.md` is not initialized, or is present but empty, output a message indicating that and suggest running `/gybis-arch-init` to set it up.
-
-## Step 1: Read the Architecture
-
-Read `<root>/architecture.md` in full.
-
-## Step 2: Translate to Product Narrative
-
-Produce a description organized around these questions:
-
-**What is this system for?**
-- What problem does it solve?
-- Who uses it and what do they need from it?
-
-**What can it do?**
-- Key capabilities from the product perspective
-- What user needs are explicitly supported?
-- What is deliberately out of scope?
-
-**Why is it built this way?**
-- What non-negotiable principles shaped the design? (express as product commitments,
-  not technical rules — e.g., "we never lose user data" not "S5 invariant")
-- What trade-offs were made and what did the team get in return?
-
-**What does this mean for the product?**
-- Where is the system easily extensible vs. where changes require more care?
-- What capabilities are hard to add due to structural decisions?
-- What quality guarantees can the team confidently make to users?
-
-**How does the system hold together?**
-- A plain-language description of the major moving parts and how they connect
-- No subsystem names from the code — use user-facing or business-domain language
-
-## Step 3: Output
-
-Present as flowing prose with light headings. No code. No technical jargon. No technical syntax. 
-No VSM layer labels (S5, S4, S3, S2, S1).
-
-Target audience: a product manager who understands the product domain deeply but
-does not write code, and is not familiar with the technical architecture. The goal is to give them a clear mental model of how the system works and why it is designed the way it is, so they can make informed decisions about product direction, feature prioritization, and trade-offs.
-
-## Key Rules
-
-- Translate all technical content — never quote lambda expressions, technical syntax, or
-  VSM layer identifiers directly in the output
-- Do not invent capabilities not grounded in `<root>/architecture.md`
-- Flag if `<root>/architecture.md` has not been initialized and suggest `/gybis-arch-init`
-- Output is read-only — this workflow does not write any files
+key_constraints:
+  ¬∃(lambda_expr ∨ technical_syntax ∨ VSM_layer_id) ∈ output
+  ¬invented(capability) ∷ capability ⊆ architecture.md
+  initialized(architecture.md) ? ¬suggest("/gybis-arch-init")
+  rw(output) = false
