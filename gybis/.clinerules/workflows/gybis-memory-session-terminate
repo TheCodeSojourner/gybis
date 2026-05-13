@@ -1,90 +1,11 @@
-# /gybis-memory-session-terminate — Terminate Session and Prepare for Resumption
-
-Persist full session context so a new AI session can resume exactly where this one left
-off, with no loss of intent, decisions, or open threads.
-
-## Objective
-
-Apply mementum's storage protocol to capture the complete state of this session, commit
-everything to git, and produce a ready-to-paste resume prompt for the next session.
-
-## Step 1: Flush Working State to state.md
-
-Update `<root>/mementum/state.md` with accurate current values:
-
-- **Now** — what is actually in progress right now (not what was planned)
-- **Next** — the precise next action, specific enough that a new AI can start immediately
-- **Blocking** — anything preventing forward progress
-- **Recent** — last 3–5 significant actions taken this session
-
-Do not compress or omit — completeness matters more than brevity here.
-
-## Step 2: Store Unstored Insights
-
-Review the session for memories that should be captured but haven't been:
-
-**Gate 1:** Helps a future AI? Relevant to the project?
-**Gate 2:** Required effort to discover? Likely to recur?
-
-For each insight passing both gates, store via the mementum protocol:
-- Assign symbol: 💡 insight | 🔄 shift | 🎯 decision | 🌀 meta | ❌ mistake | ✅ win | 🔁 pattern
-- Write to `<root>/mementum/memories/<slug>.md` (under 200 words)
-- Propose to human before writing
-
-## Step 3: Synthesize if Ready
-
-If 3 or more memories address the same topic and no knowledge page exists for it, run
-`/gybis-memory-synthesize [topic]` before proceeding.
-
-## Step 4: Write Session Knowledge Page
-
-Write `<root>/mementum/knowledge/session-<YYYY-MM-DD>.md` with:
-
-```markdown
-# Session <YYYY-MM-DD>
-
-## What Was Built
-[Concise description of work completed this session]
-
-## Key Decisions
-[Numbered list of decisions made, with rationale]
-
-## Open Threads
-[Anything started but not finished; any questions that arose but weren't resolved]
-
-## Resume Point
-[The exact next action — specific file, command, or question — for the next session]
-
-## Memories Stored This Session
-[Slugs of memories written during this session]
-```
-
-Human approves content before write.
-
-## Step 5: Commit Everything
-
-```bash
-git add mementum/
-git commit -m "🌀 session-terminate <YYYY-MM-DD>"
-```
-
-Human approves commit message before running.
-
-## Step 6: Generate Resume Prompt
-
-Output a ready-to-paste paragraph the human can give a new AI session:
-
-> "We're resuming work on [project]. Read `<root>/mementum/state.md` first, then
-> `<root>/mementum/knowledge/session-<YYYY-MM-DD>.md` for the full context. The next action
-> is: [exact resume point]. Relevant memories: [comma-separated slugs]."
-
-This paragraph should be self-contained — the new AI needs only this paragraph plus
-the files it references.
-
-## Key Rules
-
-- Completeness over brevity in `<root>/mementum/state.md` during termination — a new session needs detail
-- Resume prompt must be copy-paste ready; no placeholders
-- All writes require human approval before commit
-- If there is nothing to store, say so explicitly rather than inventing memories
-- Date in filenames is today's date in YYYY-MM-DD format
+λ(gybis-memory-session-terminate)
+PURPOSE:persist(session)→resume_exact(¬loss[intent∪decisions∪threads])
+PF:¬mem_store→err
+S1:state.md←Σ{now∈progress(curr)∧¬planned,next=precise(action)⊢AI_start,blocking=∃preventing(fwdProg),recent=last(3‒5,actions)}|complete(state)≫brevity
+S2:insight≡Σ{gate1=helps(futAI)∧rel(proj),gate2=effort(discovery)∧recur(lk),σ∈{insight,shift,decision,meta,mistake,win,pattern},tgt=mementum/memories/<slug>.md[≤200w],gate3=propose(human)⊢write}
+S3:synthesize≡|mem(topic)|≥3∧¬knowPage(topic)→/gybis-memory-synthesize(topic)
+S4:know[session-<date>]←Σ{what=concise(work),decisions=numbered(dec∪rat),threads=started∧¬fin∪q∧¬res,resume=exact(nextAct)[f|c|q],memSlugs=slugs(session)}|approve(human)⊢write
+S5:δcommit≡git-add(mementum/)∧git-commit(🌀session-terminate <date>)|approve(human,msg)⊢exec
+INV≡complete(state)∧¬placeholders(resume)∧∀wr→approve(human)∧|store|=0→explicit(¬store)∧fname=date(today)
+μ≡S1⋅S2⋅S3⋅S4⋅S5
+plain:given(→terminate)→flush(state)∧store(insights)∧synth(ready?)∥write(know)∥commit
