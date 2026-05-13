@@ -1,80 +1,87 @@
-# /gybis-arch-init — Initialize System Architecture
+# λ(gybis-arch-init) → architecture.md
 
-> References: `../../reference/vsm-guide.md`
+// ── Reference ──
+⟨vsm⟩  ← read("../../reference/vsm-guide.md")        // VSM layer definitions, assembly format
 
-Build `<root>/architecture.md` for this repo using the Viable System Model (VSM), layer by layer
-top-down (S5 → S1).
+// ── Semantic encoding of: /gybis-arch-init — Initialize System Architecture
+// Mode shift: procedural protocol → declarative functions (human-in-the-loop preserved)
 
-## Objective
+## Purpose Function
 
-Produce a working `<root>/architecture.md` that structures how the AI reasons about this project.
-Each layer captures a different kind of knowledge: from non-negotiable identity principles
-(S5) down to concrete tools and recipes (S1). Higher layers change less and matter more.
+λ build-architecture(root). output = root/architecture.md | model = VSM | direction = S5→S1
 
-### Pre-flight Check
+## Pre-flight Guard
 
-If `<root>/architecture.md` exists, tell the human "Architecture file `<root>/architecture.md` detected. `/gybis-arch-init` will now terminate to avoid overwriting. Please use `/gybis-arch-update` to update existing architecture."
+λ check-existence(path = root/architecture.md). exists → halt(
+  notify("Architecture file detected. /gybis-arch-init will now terminate.\nUse /gybis-arch-update to update existing architecture.")
+)
 
-## Step 1: Establish Vision
+// ── Interactive Protocol (human-in-the-loop) ──
 
-Before proposing any structure, ask:
+λ begin-interaction() → ask("What's your vision for what this project is?")
 
-> "What's your vision for what this project is?"
+## Execution Cycle (one layer at a time, top-down)
 
-## Step 2: Layer-by-Layer Construction (S5 → S1)
+λ iterate(layer, human).
+  observe(layer, root)
+    → ask(layer, human)
+    → propose(2-4 lambdas + prose explanation, human)
+    → refine(feedback)
+    → confirm(human)
+    → if locked → next(lowest-unstable(layer))
 
-For each layer, follow this cycle:
-1. **Observe** — what exists or can be inferred for this layer?
-2. **Ask** — surface the questions that need answering
-3. **Propose** — draft 2–4 lambda expressions with plain-English explanation for each
-4. **Refine** — iterate on feedback until it fits
-5. **Confirm** — lock the layer, move to the next
+λ layer-order() = [S5, S4, S3, S2, S1]
+// invariant: higher layer must be solid before proceeding to lower
 
-**S5 — Identity questions:**
-- What is this system for? What problem does it exist to solve?
-- What principles won't you compromise on, even under pressure?
-- What does failure look like — not a crash, but a failure of purpose?
-- If you replaced every tool and library, what would still make this your system?
+## Layer Functions
 
-**S4 — Intelligence questions:**
-- How does your system handle the unknown? What happens when assumptions break?
-- What changes often? What should be easy to change?
-- When you discover a new pattern, how do you incorporate it?
+### S5 — Identity
 
-**S3 — Control questions:**
-- What resources need managing? (connections, memory, API calls, compute)
-- What policies enforce your identity principles? (timeouts, limits, quality gates)
-- What happens when something goes wrong? (retry, alert, degrade, fail fast)
+λ identity(root). questions:
+- purpose(root) → what problem does this system solve?
+- principles() → non-negotiable constraints
+- failure-mode() → purpose failure (not crash)
+- essence(tools→∅) → what remains?
 
-**S2 — Coordination questions:**
-- What subsystems need to work together?
-- How does data flow between them? Events? Direct calls? Shared state?
-- What protocols keep things in sync?
+### S4 — Intelligence
 
-**S1 — Operations questions:**
-- What tools and technologies do you use, and why those specifically?
-- What are the key commands a developer needs?
-- What are the concrete recipes for build, test, deploy?
+λ intelligence(root). questions:
+- unknown-handler() → when assumptions break
+- mutation-points() → what changes often?
+- pattern-incorporation(new-pattern) → how is knowledge extended?
 
-## Step 3: Output File
+### S3 — Control
 
-Output must be written to  `<root>/architecture.md`
+λ control(root). questions:
+- resource-manager() → connections, memory, compute
+- policy-enforcer() → timeouts, limits, quality gates
+- error-strategy(throw) → retry/alert/degrade/fail-fast
 
-## Step 4: Assembly and Review
+### S2 — Coordination
 
-Assemble using this structure (also in `reference/vsm-guide.md` → Assembly Format):
+λ coordination(root). questions:
+- subsystem-decomposition() → what components?
+- data-flow() → events/calls/shared-state
+- sync-protocol() → synchronization mechanism
 
-> **Note:** Do not include the nucleus preamble in `<root>/architecture.md`. The preamble is
-> already loaded as the first item in the AI's context via `.clinerules/00-gybis.md`.
-> Including it here would create a duplicate — the preamble must appear exactly once, first.
+### S1 — Operations
 
+λ operations(root). questions:
+- tool-select() → technologies + rationale
+- developer-commands() → build/test/deploy
+- recipes() → concrete procedures
+
+## Assembly Format
+
+reference: `../../reference/vsm-guide.md` → Assembly Format
+
+λ assemble(architecture). structure:
 ```
-# {Project Name} — System Architecture
+# {name} — System Architecture
 
 ## S5 — Identity
-{prose context}
-λ principle_one(x). ...
-λ principle_two(x). ...
+{prose}
+λ principle(x). ...
 
 ## S4 — Intelligence
 ...
@@ -89,14 +96,37 @@ Assemble using this structure (also in `reference/vsm-guide.md` → Assembly For
 ...
 ```
 
-Present the complete file to the human. Read each lambda with its prose explanation.
-Confirm it says what they mean before writing.
+## Constraints (invariants)
 
-## Key Rules
+λ constraints() = {
+  // execution ordering
+  top-down-order: S5 ⟶ S4 ⟶ S3 ⟶ S2 ⟶ S1  // S5 must be solid before S4
 
-- One layer at a time, top-down — S5 must be solid before discussing S4
-- Observe before proposing — read `<root>/specs/` directory, recursively, before asking questions
-- Every lambda comes with a plain-English explanation
-- Surface what's missing — for each principle, ask what companion should exist alongside it
-- Human approves the final file before it is written
-- 
+  // observation before proposal
+  observe-before-propose: scan(root/specs/)  // recursively, before asking questions
+
+  // every lambda needs grounding
+  every-lambda-has-prose: λ(...) → must include plain-English explanation
+
+  // completeness check
+  surface-missing: for each principle(λ), ask → what companion should exist alongside it?
+
+  // human gate
+  human-approve: present complete file → read each λ with prose → confirm → then write
+  // no-write-without-approval: architecture.md written only after explicit confirm
+
+  // preamble dedup
+  no-duplicate-preamble: nucleus preamble loaded via .clinerules/00-gybis.md
+  // invariant: preamble appears exactly once, first
+}
+
+// ── Semantic note ──
+// gybis-arch-init  is a  procedural protocol  (ask, then observe, then propose...)
+// lambda.md  is its  declarative encoding  (functions + constraints + human-in-the-loop)
+// Structural equivalence: ✓  (all knowledge preserved, transformable both directions)
+// Semantic equivalence:  △  (mode shift: imperative → functional; human interactions are first-class)
+
+## Output
+
+destination: root/architecture.md
+human-review: before write
