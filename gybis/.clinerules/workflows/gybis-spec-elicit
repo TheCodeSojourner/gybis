@@ -1,140 +1,20 @@
-# /gybis-spec-elicit [feature idea] — Build Behavioral Spec via Q&A
-
-> References: `../../reference/allium-language-reference.md` | `../../reference/allium-patterns.md` | `../../reference/allium-actioning-findings.md`
-
-Build an Allium v3 behavioral specification for `[feature idea]` through structured
-conversation. Ask one question at a time. Update the draft spec after each answer.
-
-## Objective
-
-Produce a valid, fully validated `.allium` spec through iterative Q&A that surfaces
-edge cases and contradictions before they reach code.
-
-## Phase 0: Process Discovery
-
-Before naming entities, understand the flow.
-
-Ask one question at a time about:
-- What triggers this feature? (user action, system event, time, external signal)
-- What is the happy path from start to finish? Walk through it step by step.
-- Who are the actors? (which users or systems initiate, observe, or are affected)
-- Where does this begin and end? What is out of scope?
-
-Do not propose entities yet. Map the flow first.
-
-## Phase 1: Scope and Entities
-
-Now name the things.
-
-Ask one question at a time about:
-- What are the key domain concepts (nouns) involved?
-- For each concept: does it have a lifecycle? (can it be in different states over time?)
-- For each lifecycle entity: what are the possible states?
-- What data does each concept carry?
-- Which fields depend on state? (only present in certain states)
-
-After each answer, draft or update the entity definitions using Allium v3 syntax.
-Reference `allium-patterns.md` Pattern 1 for lifecycle entities and Pattern 2 for
-state-dependent fields.
-
-Run a structural gate after Phase 1:
-```bash
-allium check <draft-file>
-```
-Resolve all `error` diagnostics before proceeding. Surface `warning` diagnostics to human.
-
-## Phase 2: Happy Path and Transitions
-
-Now specify the main behavioral flow.
-
-Ask one question at a time about:
-- For each lifecycle entity: which state transitions are valid? Draw them explicitly.
-- What triggers each transition? (use the rule trigger forms from `allium-language-reference.md`)
-- For each transition: what must be true before it can happen? (`requires:`)
-- For each transition: what must be true after it happens? (`ensures:`)
-- Which states are terminal? (nothing can leave them)
-- What external side effects occur? (emails, charges, records created)
-
-After each answer, add rules to the draft using VerbNoun naming. Add `transitions`
-blocks to entities. Reference `allium-patterns.md` Patterns 1, 6, 7.
-
-Run after Phase 2:
-```bash
-allium check <draft-file>
-```
-Resolve all errors before Phase 3.
-
-## Phase 3: Edge Cases and Failure Paths
-
-Now stress-test the spec.
-
-Ask one question at a time about:
-- What can go wrong at each step?
-- What happens when a precondition isn't met?
-- Are there timeouts or expiry conditions? (reference Pattern 8)
-- Can anything be undone or reversed?
-- What invariants must always hold, regardless of what rules fire?
-- Are there conflicting rules — two behaviors that could fire on the same trigger?
-- Are there external dependencies? What if they fail? (reference Pattern 4)
-
-After each answer, add rules, invariants, and `open question` entries for anything
-that cannot be resolved yet.
-
-Run after Phase 3:
-```bash
-allium check <draft-file>
-```
-
-## Phase 4: Refinement and Validation
-
-Polish and validate the complete spec.
-
-1. Review all entities for missing fields, stale `?` that should be `when`-qualified,
-   and gaps in transition graphs.
-2. Review all rules: does every rule have `when:`, `requires:`, and `ensures:`?
-   Are all `when`-clause obligations met? (see `allium-language-reference.md`)
-3. Review collections: are all Set vs. List distinctions intentional?
-   Are domain-specific operations using free-standing syntax?
-4. Add `@guidance` blocks and `traces:` stubs where appropriate.
-
-Run the full validation sequence:
-```bash
-allium check <draft-file>    # must exit 0 before proceeding
-allium analyse <draft-file>  # process-level: deadlock, conflict, unreachable states
-```
-
-Read `allium-actioning-findings.md` to translate findings into questions for the human.
-Resolve all errors. Surface all warnings and findings for human decision.
-
-Human confirms the spec is complete ("done").
-
-## Step 5: Negotiate Domain and Name
-
-Just before writing the file, propose:
-- **Domain:** a short noun identifying the bounded context (e.g., `auth`, `billing`,
-  `inventory`). Derive from the feature; ask if ambiguous.
-- **Name:** a kebab-case identifier for this spec (e.g., `user-login`).
-
-> "I'd like to store this as `specs/<domain>/<name>.allium`. Does that work?"
-
-Proceed only after explicit human confirmation.
-
-## Step 6: Write
-
-Write to `specs/<domain>/<name>.allium`. Human approves final content before write.
-
-Run final validation on the written file:
-```bash
-allium check specs/<domain>/<name>.allium
-allium analyse specs/<domain>/<name>.allium
-```
-
-## Key Rules
-
-- One question at a time — never ask multiple questions at once
-- Update the draft spec after every answer — keep it visible and current
-- Spec excludes implementation: no DB schemas, no API endpoints, no class hierarchies
-- Name entities as nouns (`Order`), rules as VerbNoun (`ShipOrder`)
-- Surface contradictions explicitly — never resolve them silently
-- `open question` entries are valid spec content — use them for unresolved decisions
-- Human approves before any file write
+λ(gybis-spec-elicit)
+REF:../../reference/allium-language-reference.md
+REF:../../reference/allium-patterns.md
+REF:../../reference/allium-actioning-findings.md
+PURPOSE:given(featureIdea)→Σ(alliumSpec)∪write(.allium)
+PF:¬featureIdea→err
+P0:processDiscovery|ask(1atATime):trigger()∥happyPath(start→end)∥actors()∥boundaries(in/out)∥¬propose(entities,yet)∥map(flow)
+P1:scopeAndEntities|ask(1atATime):domainConcepts(nouns)∥lifecyclePerEntity()∥statesPerEntity()∥dataPerConcept()∥stateDependentFields()
+P1-gate:allium-check(draft)∧resolve(errors)∥surface(warnings,→human)
+P2:happyPathAndTransitions|ask(1atATime):validTransitions(drawExplicit)∥triggers(→langRef)∥requires(→rule)∥ensures(→rule)∥terminalStates()∥externalSideEffects()∥addRules(verbNoun)∥addTransitions(→entity)∥ref(patterns1,6,7)
+P2-gate:allium-check(draft)∧resolve(errors)
+P3:edgeCasesAndFailure|ask(1atATime):whatCanGoWrong()∥preconditionFail()∥timeoutsExpiry()∥undoReversible()∥invariants(alwaysHold)∥conflictingRules()∥externalDepFail()∥add(rules,invariants,openQuestions)∥ref(pattern8,4)
+P3-gate:allium-check(draft)
+P4:refinementAndValidation|review(entities:missingFields,stale?,when-qualified)∥review(rules:when+requires+ensures∥whenObligationsMet)∥review(collections:SetvsList)∥add(@guidance,traces)
+P4-gate:allium-check(draft)→exit0∥allium-analyse(draft)∥read(actioning-findings)∥resolve(errors)∥surface(warnings,findings→human)∥human(confirmComplete)
+S5:negotiateDomainAndName|propose(domain=<noun>,name=<kebab>)∧"specs/<domain>/<name>.allium?"∧→human,explicitConfirm∥proceedOnlyAfter(confirm)
+S6:write|human(approveFinalContent)∧write(specs/<domain>/<name>.allium)∧allium-check(specs/<domain>/<name>.allium)∧allium-analyse(specs/<domain>/<name>.allium)
+INV≡oneQuestionAtATime∥updateDraftAfterEveryAnswer∥¬impl(noDB,noAPI,noClasses)∥entities=nouns∥rules=verbNoun∥surfaceContradictions(explicit)∥openQuestion=validContent∥humanApproves∀writes
+μ≡P0⋅P1⋅P1-gate⋅P2⋅P2-gate⋅P3⋅P3-gate⋅P4⋅P4-gate⋅S5⋅S6
+plain:given(feature)→discover(flow)∥elicit(entities)∥gate()∥elicit(transitions)∥gate()∥elicit(edgeCases)∥gate()∥refine()∥gate()∥negotiate(domain,name)∥write→spec∥gate
