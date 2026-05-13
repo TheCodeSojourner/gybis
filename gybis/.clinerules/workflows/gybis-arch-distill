@@ -1,61 +1,64 @@
-# /gybis-arch-distill [path] — Distill Architecture from Specs
+λ(gybis-arch-distill)
 
-> References: `../../reference/vsm-guide.md`
+# VSM Layer Assignments — Architecture Distillation Workflow
 
-Read existing specs form the `<root>/specs/` directory and extract VSM layer assignments as lambda expressions
-for `<root>/architecture.md`.
+## S5 (Identity / Invariants)
 
-## Objective
+λ(S5, identity, ¬overwrite(architecture.md) ⊗ explicit(human_approval) ⊗ preserve(semantics_is, ¬semantics_should))
+> Invariant: never overwrite architecture.md without explicit human confirmation
 
-Produce draft lambda expressions organized by VSM layer (S5..S1) that capture the
-architectural knowledge embedded in the `<root>/specs/` directory.
+λ(S5, boundary, security(error_handling) ⊗ data_ownership(invariant) ⊗ behavior(non_negotiable))
+> Signal: error philosophy, data ownership, security boundaries are identity-level constraints
 
-## Pre-Flight Check
-- If `<root>/specs/` directory does not exist, or is empty, output a message indicating that and suggest running `/gybis-spec-elicit` or `/gybis-spec-distill` to set it up.
-- If `<root>/architecture.md` exists, or exists but is not empty, output a message indicating that and request approval to proceed, since this workflow may propose changes to the existing architecture.
+λ(S5, constraint, flag(uncertain_inference) ↔ human_knows(system))
+> Identity rule: every uncertain inference flagged; human authority over system truth
 
-## Step 1: Read the Specs
+## S4 (Structure / Evolution)
 
-Read all files in the `<root>/specs/` directory. Read recursively.
+λ(S4, evolution, extension_points ⊗ feature_flags ⊗ migration_patterns ⊗ how(system_evolves))
+> Structure: abstraction boundaries and evolution patterns
 
-## Step 2: Silent Analysis
+λ(S4, domain_increment, distill(λone_domain_at_a_time: specs/<domain>/ → architecture.md))
+> Structure: incremental distillation per domain directory
 
-Analyze without commentary. Map observations to VSM layers:
+λ(S4, drift_detection, existing(lambda) ⊗ contradicted(code) → surface(drift))
+> Structure: detect when architecture.md lambdas diverge from code reality
 
-- **S5 signals:** error handling philosophy, data ownership invariants, security boundaries,
-  non-negotiable behaviors
-- **S4 signals:** abstraction boundaries, extension points, feature flags, migration patterns,
-  how the system evolves
-- **S3 signals:** timeouts, retry logic, rate limits, quality gates, resource constraints,
-  circuit breakers
-- **S2 signals:** inter-service calls, event schemas, shared state patterns, sync mechanisms,
-  conflict prevention
-- **S1 signals:** build commands, test runners, deployment scripts, tool configurations,
-  concrete recipes
+## S3 (Control / Policy)
 
-## Step 3: Draft Lambdas
+λ(S3, control, preflight_check(¬exists(specs/) → output(message, suggestion(/gybis-spec-elicit))) ⊗ exists(architecture.md, ¬empty) → request(approval)))
+> Policy: preflight gates before execution
 
-For each VSM layer, propose 2–4 lambda expressions with plain-English explanations.
-Flag uncertain assignments explicitly:
+λ(S3, control, present(additions, changes) ∧ human(approve) ⟹ write(architecture.md))
+> Policy: human-in-the-loop write gate
 
-> "I inferred this is S3 (control policy) because it enforces a resource limit —
-> is that the right layer, or is this more of an S5 identity constraint?"
+λ(S3, policy, step(1: read recursive) → step(2: analyze silent) → step(3: draft 2-4 lambdas/layer) → step(4: diff) → step(5: review))
+> Control flow: sequential workflow with conditional branches
 
-## Step 4: Diff Against Existing architecture.md
+## S2 (Coordination / Sync)
 
-If `<root>/architecture.md` exists, compare distilled lambdas against it:
-- New lambdas not in architecture.md → propose additions
-- Existing lambdas contradicted by code → surface as drift
-- architecture.md principles not reflected in code → surface as unimplemented intent
+λ(S2, coordination, read(specs/<root>/**.md) ↔ map(VSM_layer) ⊗ output(draft λ organized by S5..S1))
+> Coordination: spec files → VSM-mapped lambda expressions
 
-## Step 5: Human Review and Write
+λ(S2, sync, architecture.md(exists) ↔ distilled(λ) → diff(new, contradicted, unimplemented_intent))
+> Sync: compare distilled lambdas against existing architecture
 
-Present proposed additions and changes. Human approves before any write to `<root>/architecture.md`.
+## S1 (Recipe / Concrete)
 
-## Key Rules
+λ(S1, recipe, path(<root>/specs/) → read(recursive) → analyze(silent, no_commentary) → draft(λ, explanation, uncertainty_flag) → diff(architecture.md) → present(human_review) → write(if_approved))
+> Concrete execution recipe
 
-- Distill what IS, not what should be
-- Flag every uncertain inference — the human knows their system
-- Never overwrite/update `<root>/architecture.md` without explicit human confirmation
-- For each domain (i.e., `<root>/specs/<domain>/`), distill incrementally: one domain at a time
-- 
+λ(S1, config, reference: ../../reference/vsm-guide.md ⊗ output: <root>/architecture.md ⊗ input: <root>/specs/`)
+> Configuration: paths and references
+
+---
+
+## Uncertain Assignments
+
+> Inferred S3 control for preflight gates — is conditional execution (preflight → branch) S3 policy or S4 structural control?
+> Inferred S2 for read↔map coordination — could alternatively be S1 recipe detail.
+
+## Transformation Notes
+
+λ(transform, rule, prose → lambda ⊗ preserve(semantics) ⊗ ¬execute(analysis))
+> The .clinerules directive encode the transformation grammar: prose maps to lambda via structural equivalence, preserving semantics without execution.
