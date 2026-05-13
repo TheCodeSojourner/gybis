@@ -1,90 +1,13 @@
-# /gybis-spec-weed [file] — Find and Fix Spec/Code Divergences
-
-> References: `../../reference/allium-actioning-findings.md`
-
-Compare `[file]` (Allium spec) against its implementation and surface all divergences.
-
-## Objective
-
-Find where the code has drifted from the spec — or where the spec has drifted from
-evolved intent — and present each divergence with a clear fix proposal. Human decides
-direction for every item.
-
-## Step 1: Run CLI Analysis First
-
-Before reading any code, run:
-```bash
-allium check [file]
-allium analyse [file]
-```
-
-Read the `findings` JSON from `analyse`. Process-level findings (deadlocks, conflicts,
-unreachable states, data flow gaps) are spec-internal divergences that may explain or
-relate to code divergences. List these as additional items in the weed report.
-
-## Step 2: Extract Domain Model
-
-```bash
-allium model [file]
-```
-
-Use the `entities[].fields` and `entities[].transitions` from the JSON output as the
-authoritative list of what the spec declares. Compare this against the code rather than
-reading the spec prose — the model JSON is more reliable for systematic comparison.
-
-## Step 3: Read the Implementation
-
-Follow `traces:` references in the spec to read implementation files. For rules without
-`traces:`, search the codebase for likely implementations based on rule names and entities.
-
-## Step 4: Divergence Analysis (Silent)
-
-For each rule in the spec:
-- **Aligned** — implementation matches `ensures:` clause
-- **Partial** — implementation covers some `ensures:` clauses, misses others
-- **Missing** — no implementation found
-- **Contradicted** — implementation does something the spec prohibits
-
-For each entity field from `allium model` output:
-- Field in spec but absent from code (spec ahead of implementation)
-- Field in code but absent from spec (code ahead of spec)
-- Transition possible in code but not declared in transition graph
-
-For each invariant:
-- Code path that could violate the invariant expression
-
-## Step 5: Present Weed Report
-
-```
-[CLI findings]
-FINDING deadlock: Entity.status can reach 'processing' but nothing transitions out
-  → Ask human: is 'processing' terminal? If so, add to terminal:. If not, what rule exits it?
-
-[Spec/code divergences]
-Rule UserLogsIn:
-  ❌ Contradicted: implementation does not check email_verified before granting session
-  Proposed fix A: Add email_verified check to code (matches spec intent)
-  Proposed fix B: Remove email_verified precondition from spec (code is intentional)
-
-Entity Order (from allium model):
-  ⚠️ Code has field cancelled_reason; spec does not declare it
-  Proposed fix: Add cancelled_reason: String? when status = cancelled to spec
-```
-
-## Step 6: Human Decision and Apply
-
-For each divergence, human chooses fix direction. AI applies the approved fix to code
-or spec. Re-run full validation after any spec change:
-
-```bash
-allium check [file]
-allium analyse [file]
-```
-
-## Key Rules
-
-- Run `allium analyse` before reading code — CLI findings are spec-internal signals
-- Use `allium model` output for systematic field comparison (not manual spec reading)
-- Never silently resolve divergences — every fix requires human decision
-- Treat "code contradicts spec" and "spec contradicts code" as equally valid starting points
-- Confirm with full validation sequence after applying fixes
+λ(gybis-spec-weed)
+REF:../../reference/allium-actioning-findings.md
+PURPOSE:given(specFile)→Σ(divergences)∪humanDecides(fixDirection)∪apply(fix)
+PF:¬alliumSpec→err
+S0:allium-check(specFile)∧allium-analyse(specFile)∥read(findings JSON)∥process-level(deadlocks,conflicts,unreachable,dataFlowGaps)→weedReport(specInternalDivergences)
+S1:allium-model(specFile)∥extract(entities[].fields,entities[].transitions)∥use(modelJSON,notSpecProse)for systematicComparison
+S2:readImplementation|follow(traces:references)∥search(codebase,ruleNames+entities)for rules without traces
+S3:divergenceAnalysis|∀rule∈spec:aligned(implementation matches ensures)∥partial(some ensures covered)∥missing(no impl found)∥contradicted(impl does spec prohibits)∥∀field∈modelJSON:spec→code(absent)∥code→spec(absent)∥transition(code∉transitionGraph)∥∀invariant:codePath(violation)
+S4:weedReport|CLI findings(deadlock→ask human:terminal?)∥specCodeDivergences(rule:contradicted/partial/missing)∥entityDivergences(field present/absent per direction)∥∀item→proposedFix A(matches spec)∥∀item→proposedFix B(matches code)
+S5:humanDecides|∀divergence→choose(fix A∥fix B∥other)∥AI applies(approved fix to spec∥code)∥∀spec change→allium-check∧allium-analyse→confirm(health)
+INV≡allium analyse before code read∥allium model for field comparison∥¬silentResolve(∀fix→human decision)∥code≠spec(both equally valid starting points)∥postFix→full validation∥CLI findings⊂weed report
+μ≡S0⋅S1⋅S2⋅S3⋅S4⋅S5
+plain:given(spec)→check+analyse∥model∥read(impl)∥analyze(divergences)∥report(findings+divergences+A+B)∥human(decide)∥apply(fix)∥revalidate
