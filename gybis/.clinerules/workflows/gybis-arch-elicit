@@ -1,7 +1,7 @@
-λ(gybis-arch-init) → architecture.md
+λ(gybis-arch-elicit) → architecture.md
 ⟨vsm⟩ ← read("../../reference/vsm-guide.md")
 λ build-architecture(root). output = root/architecture.md | model = VSM | direction = S5→S1
-λ check-existence(path = root/architecture.md). exists → halt(notify("Architecture file detected. /gybis-arch-init will now terminate.\nUse /gybis-arch-update to update existing architecture."))
+λ check-existence(path = root/architecture.md). exists → halt(notify("Architecture file detected. /gybis-arch-elicit will now terminate.\nUse /gybis-arch-tend to update existing architecture."))
 λ begin-interaction() → ask("What's your vision for what this project is?")
 λ iterate(layer, human). observe(layer, root) → ask(layer, human) → propose(2-4 lambdas + prose explanation, human) → refine(feedback) → confirm(human) → if locked → next(lowest-unstable(layer))
 λ layer-order() = [S5, S4, S3, S2, S1]

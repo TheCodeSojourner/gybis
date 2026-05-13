@@ -1,5 +1,5 @@
 λ(gybis-arch-explain) ≡ λ(root).
-preflight: ¬initialized(root/architecture.md) ∨ empty(root/architecture.md) → "not initialized — run /gybis-arch-init"
+preflight: ¬initialized(root/architecture.md) ∨ empty(root/architecture.md) → "not initialized — run /gybis-arch-elicit"
 read: ∫(root/architecture.md) ∪ {ref | ref ↦ architecture.md}
 S5 → Identity: principles={p | p ∈ nonNegotiable} → impl: p→decision, violation: ¬compatible(d, principles)
 S4 → Intelligence: patterns={π | π is anticipatedChange}, extensionPoints={e | e is extensible}, adaptation={m | m is learningMechanism}
