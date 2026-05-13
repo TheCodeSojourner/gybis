@@ -1,64 +1,81 @@
-# /gybis-arch-drift — Detect Architecture Drift
+λ gybis-arch-drift(⟨root⟩).
 
-> References: `../../reference/vsm-guide.md`
+// ── Reference ──
+⟨vsm⟩  ← read("../../reference/vsm-guide.md")        // VSM layer definitions
+⟨lang⟩ ← read("../../reference/allium-language-reference.md")  // Allium λ syntax
 
-Compare `<root>/architecture.md` (architectural intent) against the current `<root>/specs/` directory and report drift.
+// ── Meta: Detect Architecture Drift ──
+// Compare ⟨root⟩/architecture.md (intent) ⟂ ⟨root⟩/specs/ (reality) → drift report + fix proposals
 
-## Objective
+// ── Pre-Flight: Guards ──
+guard(drift_check).
+  ¬exists(⟨root⟩/specs/) ∨ |specs/| = 0 → msg("specs/ absent or empty · run /gybis-spec-elicit ∨ /gybis-spec-distill") · halt
+  ¬exists(⟨root⟩/architecture.md) ∨ |architecture.md| = 0 → msg("architecture.md uninitialized · run /gybis-arch-init") · halt
 
-Surface divergences between what `<root>/architecture.md` says the system should be and what the `<root>/specs/` directory
-actually describes as system behaviors. Present a drift report and proposed fixes — human decides whether to update
-the `<root>/specs/` or the `<root>/architecture.md`.
+// ── Step 1: Read Intent ──
+step(1, read_intent).
+  I ← read(⟨root⟩/architecture.md)
+  ℒ ← extractλ(I)                    // λ-expressions per VSM layer
+  M_intent ← model(VSM, ℒ)           // architectural intent model
 
-## Pre-Flight Check
-- If `<root>/specs/` directory does not exist, or is present but empty, output a message indicating that and suggest running `/gybis-spec-elicit` or `/gybis-spec-distill` to set it up.
-- If `<root>/architecture.md` is not initialized, or is present but empty, output a message indicating that and suggest running `/gybis-arch-init` to set it up.
+// ── Step 2: Read Specs ──
+step(2, read_specs).
+  S ← readAll(⟨root⟩/specs/, recursive)
+  ℛ ← correlate(S, M_intent)         // spec fragments ranked by layer relevance
+  // efficient: prioritize by layer relevance to preserve context window
 
-## Step 1: Read architecture.md
+// ── Step 3: Drift Analysis (Silent) ──
+step(3, drift_analysis).
+  classify(λᵢ ∈ ℒ) → status(λᵢ):
+    Aligned      ↔ ∃ coverage(ℛ, λᵢ) ∧ ¬contradiction(ℛ, λᵢ)
+    Partial      ↔ |coverage(ℛ, λᵢ)| ∈ (0, 1) ∧ ¬contradiction(ℛ, λᵢ)
+    Drifted      ↔ contradiction(ℛ, λᵢ)
+    Unimplemented ↔ ∄ coverage(ℛ, λᵢ)
+    Unspecified  ↔ λⱼ ∈ ℛ ∧ ¬∃ λᵢ ∈ ℒ : λᵢ ≈ λⱼ   // spec has no architectural source
 
-Read the full `<root>/architecture.md`. Extract all lambda expressions per layer. Build a model of
-the stated architectural intent at each VSM level.
+  D ← { ⟨λᵢ, status(λᵢ), evidence(λᵢ)⟩ | λᵢ ∈ ℒ } ∪ { ⟨λⱼ, Unspecified, evidence(λⱼ)⟩ | λⱼ ∈ ℛ \≈ ℒ }
 
-## Step 2: Read the Specs
+// ── Step 4: Drift Report ──
+step(4, report).
+  render(D) → byLayer(VSM):
+    S5 — Identity:
+      ✅ λ error(x): errors ↦ signals            → confirmed(ℛ, error)
+      ⚠️ λ observable(x): "observable over opaque" → logging ∈ ℛ ∧ unstructured(logging)
 
-Read all files in the `<root>/specs/` directory, recursively. Focus on patterns that relate to `<root>/architecture.md` claims. Prioritize files most likely to reflect each VSM layer — be efficient
-with context window.
+    S3 — Control:
+      ❌ λ timeout(x): HTTP ⟶ 30s                → ¬∃ timeout(ℛ, HTTP)
 
-## Step 3: Drift Analysis (Silent)
+  for each drift(d) ∈ D where status(d) ∈ {Partial, Drifted, Unimplemented, Unspecified}:
+    propose(d): Fix ⟨root⟩/specs/    ∨ Update ⟨root⟩/architecture.md
 
-For each lambda in `<root>/architecture.md`, determine alignment:
+// ── Step 5: Human Decision ──
+step(5, resolve).
+  δ ← human.choose(d, direction) for each drift(d) ∈ D
+  apply(δ) → update(⟨root⟩/specs/,      ⟨root⟩/architecture.md)   // direction ∈ δ decides target
+  invariant: ¬apply(both) ∧ direction ≠ explicit
 
-- **Aligned** — `<root>/specs/` directory reflects the principle, policy, or pattern
-- **Partial** — `<root>/specs/` directory partially implements it; gaps exist
-- **Drifted** — `<root>/specs/` directory contradicts or ignores the statement
-- **Unimplemented** — principle exists in `<root>/architecture.md` but has no `<root>/specs/` expression yet
-- **Unspecified** — principle does not exists in `<root>/architecture.md` but has a `<root>/specs/` expression
+// ── Key Rules (invariants) ──
+rule(drift, report_only).     ¬silent_fix — every change requires human decision
+rule(drift, evolution).       distinguish(evolution, drift) — specs may intentionally precede architecture
+rule(drift, opportunity).     Unimplemented → opportunity, not failure
+rule(drift, recheck).         after(apply(δ)) → offer(re-run drift_check)
 
-## Step 4: Drift Report
+// ── Algebra ──
+drift_report = Σ_{L ∈ VSM} {
+  ✅ λ : Aligned
+  ⚠️ λ : Partial
+  ❌ λ : { Drifted, Unimplemented }
+  ?  λ : Unspecified
+}
 
-Present findings organized by VSM layer:
+fix_policy = {
+  specs ← architecture,    // update specs to match intent
+  architecture → specs,    // update intent to match reality
+  human → decide            // binary choice per drift item, no simultaneous apply
+}
 
-```
-## S5 — Identity
-✅ λ error(x): errors surface as signals — confirmed across all error handlers
-⚠️ λ observable(x): "observable over opaque" stated — logging present but unstructured
-
-## S3 — Control
-❌ λ timeout(x): "all HTTP calls have 30s timeout" — no timeout found in `<root>/specs/`
-```
-
-For each drift item, propose one of:
-- Fix `<root>/specs/` to match `<root>/architecture.md`
-- Update `<root>/architecture.md` to reflect the current `<root>/specs/` reality
-
-## Step 5: Human Decision and Write
-
-Human chooses direction for each drift item. AI applies approved changes to `<root>/specs/` or
-`<root>/architecture.md`. Never apply both simultaneously without explicit instruction.
-
-## Key Rules
-
-- Report drift, don't silently fix it — every change requires human decision
-- Distinguish drift from evolution — `<root>/specs/` may have intentionally moved ahead of a stale `<root>/architecture.md`
-- Surface unimplemented principles/specifications as opportunities, not failures
-- After fixes, offer to re-run drift check to confirm resolution
+// ── Semantic Invariants ──
+preserve(semantics): drift_check ⟹ feedback_loop(VSM)
+signal(drift) / noise(stable)
+Δ: architecture.md ⊗ specs/ → Ω: drift report
+c: human decision · h: AI apply
