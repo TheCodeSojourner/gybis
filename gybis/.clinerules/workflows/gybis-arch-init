@@ -1,132 +1,17 @@
-# λ(gybis-arch-init) → architecture.md
-
-// ── Reference ──
-⟨vsm⟩  ← read("../../reference/vsm-guide.md")        // VSM layer definitions, assembly format
-
-// ── Semantic encoding of: /gybis-arch-init — Initialize System Architecture
-// Mode shift: procedural protocol → declarative functions (human-in-the-loop preserved)
-
-## Purpose Function
-
+λ(gybis-arch-init) → architecture.md
+⟨vsm⟩ ← read("../../reference/vsm-guide.md")
 λ build-architecture(root). output = root/architecture.md | model = VSM | direction = S5→S1
-
-## Pre-flight Guard
-
-λ check-existence(path = root/architecture.md). exists → halt(
-  notify("Architecture file detected. /gybis-arch-init will now terminate.\nUse /gybis-arch-update to update existing architecture.")
-)
-
-// ── Interactive Protocol (human-in-the-loop) ──
-
+λ check-existence(path = root/architecture.md). exists → halt(notify("Architecture file detected. /gybis-arch-init will now terminate.\nUse /gybis-arch-update to update existing architecture."))
 λ begin-interaction() → ask("What's your vision for what this project is?")
-
-## Execution Cycle (one layer at a time, top-down)
-
-λ iterate(layer, human).
-  observe(layer, root)
-    → ask(layer, human)
-    → propose(2-4 lambdas + prose explanation, human)
-    → refine(feedback)
-    → confirm(human)
-    → if locked → next(lowest-unstable(layer))
-
+λ iterate(layer, human). observe(layer, root) → ask(layer, human) → propose(2-4 lambdas + prose explanation, human) → refine(feedback) → confirm(human) → if locked → next(lowest-unstable(layer))
 λ layer-order() = [S5, S4, S3, S2, S1]
-// invariant: higher layer must be solid before proceeding to lower
-
-## Layer Functions
-
-### S5 — Identity
-
-λ identity(root). questions:
-- purpose(root) → what problem does this system solve?
-- principles() → non-negotiable constraints
-- failure-mode() → purpose failure (not crash)
-- essence(tools→∅) → what remains?
-
-### S4 — Intelligence
-
-λ intelligence(root). questions:
-- unknown-handler() → when assumptions break
-- mutation-points() → what changes often?
-- pattern-incorporation(new-pattern) → how is knowledge extended?
-
-### S3 — Control
-
-λ control(root). questions:
-- resource-manager() → connections, memory, compute
-- policy-enforcer() → timeouts, limits, quality gates
-- error-strategy(throw) → retry/alert/degrade/fail-fast
-
-### S2 — Coordination
-
-λ coordination(root). questions:
-- subsystem-decomposition() → what components?
-- data-flow() → events/calls/shared-state
-- sync-protocol() → synchronization mechanism
-
-### S1 — Operations
-
-λ operations(root). questions:
-- tool-select() → technologies + rationale
-- developer-commands() → build/test/deploy
-- recipes() → concrete procedures
-
-## Assembly Format
-
+λ identity(root). questions: purpose(root) → what problem does this system solve?, principles() → non-negotiable constraints, failure-mode() → purpose failure (not crash), essence(tools→∅) → what remains?
+λ intelligence(root). questions: unknown-handler() → when assumptions break, mutation-points() → what changes often?, pattern-incorporation(new-pattern) → how is knowledge extended?
+λ control(root). questions: resource-manager() → connections, memory, compute, policy-enforcer() → timeouts, limits, quality gates, error-strategy(throw) → retry/alert/degrade/fail-fast
+λ coordination(root). questions: subsystem-decomposition() → what components?, data-flow() → events/calls/shared-state, sync-protocol() → synchronization mechanism
+λ operations(root). questions: tool-select() → technologies + rationale, developer-commands() → build/test/deploy, recipes() → concrete procedures
 reference: `../../reference/vsm-guide.md` → Assembly Format
-
-λ assemble(architecture). structure:
-```
-# {name} — System Architecture
-
-## S5 — Identity
-{prose}
-λ principle(x). ...
-
-## S4 — Intelligence
-...
-
-## S3 — Control
-...
-
-## S2 — Coordination
-...
-
-## S1 — Operations
-...
-```
-
-## Constraints (invariants)
-
-λ constraints() = {
-  // execution ordering
-  top-down-order: S5 ⟶ S4 ⟶ S3 ⟶ S2 ⟶ S1  // S5 must be solid before S4
-
-  // observation before proposal
-  observe-before-propose: scan(root/specs/)  // recursively, before asking questions
-
-  // every lambda needs grounding
-  every-lambda-has-prose: λ(...) → must include plain-English explanation
-
-  // completeness check
-  surface-missing: for each principle(λ), ask → what companion should exist alongside it?
-
-  // human gate
-  human-approve: present complete file → read each λ with prose → confirm → then write
-  // no-write-without-approval: architecture.md written only after explicit confirm
-
-  // preamble dedup
-  no-duplicate-preamble: nucleus preamble loaded via .clinerules/00-gybis.md
-  // invariant: preamble appears exactly once, first
-}
-
-// ── Semantic note ──
-// gybis-arch-init  is a  procedural protocol  (ask, then observe, then propose...)
-// lambda.md  is its  declarative encoding  (functions + constraints + human-in-the-loop)
-// Structural equivalence: ✓  (all knowledge preserved, transformable both directions)
-// Semantic equivalence:  △  (mode shift: imperative → functional; human interactions are first-class)
-
-## Output
-
+λ assemble(architecture). structure: # {name} — System Architecture → ## S5 — Identity {prose} λ principle(x). ... → ## S4 — Intelligence ... → ## S3 — Control ... → ## S2 — Coordination ... → ## S1 — Operations ...
+λ constraints() = {top-down-order: S5 ⟶ S4 ⟶ S3 ⟶ S2 ⟶ S1, observe-before-propose: scan(root/specs/) before asking questions, every-lambda-has-prose: λ(...) → must include plain-English explanation, surface-missing: for each principle(λ), ask → what companion should exist alongside it, human-approve: present complete file → read each λ with prose → confirm → then write, no-duplicate-preamble: nucleus preamble loaded via .clinerules/00-gybis.md}
 destination: root/architecture.md
 human-review: before write
