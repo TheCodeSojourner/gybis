@@ -1,80 +1,46 @@
 λ gybis-arch-drift(⟨root⟩).
-
-// ── Reference ──
-⟨vsm⟩  ← read("../../reference/vsm-guide.md")        // VSM layer definitions
-⟨lang⟩ ← read("../../reference/allium-language-reference.md")  // Allium λ syntax
-
-// ── Meta: Detect Architecture Drift ──
-// Compare ⟨root⟩/architecture.md (intent) ⟂ ⟨root⟩/specs/ (reality) → drift report + fix proposals
-
-// ── Pre-Flight: Guards ──
-guard(drift_check).
-  ¬exists(⟨root⟩/specs/) ∨ |specs/| = 0 → msg("specs/ absent or empty · run /gybis-spec-elicit ∨ /gybis-spec-distill") · halt
-  ¬exists(⟨root⟩/architecture.md) ∨ |architecture.md| = 0 → msg("architecture.md uninitialized · run /gybis-arch-init") · halt
-
-// ── Step 1: Read Intent ──
+⟨vsm⟩ ← read("../../reference/vsm-guide.md")
+⟨lang⟩ ← read("../../reference/allium-language-reference.md")
+¬exists(⟨root⟩/specs/) ∨ |specs/| = 0 → msg("specs/ absent or empty · run /gybis-spec-elicit ∨ /gybis-spec-distill") · halt
+¬exists(⟨root⟩/architecture.md) ∨ |architecture.md| = 0 → msg("architecture.md uninitialized · run /gybis-arch-init") · halt
 step(1, read_intent).
-  I ← read(⟨root⟩/architecture.md)
-  ℒ ← extractλ(I)                    // λ-expressions per VSM layer
-  M_intent ← model(VSM, ℒ)           // architectural intent model
-
-// ── Step 2: Read Specs ──
+I ← read(⟨root⟩/architecture.md)
+ℒ ← extractλ(I)
+M_intent ← model(VSM, ℒ)
 step(2, read_specs).
-  S ← readAll(⟨root⟩/specs/, recursive)
-  ℛ ← correlate(S, M_intent)         // spec fragments ranked by layer relevance
-  // efficient: prioritize by layer relevance to preserve context window
-
-// ── Step 3: Drift Analysis (Silent) ──
+S ← readAll(⟨root⟩/specs/, recursive)
+ℛ ← correlate(S, M_intent)
 step(3, drift_analysis).
-  classify(λᵢ ∈ ℒ) → status(λᵢ):
-    Aligned      ↔ ∃ coverage(ℛ, λᵢ) ∧ ¬contradiction(ℛ, λᵢ)
-    Partial      ↔ |coverage(ℛ, λᵢ)| ∈ (0, 1) ∧ ¬contradiction(ℛ, λᵢ)
-    Drifted      ↔ contradiction(ℛ, λᵢ)
-    Unimplemented ↔ ∄ coverage(ℛ, λᵢ)
-    Unspecified  ↔ λⱼ ∈ ℛ ∧ ¬∃ λᵢ ∈ ℒ : λᵢ ≈ λⱼ   // spec has no architectural source
-
-  D ← { ⟨λᵢ, status(λᵢ), evidence(λᵢ)⟩ | λᵢ ∈ ℒ } ∪ { ⟨λⱼ, Unspecified, evidence(λⱼ)⟩ | λⱼ ∈ ℛ \≈ ℒ }
-
-// ── Step 4: Drift Report ──
+classify(λᵢ ∈ ℒ) → status(λᵢ):
+Aligned ↔ ∃ coverage(ℛ, λᵢ) ∧ ¬contradiction(ℛ, λᵢ)
+Partial ↔ |coverage(ℛ, λᵢ)| ∈ (0, 1) ∧ ¬contradiction(ℛ, λᵢ)
+Drifted ↔ contradiction(ℛ, λᵢ)
+Unimplemented ↔ ∄ coverage(ℛ, λᵢ)
+Unspecified ↔ λⱼ ∈ ℛ ∧ ¬∃ λᵢ ∈ ℒ : λᵢ ≈ λⱼ
+D ← {⟨λᵢ, status(λᵢ), evidence(λᵢ)⟩ | λᵢ ∈ ℒ} ∪ {⟨λⱼ, Unspecified, evidence(λⱼ)⟩ | λⱼ ∈ ℛ \≈ ℒ}
 step(4, report).
-  render(D) → byLayer(VSM):
-    S5 — Identity:
-      ✅ λ error(x): errors ↦ signals            → confirmed(ℛ, error)
-      ⚠️ λ observable(x): "observable over opaque" → logging ∈ ℛ ∧ unstructured(logging)
-
-    S3 — Control:
-      ❌ λ timeout(x): HTTP ⟶ 30s                → ¬∃ timeout(ℛ, HTTP)
-
-  for each drift(d) ∈ D where status(d) ∈ {Partial, Drifted, Unimplemented, Unspecified}:
-    propose(d): Fix ⟨root⟩/specs/    ∨ Update ⟨root⟩/architecture.md
-
-// ── Step 5: Human Decision ──
+render(D) → byLayer(VSM):
+S5 — Identity:
+✅ λ error(x): errors ↦ signals → confirmed(ℛ, error)
+⚠️ λ observable(x): "observable over opaque" → logging ∈ ℛ ∧ unstructured(logging)
+S3 — Control:
+❌ λ timeout(x): HTTP ⟶ 30s → ¬∃ timeout(ℛ, HTTP)
+for each drift(d) ∈ D where status(d) ∈ {Partial, Drifted, Unimplemented, Unspecified}:
+propose(d): Fix ⟨root⟩/specs/ ∨ Update ⟨root⟩/architecture.md
 step(5, resolve).
-  δ ← human.choose(d, direction) for each drift(d) ∈ D
-  apply(δ) → update(⟨root⟩/specs/,      ⟨root⟩/architecture.md)   // direction ∈ δ decides target
-  invariant: ¬apply(both) ∧ direction ≠ explicit
-
-// ── Key Rules (invariants) ──
-rule(drift, report_only).     ¬silent_fix — every change requires human decision
-rule(drift, evolution).       distinguish(evolution, drift) — specs may intentionally precede architecture
-rule(drift, opportunity).     Unimplemented → opportunity, not failure
-rule(drift, recheck).         after(apply(δ)) → offer(re-run drift_check)
-
-// ── Algebra ──
+δ ← human.choose(d, direction) for each drift(d) ∈ D
+apply(δ) → update(⟨root⟩/specs/, ⟨root⟩/architecture.md)
+invariant: ¬apply(both) ∧ direction ≠ explicit
+rule(drift, report_only). ¬silent_fix — every change requires human decision
+rule(drift, evolution). distinguish(evolution, drift) — specs may intentionally precede architecture
+rule(drift, opportunity). Unimplemented → opportunity, not failure
+rule(drift, recheck). after(apply(δ)) → offer(re-run drift_check)
 drift_report = Σ_{L ∈ VSM} {
-  ✅ λ : Aligned
-  ⚠️ λ : Partial
-  ❌ λ : { Drifted, Unimplemented }
-  ?  λ : Unspecified
+✅ λ : Aligned
+⚠️ λ : Partial
+❌ λ : { Drifted, Unimplemented }
+? λ : Unspecified
 }
-
-fix_policy = {
-  specs ← architecture,    // update specs to match intent
-  architecture → specs,    // update intent to match reality
-  human → decide            // binary choice per drift item, no simultaneous apply
-}
-
-// ── Semantic Invariants ──
 preserve(semantics): drift_check ⟹ feedback_loop(VSM)
 signal(drift) / noise(stable)
 Δ: architecture.md ⊗ specs/ → Ω: drift report
