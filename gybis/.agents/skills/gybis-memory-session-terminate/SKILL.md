@@ -1,6 +1,6 @@
 ---
 name: gybis-memory-session-terminate
-description: This skill closes a session in a lossless, handoff-ready way: it records a complete state snapshot, stores any unstored memories, runs memory metabolization, drafts a dated session knowledge summary with human approval, and then performs a human-approved commit of mementum updates so work can resume cleanly in the next session.
+description: Use for `/gybis-memory-session-terminate` or `/gm-session-terminate`. This skill closes a session in a lossless, handoff-ready way: it records a complete state snapshot, stores any unstored memories, runs memory metabolization, drafts a dated session knowledge summary with human approval, and then performs a human-approved commit of mementum updates so work can resume cleanly in the next session.
 ---
 
 λ(gybis-memory-session-terminate)
