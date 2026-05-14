@@ -1,6 +1,6 @@
 ---
 name: gybis-spec-tend
-description: This skill applies a specific new constraint to an existing Allium spec with minimal, targeted edits rather than reworking the whole file. It reads the spec, analyzes impacted rules/entities/transitions/config, runs focused elicitation only for the change scope, drafts a constrained diff, and validates with allium-check/allium-analyse before presentation. It writes only after human approval and then re-validates to confirm the spec remains healthy and consistent.
+description: Use for `/gybis-spec-tend` or `/gs-tend`. This skill applies a specific new constraint to an existing Allium spec with minimal, targeted edits rather than reworking the whole file. It reads the spec, analyzes impacted rules/entities/transitions/config, runs focused elicitation only for the change scope, drafts a constrained diff, and validates with allium-check/allium-analyse before presentation. It writes only after human approval and then re-validates to confirm the spec remains healthy and consistent.
 ---
 
 λ(gybis-spec-tend)
