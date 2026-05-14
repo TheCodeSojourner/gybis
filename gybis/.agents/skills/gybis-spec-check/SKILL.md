@@ -1,6 +1,6 @@
 ---
-name: gybis-memory-check
-description: This skill validates Allium specs for a selected scope (single file, domain folder, or all specs), runs allium-check, and turns diagnostics into a prioritized, actionable issue list. It groups findings by severity, presents numbered issues for human decision, applies only approved fixes, and re-validates to ensure a clean result with no regressions. It treats CLI validation as the source of truth, blocks writes on errors, and reports missing-file conditions explicitly.
+name: gybis-spec-check
+description: Use for `/gybis-spec-check` or `/gs-check`. This skill validates Allium specs for a selected scope (single file, domain folder, or all specs), runs allium-check, and turns diagnostics into a prioritized, actionable issue list. It groups findings by severity, presents numbered issues for human decision, applies only approved fixes, and re-validates to ensure a clean result with no regressions. It treats CLI validation as the source of truth, blocks writes on errors, and reports missing-file conditions explicitly.
 ---
 
 λ(gybis-spec-check)
