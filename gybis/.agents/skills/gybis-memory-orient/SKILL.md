@@ -1,6 +1,6 @@
 ---
 name: gybis-memory-orient
-description: This skill provides a quick shorthand command (/gybis-memory-orient) that triggers the core memory orientation workflow, so context can be restored immediately with less user friction. It is essentially an ergonomic alias for fast re-orientation.
+description: Use for `/gybis-memory-orient` or `/gm-orient`. This skill provides a quick shorthand command that triggers the core memory orientation workflow, so context can be restored immediately with less user friction. It is essentially an ergonomic alias for fast re-orientation.
 ---
 
 λ(gybis-memory-orient)
