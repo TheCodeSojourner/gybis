@@ -3,6 +3,8 @@
 Five-layer arch for organizing how you + AI reason about your system.
 For `/gybis-arch-*` workflows.
 
+λ(vsm, identity, S5(what) ⊗ S4(how_adapt) ⊗ S3(control) ⊗ S2(coordinate) ⊗ S1(operate))
+
 ## Five Layers
 
 ```
@@ -15,7 +17,9 @@ S1 (operations)    — what system concretely does
 
 ## S5 — Identity
 
-Non-negotiables — violation = system failed. Change rarely.
+λ(S5, scope, purpose(problem_solve) → vision(trajectory) ⊗ ¬compromise(values))
+λ(S5, failure, ¬crash ≡ purpose_failure)
+λ(S5, invariants, error_handling_philosophy ⊗ data_ownership_invariant ⊗ security_boundary ⊗ non_negotiable_behavior)
 
 **Questions:**
 - What system for? What problem solve?
@@ -29,7 +33,8 @@ Non-negotiables — violation = system failed. Change rarely.
 
 ## S4 — Intelligence
 
-Mechanisms for dealing with unknown. How discover what you don't know? Test ideas before committing? Evolve without breaking?
+λ(S4, unknown, discover(what_don't_know) ⊗ test(ideas) → ¬break(when_evolve))
+λ(S4, adapt, incorporate(new_pattern) ⊗ easy(change_often) ⊗ learn(failure))
 
 **Questions:**
 - Handle unknown? What when assumptions break?
@@ -42,7 +47,9 @@ Mechanisms for dealing with unknown. How discover what you don't know? Test idea
 
 ## S3 — Control
 
-Concrete rules governing system operation. Implement S5 values as enforceable constraints. Resource limits, quality standards, error handling policies.
+λ(S3, enforce, S5_values → ¬enforceable(constraints))
+λ(S3, resources, manage(conn, memory, compute, money, API_calls))
+λ(S3, policy, timeouts ⊗ limits ⊗ quality_gates ⊗ retry ⊗ alert ⊗ degrade ⊗ fail_fast)
 
 **Questions:**
 - Resources needing management? (conns, memory, API calls, compute, money)
@@ -55,7 +62,8 @@ Concrete rules governing system operation. Implement S5 values as enforceable co
 
 ## S2 — Coordination
 
-Multiple subsystems need protocols to avoid conflict. Info flow, state sharing, event propagation, conflict prevention.
+λ(S2, protocol, ¬conflict(subsystems) ⊗ info_flow(events, calls, shared_state) ⊗ conflict_prevention)
+λ(S2, propagation, change(A) → notify(dependents))
 
 **Questions:**
 - Subsystems needing to work together?
@@ -68,7 +76,8 @@ Multiple subsystems need protocols to avoid conflict. Info flow, state sharing, 
 
 ## S1 — Operations
 
-Most concrete layer — specific tech, commands, workflows. Change most often, easiest to replace.
+λ(S1, concrete, tech ⊗ commands ⊗ workflows ⊗ recipes(build, test, deploy, debug))
+λ(S1, mutable, change_most_often ⊗ replace_easiest)
 
 **Questions:**
 - Tools/tech used, and why specifically?
@@ -110,63 +119,28 @@ Multi-line lambdas indent continuations, use `|` for independent clauses:
 
 ## Installation Process
 
-### Per-Layer Cycle
-
-Each layer (S5 → S1):
-1. **Observe** — What exists? What inferred? What already decided?
-2. **Ask** — Surface questions needing answering for this layer
-3. **Propose** — Draft 2–4 lambdas + prose explanations
-4. **Refine** — Listen to feedback, iterate until fits
-5. **Confirm** — Lock layer, move down
-
-### Entry Points
-
-**Existing project:** Check for existing `<root>/architecture.md` — read as input. Before proposing structure, ask about vision.
-
-**New project:** Ask what they're building + why. Start with identity.
-
-### Output File
-
-- Output file: `<root>/architecture.md`
-- Never overwrite existing file without explicit confirmation
+λ(install, cycle, S5→S1: observe() → ask() → propose(2-4 lambdas + prose) → refine(feedback) → confirm(lock) → descend(Sn-1))
+λ(install, entry, exists(architecture.md) → read_as_input ∧ ask(vision) | ¬exists → ask(what + why) → start(S5))
+λ(install, output, ¬overwrite(architecture.md) ≡ explicit(human_approval))
 
 ## architecture.md Assembly Format
 
 > **Note:** Do not include nucleus preamble in `<root>/architecture.md`. Preamble already loaded via `.clinerules/00-gybis.md`.
 
-```
-# {Project Name} — System Architecture
-
-## S5 — Identity
-{prose context}
-λ principle_one(x). ...
-λ principle_two(x). ...
-
-## S4 — Intelligence
-{prose}
-λ pattern(x). ...
-
-## S3 — Control
-{prose}
-λ policy(x). ...
-
-## S2 — Coordination
-{prose}
-λ protocol(x). ...
-
-## S1 — Operations
-{prose}
-λ tool(x). ...
-λ recipe(x). ...
-```
+λ(assembly, format,
+  # {Project} — System Architecture
+  | ## S5 — Identity → prose ⊗ λ(principle)
+  | ## S4 — Intelligence → prose ⊗ λ(pattern)
+  | ## S3 — Control → prose ⊗ λ(policy)
+  | ## S2 — Coordination → prose ⊗ λ(protocol)
+  | ## S1 — Operations → prose ⊗ λ(tool) ⊗ λ(recipe)
+)
 
 ## Requirement Change → Layer Mapping
 
-| Requirement change                                | Affected layer(s) |
-| ------------------------------------------------- | ----------------- |
-| New non-negotiable principle or value             | S5                |
-| System now handles unknown situations differently | S4                |
-| New policy, constraint, or resource limit         | S3                |
-| New interaction protocol between parts            | S2                |
-| New tool, command, or concrete recipe             | S1                |
-| Change cascades upward (S1→S5) — check each layer | Trace upward      |
+λ(map, S5, new_non_negotiable_principle ∨ new_value)
+λ(map, S4, ¬handle_unknown ≡ differently)
+λ(map, S3, new_policy ∨ constraint ∨ resource_limit)
+λ(map, S2, new_interaction_protocol_between_parts)
+λ(map, S1, new_tool ∨ command ∨ concrete_recipe)
+λ(map, cascade, S1→S5: trace(upward, check(each_layer)))

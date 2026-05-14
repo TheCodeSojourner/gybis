@@ -29,11 +29,9 @@ open question declarations
 
 ## Naming
 
-| Kind                                                   | Convention          | Exs                              |
-| ------------------------------------------------------ | ------------------- | -------------------------------- |
-| Entities, Rules, Triggers, Actors, Surfaces, Contracts | `PascalCase`        | `Order`, `ShipOrder`, `Customer` |
-| Fields, Config keys, Derived values, Enum values       | `snake_case`        | `shipped_at`, `max_retries`      |
-| Collections (relationship fields)                      | Plural `PascalCase` | `Orders`, `LineItems`            |
+λ(naming, PascalCase, entities ∨ rules ∨ triggers ∨ actors ∨ surfaces ∨ contracts)
+λ(naming, snake_case, fields ∨ config_keys ∨ derived_values ∨ enum_values)
+λ(naming, plural_PascalCase, collections_relationship_fields)
 
 ---
 
@@ -301,35 +299,31 @@ open question "In-flight shipments on account suspend?"
 
 ## Field Modifier Ref
 
-| Syntax                             | Meaning                            |
-| ---------------------------------- | ---------------------------------- |
-| `field: Type`                      | Required, always present           |
-| `field: Type?`                     | Optional                           |
-| `field: Type when status = x`      | Required when status is `x`        |
-| `field: Type when status = x \| y` | Required when status is `x` or `y` |
-| `field: Type? when status = x`     | Optional + state-gated             |
+λ(field_mod, required, field: Type)
+λ(field_mod, optional, field: Type?)
+λ(field_mod, state_gated_required, field: Type when status = x)
+λ(field_mod, multi_state_gated, field: Type when status = x | y)
+λ(field_mod, state_gated_optional, field: Type? when status = x)
 
-**When-clause obligations** (enforced by `allium check`):
-- Rule transitioning INTO `when` set → MUST set field in `ensures:`
-- Rule transitioning OUT of `when` set → MUST clear field in `ensures:`
-- `requires:` reading `when`-qualified field → MUST guard on state first
+λ(when_clause_obligations,
+  transitioning_INTO(when_set) → MUST_set_field(in ensures:)
+  transitioning_OUT_OF(when_set) → MUST_clear_field(in ensures:)
+  requires_reading(when_qualified_field) → MUST_guard_on_state_first
+)
 
 ---
 
 ## Collection Types
 
-| Type          | Ordering  | Use When                          |
-| ------------- | --------- | --------------------------------- |
-| `Set<T>`      | Unordered | Default; order doesn't matter     |
-| `List<T>`     | Explicit  | Insertion order matters           |
-| `Sequence<T>` | Inferred  | Produced by ordered relationships |
+λ(collection, Set<T>, unordered_default)
+λ(collection, List<T>, explicit_ordering_insert_order_matters)
+λ(collection, Sequence<T>, inferred_ordered_relationships)
 
-**Built-in dot-methods:** `.count` `.any()` `.all()` `.first` `.last` `.unique` `.add()` `.remove()`
+λ(collection_methods, .count ∨ .any() ∨ .all() ∨ .first ∨ .last ∨ .unique ∨ .add() ∨ .remove())
+λ(collection_warning, .first/.last require List<T> ∨ Sequence<T> — Set<T> = warning(future_error))
+λ(collection_unique, .unique → Set<T>)
 
-> `.first`/`.last` require `List<T>` or `Sequence<T>` — `Set<T>` = warning (error in future).
-> `.unique` → `Set<T>`.
-
-**Domain-specific ops** — free-standing syntax only:
+Domain-specific ops — free-standing syntax only:
 
 ```allium
 -- CORRECT:
@@ -347,18 +341,16 @@ password.hash()
 
 ## Transition Graph Rules (enforced by `allium check`)
 
-- Non-terminal state → MUST have ≥1 outbound edge
-- `ensures: entity.status = X` → MUST correspond to declared edge
-- Every declared edge → MUST be witnessed by ≥1 rule `ensures:`
-- Enum values not in graph → flagged unreachable
-- `terminal:` states: no outbound edges; rules cannot transition away
+λ(transition_rule, non_terminal → MUST_have(≥1_outbound_edge))
+λ(transition_rule, ensures_status_X → MUST_correspond_to_declared_edge)
+λ(transition_rule, declared_edge → MUST_have(≥1_witnessing_rule_ensures))
+λ(transition_rule, enum_not_in_graph → flagged_unreachable)
+λ(transition_rule, terminal_states → ¬outbound_edges ∧ ¬rules_transition_away)
 
 ---
 
 ## Annotations
 
-| Annotation        | Context                  | Meaning                                            |
-| ----------------- | ------------------------ | -------------------------------------------------- |
-| `@guidance`       | Rule, Surface, top-level | Non-normative impl advice; excluded from semantics |
-| `@invariant Name` | Contract, Surface        | Prose assertion; checked by `allium analyse`       |
-| `@guarantee Name` | Surface                  | Prose guarantee to facing actor                    |
+λ(annotation, @guidance, rule ∨ surface ∨ top_level → non_normative_impl_advice ∨ excluded_from_semantics)
+λ(annotation, @invariant, contract ∨ surface → prose_assertion ∨ checked_by(allium_analyse))
+λ(annotation, @guarantee, surface → prose_guarantee_to_facing_actor)

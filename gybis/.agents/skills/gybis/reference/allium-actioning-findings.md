@@ -2,75 +2,53 @@
 
 Read JSON from `allium check`. Turn into human issues. Decide fix.
 
+λ(actioning, purpose, read(allium_check_JSON) → present(human_issues) → decide(fix))
+
 ---
 
 ## Canonical Sequence
 
 ```bash
-allium check <file> 
+allium check <file>
 ```
+
 ---
 
 ## Reading check Diagnostics
 
-Parse `diagnostics` array. Group by severity:
-
-1. **`error`** — blocks write; fix before save
-2. **`warning`** — human decision (fix or accept)
-3. **`info`** — advisory; show human, no block
-
-**Present each as:**
-
-```
-[E/W/I] {code} at line {line}: {message}
-  → Suggested fix: <interpretation>
-```
+λ(severity, order, error(block_write) > warning(human_decision) > info(advisory))
+λ(present, [E/W/I] {code}@line({line}): {message} → suggested_fix(interpretation))
 
 **Common diagnostics:**
 
-| Code pattern              | Category             | Ask human                                                                     |
-| ------------------------- | -------------------- | ----------------------------------------------------------------------------- |
-| Missing `ensures:`        | Incomplete rule      | "Rule has no outcome — what happens after [trigger]?"                         |
-| Undefined field reference | Missing entity field | "Field `[name]` used in rule but not on [Entity]. Add it?"                    |
-| Contradictory `requires:` | Spec conflict        | "Rules [A] and [B] have conflicting preconditions on [field]. Which correct?" |
-| `when`-clause obligation  | State field gap      | "Transitioning [Entity] to [state] needs field `[name]`. Which rule sets it?" |
-| No `when:` on rule        | Unreachable rule     | "Rule [Name] has no trigger — when should it fire?"                           |
-| Stale `traces:`           | Implementation drift | "Traces reference [file] gone. Update or remove?"                             |
-| Unused `use` import       | Dead import          | "Module [alias] imported but unused. Remove?"                                 |
-| `.first`/`.last` on Set   | Collection type      | "Calling `.first` on unordered Set. Make [field] `List<T>`?"                  |
-| Custom dot-method         | Syntax error         | "Use free-standing: `filter(collection, pred)` not `collection.filter(pred)`" |
-| Missing version header    | Format error         | "Add `-- allium: 3` as first line."                                           |
+λ(diag, missing_ensures, ¬ensures: → "Rule has no outcome — what happens after [trigger]?")
+λ(diag, undefined_field, field_ref(used) ∧ ¬field_ref(entity) → "Field [name] on [Entity]? Add it?")
+λ(diag, contradictory_requires, requires(A) ⊗ requires(B) ⊗ conflict(field) → "Which correct?")
+λ(diag, when_clause_obligation, when(transition(Entity, state)) → needs(field[name]) ∧ ¬rule_sets(it) → "Which rule sets it?")
+λ(diag, no_when_clause, ¬when: on rule → "Rule [Name] has no trigger — when should it fire?")
+λ(diag, stale_traces, traces(file) ∧ ¬exists(file) → "Update or remove?")
+λ(diag, unused_use, use(alias) ∧ ¬used(alias) → "Remove?")
+λ(diag, first_last_on_set, .first/.last(Set) → "Make [field] `List<T>`?")
+λ(diag, custom_dot_method, collection.filter(pred) → "Use free-standing: `filter(collection, pred)`")
+λ(diag, missing_version, ¬-- allium: 3 at line 1 → "Add `-- allium: 3` as first line.")
 
 ---
 
 ## Priority Rules
 
-| Situation                | Action                                          |
-| ------------------------ | ----------------------------------------------- |
-| `check` errors present   | Block writes; fix errors first                  |
-| `check` warnings present | Show human; need explicit decision before write |
-| `check` exits 0          | Proceed to `analyse`                            |
+λ(priority, errors_present, check(errors) → ¬write ∧ fix_first)
+λ(priority, warnings_present, check(warnings) → present(human) ∧ explicit(decision) → write)
+λ(priority, exit_0, check(exit 0) → proceed(analyse))
 
 ---
 
 ## Auto-Fix vs. Surface to Human
 
-**Auto-fix (no approval):**
-- Missing version header (`-- allium: 3`) — add silently
-- Unused `use` imports — remove silently
-- Formatting issues (indentation, spacing)
-
-**Always surface:**
-- Any `error`/`warning` on behavioral semantics
-- `data_flow` findings (human knows if dead data intentional)
-- Stale `traces:` references (human knows current location)
+λ(autofix, ¬approval_needed, version_header ∨ unused_import ∨ formatting(indent, spacing))
+λ(surface, ¬autofix, error_behavior ∨ warning_behavior ∨ data_flow(human_knows_dead_intentional) ∨ stale_traces(human_knows_location))
 
 ---
 
 ## After Fixes
 
-Re-run after fixes, confirm no regressions:
-
-```bash
-allium check <file>    # must exit 0
-```
+λ(verify, fixes → allium_check(file) ≡ exit(0) ∧ ¬regressions)

@@ -4,55 +4,37 @@ When working with an Allium spec, assess its maturity before deciding what to do
 
 ## Spec-level assessment
 
-Read the spec and note which constructs are present:
+λ(construct, entities_no_transitions → lifecycles_unexplored)
+λ(construct, transition_graphs → lifecycles_sketched(states_and_flows_known)
+λ(construct, rules_witnessing_transitions → behaviour_specified(triggers_guards_outcomes)
+λ(construct, surfaces_exposes_provides → boundaries_defined(who_sees_what)
+λ(construct, actors_identified_by → roles_formalised)
+λ(construct, invariants → cross_cutting_properties_asserted)
+λ(construct, open_questions → known_unknowns_documented)
+λ(construct, deferred_specifications → complexity_acked_scoped_for_later)
 
-| What's present                             | What it tells you                                                  |
-| ------------------------------------------ | ------------------------------------------------------------------ |
-| Entities with fields, no transition graphs | Domain concepts identified but lifecycles not yet explored         |
-| Transition graphs on entities              | Lifecycles sketched — the user knows the states and intended flows |
-| Rules witnessing transitions               | Behaviour specified — triggers, guards and outcomes defined        |
-| Surfaces with exposes and provides         | Boundaries defined — who sees what and can do what                 |
-| Actors with identified_by                  | Roles identified and formalised                                    |
-| Invariants                                 | Cross-cutting properties asserted                                  |
-| Open questions                             | Known unknowns documented                                          |
-| Deferred specifications                    | Complexity acknowledged and scoped for later                       |
-
-A spec with entities and transition graphs but no rules is coarse. The right next step is filling in rules ("what triggers this transition?"). A spec with rules but no surfaces has behaviour without boundaries. The right next step is asking about actors and what they see.
+λ(assessment, coarse, entities + transitions ∧ ¬rules → fill(rules: "what triggers this transition?"))
+λ(assessment, behaviourless, rules ∧ ¬surfaces → add(surfaces: "actors and what they see"))
 
 ## Per-entity assessment
 
-Each entity can be at a different level of development. Check:
-
-- **Has a transition graph?** The lifecycle is sketched.
-- **Has witnessing rules for all transitions?** Every declared edge has a rule that produces it.
-- **Has surfaces providing all external triggers?** Every rule that listens for an external stimulus has a surface that provides it.
-- **Has all `requires` clauses traceable to a producer?** Every precondition can be satisfied by a prior rule or surface in the spec.
-
-An entity that has all four is structurally complete. It may still lack exception transitions, temporal triggers or failure paths — those are explored through obstacle elicitation, not structural assessment. An entity missing the fourth criterion has gaps the user may not be aware of.
+λ(entity_checklist, transition_graph? ∧ all_witnessing_rules? ∧ all_surfaces_providing_triggers? ∧ all_requires_traceable_to_producer?)
+λ(entity_complete, all_four → structurally_complete(¬exception_transitions ∧ ¬temporal_triggers ∧ ¬failure_paths → obstacle_elicitation))
+λ(entity_missing_fourth, ¬traceable_requires → gaps_user_may_not_know)
 
 ## When to use `check` vs `analyse`
 
-If the Allium CLI is available:
-
-The two commands produce different kinds of output. `check` produces **diagnostics**: line-level structural warnings (syntax issues, unreachable values, unused fields). `analyse` produces **findings**: process-level results with typed evidence (missing producers, dead transitions, deadlocks). Both are returned as JSON. See [actioning findings](allium-actioning-findings.md) for how to translate findings into domain questions.
-
-Run `allium check` after every edit. It validates what's written — syntax, field resolution, transition graph structure, witnessing rules. It's fast and useful at every stage, including coarse specs.
-
-Run `allium analyse` at natural checkpoints: when the user asks about completeness, when at least one entity has both witnessing rules and surfaces defined, when transitioning from one entity to another, or when stepping back to review. It reasons about what's missing — data flow gaps, unreachable transitions, deadlocks.
-
-If the CLI is not available, fall back to the language reference for validation. The first time this fallback happens, note: "I'll validate against the language reference instead. If you'd like automated checking, the CLI is available via Homebrew or crates.io — see the README for details."
-
-If `allium analyse` fails with an unrecognised command error, the installed CLI predates the `analyse` feature. Fall back to conversational analysis (trace data flow and reachability by reading the spec) and don't retry `analyse` in the same session. Mention that updating the CLI would enable automated process-level checking.
+λ(when, check, available → run(after_each_edit, validates(syntax ∧ field_resolution ∧ transition_structure ∧ witnessing_rules) ∧ fast ∧ useful_at_all_stages))
+λ(when, analyse, available → run(at_checkpoints: completeness_request ∧ entity_has(rules ∧ surfaces) ∧ entity_transition ∧ step_back_review, reasons_about(missing_producers ∧ dead_transitions ∧ deadlocks)))
+λ(when, cli_missing, ¬CLI_available → fallback(language_reference_validation) ∧ note("CLI available via Homebrew/crates.io — see README"))
+λ(when, analyse_unrecognized, analyse → unrecognised_command_error → CLI_predates_analyse_feature, fallback(conversational_analysis: trace_data_flow_reachability_by_reading_spec) ∧ ¬retry(analyse, same_session) ∧ note(update_CLI_enables_automated_checking))
 
 ## Adjusting your approach
 
-Work at the right level for each part of the spec:
-
-- A coarse entity calls for walkthrough questions: "What triggers this transition? Who's involved at this step?"
-- A detailed entity with rules calls for gap analysis: "This rule requires a value that nothing in the spec produces. Where does it come from?"
-- A well-specified entity calls for validation: "Here's the lifecycle as I understand it — does this match your mental model?"
-
-Don't apply detailed analysis to a coarse spec (it produces noise about things that haven't been written yet). Don't ask exploratory questions about an entity that already has rules and surfaces covering all declared transitions, including exception paths (the user has already answered them).
+λ(approach, coarse_entity → walkthrough("What triggers this transition? Who's involved?"))
+λ(approach, detailed_entity → gap_analysis("This rule requires a value that nothing produces. Where from?"))
+λ(approach, well_specified_entity → validation("Here's the lifecycle — does it match your mental model?"))
+λ(approach, warning, ¬detailed_analysis_on_coarse_spec → noise_about_unwritten_things ∧ ¬exploratory_questions_on_complete_entity → user_already_answered_them)
 
 ## Communicating with stakeholders
 
