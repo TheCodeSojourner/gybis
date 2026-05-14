@@ -1,6 +1,6 @@
 ---
 name: gybis-arch-tend
-description: This skill updates an existing architecture.md when the human already knows requirements have changed, guiding the change through the correct VSM layers (S5 to S1). It asks what changed, maps impacts by layer, shows current lambdas, drafts grouped add/modify/remove proposals with explanations, and iterates until explicit human approval before writing. After writing, it verifies structural integrity (no duplicate lambdas, correct layer order, prose plus lambdas per layer) and can then suggest /gybis-arch-weed for alignment checks against specs.
+description: Use for `/gybis-arch-tend` or `/ga-tend`. This skill updates an existing architecture.md when the human already knows requirements have changed, guiding the change through the correct VSM layers (S5 to S1). It asks what changed, maps impacts by layer, shows current lambdas, drafts grouped add/modify/remove proposals with explanations, and iterates until explicit human approval before writing. After writing, it verifies structural integrity (no duplicate lambdas, correct layer order, prose plus lambdas per layer) and can then suggest /gybis-arch-weed for alignment checks against specs.
 ---
 
 λ(gybis-arch-tend)
