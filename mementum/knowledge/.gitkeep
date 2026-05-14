@@ -1,0 +1,2 @@
+# This file ensures the knowledge directory is tracked by git
+# Even when empty, git will preserve this directory in the repository
