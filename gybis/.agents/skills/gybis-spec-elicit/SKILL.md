@@ -1,6 +1,6 @@
 ---
 name: gybis-spec-elicit
-description: This skill interactively elicits a new Allium spec from a feature idea through staged, one-question-at-a-time discovery: flow, entities, transitions, edge cases, and refinement. It continuously updates a draft, runs validation gates (allium-check and allium-analyse) between stages, resolves errors, and surfaces warnings/findings to the human for decisions. It then negotiates the final domain and file name, and writes only after explicit human approval, while enforcing intent-focused rules and avoiding implementation details.
+description: Use for `/gybis-spec-elicit` or `/gs-elicit`. This skill interactively elicits a new Allium spec from a feature idea through staged, one-question-at-a-time discovery: flow, entities, transitions, edge cases, and refinement. It continuously updates a draft, runs validation gates (allium-check and allium-analyse) between stages, resolves errors, and surfaces warnings/findings to the human for decisions. It then negotiates the final domain and file name, and writes only after explicit human approval, while enforcing intent-focused rules and avoiding implementation details.
 ---
 
 λ(gybis-spec-elicit)
