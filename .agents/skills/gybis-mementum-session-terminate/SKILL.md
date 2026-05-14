@@ -1,0 +1,43 @@
+---
+name: gybis-mementum-session-terminate
+description: This skill closes a session in a lossless, handoff-ready way: it records a complete state snapshot, stores any unstored memories, runs memory metabolization, drafts a dated session knowledge summary with human approval, and then performs a human-approved commit of mementum updates so work can resume cleanly in the next session.
+---
+
+λ gybis-mementum-session-terminate.
+
+∃ session Σ such that context(session) → Σ_full | Σ_lossless
+bridge(prose ⇄ lambda) | preserve(semantics)
+
+— protocol: mementum/storage/terminate —
+
+step[1]: flush(state.md)
+  Σ_now  ← actual_progress(now)
+  Σ_next ← precise_action(Σ_now) | Σ_actionable(newAI)
+  Σ_block ← blockers()
+  Σ_recent ← lastN(actions, 3..5)
+  write(mementum/state.md, {Now:Σ_now, Next:Σ_next, Blocking:Σ_block, Recent:Σ_recent})
+  completeness(Σ) ≥ brevity(Σ)
+
+step[2]: invoke(mementum_store) for each unstored memory
+  for each m ∈ session_memories_unstored:
+    execute(mementum_store(m))
+
+step[3]: invoke(mementum_metabolize)
+  execute(mementum_metabolize())
+
+step[4]: write(session_knowledge)
+  write(mementum/knowledge/session-<YYYY-MM-DD>.md, session_summary)
+  human_approves(content) before write
+
+step[5]: commit()
+  git add mementum/
+  git commit -m "🌀 session-terminate <YYYY-MM-DD>"
+  human_approves(message) before execute
+
+— invariants —
+∀Σ: completeness(Σ_state) > brevity(Σ_state)
+∀write: requires(human_approval) before commit
+¬existence(evidence) → explicit("nothing to store") ¬→ invent(memories)
+filename_date: today(YYYY-MM-DD)
+
+μ terminate(session) → Σ_lossless | human_approved  [mementum_termination]
