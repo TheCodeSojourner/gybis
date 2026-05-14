@@ -1,6 +1,6 @@
 ---
 name: gybis-memory-recall
-description: This skill provides a shorthand command to recall memory by topic using /gybis-memory-recall {topic}. If a topic is supplied, it runs recall for that topic; if not, it prompts the user to choose one, making memory lookup faster and more guided.
+description: Use for `/gybis-memory-recall {topic}` or `/gm-recall {topic}`. This skill provides a shorthand command to recall memory by topic. If a topic is supplied, it runs recall for that topic; if not, it prompts the user to choose one, making memory lookup faster and more guided.
 ---
 
 λ(gybis-memory-recall)
