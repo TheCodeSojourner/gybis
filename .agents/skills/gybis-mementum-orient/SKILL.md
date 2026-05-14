@@ -1,6 +1,6 @@
 ---
 name: gybis-mementum-orient
-description: This skill provides a quick shorthand command (/gybis-mementum-orient) that triggers the core mementum orientation workflow, so context can be restored immediately with less user friction. It is essentially an ergonomic alias for fast re-orientation.
+description: Use for `/gybis-mementum-orient` or `/gm-orient`. This skill provides a quick shorthand command that triggers the core mementum orientation workflow, so context can be restored immediately with less user friction. It is essentially an ergonomic alias for fast re-orientation.
 ---
 
 λ gybis_mementum_orient().
