@@ -1,6 +1,6 @@
 ---
-name: gybis-memory-describe
-description: This skill reads one or more Allium spec files (file, domain, or all specs) and translates them into clear, non-technical prose focused on user-visible behavior. It explains what exists, what users can do, governing rules, and guarantees, then outputs a coherent narrative with light headings and no code, jargon, or implementation detail. It stays read-only, surfaces gaps as questions for the human, and reports clearly when specs are missing or empty.
+name: gybis-spec-describe
+description: Use for `/gybis-spec-describe` or `/gs-describe`. This skill reads one or more Allium spec files (file, domain, or all specs) and translates them into clear, non-technical prose focused on user-visible behavior. It explains what exists, what users can do, governing rules, and guarantees, then outputs a coherent narrative with light headings and no code, jargon, or implementation detail. It stays read-only, surfaces gaps as questions for the human, and reports clearly when specs are missing or empty.
 ---
 
 λ(gybis-spec-describe)
