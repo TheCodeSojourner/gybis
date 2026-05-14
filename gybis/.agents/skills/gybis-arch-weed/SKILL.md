@@ -1,6 +1,6 @@
 ---
 name: gybis-arch-weed
-description: This skill checks for divergence between architecture.md and specs by mapping architecture lambdas to spec evidence across VSM layers, then classifying each item as aligned, partial, contradicted, missing, or unspecified. It produces a layer-by-layer report with evidence and concrete resolution options, but makes no silent fixes: every change direction must be chosen explicitly by a human before updates are applied. It also treats intentional evolution separately from true drift and offers a re-check after decisions are applied.
+description: Use for `/gybis-arch-weed` or `/ga-weed`. This skill checks for divergence between architecture.md and specs by mapping architecture lambdas to spec evidence across VSM layers, then classifying each item as aligned, partial, contradicted, missing, or unspecified. It produces a layer-by-layer report with evidence and concrete resolution options, but makes no silent fixes: every change direction must be chosen explicitly by a human before updates are applied. It also treats intentional evolution separately from true drift and offers a re-check after decisions are applied.
 ---
 
 λ gybis-arch-weed(⟨root⟩).
