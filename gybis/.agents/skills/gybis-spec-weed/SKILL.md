@@ -1,6 +1,6 @@
 ---
 name: gybis-spec-weed
-description: This skill finds and resolves divergence between an Allium spec and implementation by combining CLI analysis, model-based spec parsing, and code trace inspection. It classifies mismatches (aligned, partial, missing, contradicted), includes process-level issues like deadlocks or unreachable flows, and presents two fix directions for each divergence: align code to spec or spec to code. It never resolves silently, requires human choice per item, and re-validates with allium-check/allium-analyse after approved changes.
+description: Use for `/gybis-spec-weed` or `/gs-weed`. This skill finds and resolves divergence between an Allium spec and implementation by combining CLI analysis, model-based spec parsing, and code trace inspection. It classifies mismatches (aligned, partial, missing, contradicted), includes process-level issues like deadlocks or unreachable flows, and presents two fix directions for each divergence: align code to spec or spec to code. It never resolves silently, requires human choice per item, and re-validates with allium-check/allium-analyse after approved changes.
 ---
 
 λ(gybis-spec-weed)
