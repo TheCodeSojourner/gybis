@@ -6,16 +6,16 @@ When working with an Allium spec, assess its maturity before deciding what to do
 
 Read the spec and note which constructs are present:
 
-| What's present | What it tells you |
-|---|---|
-| Entities with fields, no transition graphs | Domain concepts identified but lifecycles not yet explored |
-| Transition graphs on entities | Lifecycles sketched — the user knows the states and intended flows |
-| Rules witnessing transitions | Behaviour specified — triggers, guards and outcomes defined |
-| Surfaces with exposes and provides | Boundaries defined — who sees what and can do what |
-| Actors with identified_by | Roles identified and formalised |
-| Invariants | Cross-cutting properties asserted |
-| Open questions | Known unknowns documented |
-| Deferred specifications | Complexity acknowledged and scoped for later |
+| What's present                             | What it tells you                                                  |
+| ------------------------------------------ | ------------------------------------------------------------------ |
+| Entities with fields, no transition graphs | Domain concepts identified but lifecycles not yet explored         |
+| Transition graphs on entities              | Lifecycles sketched — the user knows the states and intended flows |
+| Rules witnessing transitions               | Behaviour specified — triggers, guards and outcomes defined        |
+| Surfaces with exposes and provides         | Boundaries defined — who sees what and can do what                 |
+| Actors with identified_by                  | Roles identified and formalised                                    |
+| Invariants                                 | Cross-cutting properties asserted                                  |
+| Open questions                             | Known unknowns documented                                          |
+| Deferred specifications                    | Complexity acknowledged and scoped for later                       |
 
 A spec with entities and transition graphs but no rules is coarse. The right next step is filling in rules ("what triggers this transition?"). A spec with rules but no surfaces has behaviour without boundaries. The right next step is asking about actors and what they see.
 
@@ -34,7 +34,7 @@ An entity that has all four is structurally complete. It may still lack exceptio
 
 If the Allium CLI is available:
 
-The two commands produce different kinds of output. `check` produces **diagnostics**: line-level structural warnings (syntax issues, unreachable values, unused fields). `analyse` produces **findings**: process-level results with typed evidence (missing producers, dead transitions, deadlocks). Both are returned as JSON. See [actioning findings](actioning-findings.md) for how to translate findings into domain questions.
+The two commands produce different kinds of output. `check` produces **diagnostics**: line-level structural warnings (syntax issues, unreachable values, unused fields). `analyse` produces **findings**: process-level results with typed evidence (missing producers, dead transitions, deadlocks). Both are returned as JSON. See [actioning findings](allium-actioning-findings.md) for how to translate findings into domain questions.
 
 Run `allium check` after every edit. It validates what's written — syntax, field resolution, transition graph structure, witnessing rules. It's fast and useful at every stage, including coarse specs.
 
