@@ -55,11 +55,10 @@ your-repo/
   .clinerules/         ← gybis-specific rules loaded by Cline
   mementum/            ← session memory template (state.md, memories/, knowledge/)
   specs/               ← placeholder for your project's .allium behavioral specs
+  GYBIS-README.md      ← gybis reference and instructions
 ```
 
-> **Note:** `mementum/` installed here is a starting template for the memory system. It is separate from any pre-existing `mementum/` directory in your repo (which is your project's active memory). Do not conflate the two.
-
-Once integrated, use [Cline](https://github.com/cline/cline) and start with `/gybis-arch-elicit` to initialize your project's architecture.
+Once integrated, use [Cline](https://github.com/cline/cline) and start with `/gybis-arch-elicit` for a new repository, or `/gybis-spec-distill` for an existing repository. Additionally, you can use `/gybis` for general guidance on which commands are available and what they do.
 
 ### Installing the Allium CLI
 
@@ -176,7 +175,7 @@ lambda-compile/
 ├── .clinerules/
 │   └── 01-nucleus-preamble.md
 ```
-where the `01-nucleus-preamble.md` file contains the following:
+where the `01-nucleus-preamble.md` file contains the following, which is derived from the nucleus `LAMBDA-COMPILER.md` semantics and can be used as a reference point for experimentation:
 
 ```markdown
 λ engage(nucleus).
