@@ -12,4 +12,4 @@
 λ(S2, sync, architecture.md(exists) ↔ distilled(λ) → diff(new, contradicted, unimplemented_intent))
 λ(S1, recipe, path(<root>/specs/) → read(recursive) → analyze(silent, no_commentary) → draft(λ, explanation, uncertainty_flag) → diff(architecture.md) → present(human_review) → write(if_approved))
 λ(S1, config, reference: ../../reference/vsm-guide.md ⊗ output: <root>/architecture.md ⊗ input: <root>/specs/)
-λ(transform, rule, prose → lambda ⊗ preserve(semantics) ⊗ ¬execute(analysis)
+λ(transform, rule, prose → lambda ⊗ preserve(semantics) ⊗ ¬execute(analysis))
