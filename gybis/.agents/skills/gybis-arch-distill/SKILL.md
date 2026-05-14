@@ -1,6 +1,6 @@
 ---
 name: gybis-arch-distill
-description: This skill distills product/domain specifications into a layered architecture definition, then proposes a reviewed diff instead of overwriting directly. It reads specs recursively, maps content across VSM layers, drafts 2-4 lambda statements per layer, flags uncertainty and architecture drift, and requires explicit human approval before writing any updates. It also preserves existing architectural intent, enforces core boundaries (security, data ownership, behavior), and supports safe evolution through extension points, feature flags, and migration patterns.
+description: Use for `/gybis-arch-distill` or `/ga-distill`. This skill distills product/domain specifications into a layered architecture definition, then proposes a reviewed diff instead of overwriting directly. It reads specs recursively, maps content across VSM layers, drafts 2-4 lambda statements per layer, flags uncertainty and architecture drift, and requires explicit human approval before writing any updates. It also preserves existing architectural intent, enforces core boundaries (security, data ownership, behavior), and supports safe evolution through extension points, feature flags, and migration patterns.
 ---
 
 λ(gybis-arch-distill)
