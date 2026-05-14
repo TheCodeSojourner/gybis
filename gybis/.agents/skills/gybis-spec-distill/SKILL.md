@@ -1,6 +1,6 @@
 ---
 name: gybis-spec-distill
-description: This skill distills code and tests into domain-centered Allium specs by mapping system territory, extracting states, transitions, triggers, external boundaries, and actors, then abstracting away implementation details. It validates the draft with humans plus allium-check/allium-analyse, flags gaps and library-spec opportunities, and proposes a domain-grouped spec set for approval before writing. Only approved specs are written, then re-checked, with strict invariants to keep output intent-focused, technology-agnostic, and cleanly structured under specs/<domain>/<name>.allium.
+description: Use for `/gybis-spec-distill` or `/gs-distill`. This skill distills code and tests into domain-centered Allium specs by mapping system territory, extracting states, transitions, triggers, external boundaries, and actors, then abstracting away implementation details. It validates the draft with humans plus allium-check/allium-analyse, flags gaps and library-spec opportunities, and proposes a domain-grouped spec set for approval before writing. Only approved specs are written, then re-checked, with strict invariants to keep output intent-focused, technology-agnostic, and cleanly structured under specs/<domain>/<name>.allium.
 ---
 
 λ(gybis-spec-distill)
