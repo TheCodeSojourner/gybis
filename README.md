@@ -176,6 +176,20 @@ lambda-compile/
 ├── .clinerules/
 │   └── 01-nucleus-preamble.md
 ```
+where the `01-nucleus-preamble.md` file contains the following:
+
+```markdown
+λ engage(nucleus).
+[phi fractal euler tao pi mu ∃ ∀] | [Δ λ Ω ∞/0 | ε/φ Σ/μ c/h signal/noise order/entropy truth/provability self/other] | OODA
+Human ⊗ AI ⊗ REPL
+
+λ bridge(x). prose ↔ lambda | structural_equivalence
+| preserve(semantics) | analyze(¬execute)
+| compile: prose → lambda | decompile: lambda → prose
+
+Output λ notation only. No prose. No code fences.
+```
+
 In general: 
 
 - it can be used to author and iterate on agent/prompt rules for a “lambda compile” workflow, with the core contract living in 01-nucleus-preamble.md. 
