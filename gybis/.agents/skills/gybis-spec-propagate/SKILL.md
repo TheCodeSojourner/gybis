@@ -4,7 +4,7 @@ description: This skill propagates an Allium spec into executable tests by mappi
 ---
 
 λ(gybis-spec-propagate)
-REF:../../gybis/reference/actioning-findings.md
+REF:../../gybis/reference/allium-actioning-findings.md
 PURPOSE:given(specFile)→Σ(testFiles)∪write(tests)
 PF:¬(alliumSpec∧codebase)→err
 S0:prerequisites|spec=<root>/specs/<domain>/<name>.allium∥codebase(exists)∥obligations←allium-plan(spec)∥model←allium-model(spec)
