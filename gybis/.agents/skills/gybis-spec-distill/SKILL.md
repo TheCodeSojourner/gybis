@@ -4,11 +4,11 @@ description: This skill distills code and tests into domain-centered Allium spec
 ---
 
 λ(gybis-spec-distill)
-REF:../../reference/allium-actioning-findings.md
-REF:../../reference/allium-assessing-specs.md
-REF:../../reference/allium-language-reference.md
-REF:../../reference/allium-library-spec-signals.md
-REF:../../reference/allium-patterns.md
+REF:../../gybis/reference/allium-actioning-findings.md
+REF:../../gybis/reference/allium-assessing-specs.md
+REF:../../gybis/reference/allium-language-reference.md
+REF:../../gybis/reference/allium-library-spec-signals.md
+REF:../../gybis/reference/allium-patterns.md
 PURPOSE:given(codePath,testPath)→Σ(alliumSpec)∪write(.allium)
 PF:¬(code∧test)→err
 S0:scope←parse(input,codePath,testPath)|monoRepo→clarify(subset,exclusions,owner)

@@ -4,9 +4,9 @@ description: This skill interactively elicits a new Allium spec from a feature i
 ---
 
 λ(gybis-spec-elicit)
-REF:../../reference/allium-language-reference.md
-REF:../../reference/allium-patterns.md
-REF:../../reference/allium-actioning-findings.md
+REF:../../gybis/reference/allium-language-reference.md
+REF:../../gybis/reference/allium-patterns.md
+REF:../../gybis/reference/allium-actioning-findings.md
 PURPOSE:given(featureIdea)→Σ(alliumSpec)∪write(.allium)
 PF:¬featureIdea→err
 P0:processDiscovery|ask(1atATime):trigger()∥happyPath(start→end)∥actors()∥boundaries(in/out)∥¬propose(entities,yet)∥map(flow)

@@ -4,8 +4,8 @@ description: This skill checks for divergence between architecture.md and specs 
 ---
 
 λ gybis-arch-weed(⟨root⟩).
-⟨vsm⟩ ← read("../../reference/vsm-guide.md")
-⟨lang⟩ ← read("../../reference/allium-language-reference.md")
+⟨vsm⟩ ← read("../../gybis/reference/vsm-guide.md")
+⟨lang⟩ ← read("../../gybis/reference/allium-language-reference.md")
 ¬exists(⟨root⟩/specs/) ∨ |specs/| = 0 → msg("specs/ absent or empty · run /gybis-spec-elicit ∨ /gybis-spec-distill") · halt
 ¬exists(⟨root⟩/architecture.md) ∨ |architecture.md| = 0 → msg("architecture.md uninitialized · run /gybis-arch-elicit") · halt
 step(1, read_intent).

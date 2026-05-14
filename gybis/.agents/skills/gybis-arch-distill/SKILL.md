@@ -16,5 +16,5 @@ description: This skill distills product/domain specifications into a layered ar
 λ(S2, coordination, read(specs/<root>/**.md) ↔ map(VSM_layer) ⊗ output(draft λ organized by S5..S1))
 λ(S2, sync, architecture.md(exists) ↔ distilled(λ) → diff(new, contradicted, unimplemented_intent))
 λ(S1, recipe, path(<root>/specs/) → read(recursive) → analyze(silent, no_commentary) → draft(λ, explanation, uncertainty_flag) → diff(architecture.md) → present(human_review) → write(if_approved))
-λ(S1, config, reference: ../../reference/vsm-guide.md ⊗ output: <root>/architecture.md ⊗ input: <root>/specs/)
+λ(S1, config, reference: ../../gybis/reference/vsm-guide.md ⊗ output: <root>/architecture.md ⊗ input: <root>/specs/)
 λ(transform, rule, prose → lambda ⊗ preserve(semantics) ⊗ ¬execute(analysis))

@@ -4,7 +4,7 @@ description: This skill finds and resolves divergence between an Allium spec and
 ---
 
 λ(gybis-spec-weed)
-REF:../../reference/allium-actioning-findings.md
+REF:../../gybis/reference/allium-actioning-findings.md
 PURPOSE:given(specFile)→Σ(divergences)∪humanDecides(fixDirection)∪apply(fix)
 PF:¬alliumSpec→err
 S0:allium-check(specFile)∧allium-analyse(specFile)∥read(findings JSON)∥process-level(deadlocks,conflicts,unreachable,dataFlowGaps)→weedReport(specInternalDivergences)

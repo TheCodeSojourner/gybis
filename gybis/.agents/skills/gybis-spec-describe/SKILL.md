@@ -4,7 +4,7 @@ description: This skill reads one or more Allium spec files (file, domain, or al
 ---
 
 λ(gybis-spec-describe)
-REF:../../reference/allium-language-reference.md
+REF:../../gybis/reference/allium-language-reference.md
 PURPOSE:given(file|domain)→prose(non-technical)∪readOnly
 PF:¬alliumFiles→say(emptyOrMissing)
 S0:files←parse(input)|file→read(single)∥domain→read(all,<root>/specs/{domain}/*.allium)∥noArg→read(all,<root>/specs/**/*.allium)∥ambiguous→ask(human,clarify)

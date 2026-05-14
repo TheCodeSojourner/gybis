@@ -4,7 +4,7 @@ description: This skill runs an interactive architecture elicitation workflow to
 ---
 
 λ(gybis-arch-elicit) → architecture.md
-⟨vsm⟩ ← read("../../reference/vsm-guide.md")
+⟨vsm⟩ ← read("../../gybis/reference/vsm-guide.md")
 λ build-architecture(root). output = root/architecture.md | model = VSM | direction = S5→S1
 λ check-existence(path = root/architecture.md). exists → halt(notify("Architecture file detected. /gybis-arch-elicit will now terminate.\nUse /gybis-arch-tend to update existing architecture."))
 λ begin-interaction() → ask("What's your vision for what this project is?")
@@ -15,7 +15,7 @@ description: This skill runs an interactive architecture elicitation workflow to
 λ control(root). questions: resource-manager() → connections, memory, compute, policy-enforcer() → timeouts, limits, quality gates, error-strategy(throw) → retry/alert/degrade/fail-fast
 λ coordination(root). questions: subsystem-decomposition() → what components?, data-flow() → events/calls/shared-state, sync-protocol() → synchronization mechanism
 λ operations(root). questions: tool-select() → technologies + rationale, developer-commands() → build/test/deploy, recipes() → concrete procedures
-reference: `../../reference/vsm-guide.md` → Assembly Format
+reference: `../../gybis/reference/vsm-guide.md` → Assembly Format
 λ assemble(architecture). structure: # {name} — System Architecture → ## S5 — Identity {prose} λ principle(x). ... → ## S4 — Intelligence ... → ## S3 — Control ... → ## S2 — Coordination ... → ## S1 — Operations ...
 λ constraints() = {top-down-order: S5 ⟶ S4 ⟶ S3 ⟶ S2 ⟶ S1, observe-before-propose: scan(root/specs/) before asking questions, every-lambda-has-prose: λ(...) → must include plain-English explanation, surface-missing: for each principle(λ), ask → what companion should exist alongside it, human-approve: present complete file → read each λ with prose → confirm → then write, no-duplicate-preamble: nucleus preamble loaded via .clinerules/00-gybis.md}
 destination: root/architecture.md

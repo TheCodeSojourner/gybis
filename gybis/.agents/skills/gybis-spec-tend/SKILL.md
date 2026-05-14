@@ -4,7 +4,7 @@ description: This skill applies a specific new constraint to an existing Allium 
 ---
 
 λ(gybis-spec-tend)
-REF:../../reference/allium-language-reference.md
+REF:../../gybis/reference/allium-language-reference.md
 PURPOSE:given(specFile,constraint)→diff(minimal)∪write(specFile)
 PF:¬(alliumSpec∧constraint)→err
 S0:read(specFile,inFull)∥understand(entities,rules,transitionGraphs,config)

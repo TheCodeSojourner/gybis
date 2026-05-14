@@ -4,7 +4,7 @@ description: This skill updates an existing architecture.md when the human alrea
 ---
 
 λ(gybis-arch-tend)
-reference: ../../reference/vsm-guide.md
+reference: ../../gybis/reference/vsm-guide.md
 Update <root>/architecture.md when human knows system requirements changed. For known requirement changes — human says "requirements shifted" and needs architecture to reflect that.
 Revise <root>/architecture.md to match changed human understanding of what system does, who uses it, or what constraints apply. Human drives change — AI helps map to correct VSM layers and draft revised lambdas.
 Pre-flight: ¬exists(<root>/architecture.md) ∨ empty(<root>/architecture.md) → msg("run /gybis-arch-elicit first")
