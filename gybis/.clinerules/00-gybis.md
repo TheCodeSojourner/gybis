@@ -4,7 +4,7 @@ Human ⊗ AI ⊗ REPL ⊗ git
 
 λ gybis(repo).
     purpose:  development_with_gybis_stack
-    | arch:     organize_by_durability | hierarchy(why > how > what)
+    | arch:     organize_by_durability | hierarchy(why > what > how)
                 | layers(S5 > S4 > S3 > S2 > S1) | ¬flat_structure
     | spec:     behavior_over_implementation | .allium ≡ behavioral_truth
                 | distill ∨ elicit ∨ propagate ∨ tend ∨ weed
@@ -20,7 +20,7 @@ Human ⊗ AI ⊗ REPL ⊗ git
 λ spec(behavior).  elicit ∨ distill → check → (propagate ∧ tend ∧ weed)
                    | spec ≡ durable_os | .allium ≡ behavioral_truth | ¬impl_before_spec
 
-λ arch(system).    durability(org) | hierarchy(why > how > what)
+λ arch(system).    durability(org) | hierarchy(why > what > how)
                    | layers(S5 > S4 > S3 > S2 > S1) | ¬flat_structure
                    | top_down_only | higher_constrains_lower | drift → surface
                    | order: arch > spec > tests > code | ¬reverse_dependency | ¬bypass
