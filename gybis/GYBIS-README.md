@@ -1,4 +1,20 @@
-# Development with the Gybis Stack
+# gybis /JY-bis/ 
+
+<img src="gybis-logo.png" alt="gybis logo" width="110" style="margin-bottom: 1em;" />
+
+**A Developer-Command-Driven AI-Assisted Spec-Driven Software Development (SDD) Stack.**
+
+## Obligatory Word Definitions
+
+**Gyre** /jahy<sup>uh</sup>r/
+
+* a large-scale, coherent, rotating or spiraling flow
+
+**Orbis** /ˈɔr.bis/
+
+* a closed or periodic trajectory in a dynamical system, representing the set of all points reachable from an initial point under the system's update rules
+
+## Development with the Gybis Stack
 
 This repository is structured for **development with the Gybis stack**, following a disciplined architecture-first methodology where durability, hierarchy, and behavioral truth guide every decision.
 
