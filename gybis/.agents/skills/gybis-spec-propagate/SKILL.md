@@ -1,6 +1,6 @@
 ---
 name: gybis-spec-propagate
-description: This skill propagates an Allium spec into executable tests by mapping spec obligations to real implementation surfaces, rules, entities, and transitions, then generating coverage across behavior, invariants, temporal logic, and cross-module flows. It chooses the right test strategy (assertion-based, property-based, or state-machine), builds transition action maps, reuses existing tests to avoid duplication, and creates stubs for deferred modules when code is missing. It verifies generated tests for compile/syntax validity and prioritizes gaps flagged by analysis, producing test files as a practical starting point for refinement.
+description: Use for `/gybis-spec-propagate` or `/gs-propagate`. This skill propagates an Allium spec into executable tests by mapping spec obligations to real implementation surfaces, rules, entities, and transitions, then generating coverage across behavior, invariants, temporal logic, and cross-module flows. It chooses the right test strategy (assertion-based, property-based, or state-machine), builds transition action maps, reuses existing tests to avoid duplication, and creates stubs for deferred modules when code is missing. It verifies generated tests for compile/syntax validity and prioritizes gaps flagged by analysis, producing test files as a practical starting point for refinement.
 ---
 
 λ(gybis-spec-propagate)
