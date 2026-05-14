@@ -1,6 +1,6 @@
 ---
 name: gybis-arch-elicit
-description: This skill runs an interactive architecture elicitation workflow to create architecture.md from scratch using a top-down VSM sequence (S5 to S1). It asks structured questions per layer, proposes 2-4 lambda principles with plain-English explanations, iterates with human feedback until each layer is confirmed, and writes only after full human review and approval. If architecture.md already exists, it stops and directs the user to /gybis-arch-tend instead.
+description: Use for `/gybis-arch-elicit` or `/ga-elicit`. This skill runs an interactive architecture elicitation workflow to create architecture.md from scratch using a top-down VSM sequence (S5 to S1). It asks structured questions per layer, proposes 2-4 lambda principles with plain-English explanations, iterates with human feedback until each layer is confirmed, and writes only after full human review and approval. If architecture.md already exists, it stops and directs the user to /gybis-arch-tend instead.
 ---
 
 λ(gybis-arch-elicit) → architecture.md
