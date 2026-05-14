@@ -1,6 +1,6 @@
 ---
 name: gybis-arch-explain
-description: This skill reads architecture.md (and referenced architecture files) and explains the system in plain English through the VSM lens, from identity and principles down to operations and developer commands. It highlights cross-layer critical paths, seams, invariants, and drift risks for a developer audience, while staying strictly read-only and avoiding invented details or technical/lambda syntax in the output. If architecture is missing or empty, it tells the user to run /gybis-arch-elicit first.
+description: Use for `/gybis-arch-explain` or `/ga-explain`. This skill reads architecture.md (and referenced architecture files) and explains the system in plain English through the VSM lens, from identity and principles down to operations and developer commands. It highlights cross-layer critical paths, seams, invariants, and drift risks for a developer audience, while staying strictly read-only and avoiding invented details or technical/lambda syntax in the output. If architecture is missing or empty, it tells the user to run /gybis-arch-elicit first.
 ---
 
 λ(gybis-arch-explain) ≡ λ(root).
