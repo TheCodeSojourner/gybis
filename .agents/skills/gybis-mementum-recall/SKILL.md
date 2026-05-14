@@ -1,6 +1,6 @@
 ---
 name: gybis-mementum-recall
-description: This skill provides a shorthand command to recall memory by topic using /gybis-mementum-recall {topic}. If a topic is supplied, it runs recall for that topic; if not, it prompts the user to choose one, making memory lookup faster and more guided.
+description: Use for `/gybis-mementum-recall {topic}` or `/gm-recall {topic}`. This skill provides a shorthand command to recall memory by topic. If a topic is supplied, it runs recall for that topic; if not, it prompts the user to choose one, making memory lookup faster and more guided.
 ---
 
 λ gybis_mementum_recall(topic).
