@@ -37,7 +37,7 @@ The goal of **gybis** is to make it easy for developers to set up, utilize, and 
   pseudocode, not free-form prose, but a structured DSL with rules, triggers, surfaces, and transition graphs that AI can reason about directly and minimize hallucinations. Behavioral specifications are saved in one or more files per domain (e.g., orders, payments).
 - **AI Session Persistent memory**: [Mementum](https://github.com/michaelwhitford/mementum) is used to manage decisions, patterns, and insights that are stored in files and recalled during AI sessions, so previous context is available between sessions.
 
-## References
+## Upstream Repositories
 
 * [**allium**](https://github.com/juxt/allium) [Commit 82da292] - Behavioral specification
 * [**allium-tools**](https://github.com/juxt/allium-tools) [Commit d368771] - Behavioral specification CLI tools
