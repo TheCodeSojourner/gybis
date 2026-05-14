@@ -1,6 +1,6 @@
 ---
 name: gybis-arch-describe
-description: This skill turns architecture.md into a concise, product-manager-friendly explanation of the system: what problem it solves, who it serves, what it can and cannot do, why key design choices were made, and how the parts connect. It only uses facts present in architecture.md, avoids technical syntax and jargon, and if the file is missing or empty, it tells the user to run /gybis-arch-elicit first.
+description: Use for `/gybis-arch-describe` or `/ga-describe`. This skill turns architecture.md into a concise, product-manager-friendly explanation of the system: what problem it solves, who it serves, what it can and cannot do, why key design choices were made, and how the parts connect. It only uses facts present in architecture.md, avoids technical syntax and jargon, and if the file is missing or empty, it tells the user to run /gybis-arch-elicit first.
 ---
 
 λ(gybis-arch-describe)
