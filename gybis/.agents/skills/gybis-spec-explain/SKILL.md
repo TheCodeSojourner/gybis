@@ -1,6 +1,6 @@
 ---
 name: gybis-spec-explain
-description: This skill reads one or more Allium specs (file, domain, or all) and produces a technical, developer-focused explanation of domain structures, behaviors, constraints, guarantees, and cross-spec relationships. It outputs precise prose with light headings and domain terminology, while avoiding implementation code, pseudocode, and speculative design. It remains strictly read-only, surfaces gaps as technical questions, and reports clearly when specs are missing or empty.
+description: Use for `/gybis-spec-explain` or `/gs-explain`. This skill reads one or more Allium specs (file, domain, or all) and produces a technical, developer-focused explanation of domain structures, behaviors, constraints, guarantees, and cross-spec relationships. It outputs precise prose with light headings and domain terminology, while avoiding implementation code, pseudocode, and speculative design. It remains strictly read-only, surfaces gaps as technical questions, and reports clearly when specs are missing or empty.
 ---
 
 λ(gybis-spec-explain)
