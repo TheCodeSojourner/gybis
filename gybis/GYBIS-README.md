@@ -26,6 +26,12 @@ In gybis, specifications are durable and implementation is replaceable.
 - **Human-controlled AI assistance:** AI supports analysis, authoring, and validation, but humans stay in control of decisions and approvals.
 - **Durable truth model:** Architecture and specs are the source of truth; code and tests must align to them.
 
+## Installing the Allium CLI
+
+The `allium` CLI is required for spec validation and analysis commands (`/gybis-spec-check`, `/gybis-spec-distill`, etc.). It must be installed on your system separately.
+
+See the [allium-tools repository](https://github.com/juxt/allium-tools) for installation instructions.
+
 ## Quick Start
 
 - **New repository:** Start with `/gybis-arch-elicit` to establish architecture constraints.

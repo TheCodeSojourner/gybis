@@ -64,25 +64,7 @@ Once integrated, use [Cline](https://github.com/cline/cline) and start with `/gy
 
 The `allium` CLI is required for spec validation and analysis commands (`/gybis-spec-check`, `/gybis-spec-distill`, etc.). It must be installed on your system separately.
 
-**Homebrew (macOS / Linux):**
-
-```bash
-brew tap juxt/allium && brew install allium
-```
-
-**Cargo:**
-
-```bash
-cargo install allium-cli
-```
-
-**Pre-built binaries** for Linux and macOS are available on the [allium-tools releases page](https://github.com/juxt/allium-tools/releases).
-
-Verify the installation:
-
-```bash
-allium --version
-```
+See the [allium-tools repository](https://github.com/juxt/allium-tools) for installation instructions.
 
 ## Upstream Repositories
 
