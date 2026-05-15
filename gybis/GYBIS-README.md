@@ -1,7 +1,5 @@
 # gybis /JY-bis/ 
 
-<img src="gybis-logo.png" alt="gybis logo" width="110" style="margin-bottom: 1em;" />
-
 **A Developer-Command-Driven AI-Assisted Spec-Driven Software Development (SDD) Stack.**
 
 ## Obligatory Word Definitions
