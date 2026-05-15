@@ -171,3 +171,65 @@ architecture > specification > tests > code
 | `/gybis-spec-propagate` or `/gs-propagate`                   | This skill propagates an Allium spec into executable tests by mapping spec obligations to real implementation surfaces, rules, entities, and transitions, then generating coverage across behavior, invariants, temporal logic, and cross-module flows. It chooses the right test strategy (assertion-based, property-based, or state-machine), builds transition action maps, reuses existing tests to avoid duplication, and creates stubs for deferred modules when code is missing. It verifies generated tests for compile/syntax validity and prioritizes gaps flagged by analysis, producing test files as a practical starting point for refinement. |
 | `/gybis-spec-tend` or `/gs-tend`                             | This skill applies a specific new constraint to an existing Allium spec with minimal, targeted edits rather than reworking the whole file. It reads the spec, analyzes impacted rules/entities/transitions/config, runs focused elicitation only for the change scope, drafts a constrained diff, and validates with allium-check/allium-analyse before presentation. It writes only after human approval and then re-validates to confirm the spec remains healthy and consistent.                                                                                                                                                                          |
 | `/gybis-spec-weed` or `/gs-weed`                             | This skill finds and resolves divergence between an Allium spec and implementation by combining CLI analysis, model-based spec parsing, and code trace inspection. It classifies mismatches (aligned, partial, missing, contradicted), includes process-level issues like deadlocks or unreachable flows, and presents two fix directions for each divergence: align code to spec or spec to code. It never resolves silently, requires human choice per item, and re-validates with allium-check/allium-analyse after approved changes.                                                                                                                     |
+
+## Upstream Citations
+
+## allium
+
+This project incorporates ideas, code, and/or structure from
+[allium](https://github.com/juxt/allium)
+by JUXT.
+
+Original project:
+https://github.com/juxt/allium
+
+Portions derived from the upstream project remain subject to the
+terms of its license.
+
+## allium-tools
+
+This project incorporates ideas, code, and/or structure from
+[allium-tools](https://github.com/juxt/allium-tools)
+by JUXT.
+
+Original project:
+https://github.com/juxt/allium-tools
+
+Portions derived from the upstream project remain subject to the
+terms of its license.
+
+## gybis
+
+This project incorporates ideas, code, and/or structure from
+[gybis](https://github.com/TheCodeSojourner/gybis)
+by Paul Whittington.
+
+Original project:
+https://github.com/TheCodeSojourner/gybis
+
+Portions derived from the upstream project remain subject to the
+terms of its license.
+
+## mementum
+
+This project incorporates ideas, code, and/or structure from
+[mementum](https://github.com/michaelwhitford/mementum)
+by Michael Whitford.
+
+Original project:
+https://github.com/michaelwhitford/mementum
+
+Portions derived from the upstream project remain subject to the
+terms of its license.
+
+## nucleus
+
+This project incorporates ideas, code, and/or structure from
+[nucleus](https://github.com/michaelwhitford/nucleus)
+by Michael Whitford.
+
+Original project:
+https://github.com/michaelwhitford/nucleus
+
+Portions derived from the upstream project remain subject to the
+terms of its license.

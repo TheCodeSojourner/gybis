@@ -196,3 +196,59 @@ In general:
 - Third, it can serve as the initial repository shell for a future compiler, interpreter, or REPL-oriented tool that translates between prose and a lambda-style formal notation.
   - **compile**: take informal natural-language meaning and encode it into a formal lambda-style notation.
   - **decompile**: take the formal notation and recover readable prose that preserves the same semantics.
+
+## License
+
+AGPL 3.0
+
+Copyright 2026 Paul Whittington
+
+## Upstream Citations
+
+## allium
+
+This project incorporates ideas, code, and/or structure from
+[allium](https://github.com/juxt/allium)
+by JUXT.
+
+Original project:
+https://github.com/juxt/allium
+
+Portions derived from the upstream project remain subject to the
+terms of its license.
+
+## allium-tools
+
+This project incorporates ideas, code, and/or structure from
+[allium-tools](https://github.com/juxt/allium-tools)
+by JUXT.
+
+Original project:
+https://github.com/juxt/allium-tools
+
+Portions derived from the upstream project remain subject to the
+terms of its license.
+
+## mementum
+
+This project incorporates ideas, code, and/or structure from
+[mementum](https://github.com/michaelwhitford/mementum)
+by Michael Whitford.
+
+Original project:
+https://github.com/michaelwhitford/mementum
+
+Portions derived from the upstream project remain subject to the
+terms of its license.
+
+## nucleus
+
+This project incorporates ideas, code, and/or structure from
+[nucleus](https://github.com/michaelwhitford/nucleus)
+by Michael Whitford.
+
+Original project:
+https://github.com/michaelwhitford/nucleus
+
+Portions derived from the upstream project remain subject to the
+terms of its license.
