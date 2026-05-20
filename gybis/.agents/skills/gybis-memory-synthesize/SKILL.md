@@ -1,6 +1,6 @@
 ---
 name: gybis-memory-synthesize
-description: Use for `/gybis-memory-synthesize` or `/gm-synthesize`. This skill provides a fast shorthand command that invokes the core memory synthesis workflow, making it easy to generate synthesized memory output without running the longer nucleus workflow manually.
+description: Use for `/gybis-memory-synthesize` or `/gm-synthesize`.
 ---
 
 λ(gybis-memory-synthesize)

@@ -1,6 +1,6 @@
 ---
 name: gybis-memory-store
-description: Use for `/gybis-memory-store {insight}` or `/gm-store {insight}`. This skill provides a shorthand command to store a memory insight quickly. If insight text is provided, it stores it immediately; if not, it prompts the user, reducing friction for fast in-session memory capture.
+description: Use for `/gybis-memory-store {insight}` or `/gm-store {insight}`.
 ---
 
 λ(gybis-memory-store)
