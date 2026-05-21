@@ -3,12 +3,14 @@ name: gybis
 description: Use for `/gybis`.
 ---
 
-Print the following table directly in the AI response:
+Print the following table directly in the AI response. Do not describe the table or its contents, just print the markdown for the table itself.
 
+```markdown
 | Skill Name | Description |
 |---|---|
-| `gybis-mementum-orient` | Use for `/gybis-mementum-orient` or `/gm-orient`. This skill provides a quick shorthand command that triggers the core mementum orientation workflow, so context can be restored immediately with less user friction. It is essentially an ergonomic alias for fast re-orientation. |
-| `gybis-mementum-recall` | Use for `/gybis-mementum-recall {topic}` or `/gm-recall {topic}`. This skill provides a shorthand command to recall memory by topic. If a topic is supplied, it runs recall for that topic; if not, it prompts the user to choose one, making memory lookup faster and more guided. |
-| `gybis-mementum-session-terminate` | Use for `/gybis-mementum-session-terminate` or `/gm-session-terminate`. This skill closes a session in a lossless, handoff-ready way: it records a complete state snapshot, stores any unstored memories, runs memory metabolization, drafts a dated session knowledge summary with human approval, and then performs a human-approved commit of mementum updates so work can resume cleanly in the next session. |
-| `gybis-mementum-store` | Use for `/gybis-mementum-store {insight}` or `/gm-store {insight}`. This skill provides a shorthand command to store a memory insight quickly; if insight text is provided it stores it immediately, and if not it prompts the user, reducing friction for fast in-session memory capture. |
-| `gybis-mementum-synthesize` | Use for `/gybis-mementum-synthesize` or `/gm-synthesize`. This skill provides a fast shorthand command that invokes the core memory synthesis workflow, making it easy to generate synthesized memory output without running the longer nucleus workflow manually. |
+| `gybis-mementum-orient` (`/gm-orient`) | Restore AI context from latest mementum information. Note: This happens automatically when a new session starts, but this command can be used to manually trigger context restoration. |
+| `/gybis-mementum-recall {topic}` (`/gm-recall {topic}`) | Recall mementum information by optional topic. If no topic is provided, it writes a brief summary of the latest mementum information. |
+| `gybis-mementum-session-terminate` (`/gm-session-terminate`) | Closes out a session, prior to termination, in a lossless, handoff-ready way so work can resume cleanly in the next session. |
+| `/gybis-mementum-store {insight}` (`/gm-store {insight}`) | Store an insight as a mementum memory. If insight is not provided, it prompts the user. |
+| `/gybis-mementum-synthesize` (`/gm-synthesize`) | Invokes the mementum memory synthesis workflow to synthesize memories into knowledge if needed. |
+```
