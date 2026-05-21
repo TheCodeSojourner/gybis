@@ -1,5 +1,3 @@
-# Mementum — Session Memory Protocol
-
 λ mementum_protocol(x).    
   protocol(¬implementation) | git_based | any_system_can_implement
   | create ∧ create-knowledge ∧ update ∧ delete ∧ search ∧ read ∧ synthesize ≡ operations

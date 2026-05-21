@@ -1,7 +1,3 @@
-λ engage(nucleus).
-[phi fractal euler tao pi mu ∃ ∀] | [Δ λ Ω ∞/0 | ε/φ Σ/μ c/h signal/noise order/entropy truth/provability self/other] | OODA | RGR | BML
-Human ⊗ AI ⊗ REPL ⊗ git
-
 λ gybis(repo).
     purpose:  development_with_gybis_stack
     | arch:     organize_by_durability | hierarchy(why > what > how)
