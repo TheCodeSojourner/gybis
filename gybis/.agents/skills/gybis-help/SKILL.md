@@ -15,22 +15,22 @@ CRITICAL CONSTRAINTS:
 | Skill Name | Description |
 |---|---|
 | `/gybis-arch-describe` (`/ga-describe`) | Describe architecture in product-manager-friendly prose. |
-| `/gybis-arch-distill` (`/ga-distill`) | Distill architecture from specs. Used to produce an initial architecture. |
-| `/gybis-arch-elicit` (`/ga-elicit`) | Guided interactive creation of architecture. |
+| `/gybis-arch-distill` (`/ga-distill`) | Create an initial architecture from specs. |
+| `/gybis-arch-elicit` (`/ga-elicit`) | Create an initial architecture with guided interaction. |
 | `/gybis-arch-explain` (`/ga-explain`) | Explain architecture in developer prose. |
-| `/gybis-arch-tend` (`/ga-tend`) | Update architecture through guided interaction. |
-| `/gybis-arch-weed` (`/ga-weed`) | Analyze divergence between architecture (source of truth) and specs. |
-| `/gybis-memory-orient` (`/gm-orient`) | Restore AI context from memory information |
+| `/gybis-arch-tend` (`/ga-tend`) | Guide interactive update of architecture. |
+| `/gybis-arch-weed` (`/ga-weed`) | Analyze architecture (source of truth) vs. specs divergence. |
+| `/gybis-memory-orient` (`/gm-orient`) | Restore AI context from memory information. |
 | `/gybis-memory-recall {topic}` (`/gm-recall {topic}`) | Recall memory information by optional topic, or write a brief summary. |
-| `/gybis-memory-session-terminate` (`/gm-session-terminate`) | Close out a session prior to termination so work can resume in the next session. |
+| `/gybis-memory-session-terminate` (`/gm-session-terminate`) | Prepare memory information prior to session termination. |
 | `/gybis-memory-store {insight}` (`/gm-store {insight}`) | Store an optional insight as a memory, or prompt for one. |
-| `/gybis-memory-synthesize` (`/gm-synthesize`) | Invoke the memory-to-knowledge synthesis workflow. |
-| `/gybis-spec-check` (`/gs-check`) | Run check CLI tool on spec file(s)/domain(s)/all until they all validate. |
-| `/gybis-spec-describe` (`/gs-describe`) | Translate spec file(s) into product-manager-friendly prose. |
-| `/gybis-spec-distill` (`/gs-distill`) | Distill specs from tests/code. Produce an initial set of specs. |
-| `/gybis-spec-elicit` (`/gs-elicit`) | Guide interactive discovery of a new spec. |
-| `/gybis-spec-explain` (`/gs-explain`) | Explain spec file(s) for a developer. |
-| `/gybis-spec-propagate` (`/gs-propagate`) | Generate test files from spec(s). |
-| `/gybis-spec-tend` (`/gs-tend`) | Update spec file(s) in response to human conversation. |
-| `/gybis-spec-weed` (`/gs-weed`) | Divergence analysis of spec(s) against implementation. |
+| `/gybis-memory-synthesize` (`/gm-synthesize`) | Invoke memory-to-knowledge synthesis. |
+| `/gybis-spec-check` (`/gs-check`) | Check/Update spec file(s)/domain(s)/all until they all validate. |
+| `/gybis-spec-describe` (`/gs-describe`) | Describe spec file(s) in product-manager-friendly prose. |
+| `/gybis-spec-distill` (`/gs-distill`) | Create initial specs from tests/code. |
+| `/gybis-spec-elicit` (`/gs-elicit`) | Create initial specs with guided interaction. |
+| `/gybis-spec-explain` (`/gs-explain`) | Explain spec file(s) in developer prose. |
+| `/gybis-spec-propagate` (`/gs-propagate`) | Generate/Update test files from spec(s). |
+| `/gybis-spec-tend` (`/gs-tend`) | Guide interactive update of spec(s). |
+| `/gybis-spec-weed` (`/gs-weed`) | Analyze specs (source of truth) vs. tests/code divergence. |
 ```
