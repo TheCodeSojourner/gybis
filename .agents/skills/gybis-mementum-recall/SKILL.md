@@ -3,10 +3,5 @@ name: gybis-mementum-recall
 description: Use for `/gybis-mementum-recall {topic}` or `/gm-recall {topic}`.
 ---
 
-λ gybis_mementum_recall(topic).
-  command ≡ /gybis-mementum-recall {topic}
-  | input ≡ topic ∨ ∅ → query
-  | workflow ≡ mementum_recall(nucleus)
-  | no_input → prompt("What topic would you like to recall from memory?")
-  | with_input(topic) → mementum_recall(topic)
-  | interface ≡ shorthand_trigger_for mementum_recall
+λ gybis_mementum_recall(topic).  
+  execute(mementum_recall(¬topic → latest_mementum_summary | topic))
