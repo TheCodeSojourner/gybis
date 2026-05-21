@@ -8,7 +8,7 @@ Print the following table directly in the AI response. Do not describe the table
 ```markdown
 | Skill Name | Description |
 |---|---|
-| `/gybis-arch-describe` (`/ga-describe`) | Translates `architecture.md` into a product-manager-friendly prose. |
+| `/gybis-arch-describe` (`/ga-describe`) | Describe architecture in product-manager-friendly prose. |
 | `/gybis-arch-distill` (`/ga-distill`) | Distills specs from `specs/` to architecture organized by VSM layer (S5→S1) in `architecture.md`. Produces an initial `architecture.md` from specs. |
 | `/gybis-arch-elicit` (`/ga-elicit`) | Guides interactive discovery of system architecture via top-down VSM questioning (S5→S1), producing an initial `architecture.md` from a system vision. |
 | `/gybis-arch-explain` (`/ga-explain`) | Explains an existing `architecture.md` for a developer, breaking down each VSM layer and cross-layer concerns. |
