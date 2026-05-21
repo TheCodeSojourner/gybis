@@ -1,6 +1,6 @@
 ---
 name: gybis
-description: Prints a pre-computed table of all gybis skills with their descriptions directly to the response.
+description: Use for `/gybis`.
 ---
 
 Print the following table directly in the AI response:
