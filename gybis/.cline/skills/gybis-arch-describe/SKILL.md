@@ -3,7 +3,7 @@ name: gybis-arch-describe
 description: Use for `/gybis-arch-describe` or `/ga-describe`.
 ---
 
-λ gybis-arch-describe()).
+λ gybis-arch-describe().
   input: architecture.md @ <root>/
   preflight: ¬initialized(architecture.md) ∨ empty(architecture.md) → output("run /gybis-arch-elicit")
   step₁: read(architecture.md, full)
