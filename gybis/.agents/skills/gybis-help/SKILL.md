@@ -3,15 +3,14 @@ name: gybis-help
 description: Use for `/gybis-help`.
 ---
 
-Print the following table directly in the AI response. Do not describe the table or its contents, just print the markdown for the table itself.
+Print the following table directly in your response as rendered markdown. Do not wrap the table in a code fence — output it as plain markdown so it renders as a proper table. Do not describe the table or its contents, just output the table itself.
 
 CRITICAL CONSTRAINTS:
 1. The table must be an exact verbatim copy of the markdown below — do not modify, reword, reformat, or paraphrase any cell content in either column.
 2. Do NOT add any preamble before the table.
-3. Do NOT add any text, summary, follow-up, or questions after the closing code fence.
-4. The response must contain nothing except the code-fenced markdown table and nothing else.
+3. Do NOT add any text, summary, follow-up, or questions after the table.
+4. The response must contain nothing except the rendered markdown table and nothing else.
 
-```markdown
 | Skill Name | Description |
 |---|---|
 | `/gybis-arch-describe` (`/ga-describe`) | Describe architecture in product-manager-friendly prose. |
@@ -33,4 +32,5 @@ CRITICAL CONSTRAINTS:
 | `/gybis-spec-propagate` (`/gs-propagate`) | Generate/Update test files from spec file/domain/all. |
 | `/gybis-spec-tend` (`/gs-tend`) | Guide interactive update of file/domain/all. |
 | `/gybis-spec-weed` (`/gs-weed`) | Analyze specs (source of truth) vs. tests/code divergence. |
-```
+
+
