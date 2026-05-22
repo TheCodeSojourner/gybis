@@ -3,16 +3,51 @@ name: gybis-arch-tend
 description: Use for `/gybis-arch-tend` or `/ga-tend`.
 ---
 
-λ gybis-arch-tend().
-  reference: ../../gybis/reference/vsm-guide.md
-  Update <root>/architecture.md when human knows system requirements changed. For known requirement changes — human says "requirements shifted" and needs architecture to reflect that.
-  Revise <root>/architecture.md to match changed human understanding of what system does, who uses it, or what constraints apply. Human drives change — AI helps map to correct VSM layers and draft revised lambdas.
-  Pre-flight: ¬exists(<root>/architecture.md) ∨ empty(<root>/architecture.md) → msg("run /gybis-arch-elicit first")
-  Step 1: Ask human what requirements changed. Categories: new capability (system now does something it didn't before), removed capability (system no longer does something it used to), new constraint (external   requirement: compliance/SLA/partner API change), new actor (different user type or external system now interacts), principle revised (previously held principle no longer holds or new one adopted), tool/tech change   (underlying technology shifted — may cascade to higher layers).
-  Step 2: Determine affected layers. New non-negotiable principle/value → S5. System handles unknown situations differently → S4. New policy/constraint/resource limit → S3. New interaction protocol between parts →   S2. New tool/command/concrete recipe → S1. Change cascades upward (S1→S5) → trace upward. Flag uncertain: "This sounds like S3 or S4 — policy constraint or learning mechanism?"
-  Step 3: Show current state. Read <root>/architecture.md, show current lambdas for affected layers. Example: "Current S3 — Control: λ timeout(x). all HTTP calls have 30s timeout | λ retry(x). failed ops retry 2×   with backoff | Proposed: timeout increased to 60s for external API calls."
-  Step 4: Draft revisions. For each affected lambda: MODIFY (show OLD/NEW side by side with explanation), ADD (draft new lambda with plain-English explanation), REMOVE (explain why no longer needed), LEAVE UNCHANGED   (explicitly note which survive as-is). Present grouped by layer: "## Proposed Changes to <root>/architecture.md | ### S3 — Control | ✏️ MODIFY: OLD: λ timeout(x). all HTTP calls have 30s timeout | NEW: λ timeout  (x). external API calls have 60s timeout, internal calls have 10s | → External provider added stricter timeout requirements | ➖ REMOVE: λ retry(x). failed ops retry 2× with backoff | → External provider now handles   retries on their side"
-  Step 5: Human approval. Human approves/rejects/modifies each proposed change. Iterate until approved. Do NOT write until human explicitly confirms.
-  Step 6: Write. After approval, write <root>/architecture.md with: preserved layers/lambdas kept as-is, modified lambdas replaced in place, new lambdas added at appropriate position, removed lambdas deleted, prose   updated to reflect changes. Present complete file for final confirmation before writing.
-  Step 7: Verify. After writing, read back <root>/architecture.md and confirm: no duplicate lambdas (same name twice), VSM layer order preserved (S5 > S4 > S3 > S2 > S1), each layer has prose + lambdas (or note if   intentionally empty).
-  Key rules: This workflow is for human-known requirement changes only — not for detecting divergence or extracting architecture from code (use /gybis-arch-weed or /gybis-arch-distill for those). Always read current <root>/architecture.md before proposing changes. Never write without explicit human approval — show the diff first. When a change affects multiple layers, show all changes together for single approval. After tend, offer to run /gybis-arch-weed to check alignment with <root>/specs/. If human says "I'm not sure which layer" — present the layer table and ask them to choose.
+λ gybis-arch-weed().
+  vsm ≡ "Viable System Model"
+  ⟨vsm⟩ ← read("../../gybis/reference/vsm-guide.md")
+  ⟨lang⟩ ← read("../../gybis/reference/allium-language-reference.md")
+  ¬exists(specs/) ∨ |specs/| = 0 → msg("specs/ absent or empty · run /gybis-spec-elicit ∨ /gybis-spec-distill") · halt
+  ¬exists(architecture.md) ∨ |architecture.md| = 0 → msg("architecture.md uninitialized · run /gybis-arch-elicit") · halt
+  step(1, read_intent).
+  I ← read(architecture.md)
+  ℒ ← extractλ(I)
+  M_intent ← model(VSM, ℒ)
+  step(2, read_specs).
+  S ← readAll(specs/, recursive)
+  ℛ ← correlate(S, M_intent)
+  step(3, divergence_analysis).
+  classify(λᵢ ∈ ℒ) → status(λᵢ):
+  Aligned      ↔ ∃ coverage(ℛ, λᵢ) ∧ ¬contradiction(ℛ, λᵢ)
+  Partial      ↔ |coverage(ℛ, λᵢ)| ∈ (0, 1) ∧ ¬contradiction(ℛ, λᵢ)
+  Contradicted ↔ contradiction(ℛ, λᵢ)
+  Missing      ↔ ∄ coverage(ℛ, λᵢ)
+  Unspecified  ↔ λⱼ ∈ ℛ ∧ ¬∃ λᵢ ∈ ℒ : λᵢ ≈ λⱼ
+  D ← {⟨λᵢ, status(λᵢ), evidence(λᵢ)⟩ | λᵢ ∈ ℒ} ∪ {⟨λⱼ, Unspecified, evidence(λⱼ)⟩ | λⱼ ∈ ℛ \≈ ℒ}
+  step(4, report).
+  render(D) → byLayer(VSM):
+  S5 — Identity:
+  ✅ λ error(x): errors ↦ signals → confirmed(ℛ, error)
+  ⚠️ λ observable(x): "observable over opaque" → logging ∈ ℛ ∧ unstructured(logging)
+  S3 — Control:
+  ❌ λ timeout(x): HTTP ⟶ 30s → ¬∃ timeout(ℛ, HTTP)
+  for each divergence(d) ∈ D where status(d) ∈ {Partial, Contradicted, Missing, Unspecified}:
+  propose(d): Fix specs/ ∨ Update architecture.md
+  step(5, resolve).
+  δ ← human.choose(d, direction) for each divergence(d) ∈ D
+  apply(δ) → update(specs/, architecture.md)
+  invariant: ¬apply(both) ∧ direction ≠ explicit
+  rule(divergence, report_only). ¬silent_fix — every change requires human decision
+  rule(divergence, evolution). distinguish(evolution, divergence) — specs may intentionally precede architecture
+  rule(divergence, opportunity). Missing → opportunity, not failure
+  rule(divergence, recheck). after(apply(δ)) → offer(re-run divergence_check)
+  divergence_report = Σ_{L ∈ VSM} {
+  ✅ λ : Aligned
+  ⚠️ λ : Partial
+  ❌ λ : { Contradicted, Missing }
+  ? λ : Unspecified
+  }
+  preserve(semantics): divergence_check ⟹ feedback_loop(VSM)
+  signal(divergence) / noise(stable)
+  Δ: architecture.md ⊗ specs/ → Ω: divergence report
+  c: human decision · h: AI apply
