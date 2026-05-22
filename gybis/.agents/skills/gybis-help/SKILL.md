@@ -30,7 +30,7 @@ CRITICAL CONSTRAINTS:
 | `/gybis-spec-distill` (`/gs-distill`) | Create initial specs from tests/code. |
 | `/gybis-spec-elicit` (`/gs-elicit`) | Create initial specs with guided interaction. |
 | `/gybis-spec-explain` (`/gs-explain`) | Explain spec file/domain/all in developer prose. |
-| `/gybis-spec-propagate` (`/gs-propagate`) | Generate/Update test files from spec(s). |
+| `/gybis-spec-propagate` (`/gs-propagate`) | Generate/Update test files from spec file/domain/all. |
 | `/gybis-spec-tend` (`/gs-tend`) | Guide interactive update of file/domain/all. |
 | `/gybis-spec-weed` (`/gs-weed`) | Analyze specs (source of truth) vs. tests/code divergence. |
 ```
