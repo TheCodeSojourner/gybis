@@ -3,19 +3,30 @@ name: gybis-spec-describe
 description: Use for `/gybis-spec-describe` or `/gs-describe`.
 ---
 
-λ(gybis-spec-describe)
-REF:../../gybis/reference/allium-language-reference.md
-PURPOSE:given(file|domain)→prose(non-technical)∪readOnly
-PF:¬alliumFiles→say(emptyOrMissing)
-S0:files←parse(input)|file→read(single)∥domain→read(all,<root>/specs/{domain}/*.allium)∥noArg→read(all,<root>/specs/**/*.allium)∥ambiguous→ask(human,clarify)
-S1:prose←Σ{
-  whatExists:concepts(purpose,plainLang)∧¬entityNames,
-  userCanDo:actions(outcomes)∧triggers∧userExperience,
-  rules:businessRules=constraints∧prevents∧requires∧edgeCases,
-  guarantees:invariants=userFacingPromises∧terminalStates=lifecycleEndpoints,
-  domainMode:connections(userJourney,otherSpecs)
-}
-S2:output(flowingProse,lightHeadings,¬code,¬techSyntax,¬jargon,¬implDetails)
-INV≡∀userVisibleBehavior→output∥¬omit∥multiFile→coherentNarrative∥gaps→questions(human)∥readOnly∥empty→saySo
-μ≡S0⋅S1⋅S2
-plain:given(scope)→resolve(files)∥read(inFull)∥translate(plainLang)∥output(prose,lightHeadings)∥surface(gaps)
+λ gybis_spec_describe(specs).
+  purpose(transform(specs → plain_language_pm_prose))
+  | reference(../../gybis/reference/allium-language-reference.md)
+  λ gybis_input_resolve(domain?, name?).
+    specific(domain, name) → read(<root>/specs/{domain}/{name}.allium)
+    | domain_only(domain) → read(<root>/specs/{domain}/*.allium)
+    | unspecified() → read(<root>/specs/*/*.allium)
+    | ambiguous() → ask_user(clarify)
+  λ gybis_prose_generation(specs).
+    produce(
+      what_exists(purpose ∧ key_concepts ¬technical_entity_names) ∧
+      what_users_can_do(actions ∧ outcomes ∧ triggers ∧ ux) ∧
+      rules(constraints ∧ prevention ∧ requirements ∧ edge_cases) ∧
+      guarantees(promises ∧ invariants ∧ terminal_states) ∧
+      domain_connections(user_journey ∧ relationships)
+    )
+  λ gybis_output_format(prose).
+    flowing(pm_friendly) ∧ light_headings ∧ ¬code ∧ ¬technical_syntax ∧ ¬jargon ∧   ¬implementation_details
+  λ gybis_quality_guarantees(output, specs).
+    ∀user_visible_behavior(output) → represented ∧ ¬important_omission
+    | multi_file → coherent_unified_narrative
+    | gaps → surface_as_questions(human)
+    | mode: read_only
+    | ¬to_describe → explicit_say_so
+  λ gybis_spec_describe_pipeline(specs).
+    specs → gybis_input_resolve → gybis_prose_generation → gybis_output_format → output
+    | quality_check(output, specs) ≡ ∀guarantee
