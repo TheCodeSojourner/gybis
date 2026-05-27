@@ -16,8 +16,9 @@ description: Use for `/gybis-arch-propagate` or `/ga-propagate`.
   4. identify(domains, boundaries)
   5. map(domain → specs) | specs/{domain}/{concern}.allium | one_spec_per_concern
   6. consult(allium_ref) | allium_ref: ../../gybis/reference/allium-language-reference.md
-  7. generate(spec_files)
-  8. verify(allium_check(file)) ∀file ∈ spec_files
+  7. consult(allium_assess) | allium_assess: ../../gybis/reference/allium-assessing-specs.md
+  8. generate(spec_files)
+  9. verify(allium_check(file)) ∀file ∈ spec_files
 
   ¬semantic_completeness_guaranteed
   | TODO_skeletons(¬opaque_dependencies)
