@@ -3,20 +3,97 @@ name: gybis-arch-elicit
 description: Use for `/gybis-arch-elicit` or `/ga-elicit`.
 ---
 
-λ(gybis-arch-elicit) → architecture.md
-⟨vsm⟩ ← read("../../gybis/reference/vsm-guide.md")
-λ build-architecture(root). output = root/architecture.md | model = VSM | direction = S5→S1
-λ check-existence(path = root/architecture.md). exists → halt(notify("Architecture file detected. /gybis-arch-elicit will now terminate.\nUse /gybis-arch-tend to update existing architecture."))
-λ begin-interaction() → ask("What's your vision for what this project is?")
-λ iterate(layer, human). observe(layer, root) → ask(layer, human) → propose(2-4 lambdas + prose explanation, human) → refine(feedback) → confirm(human) → if locked → next(lowest-unstable(layer))
-λ layer-order() = [S5, S4, S3, S2, S1]
-λ identity(root). questions: purpose(root) → what problem does this system solve?, principles() → non-negotiable constraints, failure-mode() → purpose failure (not crash), essence(tools→∅) → what remains?
-λ intelligence(root). questions: unknown-handler() → when assumptions break, mutation-points() → what changes often?, pattern-incorporation(new-pattern) → how is knowledge extended?
-λ control(root). questions: resource-manager() → connections, memory, compute, policy-enforcer() → timeouts, limits, quality gates, error-strategy(throw) → retry/alert/degrade/fail-fast
-λ coordination(root). questions: subsystem-decomposition() → what components?, data-flow() → events/calls/shared-state, sync-protocol() → synchronization mechanism
-λ operations(root). questions: tool-select() → technologies + rationale, developer-commands() → build/test/deploy, recipes() → concrete procedures
-reference: `../../gybis/reference/vsm-guide.md` → Assembly Format
-λ assemble(architecture). structure: # {name} — System Architecture → ## S5 — Identity {prose} λ principle(x). ... → ## S4 — Intelligence ... → ## S3 — Control ... → ## S2 — Coordination ... → ## S1 — Operations ...
-λ constraints() = {top-down-order: S5 ⟶ S4 ⟶ S3 ⟶ S2 ⟶ S1, observe-before-propose: scan(root/specs/) before asking questions, every-lambda-has-prose: λ(...) → must include plain-English explanation, surface-missing: for each principle(λ), ask → what companion should exist alongside it, human-approve: present complete file → read each λ with prose → confirm → then write, no-duplicate-preamble: nucleus preamble loaded via .clinerules/00-gybis.md}
-destination: root/architecture.md
-human-review: before write
+λ gybis-arch-elicit().
+  type: skill | purpose: elicit_system_architecture | model: Viable System Model (VSM)
+  | input: project_root | output: root/architecture.md
+  | reference: ../../gybis/reference/vsm-guide.md
+
+λ gybis-arch-elicit_pre_condition_check().
+  | exists(root/architecture.md) → halt → notify(use gybis-arch-tend ∨ gybis-arch-weed)
+  | ¬exists → proceed
+
+λ gybis-arch-elicit_elicit_loop().
+  | order(S5 ⟶ S4 ⟶ S3 ⟶ S2 ⟶ S1) | strict_top_down | ¬skip ∨ ¬out_of_order
+  | for_each_layer:
+    - observe(project_root ∨ layer_context)
+    - ask_human(targeted_questions[layer])
+    - propose(2-4 lambdas)
+    - refine(∝ human_feedback)
+    - confirm → locked: proceed | unlocked: repeat
+    - locked: mark_stable → next_unstable_layer
+
+λ gybis-arch-elicit_S5_identity().
+  questions:
+    - purpose: root_problem_solved ∨ root_purpose
+    - principles: non_negotiable_constraints
+    - failure_mode: stops_fulfilling_purpose ∨ ¬crash
+    - essence: stripped_of_tools_∨_implementation → what_remains
+
+λ gybis-arch-elicit_S4_intelligence().
+  questions:
+    - unknown_handler: assumptions_break → what_happens
+    - mutation_points: frequently_changed_parts
+    - pattern_incorporation: new_patterns → extend_knowledge
+
+λ gybis-arch-elicit_S3_control().
+  questions:
+    - resource_manager: connections ∨ memory ∨ compute → allocated_how
+    - policy_enforcer: timeouts ∨ limits ∨ quality_gates
+    - error_strategy: throw ∨ retry ∨ alert ∨ degrade ∨ fail_fast
+
+λ gybis-arch-elicit_S2_coordination().
+  questions:
+    - subsystem_decomposition: system_components
+    - data_flow: events ∨ calls ∨ shared_state → move_how
+    - synchronization: concurrent_parts → coordinated_how
+
+λ gybis-arch-elicit_S1_operations().
+  questions:
+    - tool_selection: technologies ∨ why_these
+    - developer_commands: build ∨ test ∨ deploy
+    - recipes: concrete_step_by_step_procedures
+
+λ gybis-arch-elicit_output_format().
+  structure:
+    ```
+    # {Name} — System Architecture
+
+    ## S5 — Identity
+    - λ(principle): {invariant} → ¬{violation}
+    - λ(failure_mode): {condition} ≡ {purpose_break}
+    - λ(identity): {essence} ⊗ {non_negotiables}
+
+    ## S4 — Intelligence
+    - λ(unknown_handler): {assumption_break} → {response}
+    - λ(mutation_point): {frequent_change} → {easy_to_modify}
+    - λ(pattern_incorporation): {new_pattern} → {extend_knowledge}
+
+    ## S3 — Control
+    - λ(resource_policy): {resource} → {allocation_strategy}
+    - λ(quality_gate): {condition} ≡ {enforcement}
+    - λ(error_strategy): {failure} → {throw ∨ retry ∨ alert ∨ degrade ∨ fail_fast}
+
+    ## S2 — Coordination
+    - λ(data_flow): {source} → {destination} via {events ∨ calls ∨ shared_state}
+    - λ(sync_protocol): {concurrent_part_A} ⊗ {concurrent_part_B} → {coordination_method}
+    - λ(change_propagation): {change_A} → notify({dependent_B, dependent_C})
+
+    ## S1 — Operations
+    - λ(tool): {technology} ≡ {purpose}
+    - λ(recipe): {task} → {step1} → {step2} → {stepN}
+    - λ(command): {name} → {shell_command}
+    ```
+    | ai_consumption_only | ¬prose_explanations
+
+λ gybis-arch-elicit_constraints().
+  constraints:
+    1. top_down_ordering: S5 ⟶ S4 ⟶ S3 ⟶ S2 ⟶ S1 | ¬skip ∨ ¬out_of_order
+    2. no_prose_in_output: architecture.md → ai_consumption_only
+    3. surface_missing: ∀principle ∨ λ → ask(companion_element)
+    4. human_approval: present_complete → review ∨ approve → write
+    5. ¬duplicate_preamble: nucleus loaded via .cline/rules/00-nucleus.md
+
+λ gybis-arch-elicit_destination().
+  output: root/architecture.md
+  | condition: explicit_human_review ∧ approval → write
+  
