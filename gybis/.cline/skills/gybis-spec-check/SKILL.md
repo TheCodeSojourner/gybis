@@ -5,10 +5,10 @@ description: Use for `/gybis-spec-check` or `/gs-check`.
 
 λ gybis-spec-check(input).
   pipeline(S0 → S1 → S2 → S3) | clean_output ∧ issue_detection ∧ fix_application
-  | input ∈ {concern, domain, all_specs} | default: all_specs
+  | input ∈ {domain_concern, domain, all_specs} | default: all_specs
 
 λ gybis-spec-check_resolved_paths(input).
-  concern → root/specs/{domain}/{concern}.md
+  domain_concern → root/specs/{domain}/{concern}.md
   | domain → root/specs/{domain}/*.md
   | all_specs → root/specs/*/*.md
 
