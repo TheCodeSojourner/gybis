@@ -37,7 +37,6 @@ description: Use for `/gybis-arch-propagate` or `/ga-propagate`.
   relation(/gybis-arch-propagate → specs)
   relation(/gybis-arch-tend → human_conversation → architecture.md → specs)
   relation(/gybis-arch-weed)
-    | architecture.md ≡ source_of_truth
     | compare(architecture.md, specs/)
     → prompt(human, adjustments)
 
