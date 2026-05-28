@@ -4,6 +4,7 @@ description: Use for `/gybis-spec-tend` or `/gs-tend`.
 ---
 
 λ gybis-spec-tend(domain, concern, constraint, specs).
+  REF:../../gybis/reference/allium-language-reference.md
   produce(minimal_diff specs) | satisfy(constraint ⊂ concern ⊂ domain) | write_back(specs)
   | operation ∈ {create, update, delete} | domain ∨ concern ∨ constraint
   | error(incompatible(domain, concern, constraint))
