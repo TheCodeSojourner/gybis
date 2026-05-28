@@ -24,7 +24,7 @@ In gybis, specifications are durable and implementation is replaceable.
 
 - **Spec-Driven Development (SDD):** Architecture and behavioral specifications define what the system is and does, and implementation follows those constraints.
 - **Human-controlled AI assistance:** AI supports analysis, authoring, and validation, but humans stay in control of decisions and approvals.
-- **Durable truth model:** Architecture and specs are the source of truth; code and tests must align to them.
+- **Durable truth model:** Architecture and behavioral specifications are the source of truth; code and tests must align to them.
 
 ## Installing the Allium CLI
 
@@ -35,8 +35,8 @@ See the [allium-tools repository](https://github.com/juxt/allium-tools) for inst
 ## Quick Start
 
 - **New repository:** Start with `/gybis-arch-elicit` to establish architecture constraints.
-- **Existing repository:** Start with `/gybis-spec-distill` to extract behavioral specifications from current implementation.
-- **Need guidance:** Run `/gybis-help` to see available commands and recommended next steps.
+- **Existing repository:** Start with `/gybis-spec-distill` to extract behavioral specifications from current implementation, then use `/gybis-arch-distill` to derive architecture from those specifications.
+- **Need guidance:** Run `/gybis-help` to see available commands.
 
 ---
 
@@ -45,7 +45,7 @@ See the [allium-tools repository](https://github.com/juxt/allium-tools) for inst
 - **Organize by durability** — Structure things by how long they will likely last.
 - **Hierarchy of abstractions:** why > what > how.
 - **Layered system:** S5 > S4 > S3 > S2 > S1 > specs > tests > code — stricter, more durable layers constrain looser, more transient ones.
-  S5..S1 are architectural layers; together they constrain specification, then tests, then code.
+  S5..S1 are architectural layers; together they constrain specifications, which then constrain tests, which then constrain code.
 - **No flat structures.** Everything has its place in the hierarchy.
 - **Top-down only.** Higher layers constrain lower layers. Architecture (S5 ... S1) > Specs > Tests > Code.
 - **No reverse dependencies.** Lower layers never constrain higher layers.
@@ -55,18 +55,18 @@ See the [allium-tools repository](https://github.com/juxt/allium-tools) for inst
 
 ## Architecture Philosophy
 
-Architecture describes system-level constraints that drive behavior specifications that drive tests, that drive implementation.
+Architecture describes system-level constraints that drive behavior specifications that drive tests, that drive code.
 
 - **Constrain top-down.** Architecture governs specification, tests, and code, not the reverse.
 - **Governance flow:** Architecture, specification, tests and implementation must remain aligned.
 
 ### New Repository
 
-For a new repository, start with `/gybis-arch-elicit` to establish durable architectural constraints with the developer, then derive behavior specifications from the architecture with `/gybis-arch-propagate`, then derive tests from the behavior specifications with `/gybis-spec-propagate`, and finally implement the code from the derived tests with `/gybis-test-propagate`.
+For a new repository, start with `/gybis-arch-elicit` to establish durable architectural constraints with the developer, then derive behavior specifications from the architecture with `/gybis-arch-propagate`, and finally derive code and tests from the behavior specifications with `/gybis-spec-propagate`.
 
 ### Existing Repository
 
-For an existing repository, start with `/gybis-spec-distill` to create a set of behavior specifications from tests and implementation, then establish durable architectural constraints with `/gybis-arch-distill`.
+For an existing repository, start with `/gybis-spec-distill` to create a set of behavior specifications from tests and code, then establish durable architectural constraints with `/gybis-arch-distill`.
 
 ---
 
@@ -76,15 +76,15 @@ Specifications describe code **behavior**, not implementation.
 
 - **/gybis-arch-weed** checks for divergence between architecture and specs, then surfaces explicit resolution options with human approval.
 - **/gybis-spec-distill** extracts behavioral specifications from existing code, then surfaces them for review and refinement.
-- **Do not implement before specifying.** Implementation details are replaceable; specifications are the durable operating system.
-- **Workflow:** elicit → distill → check → propagate → tend → weed.
+- **Do not implement before specifying.** Implementation details are replaceable; specifications are the system's source of truth.
+- **Workflow:** propagate or distill → check → tend → weed.
 - **Governance flows:** AI is governed by formalized behavior; behavior is governed by architecture.
 
 ---
 
 ## Code as Replaceable Detail
 
-- **`code ≡ replaceable_detail`** — Implementation is ephemeral and interchangeable.
+- **`code ∧ tests ≡ replaceable_detail`** — Code and tests are ephemeral and interchangeable.
   In practice: code is the changing how, while architecture/specification define the durable what and why.
 - **`arch/spec ≡ project_truth`** — Architecture/Specifications define expected behavior and constraints of the system.
 - **`¬test_before_spec`** — Never test before specifying.
@@ -115,7 +115,7 @@ Every session guarantees **no knowledge loss**.
 
 ## Authority Model
 
-This section defines who decides what, and when.
+This section defines who decides what and when, for all non-memory operations.
 
 - **Human commands come first.** The AI never takes initiative.
 - **Human is the approval gate.** Every write operation requires human approval.
@@ -124,6 +124,8 @@ This section defines who decides what, and when.
 ---
 
 ## Transparency
+
+This section defines transparency, for all non-memory operations.
 
 - **All changes are human-visible.** Nothing happens covertly.
 - **Every write requires human approval.**
@@ -148,29 +150,27 @@ architecture > specification > tests > code
 
 ## Commands
 
-### Commands Detail
-
-| Skill Name                                                  | Description                                                            |
-| ----------------------------------------------------------- | ---------------------------------------------------------------------- |
-| `/gybis-arch-describe` (`/ga-describe`)                     | Describe architecture in product-manager-friendly prose.               |
-| `/gybis-arch-distill` (`/ga-distill`)                       | Create an initial architecture from specs.                             |
-| `/gybis-arch-elicit` (`/ga-elicit`)                         | Create an initial architecture with guided interaction.                |
-| `/gybis-arch-explain` (`/ga-explain`)                       | Explain architecture in developer prose.                               |
-| `/gybis-arch-tend` (`/ga-tend`)                             | Guide interactive update of architecture.                              |
-| `/gybis-arch-weed` (`/ga-weed`)                             | Analyze architecture (source of truth) vs. specs divergence.           |
-| `/gybis-memory-orient` (`/gm-orient`)                       | Restore AI context from memory information.                            |
-| `/gybis-memory-recall {topic}` (`/gm-recall {topic}`)       | Recall memory information by optional topic, or write a brief summary. |
-| `/gybis-memory-session-terminate` (`/gm-session-terminate`) | CRUD memory information prior to session termination.                  |
-| `/gybis-memory-store {insight}` (`/gm-store {insight}`)     | Store an optional insight as a memory, or prompt for one.              |
-| `/gybis-memory-synthesize` (`/gm-synthesize`)               | Invoke memory-to-knowledge synthesis.                                  |
-| `/gybis-spec-check` (`/gs-check`)                           | Check/Update spec file/domain/all syntax until validated.              |
-| `/gybis-spec-describe` (`/gs-describe`)                     | Describe spec file/domain/all in product-manager-friendly prose.       |
-| `/gybis-spec-distill` (`/gs-distill`)                       | Create initial specs from tests/code.                                  |
-| `/gybis-spec-elicit` (`/gs-elicit`)                         | Create initial specs with guided interaction.                          |
-| `/gybis-spec-explain` (`/gs-explain`)                       | Explain spec file/domain/all in developer prose.                       |
-| `/gybis-spec-propagate` (`/gs-propagate`)                   | Generate/Update test files from spec file/domain/all.                  |
-| `/gybis-spec-tend` (`/gs-tend`)                             | Guide interactive update of file/domain/all.                           |
-| `/gybis-spec-weed` (`/gs-weed`)                             | Analyze specs (source of truth) vs. tests/code divergence.             |
+| Skill Name                                                       | Description                                                            |
+| ---------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `/gybis-arch-describe` (`/ga-describe`)                          | Describe architecture in PM prose.                                     |
+| `/gybis-arch-distill` (`/ga-distill`)                            | Create an initial architecture from specs.                             |
+| `/gybis-arch-elicit` (`/ga-elicit`)                              | Create an initial architecture with guided interaction.                |
+| `/gybis-arch-explain` (`/ga-explain`)                            | Explain architecture in developer prose.                               |
+| `/gybis-arch-propagate` (`/ga-propagate`)                        | Generate specs from architecture.                                      |
+| `/gybis-arch-tend` (`/ga-tend`)                                  | Guide interactive update of architecture.                              |
+| `/gybis-arch-weed` (`/ga-weed`)                                  | Analyze/Modify architecture and/or specs based on divergence.          |
+| `/gybis-memory-orient` (`/gm-orient`)                            | Restore AI context from memory information.                            |
+| `/gybis-memory-recall {topic}` (`/gm-recall {topic}`)            | Recall memory information by optional topic, or write a brief summary. |
+| `/gybis-memory-session-terminate` (`/gm-session-terminate`)      | CRUD memory information prior to session termination.                  |
+| `/gybis-memory-store {insight}` (`/gm-store {insight}`)          | Store an optional insight as a memory, or prompt for one.              |
+| `/gybis-memory-synthesize` (`/gm-synthesize`)                    | Invoke memory-to-knowledge synthesis.                                  |
+| `/gybis-spec-check` (`/gs-check {concern\|domain\|all}`)         | Check/Update syntax until valid.                                       |
+| `/gybis-spec-describe` (`/gs-describe {concern\|domain\|all}`)   | Describe in PM prose.                                                  |
+| `/gybis-spec-distill` (`/gs-distill`)                            | Create initial specs from tests and code.                              |
+| `/gybis-spec-explain` (`/gs-explain {concern\|domain\|all}`)     | Explain in developer prose.                                            |
+| `/gybis-spec-propagate` (`/gs-propagate {concern\|domain\|all}`) | Generate test(s).                                                      |
+| `/gybis-spec-tend` (`/gs-tend`)                                  | Guide interactive update of specs.                                     |
+| `/gybis-spec-weed` (`/gs-weed`)                                  | Resolve specs vs. code/tests divergence.                               |
 
 ## Upstream Citations
 
