@@ -4,44 +4,80 @@ description: Use for `/gybis-spec-check` or `/gs-check`.
 ---
 
 λ gybis-spec-check(input).
-  λ workflow(ξ).
-    input: ξ ∈ {file | domain | scope | ∀}
-    output: clean ∨ issues(Σ) → fixes(Φ) → clean
-    composition: S0 → S1 → S2 → S3
-  λ prerequisite(ξ).
-    ¬∃allium(ξ) → error ∧ terminate
-    | allium_found → proceed
-  λ S0_parse(ξ).
-    resolve(ξ) → files(Σ)
-    | ξ = (domain, name) → specs/{domain}/{name}.allium
-    | ξ = domain → specs/{domain}/*.allium
-    | ξ = ⊥ → specs/*/*.allium
-    | Σ = {f₁, f₂, ..., fₙ}
-  λ S1_check(Σ).
-    ∀f ∈ Σ → S2(f)
-  λ S2(f).
-    S2.1_run(f) → {clean | issues | not_found}
-  λ S2.1_run(f).
-    allium_check(f) → exit_code
-    | exit 0 → clean(f) → S1(next)
-    | exit 1 → diagnostics(D) → group(severity) → apply(actioning) → issues(Σᵢ) → S2.2
-    | exit 2 → report(not_found, operator) → S1(next)
-  λ S2.2(Σᵢ).
-    sort(Σᵢ, domain → name → priority) → numbered_list
-    | present(Σᵢ, operator) → approvals(Φ)
-    | apply(Φ, codebase) → S2.1_run(f)
-  λ invariants.
-    I₁: cli_primary | workflow ≡ CLI_interface
-    I₂: human_in_loop | ∀d ∈ D → decision(human, d) ∧ ¬auto_action
-    I₃: errors_block_writes | errors(E) ∧ ¬resolved(E) → ¬modifications
-    I₄: warnings_need_decision | warnings(W) → review(human) → action
-    I₅: revalidation | apply_fixes → recheck → ¬regressions
-  λ composition.
-    S0(ξ) → S1(Σ) → S2(Σ) → S3(clean)
-  λ summary(ξ).
-    read(ξ) → resolve(allium_files)
-    | run(allium_check) → parse(diagnostics)
-    | group(severity) → present(numbered_issues)
-    | get(approvals) → apply(fixes)
-    | recheck → exit 0 → report(clean)
+  pipeline(S0 → S1 → S2 → S3) | clean_output ∧ issue_detection ∧ fix_application
+  | input ∈ {concern, domain, all_specs} | default: all_specs
+
+λ gybis-spec-check_resolved_paths(input).
+  concern → root/specs/{domain}/{concern}.md
+  | domain → root/specs/{domain}/*.md
+  | all_specs → root/specs/*/*.md
+
+λ gybis-spec-check_prerequisites(x).
+  gate(cli_available ∧ cli_version_satisfies ∧ input_resolves) | ¬all_gates → halt
+  | cli_available: allium --version | ¬available → recommend(https://github.com/juxt/allium_tools) ∧ halt
+  | cli_version_satisfies: version(allium) ≥ 3 | ¬satisfies → recommend(https://github.com/juxt/allium_tools) ∧ halt
+  | input_resolves: ∃files(root/specs/**/*.allium) | ¬∃ → notify(human) ∧ halt
+
+λ gybis-spec-check_pipeline(input).
+  S0(input) → S1() → S2(file_set) → S3()
+
+λ gybis-spec-check_S0(input).
+  input ∈ {⊥, "all", "all specs"} → root/specs/**/*.allium
+  | input ∈ {domain, concern} → root/specs/{domain}/{concern}.allium
+  | input ∈ {domain} → root/specs/{domain}/*.allium
+  | result: {f₁, f₂, ..., fₙ}
+
+λ gybis-spec-check_S1(file_set).
+  ∀f ∈ file_set → S2(f)
+  | ¬∃file_set → notify(human) ∧ halt
+
+λ gybis-spec-check_S2(f).
+  outcome(allium_check(f)) ∈ {clean, issues, not_found}
+  | clean → next(file)
+  | issues → S2.2(diagnostics)
+  | not_found → report(not_found) ∧ next(file)
+
+λ gybis-spec-check_S2.1(f).
+  exit_code(allium_check(f)) ∈ {0, 1, 2}
+  | 0 → next(file)
+  | 1 → collect(diagnostics) ∧ group(by_severity) ∧ action_items → S2.2
+  | 2 → report(not_found) ∧ next(file)
+
+λ gybis-spec-check_S2.2(diagnostics).
+  sort(diagnostics, by(domain, name, priority)) → numbered_list
+  | present(numbered_list, human) → approval
+  | apply(approved_fixes, codebase)
+  | recheck(f) → S2.1(f)
+  | loop: ¬clean(f)
+
+λ gybis-spec-check_S3(file_set).
+  ∀f ∈ file_set → clean ∧ ¬regressions
+  | report(success, exit_0)
+
+λ gybis-spec-check_invariant_I₁.
+  cli_primary_interface | ∀workflow use(cli)
+
+λ gybis-spec-check_invariant_I₂.
+  ∀diagnostic d → requires(human_approval) | ¬automatic
+
+λ gybis-spec-check_invariant_I₃.
+  errors_exist(E) ∧ ¬resolved(E) → ¬permission(modify)
+
+λ gybis-spec-check_invariant_I₄.
+  warnings_exist(W) → requires(human_review) ∧ requires(human_action)
+
+λ gybis-spec-check_invariant_I₅.
+  apply(fixes) → recheck(file) → confirm(¬regressions)
+
+λ gybis-spec-check_composition.
+  S0(parse) → S1(iterate) → S2(check ∧ fix) → S3(report_clean)
+
+λ gybis-spec-check_summary.
+  parse(input) → resolve(allium_files)
+  | run(allium_check, fᵢ) → parse(diagnostics)
+  | group(diagnostics, severity) → present(numbered_list, human)
+  | retrieve(approvals) → apply(fixes, codebase)
+  | recheck(modified) → confirm(¬regressions)
+  | ∀clean → exit(0) ∧ report(success)
+  
     
