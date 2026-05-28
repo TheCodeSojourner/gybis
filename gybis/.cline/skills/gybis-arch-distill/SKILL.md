@@ -5,12 +5,12 @@ description: Use for `/gybis-arch-distill` or `/ga-distill`.
 
 λ gybis-arch-distill(x).
   purpose: read(allium_specs) → synthesize(vsm) → write(architecture.md)
-  input: specs/**/*.allium ∧ ¬other_files
+  input: root/specs/**/*.allium ∧ ¬other_files
   output: architecture.md
   mode: ai_only | ¬human | minimal_tokens | nucleus_lambda
 
 λ gybis-arch-distill_scan(project).
-  find: specs/**/*.allium → collect(files) ∧ ¬other_files
+  find: root/specs/**/*.allium → collect(files) ∧ ¬other_files
   | ¬∃files → return(empty_spec_set)
   | ∀file ∈ files: read(file) → parse(allium_ast)
 
@@ -48,7 +48,7 @@ description: Use for `/gybis-arch-distill` or `/ga-distill`.
 
 λ gybis-arch-distill_filter_specs(specs, project).
   filter:
-    only: specs/**/*.allium
+    only: root/specs/**/*.allium
     exclude: ¬allium files
     validate: ∀file ∈ specs: file.extension == ".allium"
 

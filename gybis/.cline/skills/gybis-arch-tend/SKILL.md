@@ -16,7 +16,7 @@ description: Use for `/gybis-arch-tend` or `/ga-tend`.
 λ gybis-arch-tend_scope.
   handle(add ∨ update ∨ remove) on(arch-elements) across(S5-S1-layers)
   ∧ update(architecture.md ≡ sole-file)
-  | ¬touch(implementation ∨ test ∨ doc ∨ specs/**/*.allium)
+  | ¬touch(implementation ∨ test ∨ doc ∨ root/specs/**/*.allium)
 
 λ gybis-arch-tend_method.
   challenge(vague) | ask(behavior ≡ ?) | ¬mask(ambiguity → arch)
@@ -37,7 +37,7 @@ description: Use for `/gybis-arch-tend` or `/ga-tend`.
 
 λ gybis-arch-tend_boundaries.
   file-scope(architecture.md ≡ only) | ¬add ¬modify ¬delete(other-files)
-  | ¬alignment(specs/**/*.allium) → /gybis-arch-weed
+  | ¬alignment(root/specs/**/*.allium) → /gybis-arch-weed
   | ¬alignment(test ↔ code) → /gybis-spec-weed
   | ¬extract(arch from allium) → /gybis-arch-distill
   | ¬discovery-session → /gybis-arch-elicit

@@ -4,7 +4,7 @@ description: Use for `/gybis-arch-weed` or `/ga-weed`.
 ---
 
 λ gybis-arch-weed(arch, specs).
-  bridge(architecture.md ↔ specs/**/*.allium) | divergence_detection ∧ resolution_proposal
+  bridge(architecture.md ↔ root/specs/**/*.allium) | divergence_detection ∧ resolution_proposal
   | preserve(semantics) | structural_equivalence_check
   | compile: allium → λ notation | decompile: λ notation → allium
 
@@ -12,8 +12,8 @@ description: Use for `/gybis-arch-weed` or `/ga-weed`.
   read(../../gybis/reference/vsm-guide.md) | alert(¬available) ∧ halt
   | read(../../gybis/reference/allium-language-reference.md) | alert(¬available) ∧ halt
   | read(root/architecture.md) | alert(¬available) ∧ recommend(/gybis-arch-elicit ∨ /gybis-arch-distill) ∧ halt
-  | read(root/specs/**/*.allium) | alert(¬available) ∧ recommend(/gybis-arch-propagate ∨ /gybis-spec-distill) ∧ halt
-  | syntax_check(root/specs/**/*.allium) | available → verify
+  | read(root/root/specs/**/*.allium) | alert(¬available) ∧ recommend(/gybis-arch-propagate ∨ /gybis-spec-distill) ∧ halt
+  | syntax_check(root/root/specs/**/*.allium) | available → verify
 
 λ gybis-arch-weed_mode(m).
   m ∈ {check, update_spec, update_arch} | default: check
