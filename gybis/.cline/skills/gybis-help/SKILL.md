@@ -13,7 +13,7 @@ CRITICAL CONSTRAINTS:
 
 | Skill Name | Description |
 |---|---|
-| `/gybis-arch-describe` (`/ga-describe`) | Describe architecture in product-manager-friendly prose. |
+| `/gybis-arch-describe` (`/ga-describe`) | Describe architecture in PM prose. |
 | `/gybis-arch-distill` (`/ga-distill`) | Create an initial architecture from specs. |
 | `/gybis-arch-elicit` (`/ga-elicit`) | Create an initial architecture with guided interaction. |
 | `/gybis-arch-explain` (`/ga-explain`) | Explain architecture in developer prose. |
@@ -31,5 +31,5 @@ CRITICAL CONSTRAINTS:
 | `/gybis-spec-explain` (`/gs-explain {concern|domain|all}`) | Explain in developer prose. |
 | `/gybis-spec-propagate` (`/gs-propagate {concern|domain|all}`) | Generate test(s). |
 | `/gybis-spec-tend` (`/gs-tend`) | Guide interactive update of specs. |
-| `/gybis-spec-weed` (`/gs-weed`) | Resolve specs vs. tests divergence. |
+| `/gybis-spec-weed` (`/gs-weed`) | Resolve specs vs. code/tests divergence. |
 
