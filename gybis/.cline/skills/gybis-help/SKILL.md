@@ -13,7 +13,7 @@ CRITICAL CONSTRAINTS:
 
 | Skill Name | Description |
 |---|---|
-| `/gybis-arch-describe` (`/ga-describe`) | Describe architecture in PM prose. |
+| `/gybis-arch-describe` (`/ga-describe`) | Describe architecture in non-technical prose. |
 | `/gybis-arch-distill` (`/ga-distill`) | Create an initial architecture from specs. |
 | `/gybis-arch-elicit` (`/ga-elicit`) | Create an initial architecture with guided interaction. |
 | `/gybis-arch-explain` (`/ga-explain`) | Explain architecture in developer prose. |
@@ -26,7 +26,7 @@ CRITICAL CONSTRAINTS:
 | `/gybis-memory-store {insight}` (`/gm-store {insight}`) | Store an optional insight as a memory, or prompt for one. |
 | `/gybis-memory-synthesize` (`/gm-synthesize`) | Invoke memory-to-knowledge synthesis. |
 | `/gybis-spec-check` (`/gs-check {concern|domain|all}`) | Check/Update syntax until valid. |
-| `/gybis-spec-describe` (`/gs-describe {concern|domain|all}`) | Describe in PM prose. |
+| `/gybis-spec-describe` (`/gs-describe {concern|domain|all}`) | Describe in non-technical prose. |
 | `/gybis-spec-distill` (`/gs-distill`) | Create initial specs from tests and code. |
 | `/gybis-spec-explain` (`/gs-explain {concern|domain|all}`) | Explain in developer prose. |
 | `/gybis-spec-propagate` (`/gs-propagate {concern|domain|all}`) | Generate test(s). |
