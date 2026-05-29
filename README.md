@@ -2,8 +2,6 @@
 
 <img src="gybis-logo.png" alt="gybis logo" width="110" style="margin-bottom: 1em;" />
 
-
-
 **A Developer-Command-Driven AI-Assisted Spec-Driven Software Development (SDD) Stack.**
 
 ## Obligatory Word Definitions
@@ -109,6 +107,12 @@ gybis tries to follow [Clojure's](https://github.com/clojure/clojure) versioning
 - **No fixed roadmap**: Development is open-ended. Alpha/beta/RC phases allow visibility into changes, but final releases will be very stable. Deprecations will be handled carefully, and transparently.
 
 ## For gybis Users
+
+To install gybis in a target repository execute the following command while currently in the target repository:
+
+```bash
+cp -ra <pathToGybisDirectory>/gybis/. .
+```
 
 See the `gybis/GYBIS-README.md` for usage instructions, best practices, and workflow suggestions.
 
