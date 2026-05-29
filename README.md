@@ -37,9 +37,9 @@ The goal of **gybis** is to make it easy for developers to set up, utilize, and 
   pseudocode, not free-form prose, but a structured DSL with rules, triggers, surfaces, and transition graphs that AI can reason about directly and minimize hallucinations. Behavioral specifications are saved in one or more files per domain (e.g., orders, payments).
 - **AI Session Persistent memory**: [Mementum](https://github.com/michaelwhitford/mementum) is used to manage decisions, patterns, and insights that are stored in files and recalled during AI sessions, so previous context is available between sessions.
 
-## Available Commands
+## Available User Commands
 
-The following commands are available after integrating gybis into your repository. Use them with Cline:
+The following commands are available after integrating gybis into a target repository. Use them with Cline:
 
 ### Architecture Commands (`/ga-*`)
 
@@ -74,6 +74,26 @@ The following commands are available after integrating gybis into your repositor
 | `/gybis-spec-propagate` (`/gs-propagate {concern\|domain\|all}`) | Create initial code/tests                     |
 | `/gybis-spec-tend` (`/gs-tend`)                                  | Update specs with human                       |
 | `/gybis-spec-weed` (`/gs-weed`)                                  | Upsert specs/code-tests from diffs with human |
+
+### Help
+
+| Command       | Description                        |
+| ------------- | ---------------------------------- |
+| `/gybis-help` | Show all available gybis commands. |
+
+## Available Developer Commands
+
+The following commands are available while developing gybis. Use them with Cline:
+
+### Memory Commands (`/gm-*`)
+
+| Command                                                       | Description                        |
+| ------------------------------------------------------------- | ---------------------------------- |
+| `/gybis-mementum-orient` (`/gm-orient`)                       | Restore prev AI context            |
+| `/gybis-mementum-recall {topic}` (`/gm-recall {topic}`)       | Recall topic, or summarize latest  |
+| `/gybis-mementum-session-terminate` (`/gm-session-terminate`) | CRUD memory before terminate       |
+| `/gybis-mementum-store {insight}` (`/gm-store {insight}`)     | Store insight, or prompt for one   |
+| `/gybis-mementum-synthesize` (`/gm-synthesize`)               | Synthesize knowledge from memories |
 
 ### Help
 
