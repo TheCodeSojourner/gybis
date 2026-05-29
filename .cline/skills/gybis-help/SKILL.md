@@ -13,9 +13,9 @@ CRITICAL CONSTRAINTS:
 
 | Skill Name | Description |
 |---|---|
-| `/gybis-mementum-orient` (`/gm-orient`) | Restore AI context from mementum information. |
-| `/gybis-mementum-recall {topic}` (`/gm-recall {topic}`) | Recall mementum information by optional topic, or write a brief summary. |
-| `/gybis-mementum-session-terminate` (`/gm-session-terminate`) | CRUD mementum information prior to session termination. |
-| `/gybis-mementum-store {insight}` (`/gm-store {insight}`) | Store an optional insight as a mementum, or prompt for one. |
-| `/gybis-mementum-synthesize` (`/gm-synthesize`) | Invoke mementum-to-knowledge synthesis. |
+| `/gybis-mementum-orient` (`/gm-orient`) | Restore prev AI context |
+| `/gybis-mementum-recall {topic}` (`/gm-recall {topic}`) | Recall topic/summarize-latest |
+| `/gybis-mementum-session-terminate` (`/gm-session-terminate`) | CRUD memory before terminate |
+| `/gybis-mementum-store {insight}` (`/gm-store {insight}`) | Store insight |
+| `/gybis-mementum-synthesize` (`/gm-synthesize`) | Synthesize knowledge |
 
