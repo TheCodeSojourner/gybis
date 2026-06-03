@@ -10,6 +10,13 @@ description: Use for `/gybis-spec-tend` or `/gs-tend`.
   | error(incompatible(domain, concern, constraint))
   | compose: μ = S0 · S1 · S2 · S3 · S4 · S5
 
+λ gybis-spec-tend_allium_write_contract.
+  write_scope ⊆ root/specs/**/*.allium
+  | edit_scope ⊆ root/specs/**/*.allium
+  | output_format ≡ allium_v3_only
+  | invariant: ∀written_file → parses_as(allium_v3)
+  | ¬write(root/**/*.md ∨ root/**/*.txt ∨ root/**/*.rs ∨ root/**/*.py ∨ root/**/*.ts ∨ root/**/*.js)
+
 λ gybis-spec-tend_S0_read(¬).
   read(root/specs/*/*.allium) | read(entirety)
   | understand(domain ∨ entity ∨ rule ∨ transition_graph ∨ config)
