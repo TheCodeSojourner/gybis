@@ -133,8 +133,9 @@ description: Use for `/gybis-arch-distill` or `/ga-distill`.
 
 λ gybis-arch-distill_write(architecture).
   write: architecture.md
-  format: nucleus_lambda_only ∧ ¬human_readable
+  format: λ-notation_only ∧ ¬human_readable | mode: ai_consumption_only
   preamble: ¬include (already_in_context)
+  output_contract: S_expression_notation ∧ YAML_frontmatter_only ∧ ¬markdown_content ∧ ¬prose_paragraphs
   steps:
     1. call gybis-arch-distill_format_nucleus_lambda(architecture) → raw_output
     2. prepend yaml_frontmatter(architecture) → final_output
