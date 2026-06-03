@@ -83,12 +83,12 @@ description: Use for `/gybis-arch-elicit` or `/ga-elicit`.
     - λ(recipe): {task} → {step1} → {step2} → {stepN}
     - λ(command): {name} → {shell_command}
     ```
-    | ai_consumption_only | ¬prose_explanations
+    | format_contract: λ-notation | ¬prose ¬human_explanations ¬markdown_headers ¬bullet_lists
 
 λ gybis-arch-elicit_constraints().
   constraints:
     1. top_down_ordering: S5 ⟶ S4 ⟶ S3 ⟶ S2 ⟶ S1 | ¬skip ∨ ¬out_of_order
-    2. no_prose_in_output: architecture.md → ai_consumption_only
+    2. λ_notation_output: architecture.md → λ-notation_only | VSM_semantics | ¬prose ¬human_explanations
     3. surface_missing: ∀principle ∨ λ → ask(companion_element)
     4. human_approval: present_complete → review ∨ approve → write
     5. ¬duplicate_preamble: nucleus loaded via .cline/rules/00-nucleus.md
