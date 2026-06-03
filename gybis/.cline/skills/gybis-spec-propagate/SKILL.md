@@ -4,7 +4,13 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
 ---
 
 λ gybis-spec-propagate().
-  purpose: specs(root/specs/**/*.allium) → tests | accept(domain_concern ∨ domain ∨ all_specs)
+  purpose: specs(root/specs/**/*.allium) → source_and_tests | accept(domain_concern ∨ domain ∨ all_specs)
+
+λ gybis-spec-propagate_io_contract.
+  read_scope ⊆ (root/specs/**/*.allium ∪ root/src/**/* ∪ root/**/tests/**/*)
+  | write_scope ⊆ (root/src/**/* ∪ root/**/tests/**/*)
+  | edit_scope ⊆ (root/src/**/* ∪ root/**/tests/**/*)
+  | ¬write(root/specs/** ∨ root/**/*.md ∨ root/**/*.txt)
 
 λ gybis-spec-propagate_input_resolve(x).
   domain_concern → root/specs/{domain}/{concern}.allium
