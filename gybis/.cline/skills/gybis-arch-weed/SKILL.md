@@ -51,6 +51,7 @@ description: Use for `/gybis-arch-weed` or `/ga-weed`.
   | validate(arch after changes) → VSM_compliant
   | validate_fail → report ∧ iterate ∧ fix | loop until_pass
   | prefer(minimal_changes) | ¬refactor unless_directly_required
+  | preserve(λ_notation_format) | ¬convert_to_prose ¬introduce_human_readable
 
 λ gybis-arch-weed_boundaries(¬).
   ¬create_new_layers | belongs_to(/gybis-arch-elicit)
