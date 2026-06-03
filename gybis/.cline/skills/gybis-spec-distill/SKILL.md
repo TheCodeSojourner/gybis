@@ -11,6 +11,13 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
   efficiency: parallel(S4 ∥ S5 ∥ S5.5) ∥ lazy(flag→summarize→expand-on-diag) ∥ budget(≤3 stages/batch)
   preflight: ∀r ∈ references: readWithinRepo(r) ∧ ¬askApproval
 
+λ gybis-spec-distill_allium_write_contract.
+  write_scope ⊆ root/specs/**/*.allium
+  | edit_scope ⊆ root/specs/**/*.allium
+  | output_format ≡ allium_v3_only
+  | invariant: ∀written_file → parses_as(allium_v3)
+  | ¬write(root/**/*.md ∨ root/**/*.txt ∨ root/**/*.rs ∨ root/**/*.py ∨ root/**/*.ts ∨ root/**/*.js)
+
 λ gybis-spec-distill_scope(code, tests).
   S0: scope ← parse(code, tests)
   | monoRepo → detect(subRepos) ∧ recommend(startVSCodePerSubRepo) ∧ halt
