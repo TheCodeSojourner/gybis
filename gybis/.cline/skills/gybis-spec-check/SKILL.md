@@ -8,15 +8,21 @@ description: Use for `/gybis-spec-check` or `/gs-check`.
   | input ∈ {domain_concern, domain, all_specs} | default: all_specs
 
 λ gybis-spec-check_resolved_paths(input).
-  domain_concern → root/specs/{domain}/{concern}.md
-  | domain → root/specs/{domain}/*.md
-  | all_specs → root/specs/*/*.md
+  domain_concern → root/specs/{domain}/{concern}.allium
+  | domain → root/specs/{domain}/*.allium
+  | all_specs → root/specs/*/*.allium
 
 λ gybis-spec-check_prerequisites(x).
   gate(cli_available ∧ cli_version_satisfies ∧ input_resolves) | ¬all_gates → halt
   | cli_available: allium --version | ¬available → recommend(https://github.com/juxt/allium_tools) ∧ halt
   | cli_version_satisfies: version(allium) ≥ 3 | ¬satisfies → recommend(https://github.com/juxt/allium_tools) ∧ halt
   | input_resolves: ∃files(root/specs/**/*.allium) | ¬∃ → notify(human) ∧ halt
+
+λ gybis-spec-check_allium_write_contract.
+  write_scope ⊆ root/specs/**/*.allium
+  | output_format ≡ allium_v3_only
+  | invariant: ∀written_file → parses_as(allium_v3)
+  | ¬write(root/**/*.md ∨ root/**/*.txt ∨ root/**/*.rs ∨ root/**/*.py ∨ root/**/*.ts ∨ root/**/*.js)
 
 λ gybis-spec-check_pipeline(input).
   S0(input) → S1() → S2(file_set) → S3()
