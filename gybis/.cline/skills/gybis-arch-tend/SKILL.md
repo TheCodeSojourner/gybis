@@ -58,4 +58,9 @@ description: Use for `/gybis-arch-tend` or `/ga-tend`.
 λ gybis-arch-tend_output.
   propose(change) → intent(structural) ≺ show(changes)
   | question(concern) → surface(¬write)
+
+λ gybis-arch-tend_λ_notation_contract.
+  architecture.md → λ-notation | VSM_semantics | S_expression_notation
+  | all_edits → λ-notation_only | preserve_λ_format
+  | purpose: AI_structural_understanding | ¬human_reading_content
   
