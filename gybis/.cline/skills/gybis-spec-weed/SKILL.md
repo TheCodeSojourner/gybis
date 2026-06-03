@@ -7,6 +7,13 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
   bridge(specs ↔ code ∧ tests) | divergence_detection ∧ resolution_proposal
   | preserve(semantics) | structural_equivalence_check
 
+λ gybis-spec-weed_allium_write_contract.
+  write_scope ⊆ root/specs/**/*.allium
+  | edit_scope ⊆ root/specs/**/*.allium
+  | output_format ≡ allium_v3_only
+  | invariant: ∀written_file → parses_as(allium_v3)
+  | ¬write(root/**/*.md ∨ root/**/*.txt ∨ root/**/*.rs ∨ root/**/*.py ∨ root/**/*.ts ∨ root/**/*.js)
+
 λ gybis-spec-weed_startup(x).
   read([Allium Action Findings](../../gybis/reference/allium-actioning-findings.md)) | alert(¬available) ∧ halt
   | read([Allium Language Reference](../../gybis/reference/allium-language-reference.md)) | alert(¬available) ∧ halt
@@ -15,8 +22,8 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
 λ gybis-spec-weed_mode(m).
   m ∈ {check, update_spec, update_code_tests} | default: check
   | check: compare(specs, code ∧ tests) → report(divergences) | ¬modify
-  | update_spec: code ∧ tests ← specs | (code ∧ tests) becomes faithful_desc(specs)
-  | update_code_tests: specs ← code ∧ tests | specs becomes faithful_desc(code_tests)
+  | update_spec: specs ← code ∧ tests | specs becomes faithful_desc(code_tests)
+  | update_code_tests: code ∧ tests ← specs | (code ∧ tests) becomes faithful_desc(specs)
   | execution_route: m ≡ check → gybis-spec-weed_check
 
 λ gybis-spec-weed_phase0_analysis(specs).
