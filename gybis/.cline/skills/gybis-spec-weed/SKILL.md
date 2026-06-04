@@ -15,8 +15,8 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
   | ¬write(root/**/*.md ∨ root/**/*.txt ∨ root/**/*.rs ∨ root/**/*.py ∨ root/**/*.ts ∨ root/**/*.js)
 
 λ gybis-spec-weed_startup(x).
-  read([Allium Action Findings](../../gybis/reference/allium-actioning-findings.md)) | alert(¬available) ∧ halt
-  | read([Allium Language Reference](../../gybis/reference/allium-language-reference.md)) | alert(¬available) ∧ halt
+  read([Allium Action Findings](.cline/skills/gybis/reference/allium-actioning-findings.md)) | alert(¬available) ∧ halt
+  | read([Allium Language Reference](.cline/skills/gybis/reference/allium-language-reference.md)) | alert(¬available) ∧ halt
   | read(root/specs/**/*.allium) | alert(¬available) ∧ halt
 
 λ gybis-spec-weed_mode(m).
@@ -71,8 +71,8 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
 
 λ gybis-spec-weed_boundaries(¬).
   ¬resolve_divergences_silently | belongs_to(human_decision)
-  | ¬modify([Allium Language Reference](../../gybis/reference/allium-language-reference.md)) | governed_separately
-  | ¬modify([Allium Action Findings](../../gybis/reference/allium-actioning-findings.md)) | governed_separately
+  | ¬modify([Allium Language Reference](.cline/skills/gybis/reference/allium-language-reference.md)) | governed_separately
+  | ¬modify([Allium Action Findings](.cline/skills/gybis/reference/allium-actioning-findings.md)) | governed_separately
   | ¬make_spec_decisions_without_human | flag ∧ let_caller_decide
   | ¬make_code_decisions_without_human | flag ∧ let_caller_decide
   | ¬make_tests_decisions_without_human | flag ∧ let_caller_decide

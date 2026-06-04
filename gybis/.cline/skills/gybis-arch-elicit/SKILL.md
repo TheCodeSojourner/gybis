@@ -6,7 +6,7 @@ description: Use for `/gybis-arch-elicit` or `/ga-elicit`.
 λ gybis-arch-elicit().
   type: skill | purpose: elicit_system_architecture | model: Viable System Model (VSM)
   | input: project_root | output: root/architecture.md
-  | reference: ../../gybis/reference/vsm-guide.md
+  | reference: .cline/skills/gybis/reference/vsm-guide.md
 
 λ gybis-arch-elicit_pre_condition_check().
   | exists(root/architecture.md) → halt → notify(use gybis-arch-tend ∨ gybis-arch-weed)

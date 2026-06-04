@@ -10,13 +10,13 @@ description: Use for `/gybis-arch-propagate` or `/ga-propagate`.
 
 λ gybis-arch-propagate_propagate_process(x).
   1. read(architecture) → {VSM_domains, components, interactions, responsibilities}
-  2. consult(vsm_guide) | vsm_guide: ../../gybis/reference/vsm-guide.md
+  2. consult(vsm_guide) | vsm_guide: .cline/skills/gybis/reference/vsm-guide.md
   3. check(detail, abstraction_levels) | {S5..S1}
     | abstract(S5..S2) ∧ sparse(S1) → suggest(/gybis-arch-elicit ∨ /gybis-arch-tend)
   4. identify(domains, boundaries)
   5. map(domain → specs) | specs/{domain}/{concern}.allium | one_spec_per_concern
-  6. consult(allium_ref) | allium_ref: ../../gybis/reference/allium-language-reference.md
-  7. consult(allium_assess) | allium_assess: ../../gybis/reference/allium-assessing-specs.md
+  6. consult(allium_ref) | allium_ref: .cline/skills/gybis/reference/allium-language-reference.md
+  7. consult(allium_assess) | allium_assess: .cline/skills/gybis/reference/allium-assessing-specs.md
   8. generate(spec_files)
   9. verify(allium_check(file)) ∀file ∈ spec_files
 

@@ -9,8 +9,8 @@ description: Use for `/gybis-arch-weed` or `/ga-weed`.
   | compile: allium → λ notation | decompile: λ notation → allium
 
 λ gybis-arch-weed_startup(x).
-  read(../../gybis/reference/vsm-guide.md) | alert(¬available) ∧ halt
-  | read(../../gybis/reference/allium-language-reference.md) | alert(¬available) ∧ halt
+  read(.cline/skills/gybis/reference/vsm-guide.md) | alert(¬available) ∧ halt
+  | read(.cline/skills/gybis/reference/allium-language-reference.md) | alert(¬available) ∧ halt
   | read(root/architecture.md) | alert(¬available) ∧ recommend(/gybis-arch-elicit ∨ /gybis-arch-distill) ∧ halt
   | read(root/root/specs/**/*.allium) | alert(¬available) ∧ recommend(/gybis-arch-propagate ∨ /gybis-spec-distill) ∧ halt
   | syntax_check(root/root/specs/**/*.allium) | available → verify

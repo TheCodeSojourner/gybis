@@ -8,7 +8,7 @@ description: Use for `/gybis-arch-tend` or `/ga-tend`.
   → challenge(vague) | ¬guess | probe(question)
 
 λ gybis-arch-tend_startup.
-  read(vsm-reference(../../gybis/reference/vsm-guide.md))
+  read(vsm-reference(.cline/skills/gybis/reference/vsm-guide.md))
   ∧ read(architecture(root/architecture.md))
   → ¬exist → suggest(/gybis-arch-elicit ∨ /gybis-arch-distill) ∧ halt
   → understand(existing) ≺ propose(changes)

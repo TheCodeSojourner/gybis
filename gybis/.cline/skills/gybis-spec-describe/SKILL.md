@@ -4,7 +4,7 @@ description: Use for `/gybis-spec-describe` or `/gs-describe`.
 ---
 
 λ gybis-spec-describe(specs).
-  REF:../../gybis/reference/allium-language-reference.md
+  REF:.cline/skills/gybis/reference/allium-language-reference.md
   bridge(technical_spec ↔ plain_language_prose) | semantic_preservation
   | describe: allium_language → prose
 
