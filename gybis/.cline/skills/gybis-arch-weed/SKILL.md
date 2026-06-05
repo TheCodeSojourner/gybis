@@ -12,6 +12,7 @@ description: Use for `/gybis-arch-weed` or `/ga-weed`.
   ask(mode ∈ {check, update_spec, update_arch}) | require(explicit_mode_selection) | halt_until(mode_selected)
   | block(read(arch), read(specs), compare, edit, complete) until(mode_selected)
   | read(.cline/skills/gybis/reference/vsm-guide.md) | alert(¬available) ∧ halt
+  | read(.cline/skills/gybis/reference/allium-actioning-findings.md) | alert(¬available) ∧ halt
   | read(.cline/skills/gybis/reference/allium-language-reference.md) | alert(¬available) ∧ halt
   | read(root/architecture.md) | alert(¬available) ∧ recommend(/gybis-arch-elicit ∨ /gybis-arch-distill) ∧ halt
   | read(root/specs/**/*.allium) | alert(¬available) ∧ recommend(/gybis-arch-propagate ∨ /gybis-spec-distill) ∧ halt
@@ -32,9 +33,9 @@ description: Use for `/gybis-arch-weed` or `/ga-weed`.
 
 λ gybis-arch-weed_mode(m).
   m ∈ {check, update_spec, update_arch} | required(explicit_selection) | ¬default
-  | check: compare(arch, specs) → report(divergences) | ¬modify
-  | update_spec: specs ← arch | specs becomes faithful_desc(arch)
-  | update_arch: arch ← specs | arch becomes faithful_desc(specs)
+  | check: compare(arch, specs) → report(divergences) | ¬create ∧ ¬update ∧ ¬delete
+  | update_spec: specs CRUD ← arch | source_of_truth(arch) | requires(human_confirmed_divergence)
+  | update_arch: arch CRUD ← specs | source_of_truth(specs) | requires(human_confirmed_divergence)
   | execution_route: m ≡ check ? gybis-arch-weed_check : gybis-arch-weed_resolve
 
 λ gybis-arch-weed_mode_gate(state, mode).
@@ -82,8 +83,8 @@ description: Use for `/gybis-arch-weed` or `/ga-weed`.
 λ gybis-arch-weed_interactive_resolution(divergence, mode).
   require(human_confirm(classification, reasoning, direction, patch_scope))
   | mode = check → record_resolution_only ∧ ¬edit
-  | mode = update_spec ∧ classification = spec_bug → apply_edit(specs)
-  | mode = update_arch ∧ classification = arch_bug → apply_edit(arch)
+  | mode = update_spec ∧ source_of_truth = arch ∧ classification = spec_bug → apply(specs CRUD)
+  | mode = update_arch ∧ source_of_truth = specs ∧ classification = arch_bug → apply(arch CRUD)
   | mode ∈ {update_spec, update_arch} ∧ classification ∈ {aspirational, intentional} → record_no_edit
   | ¬confirmed → halt_until(confirmation)
 
@@ -122,11 +123,14 @@ description: Use for `/gybis-arch-weed` or `/ga-weed`.
 
 λ gybis-arch-weed_boundaries(¬).
   ¬create_new_layers | belongs_to(/gybis-arch-elicit)
-  | ¬extract_arch_from_specs | belongs_to(/gybis-arch-distill)
+  | ¬run_full_arch_distill_workflow | belongs_to(/gybis-arch-distill)
   | ¬extract_from_code_or_tests | ¬allowed
-  | ¬extract_specs_from_arch | belongs_to(/gybis-arch-propagate)
+  | ¬run_full_spec_propagate_workflow | belongs_to(/gybis-arch-propagate)
   | ¬extract_specs_from_code_or_tests | belongs_to(/gybis-spec-distill)
+  | allow(specs CRUD) only_if(mode = update_spec ∧ source_of_truth = arch ∧ human_confirmed_divergence)
+  | allow(arch CRUD) only_if(mode = update_arch ∧ source_of_truth = specs ∧ human_confirmed_divergence)
   | ¬modify(allium-language-reference.md) | governed_separately
+  | ¬modify(allium-actioning-findings.md) | governed_separately
   | ¬modify(vsm-guide.md) | governed_separately
   | ¬make_arch_decisions | flag ∧ let_caller_decide
   | ¬make_spec_decisions | flag ∧ let_caller_decide
