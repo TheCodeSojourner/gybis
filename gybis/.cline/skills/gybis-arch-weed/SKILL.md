@@ -16,7 +16,7 @@ description: Use for `/gybis-arch-weed` or `/ga-weed`.
   | read(root/architecture.md) | alert(¬available) ∧ recommend(/gybis-arch-elicit ∨ /gybis-arch-distill) ∧ halt
   | read(root/specs/**/*.allium) | alert(¬available) ∧ recommend(/gybis-arch-propagate ∨ /gybis-spec-distill) ∧ halt
   | gybis-arch-weed_allium_cli_available?(x) | true → continue | false → recommend(https://github.com/juxt/allium_tools) ∧ halt
-  | syntax_check(root/specs/**/*.allium) | true → verify | false → recommend(/gybis-spec-check) ∧ halt
+  | gybis-arch-weed_syntax_check(root/specs/**/*.allium) | true → verify | false → recommend(/gybis-spec-check) ∧ halt
 
 λ gybis-arch-weed_allium_cli_available?(x). 
   gate(cli_available ∧ cli_version_satisfies) | ¬all_gates → false 
