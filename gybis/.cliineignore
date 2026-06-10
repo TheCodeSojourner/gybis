@@ -1,0 +1,3 @@
+# deny cline access to files outside of repo root, including absolute paths
+../
+/**/*

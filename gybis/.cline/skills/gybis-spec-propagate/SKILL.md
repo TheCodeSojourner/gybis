@@ -3,123 +3,142 @@ name: gybis-spec-propagate
 description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
 ---
 
-λ gybis-spec-propagate().
-  purpose: specs(root/specs/**/*.allium) → tests | accept(domain_concern ∨ domain ∨ all_specs)
+λ gybis-spec-propagate(input).
+  purpose: resolve(spec_targets) → validate(specs) → select(language∧framework) → generate(specs→implementation∧tests)
+  | input: all_specs_only
+  | output: generated_implementation ∧ generated_tests ∧ blocker_report
+  | mode: ai_unattended_after_language_selection | minimal_tokens | nucleus_lambda
+  | gate: proceed iff gybis-spec-propagate_specs_exist?(input)
 
-λ gybis-spec-propagate_input_resolve(x).
-  domain_concern → root/specs/{domain}/{concern}.allium
-  | domain → root/specs/{domain}/*.allium
-  | all_specs → root/specs/*/*.allium
+λ gybis-spec-propagate_startup(input).
+  gybis-spec-propagate_specs_exist?(input) | true → continue | false → alert(run_/gybis-spec-distill_or_/gybis-arch-propagate) ∧ halt
+  | gybis-spec-propagate_allium_cli_available?(x) | true → continue | false → recommend(https://github.com/juxt/allium_tools) ∧ halt
+  | per_file := gybis-spec-propagate_validate_each_spec(root/specs/**/*.allium)
+  | per_file.status = fail → alert(run_/gybis-spec-check_before_propagation) ∧ halt
+  | set_level := gybis-spec-propagate_validate_spec_set(root/specs/)
+  | set_level.status ≠ pass → alert(run_/gybis-spec-check_before_propagation) ∧ halt
+  | selection := gybis-spec-propagate_query_language_and_framework(input)
+  | selection.status ≠ resolved → alert(language_or_framework_unresolved) ∧ halt
 
-λ gybis-spec-propagate_prerequisites.
-  gate(`allium --version` ∧ executes) ∧ gate(`allium --version` ∧ executes ∧ version(≥3)) ∧ gate(input_resolves) → pipeline_start
-  | ¬gate → halt | recommend([juxt/allium_tools](https://github.com/juxt/allium-tools))
+λ gybis-spec-propagate_specs_exist?(x).
+  count(files(root/specs/**/*.allium)) > 0 → true
+  | otherwise → false
 
-λ gybis-spec-propagate_S0_init.
-  parse_resolve(input) → file-set{f₁, f₂, ..., fₙ}
-  | verify(codebase ∨ tests_exist)
-  | `allium plan {fᵢ}` → obligations
-  | `allium model {fᵢ}` → domain_models
+λ gybis-spec-propagate_allium_cli_available?(x).
+  gate(cli_available ∧ cli_version_satisfies) | ¬all_gates → false
+  | cli_available: allium --version | ¬available → false
+  | cli_version_satisfies: version(allium) ≥ 3 | ¬satisfies → false
+  | otherwise → true
 
-λ gybis-spec-propagate_S1_discover.
-  detect(test_framework) | check(pbt_support: fast-check ∨ hypothesis ∨ proptest ∨ quickcheck ∨ streamdata ∨ test.check)
-  | discover(test_location ∨ entity_naming ∨ factory_naming ∨ surface_components ∨ test_helpers)
-  | detect(time_injection_patterns) | check(cross_module_fixtures)
-  | review(existing_tests) → covered_obligations
+λ gybis-spec-propagate_validate_each_spec(path_glob).
+  specs := files(path_glob)
+  | ∀spec ∈ specs:
+      r[spec] := exec("allium check " + spec)
+      d[spec] := (json_parse(r[spec].stdout).diagnostics) ∨ []
+      has_error[spec] := any(d[spec], λx. x.severity = "error")
+      check_pass[spec] := (r[spec].exit = 0) ∨ ((r[spec].exit = 1) ∧ ¬has_error[spec])
+  | failed := {s | check_pass[s] = false}
+  | count(failed) = 0 → {status: pass, failed: ∅}
+  | otherwise → {status: fail, failed}
 
-λ gybis-spec-propagate_S2_map_bridge.
-  surface → endpoints ∨ components ∨ handlers
-  | rule → service_methods ∨ handlers ∨ fsm_transitions
-  | entity → factories ∨ builders ∨ fixtures
-  | rule_invoke → api_call ∨ func_call ∨ event_emit
-  | postcondition → db_query ∨ return_check ∨ event_verify
+λ gybis-spec-propagate_validate_spec_set(path).
+  r := exec("allium analyse " + path)
+  | d := (json_parse(r.stdout).diagnostics) ∨ []
+  | f := (json_parse(r.stdout).findings) ∨ []
+  | errors := filter(d, severity=error)
+  | findings_count := count(f)
+  | return
+      (r.exit = 0 ∧ count(errors)=0 ∧ findings_count=0) → {status: pass, diagnostics: d, findings: f}
+      | otherwise → {status: fail, diagnostics: d, findings: f}
 
-λ gybis-spec-propagate_S3_surface_tests.
-  for_each(surface):
-  | actors → iterate(actors)
-  | cases: positive(when-true) ∧ negative(when-false) ∧ failure_scenarios
-  | actor_isolation: ¬interfere(other_actors)
-  | actor_id: identified_by ∧ within_scope
-  | context: ¬specified → absent
-  | contracts: demands(pre) ∧ fulfillments(post) ∧ signatures
-  | guarantees: @guarantee
-  | timeouts: temporal_rules ∧ constraints
-  | related: navigation_links
+λ gybis-spec-propagate_query_language_and_framework(input).
+  ask_human(desired_implementation_language)
+  | ask_human(testing_framework_available_for_selected_language)
+  | language = empty ∨ framework = empty → {status: unresolved}
+  | gybis-spec-propagate_framework_available_for_language?(language, framework) = false
+      → {status: unresolved, reason: framework_not_verified_for_language}
+  | otherwise → {status: resolved, language, framework}
 
-λ gybis-spec-propagate_S4_spec_tests.
-  for_each(construct):
-  | entity_value: fields ∨ types ∨ optionality ∨ presence ∨ relationships ∨ joins ∨ equality
-  | enum: comparability ∨ membership ∨ inline_isolation
-  | sum_type: variants ∨ guards ∨ exhaustiveness ∨ construction
-  | derived: projection ∨ volatility(now) ∨ collections
-  | default: unconditional ∨ fields ∨ cross_refs
-  | config: defaults ∨ overrides ∨ mandatory ∨ expressions ∨ qualifiers ∨ chains
-  | invariant: post_rule ∨ edge_cases ∨ implications ∨ entity_level
-  | rule: success ∨ failure ∨ edge ∨ guards ∨ create/remove/bulk ∨ iterate ∨ let ∨ chains
-  | state: valid_transitions ∨ invalid ∨ terminal ∨ transitions_to(explicit) ∨ becomes(implicit) ∨ undeclared_reject
-  | temporal: deadline_boundaries ∨ re_fire_prevent ∨ null_under_pressure
-  | surface: visibility ∨ availability ∨ actor ∨ scope ∨ context ∨ related
-  | contract: signature_conformance ∨ @invariant ∨ obligation_direction
-  | cross_module: qualified_entities ∨ external_triggers ∨ type_placeholders
-  | cross_rule: duplicate_guards ∨ provision_availability ∨ interactions
-  | transition_graph: edge_reachable ∨ undeclared_reject ∨ terminal_no_outbound ∨ non_terminal_exit_paths ∨ enum_edges
-  | state_fields: present_per_state ∨ leave_obligations ∨ convergent ∨ guard_access ∨ derived_infer
-  | scenario: happy ∨ edge ∨ order_independent
-  | data_flow: surface → rule → downstream
-  | reachability: initial → terminal
-  | deadlock: allium_analyse_findings
-  | cross_entity: multi_entity_lifecycle
+λ gybis-spec-propagate_known_frameworks(language).
+  language = "rust" → {"cargo-test","rstest","proptest","quickcheck","tokio-test"}
+  | language = "typescript" → {"jest","vitest","mocha","ava","tap","uvu"}
+  | language = "javascript" → {"jest","vitest","mocha","ava","tap","uvu"}
+  | language = "python" → {"pytest","unittest","nose2","hypothesis"}
+  | language = "go" → {"go-test","ginkgo","testify"}
+  | language = "java" → {"junit","testng","spock"}
+  | note: known_frameworks_are_examples_only ∧ ai_may_verify_other_valid_language_framework_combinations
+  | otherwise → ∅
 
-λ gybis-spec-propagate_S5_test_kind.
-  deterministic → assertion
-  | invariant_verify → pbt(generate_valid_states → apply_rules → check_invariants)
-  | transition_graph → state_machine_walk
-  | ¬pbt_available → fallback(assertion)
+λ gybis-spec-propagate_framework_available_for_language?(language, framework).
+  known := gybis-spec-propagate_known_frameworks(lower(language))
+  | lower(framework) ∈ known → true
+  | ai_verifies(valid_test_framework_for_language(lower(language), lower(framework))) → true
+  | otherwise → false
 
-λ gybis-spec-propagate_S6_action_map.
-  for_each(edge in transition_graph):
-  | rule_witness(edge) → locate(implementing_code)
-  | write_test_action(setup ∨ invoke ∨ verify_target)
-  | register(from, to)
-  | pbt_walk: random_valid_paths(non_terminal_start)
+λ gybis-spec-propagate_state_machine(state, action).
+  state ∈ {INIT, STARTUP_CHECKS, QUERY_SELECTION, MAP_SPECS, GENERATE_IMPL, GENERATE_TESTS, VERIFY_GENERATION, DONE}
+  | transition(INIT → STARTUP_CHECKS) only_if(startup_requested)
+  | transition(STARTUP_CHECKS → QUERY_SELECTION) only_if(spec_validation_passed)
+  | transition(QUERY_SELECTION → MAP_SPECS) only_if(selection_resolved)
+  | transition(MAP_SPECS → GENERATE_IMPL) only_if(spec_model_ready)
+  | transition(GENERATE_IMPL → GENERATE_TESTS) only_if(implementation_generated)
+  | transition(GENERATE_TESTS → VERIFY_GENERATION) only_if(tests_generated)
+  | transition(VERIFY_GENERATION → DONE) only_if(generation_verified)
+  | otherwise reject_transition
 
-λ gybis-spec-propagate_S7_temporal_validate.
-  detect(clock_injection) → generate(temporal_tests)
-  | ¬clock_injection → flag(test_infrastructure_gap)
-  | ¬sleep ∨ ¬race_conditions
+λ gybis-spec-propagate_spec_to_impl_mapping(Σspecs, language, framework).
+  surfaces := extract(Σspecs.surfaces)
+  | entities := extract(Σspecs.entities ∪ Σspecs.value ∪ Σspecs.enums)
+  | rules := extract(Σspecs.rules ∪ Σspecs.invariants ∪ Σspecs.warnings)
+  | produce(source_modules(language, from=surfaces∪entities∪rules))
+  | produce(test_modules(language, framework, from=rules∪invariants))
+  | map(requires → preconditions)
+  | map(ensures → assertions)
+  | map(invariants → property_or_example_assertions(framework))
+  | map(warns → negative_or_boundary_tests(framework))
 
-λ gybis-spec-propagate_S8_cross_module_chains.
-  trace(trigger_emission_graph)
-  | integration_fixture_exists → reuse
-  | wiring_clear ∧ simple → generate(fixture ∧ test)
-  | wiring_opaque ∨ complex → skeleton(TODO)
+λ gybis-spec-propagate_generate_unattended(Σspecs, selection).
+  require(selection.status = resolved)
+  | write_scope := root/implementation_for(selection.language)/**
+  | test_scope := root/tests_for(selection.language, selection.framework)/**
+  | synthesize(implementation, from=Σspecs, language=selection.language)
+  | synthesize(tests, from=Σspecs, language=selection.language, framework=selection.framework)
+  | write(implementation, write_scope)
+  | write(tests, test_scope)
+  | return({status: generated, implementation_files, test_files})
 
-λ gybis-spec-propagate_S9_reuse.
-  match(existing_tests, spec_obligations) → covered
-  | ¬covered → generate(gap_tests)
+λ gybis-spec-propagate_verify_generation(result, selection).
+  require(result.status = generated)
+  | require(count(result.implementation_files) > 0)
+  | require(count(result.test_files) > 0)
+  | require(all(file.language = selection.language for file ∈ result.implementation_files ∪ result.test_files))
+  | require(all(file.path ⊄ root/specs/** for file ∈ result.implementation_files ∪ result.test_files))
+  | return({status: verified})
 
-λ gybis-spec-propagate_S10_deferred.
-  deferred_module ∉ codebase → generate(stub ∨ placeholder_interface)
+λ gybis-spec-propagate_failure_contract(x).
+  fail_specs_missing → tell_human(run_/gybis-spec-distill_or_/gybis-arch-propagate) ∧ halt
+  | fail_allium_cli → tell_human(install_or_fix_allium_cli) ∧ halt
+  | fail_allium_check_or_analyse → tell_human(use_/gybis-spec-check_then_retry) ∧ halt
+  | fail_language_framework_selection → tell_human(provide_language_and_framework) ∧ halt
 
-λ gybis-spec-propagate_S11_verify.
-  compilation_check(generated_tests) → syntactically_valid ∧ compiles
+λ gybis-spec-propagate_invariant_I₁.
+  startup_gate_order ≡ specs_exist → cli_available → allium_check_each_spec → allium_analyse_specs_set → query_language_and_framework
 
-λ gybis-spec-propagate_S12_allium_analyse.
-  `allium_analyse {root/specs/}` → findings
-  | priority(missing_producers ∨ dead_transitions) → test_creation
-  | deadlock_detected → test(stuck_state_behavior)
+λ gybis-spec-propagate_invariant_I₂.
+  any_validation_fail → mandatory_halt ∧ mandatory_recommend("/gybis-spec-check") for spec_validation_failures
 
-λ gybis-spec-propagate_invariants.
-  deterministic_completeness: construct → ≥1_test_obligation
-  | pbt → invariant_verification
-  | state_machine → transition_graph
-  | action_map → required(state_machine)
-  | time_injection → required(temporal) | ¬present → flag
-  | reuse → ¬replace(working_tests)
-  | deferred → stubs
-  | cross_module → integration_tests
-  | generated → starting_point(human_adjustment)
+λ gybis-spec-propagate_invariant_I₃.
+  after(selection_resolved): generation_mode ≡ unattended_by_human
 
-λ gybis-spec-propagate_process_composition.
-  μ = S0 · S1 · S2 · S3 · S4 · S5 · S6 · S7 · S8 · S9 · S10 · S11 · S12
-  
+λ gybis-spec-propagate_invariant_I₄.
+  ¬write(spec_files) during propagation generation
+
+λ gybis-spec-propagate_regression_contract(x).
+  assert(mandatory_specs_presence_gate_before_any_generation)
+  | assert(mandatory_allium_cli_gate_before_any_validation)
+  | assert(mandatory_per_file_allium_check_before_set_analyse)
+  | assert(mandatory_set_level_allium_analyse_before_language_query)
+  | assert(mandatory_halt_and_/gybis-spec-check_on_any_spec_validation_failure)
+  | assert(mandatory_language_and_framework_query_before_generation)
+  | assert(mandatory_framework_verified_for_selected_language_before_generation)
+  | assert(unattended_generation_after_gates_pass)
