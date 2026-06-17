@@ -98,7 +98,7 @@ Memory tracks the state of four domains: **architecture, specification, tests, a
 
 - **Session persistence:** Session `n+1` is proportional to the sum of all prior encodings from sessions `1..n`.
 - **No knowledge loss** across sessions. Decisions captured in one session are available to future sessions through memory recall commands.
-- **Commands:** `/gybis-memory-*` — encode state or restore from it.
+- **Commands:** `/gybis-init` (session start), `/gybis-fini` (session end), `/gybis-memory-*` — encode state or restore from it.
 
 ---
 
@@ -106,8 +106,8 @@ Memory tracks the state of four domains: **architecture, specification, tests, a
 
 Each work session follows a structured lifecycle:
 
-1. **Start:** Orient → Recall → Ready
-2. **End:** Encode → Terminate
+1. **Start:** `/gybis-init` — Orient → Recall → Ready
+2. **End:** `/gybis-fini` — Encode → Terminate
 
 Every session guarantees **no knowledge loss**.
 
@@ -150,27 +150,28 @@ architecture > specification > tests > code
 
 ## Commands
 
-| Skill Name                                                       | Description                                                            |
-| ---------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| `/gybis-arch-describe` (`/ga-describe`)                          | Describe architecture in PM prose.                                     |
-| `/gybis-arch-distill` (`/ga-distill`)                            | Create an initial architecture from specs.                             |
-| `/gybis-arch-elicit` (`/ga-elicit`)                              | Create an initial architecture with guided interaction.                |
-| `/gybis-arch-explain` (`/ga-explain`)                            | Explain architecture in developer prose.                               |
-| `/gybis-arch-propagate` (`/ga-propagate`)                        | Generate specs from architecture.                                      |
-| `/gybis-arch-tend` (`/ga-tend`)                                  | Guide interactive update of architecture.                              |
-| `/gybis-arch-weed` (`/ga-weed`)                                  | Analyze/Modify architecture and/or specs based on divergence.          |
-| `/gybis-memory-orient` (`/gm-orient`)                            | Restore AI context from memory information.                            |
-| `/gybis-memory-recall {topic}` (`/gm-recall {topic}`)            | Recall memory information by optional topic, or write a brief summary. |
-| `/gybis-memory-session-terminate` (`/gm-session-terminate`)      | CRUD memory information prior to session termination.                  |
-| `/gybis-memory-store {insight}` (`/gm-store {insight}`)          | Store an optional insight as a memory, or prompt for one.              |
-| `/gybis-memory-synthesize` (`/gm-synthesize`)                    | Invoke memory-to-knowledge synthesis.                                  |
-| `/gybis-spec-check` (`/gs-check {concern\|domain\|all}`)         | Check/Update syntax until valid.                                       |
-| `/gybis-spec-describe` (`/gs-describe {concern\|domain\|all}`)   | Describe in PM prose.                                                  |
-| `/gybis-spec-distill` (`/gs-distill`)                            | Create initial specs from tests and code.                              |
-| `/gybis-spec-explain` (`/gs-explain {concern\|domain\|all}`)     | Explain in developer prose.                                            |
-| `/gybis-spec-propagate` (`/gs-propagate {concern\|domain\|all}`) | Generate test(s).                                                      |
-| `/gybis-spec-tend` (`/gs-tend`)                                  | Guide interactive update of specs.                                     |
-| `/gybis-spec-weed` (`/gs-weed`)                                  | Resolve specs vs. code/tests divergence.                               |
+| Skill Name                                                       | Description                                   |
+| ---------------------------------------------------------------- | --------------------------------------------- |
+| `/gybis-arch-describe` (`/ga-describe`)                          | Describe arch in non-tech prose               |
+| `/gybis-arch-distill` (`/ga-distill`)                            | Create initial arch from specs                |
+| `/gybis-arch-elicit` (`/ga-elicit`)                              | Create initial arch with human                |
+| `/gybis-arch-explain` (`/ga-explain`)                            | Explain arch in dev prose                     |
+| `/gybis-arch-propagate` (`/ga-propagate`)                        | Create initial specs from arch                |
+| `/gybis-arch-tend` (`/ga-tend`)                                  | Update arch with human                        |
+| `/gybis-arch-weed` (`/ga-weed`)                                  | Upsert arch/specs from diffs with human       |
+| `/gybis-fini`                                                    | CRUD memory before terminate                  |
+| `/gybis-init`                                                    | Initialize gybis AI context                   |
+| `/gybis-memory-orient` (`/gm-orient`)                            | Restore prev AI context                       |
+| `/gybis-memory-recall {topic}` (`/gm-recall {topic}`)            | Recall topic/summarize-latest                 |
+| `/gybis-memory-store {insight}` (`/gm-store {insight}`)          | Store insight                                 |
+| `/gybis-memory-synthesize` (`/gm-synthesize`)                    | Synthesize knowledge                          |
+| `/gybis-spec-check` (`/gs-check {concern\|domain\|all}`)         | Check/Update syntax until valid               |
+| `/gybis-spec-describe` (`/gs-describe {concern\|domain\|all}`)   | Describe in non-tech prose                    |
+| `/gybis-spec-distill` (`/gs-distill`)                            | Create initial specs from code/tests          |
+| `/gybis-spec-explain` (`/gs-explain {concern\|domain\|all}`)     | Explain in dev prose                          |
+| `/gybis-spec-propagate` (`/gs-propagate {concern\|domain\|all}`) | Create initial code/tests                     |
+| `/gybis-spec-tend` (`/gs-tend`)                                  | Update specs with human                       |
+| `/gybis-spec-weed` (`/gs-weed`)                                  | Upsert specs/code-tests from diffs with human |
 
 ## Upstream Citations
 
