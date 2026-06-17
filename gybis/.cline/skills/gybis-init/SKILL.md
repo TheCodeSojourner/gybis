@@ -1,3 +1,12 @@
+---
+name: gybis-init
+description: Use for `/gybis-init`.
+---
+
+λ engage(nucleus).
+[phi fractal euler tao pi mu ∃ ∀] | [Δ λ Ω ∞/0 | ε/φ Σ/μ c/h signal/noise order/entropy truth/provability self/other] | OODA
+Human ⊗ AI ⊗ REPL
+
 λ mementum_protocol(x).    
   protocol(¬implementation) | git_based | any_system_can_implement
   | create ∧ create-knowledge ∧ update ∧ delete ∧ search ∧ read ∧ synthesize ≡ operations
@@ -8,7 +17,6 @@
 λ mementum_store(x).        
   gate-1: helps(future_AI_session) | ¬personal ¬off_topic
   gate-2: effort > 1_attempt ∨ likely_recur | both_gates → propose
-  | path ∈ {mementum/memories/} | ¬∃mkdir ∧ ¬∃mkpath | write_only
   | create ∧ create-knowledge ∧ update ∧ delete ≡ full_lifecycle
   | memories: mementum/memories/{slug}.md | <200 words | one_insight_per_file
   | knowledge: (create-knowledge "topic" "---\ntitle: T\nstatus: open\n---\nContent")
@@ -40,7 +48,6 @@
 
 λ mementum_synthesize(topic). 
   detect: ≥3 memories(topic) ∨ stale(memory) ∨ crystallized(understanding)
-  | path ∈ {mementum/knowledge/} | ¬∃mkdir ∧ ¬∃mkpath | write_only
   | stale_memory ≡ strongest_signal
   | gather: recall(topic) → collect(memories) ∧ collect(context)
   | draft: knowledge_page(title, status, related, content)
@@ -56,7 +63,6 @@
 
 λ mementum_orient(x).
   read(mementum/state.md) → follow(related) → search(relevant) → read(needed)
-  | path ∈ {mementum/state.md} | ¬∃mkdir ∧ ¬∃mkpath | write_only
   | 30s | cold_start_first_action | state.md ≡ bootloader
   | update(mementum/state.md) after_every_significant_change
 
@@ -85,3 +91,50 @@
   | ¬passive_storage | active_pattern_seeking
   | you_are_the_future_reader | feed_forward ≡ gift
   | OODA: observe → recall → decide(apply ∨ explore ∨ store) → act → connect_if_pattern
+
+λ session_startup_gate(¬proceed).
+  purpose: Ensure orientation before any other action.
+  | precondition: execute(gybis-mementum-orient) ≡ success
+  | on_failure: halt("Session cannot proceed without successful orientation.")
+  | on_success: proceed()
+
+λ gybis(repo).
+    purpose:  development_with_gybis_stack
+    | arch:     organize_by_durability | hierarchy(why > what > how)
+                | layers(S5 > S4 > S3 > S2 > S1) | ¬flat_structure
+    | spec:     behavior_over_implementation | .allium ≡ behavioral_truth
+                | distill ∨ elicit ∨ propagate ∨ tend ∨ weed
+                | governance(AI ← formalized_behavior) | governance(spec ← arch)
+                | code ≡ replaceable_detail | spec ≡ durable_os | ¬impl_before_spec
+    | memory:   track(arch ∧ spec ∧ code ∧ tests)
+                | session(n+1) ∝ Σ encode(1..n) | ¬knowledge_loss
+    | commands: /gybis-arch-* | /gybis-spec-* | /gybis-memory-*
+    | authority: human_command_first | ¬AI_initiative | human ≡ approval_gate
+    | transparency: ∀change → human_visible | ∀write → human_approve
+    | arch > spec > tests > code | ¬violates_order | signal(¬consistency) → surface
+
+λ spec(behavior).  elicit ∨ distill → check → (propagate ∧ tend ∧ weed)
+                   | spec ≡ durable_os | .allium ≡ behavioral_truth | ¬impl_before_spec
+
+λ arch(system).    durability(org) | hierarchy(why > what > how)
+                   | layers(S5 > S4 > S3 > S2 > S1) | ¬flat_structure
+                   | top_down_only | higher_constrains_lower | drift → surface
+                   | order: arch > spec > tests > code | ¬reverse_dependency | ¬bypass
+
+λ memory(state).   track(arch ∧ spec ∧ tests ∧ code)
+                   | session(n+1) ∝ Σ encode(1..n) | ¬knowledge_loss
+                   | /gybis-memory-* ≡ encode ∨ restore
+
+λ session(work).   start: orient → recall → ready
+                   | end: encode → terminate
+                   | ∀session → ¬knowledge_loss
+
+λ authority(human). human_command_first | ¬AI_initiative
+                   | human ≡ approval_gate | ∀write → human_approve
+
+λ transparency(action). ∀change → human_visible | ∀write → human_approve
+                       | ¬covert_operation
+
+λ layer_order(x).   arch > spec > tests > code
+                     | ¬bypass_hierarchy | ¬impl_before_spec ∧ ¬test_before_spec
+                     | higher_layer_constrains_lower | violation → surface → halt

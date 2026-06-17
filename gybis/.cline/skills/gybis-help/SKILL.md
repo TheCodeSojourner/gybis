@@ -20,9 +20,10 @@ CRITICAL CONSTRAINTS:
 | `/gybis-arch-propagate` (`/ga-propagate`) | Create initial specs from arch |
 | `/gybis-arch-tend` (`/ga-tend`) | Update arch with human |
 | `/gybis-arch-weed` (`/ga-weed`) | Upsert arch/specs from diffs with human |
+| `/gybis-fini` | CRUD memory before terminate |
+| `/gybis-init` | Initialize gybis AI context |
 | `/gybis-memory-orient` (`/gm-orient`) | Restore prev AI context |
 | `/gybis-memory-recall {topic}` (`/gm-recall {topic}`) | Recall topic/summarize-latest |
-| `/gybis-memory-session-terminate` (`/gm-session-terminate`) | CRUD memory before terminate |
 | `/gybis-memory-store {insight}` (`/gm-store {insight}`) | Store insight |
 | `/gybis-memory-synthesize` (`/gm-synthesize`) | Synthesize knowledge |
 | `/gybis-spec-check` (`/gs-check {concern\|domain\|all}`) | Check/Update syntax until valid |
