@@ -13,9 +13,10 @@ CRITICAL CONSTRAINTS:
 
 | Skill Name | Description |
 |---|---|
+| `/gybis-fini` | CRUD memory before terminate |
+| `/gybis-init` | Initialize AI context |
 | `/gybis-mementum-orient` (`/gm-orient`) | Restore prev AI context |
 | `/gybis-mementum-recall {topic}` (`/gm-recall {topic}`) | Recall topic/summarize-latest |
-| `/gybis-mementum-session-terminate` (`/gm-session-terminate`) | CRUD memory before terminate |
 | `/gybis-mementum-store {insight}` (`/gm-store {insight}`) | Store insight |
 | `/gybis-mementum-synthesize` (`/gm-synthesize`) | Synthesize knowledge |
 
