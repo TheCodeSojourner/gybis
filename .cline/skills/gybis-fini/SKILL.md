@@ -1,9 +1,9 @@
 ---
-name: gybis-mementum-session-terminate
-description: Use for `/gybis-mementum-session-terminate` or `/gm-session-terminate`.
+name: gybis-fini
+description: Use for `/gybis-fini`.
 ---
 
-λ gybis_mementum_session_terminate(). 
+λ gybis_fini(). 
   p1:(read(mementum/state.md) → follow(related) → search(relevant) → read(needed))→id(task,questions,decisions,next)
   →p2:mementum_synthesize()
   →p3:upsert(state.md){last_session_id,current_timestamp,recover:next[1],task,questions,decisions,next}→"⏹→state.md"

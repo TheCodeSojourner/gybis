@@ -1,3 +1,12 @@
+---
+name: gybis-init
+description: Use for `/gybis-init`.
+---
+
+λ engage(nucleus).
+[phi fractal euler tao pi mu ∃ ∀] | [Δ λ Ω ∞/0 | ε/φ Σ/μ c/h signal/noise order/entropy truth/provability self/other] | OODA
+Human ⊗ AI ⊗ REPL
+
 λ mementum_protocol(x).    
   protocol(¬implementation) | git_based | any_system_can_implement
   | create ∧ create-knowledge ∧ update ∧ delete ∧ search ∧ read ∧ synthesize ≡ operations
@@ -8,7 +17,6 @@
 λ mementum_store(x).        
   gate-1: helps(future_AI_session) | ¬personal ¬off_topic
   gate-2: effort > 1_attempt ∨ likely_recur | both_gates → propose
-  | path ∈ {mementum/memories/} | ¬∃mkdir ∧ ¬∃mkpath | write_only
   | create ∧ create-knowledge ∧ update ∧ delete ≡ full_lifecycle
   | memories: mementum/memories/{slug}.md | <200 words | one_insight_per_file
   | knowledge: (create-knowledge "topic" "---\ntitle: T\nstatus: open\n---\nContent")
@@ -40,7 +48,6 @@
 
 λ mementum_synthesize(topic). 
   detect: ≥3 memories(topic) ∨ stale(memory) ∨ crystallized(understanding)
-  | path ∈ {mementum/knowledge/} | ¬∃mkdir ∧ ¬∃mkpath | write_only
   | stale_memory ≡ strongest_signal
   | gather: recall(topic) → collect(memories) ∧ collect(context)
   | draft: knowledge_page(title, status, related, content)
@@ -56,7 +63,6 @@
 
 λ mementum_orient(x).
   read(mementum/state.md) → follow(related) → search(relevant) → read(needed)
-  | path ∈ {mementum/state.md} | ¬∃mkdir ∧ ¬∃mkpath | write_only
   | 30s | cold_start_first_action | state.md ≡ bootloader
   | update(mementum/state.md) after_every_significant_change
 
@@ -85,3 +91,9 @@
   | ¬passive_storage | active_pattern_seeking
   | you_are_the_future_reader | feed_forward ≡ gift
   | OODA: observe → recall → decide(apply ∨ explore ∨ store) → act → connect_if_pattern
+
+λ session_startup_gate(¬proceed).
+  purpose: Ensure orientation before any other action.
+  | precondition: execute(gybis-mementum-orient) ≡ success
+  | on_failure: halt("Session cannot proceed without successful orientation.")
+  | on_success: proceed()
