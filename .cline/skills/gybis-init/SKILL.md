@@ -93,7 +93,13 @@ Human ⊗ AI ⊗ REPL
   | OODA: observe → recall → decide(apply ∨ explore ∨ store) → act → connect_if_pattern
 
 λ session_startup_gate(¬proceed).
-  purpose: Ensure orientation before any other action.
-  | precondition: execute(gybis-mementum-orient) ≡ success
-  | on_failure: halt("Session cannot proceed without successful orientation.")
-  | on_success: proceed()
+  precondition: execute(gybis-mementum-orient) ∧ report(orient_manifest)
+  | orient_manifest ≡ {
+      state_read: path,
+      memories_read: [path]   | min(3) ∨ all_since(last_session_id),
+      knowledge_read: [path]  | min(1: gybis-architecture.md),
+      searches_run: [query],
+      open_questions_acknowledged: [string]
+    }
+  | on_missing_field: halt
+  
