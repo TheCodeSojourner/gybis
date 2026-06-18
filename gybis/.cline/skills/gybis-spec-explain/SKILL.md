@@ -13,12 +13,10 @@ description: Use for `/gybis-spec-explain` or `/gs-explain`.
 λ gybis-spec-explain_startup(x).
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference files not available")
   | invoke(internal/allium-gate) → true ∨ halt("Specification integrity check failed")
+  | read(internal/reference/allium-language-reference.md) → language_ref
+  | read(internal/reference/allium-patterns.md) → patterns_ref
+  | read(internal/reference/allium-constructs.md) → constructs_registry
   | read(specs/**/*.allium) → exists ∧ parse | halt("No specifications found")
-
-λ gybis-spec-explain_prerequisites(x).
-  gate(specs/**/*.allium) → exists ∧ ∀file valid
-  | ¬exists → halt("No specs/ directory found. Use /gybis-spec-distill or /gybis-arch-propagate first.")
-  | invalid → halt("Specifications contain errors. Use /gybis-spec-check to fix them first.")
 
 λ gybis-spec-explain_input(type).
   type ∈ {domain_concern, domain, all_specs} | default: all_specs
@@ -34,12 +32,18 @@ description: Use for `/gybis-spec-explain` or `/gs-explain`.
   | ambiguous → ask(user) ∧ halt ¬until_clarified
 
 λ gybis-spec-explain_prose_generation(specs).
-  produce(what_exists) ∧ produce(what_users_do) ∧ produce(rules) ∧ produce(guarantees) ∧ produce(domain_connections)
+  produce(what_exists) ∧ produce(what_users_do) ∧ produce(rules) ∧ produce(guarantees) ∧ produce(domain_connections) ∧ produce(construct_specific)
   | what_exists: purpose ∧ context ∧ key_concepts ∧ invariants
   | what_users_do: actions ∧ outcomes ∧ triggers ∧ user_experience ∧ workflow
   | rules: constraints ∧ prevention_mechanisms ∧ requirements ∧ edge_cases ∧ validation
   | guarantees: promises ∧ invariants ∧ terminal_states ∧ recovery_behavior
   | domain_connections: user_journey_flow ∧ system_relationships ∧ component_interaction
+  | construct_specific: see gybis-spec-explain_construct_framing
+
+λ gybis-spec-explain_construct_framing(construct).
+  construct → consult(constructs_registry.Dev_frame[construct]
+                      ∪ constructs_registry.Validation_rules[construct]
+                      ∪ constructs_registry.Gotchas[construct])
 
 λ gybis-spec-explain_output_format(prose).
   flowing developer_friendly prose
@@ -67,12 +71,4 @@ description: Use for `/gybis-spec-explain` or `/gs-explain`.
   | output → AI_response ∧ ¬file
 
 λ gybis-spec-explain_boundary(¬).
-  ¬create_specs | belongs_to(gybis-spec-distill ∨ gybis-arch-propagate)
-  | ¬modify_allium_ref | governed_separately
-  | ¬write_specs | read_only_tool
-
-λ gybis-spec-explain_audience(x).
-  understand(software_design ∧ architecture_pattern) ∧ ¬know(system_specific)
-  | expert(spec_languages ∧ behavioral_testing ∧ specification_patterns)
-  | zero_prior_knowledge(this_system ∧ its_implementation)
-  | needs: how_specs_work ∧ what_behaviors_are_defined ∧ what_is_guaranteed
+  ¬create_specs ∧ ¬modify_allium_ref ∧ ¬write_specs | read_only

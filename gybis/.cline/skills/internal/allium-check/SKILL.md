@@ -25,21 +25,10 @@ description: Internal skill - not user-facing
   | suggestions: corrective_actions
 
 λ allium-check_error_classification(error).
-  type: {syntax_error, semantic_error, validation_error, unknown_error}
-  | severity: {critical, high, medium, low}
-  | line_number: error.location | location_available
-  | message: error.description
+  type: {syntax_error, semantic_error, validation_error, unknown_error} | severity: {critical, high, medium, low} | line_number: error.location | message: error.description
 
 λ allium-check_output_format(diagnostics).
-  structure: {
-    file: file_path,
-    status: (pass ∨ fail ∨ warning),
-    conformance: percentage_passing,
-    errors: [error_1, ..., error_n],
-    warnings: [warning_1, ..., warning_m],
-    remediation: [action_1, ..., action_k]
-  }
-  | json_serializable | human_readable
+  structure: {file, status ∈ (pass ∨ fail ∨ warning), conformance, errors: [...], warnings: [...], remediation: [...]}
 
 λ allium-check_execution(file_path).
   invoke: allium-check_cli_invocation(file_path)

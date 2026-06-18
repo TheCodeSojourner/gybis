@@ -12,6 +12,9 @@ description: Use for `/gybis-spec-tend` or `/gs-tend`.
 
 λ gybis-spec-tend_startup(x).
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
+  | read(internal/reference/allium-language-reference.md) → language_ref
+  | read(internal/reference/allium-patterns.md) → patterns_ref
+  | read(internal/reference/allium-constructs.md) → constructs_registry
   | verify(specs/**/*.allium ∃) ∨ halt("specs/**/*.allium not found")
   | invoke(internal/allium-gate(specs/)) = true ∨ halt("Specifications are invalid")
   | transition(INIT → STARTUP_CHECKS)
@@ -59,11 +62,106 @@ description: Use for `/gybis-spec-tend` or `/gs-tend`.
   ∀ target ∈ developer_feedback.target_specs:
     analyze(change_impact(target, developer_feedback.proposed_changes)) → impact(target)
     | check(cross_file_consistency(target, all_specs)) → consistency(target)
-  | consolidate(impact, consistency) → impact_report
+    | classify(developer_feedback.proposed_changes) → classification(target)  -- see _impact_classification
+  | consolidate(impact, consistency, classification) → impact_report
   | return(impact_analysis = impact_report)
 
+λ gybis-spec-tend_impact_classification(change).
+  -- Classify each proposed change against the breaking/accretive/tooling-impact
+  -- taxonomy. Refer to constructs_registry.accretion_vs_breaking_change and the
+  -- language_ref §Modular specifications "Breaking changes" subsection. Surface
+  -- the classification to the developer before applying changes.
+  | change ∈ {
+      remove_enum_value,
+      remove_variant,
+      narrow_when_set,
+      remove_contract_demand,
+      remove_contract_fulfilment,
+      rename_field,
+      rename_entity,
+      rename_contract,
+      change_contract_signature,
+      remove_field,
+      tighten_field_type,
+      reduce_optional_to_required,
+      remove_transitions_edge,
+      remove_terminal_state,
+      remove_actor_type,
+      remove_surface_provides_operation
+    }
+    → breaking ∧ advice("prefer publishing under a new module name rather than mutating the existing module; consumers update at their own pace")
+  | change ∈ {
+      add_transitions_block_to_existing_entity,
+      add_when_clause_to_existing_field,
+      add_terminal_clause_to_existing_state,
+      add_contract_demand,
+      add_invariant_top_level,
+      add_invariant_entity_level,
+      promote_prose_invariant_to_expression_form,
+      tighten_existing_requires_guard,
+      narrow_existing_transition_graph
+    }
+    → tooling_impact ∧ advice("grammar preserved but downstream rules may stop checking; review every rule touching the affected entity or field; run allium-check after applying")
+  | change ∈ {
+      add_field,
+      add_optional_field,
+      add_variant,
+      add_enum_value_to_inline_or_named_enum,
+      add_entity,
+      add_value_type,
+      add_external_entity,
+      add_relationship,
+      add_projection,
+      add_derived_value,
+      add_trigger_external_stimulus,
+      add_temporal_trigger,
+      add_becomes_trigger,
+      add_transitions_to_trigger,
+      add_chained_trigger,
+      add_trigger_emission,
+      add_surface,
+      add_surface_provides_operation_with_when_guard,
+      add_surface_guarantee_prose,
+      add_default_instance,
+      add_config_parameter_with_default,
+      add_expression_form_config_default,
+      add_use_import,
+      add_open_question,
+      add_deferred_specification
+    }
+    → accretive ∧ advice("preserves existing consumers; safe to apply without coordination")
+  | change ∈ {
+      add_config_parameter_without_default,
+      add_demanded_contract_signature_method
+    }
+    → breaking_for_direct_consumers ∧ advice("existing consumers must supply a value or implement the new signature; coordinate before applying or publish under new module name")
+  | fallback: ¬ recognised(change) → unknown_classification ∧ advice("escalate to developer; do not apply without explicit approval")
+  | return(classification = {category, advice})
+
+λ gybis-spec-tend_invariant_promotion_path(invariant_candidate).
+  -- Offer to promote prose @invariant (or comment) to expression-form
+  -- invariant Name { expr } when the property is expressible as a single-
+  -- point-in-time state predicate per constructs_registry.expressibility.
+  | invariant_candidate.kind = prose_at_invariant_in_contract
+    ∧ invariant_candidate.property ∈ {uniqueness, same_entity_field_relationship, value_bounds, structural_collection_relationship, subset_or_partition}
+    → propose(promote_to_expression_form) with(suggested_brace_body)
+      ∧ mark(classification = tooling_impact)
+  | invariant_candidate.property ∈ {cross_instance_agreement, temporal_ordering, evaluation_function_contract, monotonicity, counterfactual}
+    → retain_as_prose ∧ note("property is not expressible as state predicate; keep as @invariant in contract or as prose comment")
+  | uncertain → ask_developer("Is this property checkable from current entity state alone, with no reference to history or other instances' behaviour?")
+
+λ gybis-spec-tend_ambiguous_intent_fallback(developer_feedback).
+  -- When developer intent is ambiguous, prefer inserting an open_question over
+  -- guessing. open_question is a first-class construct surfaced by the checker
+  -- as a warning, not a comment.
+  | clarity_score(developer_feedback) < threshold
+    → propose(insert(open question "<paraphrased_intent_or_decision_point>"))
+      ∧ ask_developer("Intent unclear. Insert as open question for later resolution, or clarify now?")
+  | clarity_score(developer_feedback) ≥ threshold
+    → proceed_with_change
+
 λ gybis-spec-tend_apply_changes(developer_feedback, impact_analysis).
-  ask_developer("Do you approve these changes? (yes/no)") → approval
+  ask_developer("Classification per impact_analysis: " ⊕ impact_analysis.classifications ⊕ ". Do you approve these changes? (yes/no)") → approval
   | approval = yes
     ? (∀ change ∈ developer_feedback.proposed_changes:
          apply(change, target_file) → upsert(target_file))
@@ -109,3 +207,6 @@ description: Use for `/gybis-spec-tend` or `/gs-tend`.
   | invariant: zero_errors ∧ zero_issues ∧ allium_gate = true at completion
   | invariant: all_modifications ⊆ specs/
   | invariant: no_specs_deleted (additions and mutations only)
+  | invariant: ∀ change ∈ proposed_changes : classification ∈ {accretive, tooling_impact, breaking, breaking_for_direct_consumers, unknown_classification}
+  | invariant: breaking_changes surface advice to publish under a new module name before application
+  | invariant: ambiguous_intent → prefer open_question insertion over guessing

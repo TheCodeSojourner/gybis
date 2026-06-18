@@ -12,6 +12,9 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
 
 λ gybis-spec-distill_startup(x).
   invoke(internal/gybis-ref-check) → halt_on(false)
+  | read(internal/reference/allium-language-reference.md) → language_ref
+  | read(internal/reference/allium-patterns.md) → patterns_ref
+  | read(internal/reference/allium-constructs.md) → constructs_registry
   | precondition: implementation ∃ ∧ specs/ ¬∃
   | scan(codebase) → files_found ∨ halt("no implementation found")
 
@@ -61,17 +64,30 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
   | step3: identify(contracts, invariants, preconditions, postconditions) → behavioral_specs
   | step4: recognize(patterns, protocols, relationships) → architectural_patterns
   | step5: infer(test_cases, edge_cases, error_handling) → test_obligations
-  | output: {entities → contracts, patterns → implications, obligations → test_cases}
+  | step6: classify(source_patterns) → allium_construct_map  -- see distill_construct_recognition
+  | output: {entities → contracts, patterns → implications, obligations → test_cases, source_pattern → allium_construct}
   | constraint: read-only operation
+
+λ gybis-spec-distill_construct_recognition(source_pattern).
+  source_pattern matches Cues entry → construct ≔ constructs_registry[entry]
+  | classification_rules:
+      relationship_must_reference_this_via_with
+      ∧ filter_must_use_where_without_this
+      ∧ dot_methods_restricted_to({count, any, all, first, last, unique, add, remove})
+      ∧ free_standing_call_for_all_other_collection_or_scalar_helpers
+      ∧ expressible_invariants_only_when_property_is_single_point_in_time
+      ∧ accretion_preferred_over_breaking_changes
+  | fallback: ¬recognised_pattern → standard_entity ∧ rules
 
 λ gybis-spec-distill_synthesize_specs(code_content, analysis).
   action: synthesize_allium_specifications
   | step1: map(entities) → .allium declarations
   | step2: encode(behavioral_specs) → allium preconditions, postconditions, invariants
   | step3: formalize(patterns) → allium composition rules
-  | step4: generate(specs_directory_structure) → specs/**/*.allium files
+  | step4: ∀ pattern ∈ analysis.source_pattern → allium_construct:
+    emit(pattern.allium_construct) → spec_fragment  -- per construct_recognition table
+  | step5: generate(specs_directory_structure) → specs/**/*.allium files
   | output: {spec_file_path → allium_content}
-  | rationale: each spec formally describes extracted behavior
 
 λ gybis-spec-distill_write_specs(spec_content).
   action: write_specification_files
@@ -106,7 +122,6 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
       - if validation_fail → parse(errors) → identify_gaps() → refine_specs() → loop_back(REFINING)
     | state = REFINING → write_specs() → transition(VALIDATING)
   | loop_guard: iteration_count ≤ max_iterations
-  | rationale: iteratively refine specs until allium-gate returns true with zero errors
 
 λ gybis-spec-distill_loop_guard(state).
   condition: iteration_count > max_iterations ∨ no_progress_detected
@@ -124,11 +139,8 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
   | format: "Pass {n}: Generated {count} specs, extracted {contracts} contracts, {errors} errors resolved"
 
 λ gybis-spec-distill_boundaries(¬).
-  constraint: ¬mutate(implementation)
-  | constraint: ¬delete(implementation_files)
-  | constraint: ¬generate(architecture.md)
-  | constraint: ¬invoke(user-facing skills)
-  | scope: specification distillation only, not code generation
+  ¬mutate(implementation) ∧ ¬delete(implementation_files) ∧ ¬generate(architecture.md) ∧ ¬invoke(user-facing skills)
+  | scope: specification distillation only
 
 λ gybis-spec-distill_regression_contract(x).
   invariant: implementation ¬modified ∧ ¬deleted

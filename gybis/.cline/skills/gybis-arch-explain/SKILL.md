@@ -12,7 +12,7 @@ description: Use for `/gybis-arch-explain` or `/ga-explain`.
 
 λ gybis-arch-explain_startup(x).
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference files not available")
-  | read(architecture.md) → exists ∧ parse(vsm_layers)
+  | read(architecture.md) → content ∧ parse(content.{S5, S4, S3, S2, S1}) → vsm_layers
   | read(internal/reference/vsm-guide.md) → exists | halt("VSM reference unavailable")
 
 λ gybis-arch-explain_prerequisites(x).

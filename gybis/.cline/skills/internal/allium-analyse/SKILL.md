@@ -23,41 +23,11 @@ description: Internal skill - not user-facing
   | relationships: inter_spec_dependencies ∧ pattern_consistency
 
 λ allium-analyse_finding_types(findings).
-  categories: {
-    dependency_issues: unmet_dependencies | circular_references,
-    pattern_violations: inconsistent_patterns | missing_constraints,
-    semantic_issues: type_mismatches | constraint_violations,
-    structural_issues: missing_elements | malformed_relationships
-  }
+  categories: {dependency_issues, pattern_violations, semantic_issues, structural_issues}
   | severity: {critical, high, medium, low, informational}
 
-λ allium-analyse_findings_parsing(cli_output).
-  parse: cli_output → {status, findings[], summary}
-  | status ∈ {pass, findings_detected, critical_issues}
-  | findings: [finding_1, ..., finding_n]
-  | summary: {total_findings, by_severity, by_category}
-
-λ allium-analyse_finding_classification(finding).
-  type: finding.category ∈ dependency_issues ∪ pattern_violations ∪ semantic_issues ∪ structural_issues
-  | severity: finding.severity ∈ {critical, high, medium, low, informational}
-  | affected_files: [file_1, ..., file_k]
-  | description: finding.message
-
 λ allium-analyse_output_format(findings_data).
-  structure: {
-    directory: specs_path,
-    status: (pass ∨ findings_detected ∨ critical_issues),
-    total_specs: count_allium_files,
-    findings: [finding_1, ..., finding_n],
-    summary: {
-      critical: count,
-      high: count,
-      medium: count,
-      low: count,
-      informational: count
-    },
-    remediation: [action_1, ..., action_m]
-  }
+  structure: {directory, status ∈ (pass ∨ findings_detected ∨ critical_issues), total_specs, findings: [...], summary: {critical, high, medium, low, informational}, remediation: [...]}
   | json_serializable | human_readable
 
 λ allium-analyse_execution(specs_path).

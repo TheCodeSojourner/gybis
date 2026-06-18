@@ -16,6 +16,7 @@ description: Internal skill - not user-facing
     internal/reference/allium-assessing-specs.md
     internal/reference/allium-language-reference.md
     internal/reference/allium-patterns.md
+    internal/reference/allium-constructs.md
     internal/reference/allium-actioning-findings.md
     internal/reference/allium-library-spec-signals.md
     internal/reference/vsm-guide.md
@@ -30,8 +31,7 @@ description: Internal skill - not user-facing
 
 λ gybis-ref-check_aggregate(results).
   all_pass: ∀ result ∈ results, result.status = true
-  | if all_pass → true
-  | else → (false, {failures: [failed_files], halt: immediate})
+  | all_pass → true | otherwise → (false, {failures: [failed_files]})
 
 λ gybis-ref-check_execution(x).
   Σ check(file) for file ∈ required_files

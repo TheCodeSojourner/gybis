@@ -2,96 +2,27 @@
 
 ## File structure
 
-An Allium specification file (`.allium`) begins with a language version marker, followed by these sections in order:
+An Allium file uses the following required order:
 
 ```
--- allium: 3
+-- allium: 3                     -- version marker (required, first line)
 -- Comments use double-dash
--- use declarations (optional)
+use "..." as ...                 -- imports (optional)
 
-------------------------------------------------------------
--- Given
-------------------------------------------------------------
-
--- Entity instances this module operates on (optional)
-
-------------------------------------------------------------
--- External Entities
-------------------------------------------------------------
-
--- Entities managed outside this specification
-
-------------------------------------------------------------
--- Value Types
-------------------------------------------------------------
-
--- Structured data without identity (optional section)
-
-------------------------------------------------------------
--- Contracts
-------------------------------------------------------------
-
--- Reusable obligation contracts referenced by surfaces
-
-------------------------------------------------------------
--- Enumerations
-------------------------------------------------------------
-
--- Named enumerations shared across entities (optional section)
-
-------------------------------------------------------------
--- Entities and Variants
-------------------------------------------------------------
-
--- Entities managed by this specification, plus their variants
-
-------------------------------------------------------------
--- Config
-------------------------------------------------------------
-
--- Configurable parameters for this specification
-
-------------------------------------------------------------
--- Defaults
-------------------------------------------------------------
-
--- Default entity instances
-
-------------------------------------------------------------
--- Rules
-------------------------------------------------------------
-
--- Behavioural rules organised by flow
-
-------------------------------------------------------------
--- Invariants
-------------------------------------------------------------
-
--- System-wide and entity-level property assertions
-
-------------------------------------------------------------
--- Actor Declarations
-------------------------------------------------------------
-
--- Entity types that can interact with surfaces
-
-------------------------------------------------------------
--- Surfaces
-------------------------------------------------------------
-
--- Boundary contracts between parties
-
-------------------------------------------------------------
--- Deferred Specifications
-------------------------------------------------------------
-
--- References to detailed specs defined elsewhere
-
-------------------------------------------------------------
--- Open Questions
-------------------------------------------------------------
-
--- Unresolved design decisions
+given { ... }                    -- module-scoped bindings (optional)
+external entity ...              -- entities not owned here
+value ...                        -- structured data without identity
+contract ...                     -- reusable obligation contracts
+enum ...                         -- named enumerations
+entity / variant ...             -- entities and their variants
+config { ... }                   -- configurable parameters
+default ...                      -- default entity instances
+rule ... / on ...                -- behavioural rules
+invariant ...                    -- property assertions
+actor ...                        -- types that interact with surfaces
+surface ...                      -- boundary contracts
+deferred ...                     -- detailed specs defined elsewhere
+open question ...                -- unresolved design decisions
 ```
 
 ### Formatting
@@ -119,11 +50,10 @@ given {
 
 Rules then reference `pipeline.status`, `calendar.available_slots`, etc. without ambiguity about what they refer to.
 
-Not every module needs a `given` block. Rules scoped by triggers on domain entities (e.g., `when: invitation: Invitation.expires_at <= now`) get their entities from the trigger binding. `given` is for specs where rules operate on shared instances that exist once per module scope, such as a pipeline, a catalog or a processing engine.
+
 
 `given` bindings must reference entity types declared in the same module or imported via `use`. Imported module instances are accessed via qualified names (`scheduling/calendar`) and do not need to appear in the local `given` block. Modules that operate only on imported instances may omit the `given` block entirely.
 
-This is distinct from surface `context`, which binds a parametric scope for a boundary contract (e.g., `context assignment: SlotConfirmation`).
 
 ---
 
@@ -202,7 +132,7 @@ external entity Role {
 
 External entities define their structure but not their lifecycle. The specification checker will warn when external entities are referenced, reminding that another spec or system governs them.
 
-External entities can also serve as **type placeholders**: an entity with minimal or no fields that the consuming spec substitutes with a concrete type. This enables reusable patterns where the library spec depends on an abstraction and the consumer provides the implementation.
+External entities can also serve as **type placeholders**: an entity with minimal or no fields that the consuming spec substitutes with a concrete type.
 
 ```
 -- In a comments library spec
@@ -212,11 +142,7 @@ entity Comment {
     parent: Commentable
     ...
 }
-
--- The consuming spec provides its own entity as the Commentable
 ```
-
-The consuming spec maps its entity to the placeholder by using it wherever the library expects the placeholder type. This is dependency inversion at the spec level: the library depends on the abstraction, the consumer supplies the concrete type.
 
 ### Internal entities
 
@@ -328,7 +254,6 @@ rule HandleNotification {
 }
 ```
 
-Use sum types when variants have fundamentally different data or behaviour. Do not use when simple status enums suffice or variants share most of their structure.
 
 ### Field types
 
@@ -354,9 +279,7 @@ requires: request.reminded_at = null      -- field is absent/unset
 requires: request.reminded_at != null     -- field has a value
 ```
 
-`null` represents the absence of a value for optional fields.
-
-`field = null` and `field != null` are presence checks, not comparisons. `field = null` is true when the field is absent; `field != null` is true when the field has a value. Comparisons with null produce false: `null <= now` is false, `null > 0` is false. Arithmetic with null produces null: `null + 1.day` is null. This means temporal triggers on optional fields (e.g., `when: user: User.next_digest_at <= now`) do not fire when the field is absent.
+`null` represents the absence of a value for optional fields. `field = null` and `field != null` are presence checks, not comparisons. Comparisons with null produce false; arithmetic with null produces null.
 
 **State-dependent field presence (`when` clause):**
 
@@ -617,7 +540,7 @@ confirmed_interviewers: confirmations where status = confirmed -> interviewer
 
 The `-> field` syntax extracts a field from each matching entity. When the extracted field is optional (`T?`), null values are excluded from the result: the projection produces `Set<T>`, not `Set<T?>`.
 
-Projections preserve ordering. If the source collection is a `Sequence`, the projection result is also a `Sequence` in the same relative order. This applies to both `where` filtering and `-> field` extraction. Field extraction on ordered collections retains duplicates (two source elements navigating to the same target produce two entries in sequence order); use `.unique` to deduplicate, which produces an unordered `Set`.
+Projections preserve ordering. Field extraction on ordered collections retains duplicates; use `.unique` to deduplicate.
 
 ### Derived values
 
@@ -666,14 +589,14 @@ rule RuleName {
 }
 ```
 
-| Clause | Purpose |
-|--------|---------|
-| `when` | What triggers this rule |
-| `for` | Iterate: apply the rule body for each element in a collection |
-| `let` | Local variable bindings (can appear anywhere after `when`) |
-| `requires` | Preconditions that must be true (rule fails if not met) |
-| `ensures` | What becomes true after the rule executes |
-| `@guidance` | Non-normative implementation advice (optional, always last) |
+| Clause      | Purpose                                                       |
+| ----------- | ------------------------------------------------------------- |
+| `when`      | What triggers this rule                                       |
+| `for`       | Iterate: apply the rule body for each element in a collection |
+| `let`       | Local variable bindings (can appear anywhere after `when`)    |
+| `requires`  | Preconditions that must be true (rule fails if not met)       |
+| `ensures`   | What becomes true after the rule executes                     |
+| `@guidance` | Non-normative implementation advice (optional, always last)   |
 
 Place `let` bindings where they make the rule most readable, typically just before the clause that first uses them.
 
@@ -759,7 +682,7 @@ The variable before the colon binds the entity that triggered the transition. `t
 when: interview: Interview.status becomes scheduled
 ```
 
-`becomes` fires both when an entity is created with the specified value and when a field transitions to that value from a different value. Like `transitions_to`, it is valid for enum fields, boolean fields and entity reference fields. It is equivalent to writing a `transitions_to` rule and a `.created` rule with a `requires` guard, combined into a single trigger. Use `becomes` when the rule should apply regardless of how the entity arrived at the state. Use `transitions_to` when the rule should only apply to transitions (e.g., sending a "rescheduled" notification that doesn't apply on initial creation).
+`becomes` fires both when an entity is created with the specified value and when a field transitions to that value. Use `becomes` when the rule should apply regardless of how the state was reached; use `transitions_to` for transitions only.
 
 **Temporal** — time-based condition:
 ```
@@ -1061,9 +984,7 @@ ordered_interviewers.unique
 
 `.unique` deduplicates a collection. Because deduplication discards positional information, the result is always an unordered `Set`, even when the source is ordered.
 
-`for item in collection:` iterates in declared order when the source is a `Sequence` or `List<T>`. When the source is a `Set`, iteration order is unspecified.
-
-`.add()` and `.remove()` are ensures-only mutations on a relationship. Set `+` and `-` are expression-level operations that produce new sets without mutating anything. When applied to ordered collections (`Sequence` or `List<T>`), `+` and `-` produce unordered results (`Set<T>`). The checker reports the type change if the result is used where ordering is expected.
+`.add()` and `.remove()` are ensures-only mutations. Set `+` and `-` are expression-level operations. When applied to ordered collections, they produce unordered results.
 
 Dot-method syntax on collections is reserved for built-in operations. The built-in dot-methods are: `.count`, `.any()`, `.all()`, `.first`, `.last`, `.unique`, `.add()`, `.remove()`. The checker rejects any dot-method call on a collection whose name is not in this set. Domain-specific collection operations use free-standing black box function syntax with the collection as the first argument (see [Black box functions](#black-box-functions)).
 
@@ -1237,28 +1158,16 @@ min_by(pending, e => e.offset)              -- black box
 flatMap(groups, g => g.deferred_events)     -- black box
 ```
 
-Black box functions are pure (no side effects) and deterministic for the same inputs within a rule execution.
-
-The distinction between built-in operations and black box functions is syntactic: dot-method calls on collections (`.count`, `.any()`, `.all()`, `.first`, `.last`, `.unique`, `.add()`, `.remove()`) are built-in with language-defined semantics. Free-standing function calls are black box with implementation-defined semantics. The checker enforces this boundary: an unrecognised dot-method on a collection is an error. Built-in operations may chain from the result of a black box function call, since the result is a collection: `filter(events, e => e.recent).count` is valid.
+Black box functions are pure and deterministic. Dot-method calls on collections are built-in; free-standing calls are black box.
 
 ### The `with` and `where` keywords
 
-`with` declares how entities are connected. `where` selects from those connections.
-
-A relationship declaration says "these are the InterviewSlots that belong to this Candidacy". A projection says "of those slots, show me the confirmed ones":
+`with` declares entity connections and must reference `this`. `where` filters existing collections and must not reference `this`.
 
 ```
--- Relationship: declares which InterviewSlots belong to this Candidacy
 slots: InterviewSlot with candidacy = this
-
--- Projection: of those slots, keep the confirmed ones
 confirmed_slots: slots where status = confirmed
 ```
-
-Because `with` defines a relationship from the universe of all instances, it needs `this` as an anchor — the predicate must reference the enclosing entity to establish the link. Because `where` filters an already-scoped collection, `this` would be meaningless and must not appear.
-
-- **`with`** appears in relationship declarations. The predicate defines the structural link and must reference `this`.
-- **`where`** appears in projections, iteration, surface context, actor identification and surface `let` bindings. The predicate filters an existing collection and must not reference `this`.
 
 ```
 -- Surface context (where)
@@ -1347,18 +1256,18 @@ Within an entity-level invariant, field names resolve to the enclosing entity's 
 
 Invariant expressions use the existing expression language without extension:
 
-| Construct | Example |
-|-----------|---------|
-| Navigation | `account.balance`, `slot.interview.candidate` |
-| Optional navigation | `parent?.status` |
-| Comparisons | `balance >= 0`, `status = active`, `status in {active, pending}` |
-| Boolean logic | `a and b`, `a or b`, `not a`, `a implies b` |
-| Arithmetic | `balance + pending`, `count * rate` |
-| Collection operations | `slots.count`, `slots.any(s => s.status = confirmed)` |
-| Quantification | `for x in Collection: expression` (universal, all elements must satisfy) |
-| Existence | `exists entity`, `not exists entity` |
-| Null coalescing | `field ?? default` |
-| Let bindings | `let total = debit + credit` (must be pure) |
+| Construct             | Example                                                                  |
+| --------------------- | ------------------------------------------------------------------------ |
+| Navigation            | `account.balance`, `slot.interview.candidate`                            |
+| Optional navigation   | `parent?.status`                                                         |
+| Comparisons           | `balance >= 0`, `status = active`, `status in {active, pending}`         |
+| Boolean logic         | `a and b`, `a or b`, `not a`, `a implies b`                              |
+| Arithmetic            | `balance + pending`, `count * rate`                                      |
+| Collection operations | `slots.count`, `slots.any(s => s.status = confirmed)`                    |
+| Quantification        | `for x in Collection: expression` (universal, all elements must satisfy) |
+| Existence             | `exists entity`, `not exists entity`                                     |
+| Null coalescing       | `field ?? default`                                                       |
+| Let bindings          | `let total = debit + credit` (must be pure)                              |
 
 `for x in Collection:` in an invariant body is a universal quantifier: the invariant holds when the expression is true for every element. This reuses the existing `for` iteration syntax with assertion semantics rather than ensures semantics. Nested quantification is permitted.
 
@@ -1370,9 +1279,7 @@ Invariant expressions must be pure:
 - **No `now`.** `now` is prohibited because it is volatile (re-evaluates on each read). Stored timestamp fields like `created_at` are permitted because they are stored state. The distinction is volatility, not temporality.
 - **`let` bindings** are permitted but must themselves be pure expressions, subject to the same restrictions.
 
-### Checking semantics
 
-Invariants are logical assertions over entity state, not runtime checks. Checking frequency and strategy are tooling concerns: PBT checks invariants after rule sequences, the model checker checks exhaustively, the trace validator checks against reconstructed state.
 
 Invariant expressions that reference `when`-qualified fields must scope their quantification to qualifying states. `for o in Orders: o.tracking_number != null` is an error if `tracking_number` carries a `when` clause, because the field does not exist in all states. Use a guard: `for o in Orders: o.status in {shipped, delivered} implies o.tracking_number != null`.
 
@@ -1482,25 +1389,16 @@ External config values are referenced as `oauth/config.session_duration`.
 
 ### Config parameter references
 
-A config parameter's default value can reference a parameter from an imported module's config block using a qualified name:
+A config parameter's default value can reference a parameter from an imported module's config block:
 
 ```
 use "./core.allium" as core
 
 config {
-    instance_id: String                                     -- mandatory, no default
-    required_copies: Integer = core/config.required_copies  -- defaults to core's value
-    publish_delay: Duration = core/config.publish_delay     -- defaults to core's value
+    instance_id: String
+    required_copies: Integer = core/config.required_copies
 }
 ```
-
-The local parameter can still be overridden by any consuming module. Resolution order:
-
-1. If the consuming module sets the parameter explicitly, that value wins.
-2. Otherwise, the qualified reference is followed. If the referenced parameter was itself overridden, the overridden value is used.
-3. Otherwise, the referenced parameter's own default value is used.
-
-Chains of references resolve transitively: if A defaults to B and B defaults to C, A resolves to C's value. The checker warns on chains longer than two levels of indirection.
 
 The config reference graph must be acyclic. The checker reports an error if resolving a config default would revisit a parameter already in the resolution chain. When two modules both override the same parameter in a shared dependency (diamond dependency), the checker reports a conflict rather than silently picking one.
 
@@ -1508,7 +1406,7 @@ Renaming is permitted. The local parameter name need not match the referenced pa
 
 ### Expression-form config defaults
 
-Config parameter defaults can be expressions combining qualified references, local config references and literal values with arithmetic operators:
+Config parameter defaults can be expressions with arithmetic operators:
 
 ```
 use "./core.allium" as core
@@ -1517,23 +1415,22 @@ config {
     base_timeout: Duration = core/config.base_timeout
     extended_timeout: Duration = core/config.base_timeout * 2
     buffer_size: Integer = core/config.batch_size + 10
-    retry_limit: Integer = max_attempts - 1                 -- local reference
 }
 ```
 
-Operators: `+`, `-`, `*`, `/` with standard precedence. Parenthesised sub-expressions are permitted for explicit precedence (`(base + 1) * 2`). Both local and qualified references are valid in expressions. The acyclicity rule applies uniformly to both cross-module and local reference edges. Expression-form defaults are evaluated once at config resolution time, after all overrides have been applied. They are not re-evaluated dynamically.
+Operators: `+`, `-`, `*`, `/`. Expression-form defaults are evaluated once at config resolution time.
 
 Type compatibility table for config default expressions:
 
-| Left | Operator | Right | Result |
-|------|----------|-------|--------|
-| Integer | `+` `-` `*` `/` | Integer | Integer |
-| Duration | `+` `-` | Duration | Duration |
-| Duration | `*` `/` | Integer | Duration |
-| Integer | `*` | Duration | Duration |
-| Decimal | `+` `-` `*` `/` | Decimal | Decimal |
-| Decimal | `*` `/` | Integer | Decimal |
-| Integer | `*` | Decimal | Decimal |
+| Left     | Operator        | Right    | Result   |
+| -------- | --------------- | -------- | -------- |
+| Integer  | `+` `-` `*` `/` | Integer  | Integer  |
+| Duration | `+` `-`         | Duration | Duration |
+| Duration | `*` `/`         | Integer  | Duration |
+| Integer  | `*`             | Duration | Duration |
+| Decimal  | `+` `-` `*` `/` | Decimal  | Decimal  |
+| Decimal  | `*` `/`         | Integer  | Decimal  |
+| Integer  | `*`             | Decimal  | Decimal  |
 
 Integer division uses truncation toward zero. All other type combinations are type errors. `Duration * Decimal` and `Decimal * Duration` are type errors; duration scaling uses Integer multipliers only. Commutative rows are listed for scalar multiplication only; addition and subtraction require matching types (Integer with Integer, Duration with Duration, Decimal with Decimal). Config default expressions are restricted to arithmetic operators and config references; boolean expressions are not permitted.
 
@@ -1655,7 +1552,7 @@ Reference external config values as `oauth/config.session_duration`. This uses t
 
 ### Breaking changes
 
-Avoid breaking changes: accrete (add new fields, triggers, states; never remove or rename). If a breaking change is necessary, publish under a new name rather than a new version. Consumers update at their own pace; old coordinates remain valid forever.
+Avoid breaking changes: accrete. If necessary, publish under a new name rather than a new version.
 
 ### Local specs
 
@@ -1672,13 +1569,7 @@ External entities in one spec may be internal entities in another. The boundary 
 
 ## Surfaces
 
-A surface defines a contract at a boundary. A boundary exists wherever two parties interact: a user and an application, a framework and its domain modules, a service and its consumers. Each surface names the boundary and specifies what each party exposes and provides, with a `contracts:` clause for programmatic integration obligations.
-
-Surfaces serve two purposes:
-- **Documentation**: Capture expectations about what each party sees, must contribute and can use
-- **Test generation**: Generate tests that verify the implementation honours the contract
-
-Surfaces do not specify implementation details (database schemas, wire protocols, thread models, UI layout). They specify the behavioural contract both sides must honour.
+A surface defines a contract at a boundary where two parties interact. Each surface specifies what each party exposes and provides, with optional `contracts:` clauses.
 
 ### Actor declarations
 
@@ -1700,7 +1591,7 @@ actor AuthenticatedUser {
 
 The `identified_by` expression specifies the entity type and condition that identifies the actor. It takes the form `EntityType where condition`, where the condition uses the entity's own fields, derived values and relationships. When an actor type is used in a `facing` clause, the binding variable has the entity type from the actor's `identified_by` expression. For example, `facing viewer: Interviewer` where `Interviewer` has `identified_by: User where role = interviewer` binds `viewer` as type `User`.
 
-When an actor's identity depends on a context that varies per surface, declare the expected context type with a `within` clause and reference it in `identified_by`:
+When an actor's identity depends on context, declare a `within` clause:
 
 ```
 actor WorkspaceAdmin {
@@ -1709,24 +1600,7 @@ actor WorkspaceAdmin {
 }
 ```
 
-The `within` clause declares the entity type this actor requires from the surface's `context` binding. This makes the dependency explicit: the checker can verify that any surface using this actor provides a compatible context.
-
-Two keywords are available inside `identified_by`:
-
-- `this` — the entity instance being tested (here, the User). Same semantics as `this` in entity declarations.
-- `within` — the entity bound by the `context` clause of the surface that uses this actor, constrained to the type declared in the actor's `within` clause.
-
-```
-surface WorkspaceManagement {
-    facing admin: WorkspaceAdmin
-    context workspace: Workspace    -- matches WorkspaceAdmin's within: Workspace
-    ...
-}
-```
-
-An actor declaration with a `within` clause can only be used in surfaces that declare a `context` clause. The surface's context type must match the actor's declared `within` type.
-
-The `facing` clause accepts either an actor type or an entity type directly. Use actor declarations when the boundary has specific identity requirements (e.g., `WorkspaceAdmin` requires admin membership). Use entity types directly when any instance of that entity can interact (e.g., `facing visitor: User` for a public-facing surface). For integration surfaces where the external party is code rather than a person, declare an actor type with a minimal `identified_by` expression rather than leaving the type undeclared.
+The `facing` clause accepts either an actor type or an entity type directly.
 
 ### Surface structure
 
@@ -1765,18 +1639,18 @@ surface SurfaceName {
 
 Variable names (`party`, `item`) are user-chosen, not reserved keywords. All clauses are optional.
 
-| Clause | Purpose |
-|--------|---------|
-| `facing` | Who is on the other side of the boundary |
-| `context` | What entity or scope this surface applies to (one surface instance per matching entity; absent when no entity matches) |
-| `let` | Local bindings, same as in rules |
-| `exposes` | Visible data (supports `for` iteration over collections) |
-| `provides` | Available operations with optional when-guards (parameters are per-action inputs from the party) |
-| `contracts` | References to module-level `contract` declarations with direction markers. `demands ContractName` indicates the counterpart must implement; `fulfils ContractName` indicates this surface supplies |
-| `@guarantee` | Named constraint that must hold across the boundary (prose annotation; PascalCase name required) |
-| `@guidance` | Non-normative implementation advice (prose annotation; no name; must appear last) |
-| `related` | Associated surfaces reachable from this one; the parenthesised expression evaluates to the entity instance that the target surface's `context` clause binds to, and its type must match the target surface's context type |
-| `timeout` | References to temporal rules that apply within this surface's context (the rule name must correspond to a defined rule with a temporal trigger) |
+| Clause       | Purpose                                                                                                                                                                                                                   |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `facing`     | Who is on the other side of the boundary                                                                                                                                                                                  |
+| `context`    | What entity or scope this surface applies to (one surface instance per matching entity; absent when no entity matches)                                                                                                    |
+| `let`        | Local bindings, same as in rules                                                                                                                                                                                          |
+| `exposes`    | Visible data (supports `for` iteration over collections)                                                                                                                                                                  |
+| `provides`   | Available operations with optional when-guards (parameters are per-action inputs from the party)                                                                                                                          |
+| `contracts`  | References to module-level `contract` declarations with direction markers. `demands ContractName` indicates the counterpart must implement; `fulfils ContractName` indicates this surface supplies                        |
+| `@guarantee` | Named constraint that must hold across the boundary (prose annotation; PascalCase name required)                                                                                                                          |
+| `@guidance`  | Non-normative implementation advice (prose annotation; no name; must appear last)                                                                                                                                         |
+| `related`    | Associated surfaces reachable from this one; the parenthesised expression evaluates to the entity instance that the target surface's `context` clause binds to, and its type must match the target surface's context type |
+| `timeout`    | References to temporal rules that apply within this surface's context (the rule name must correspond to a defined rule with a temporal trigger)                                                                           |
 
 ### Examples
 
@@ -2161,53 +2035,53 @@ ensures: deadline = now + config.confirmation_deadline
 
 ## Glossary
 
-| Term | Definition |
-|------|------------|
-| **Given (module)** | Entity instances a module operates on, declared with `given { ... }`; inherited by all rules in the module. Binds singleton instances at module scope. Contrast with **Context**, which is parametric |
-| **Context (surface)** | Parametric scope binding for a boundary contract, declared with `context` inside a surface. Creates one surface instance per matching entity. Contrast with **Given**, which binds singleton instances at module scope |
-| **Entity** | A domain concept with identity and lifecycle |
-| **Value** | Structured data without identity, compared by structure |
-| **Sum Type** | Entity constrained to exactly one of several variants via a discriminator field |
-| **Discriminator** | Field whose pipe-separated capitalised values name the variants |
-| **Variant** | One alternative in a sum type, declared with `variant X : Base { ... }` |
-| **Type Guard** | Condition (`requires:` or `if`) that narrows to a variant, unlocking its fields |
-| **Field** | Data stored on an entity or value |
-| **Relationship** | Navigation from one entity to related entities. Unordered relationships produce `Set`; ordered relationships produce `Sequence`. Declaration syntax for ordered relationships is pending |
-| **Projection** | A filtered view of a relationship. Preserves the ordering of the source collection: a projection of a `Sequence` is a `Sequence` |
-| **Sequence** | Ordered collection type that will be produced by ordered relationships and their projections when declaration syntax is introduced (pending follow-up ALP). A subtype of `Set`: assignable where an unordered collection is expected, but not the reverse. Distinct from `List<T>`, which is a compound field type declared explicitly. Ordering propagates through `where` and field extraction; set arithmetic (`+`, `-`) and `.unique` produce unordered results |
-| **Ordered collection** | A collection whose elements have a meaningful sequence (intrinsic order). `Sequence` and `List<T>` are the two ordered collection types. `.first`, `.last` and deterministic `for` iteration are restricted to ordered collections |
-| **Derived Value** | A computed value based on other fields |
-| **Parameterised Derived Value** | A derived value that takes arguments, e.g. `can_use_feature(f): f in plan.features` |
-| **Rule** | A specification of behaviour triggered by some condition |
-| **Trigger** | The condition that causes a rule to fire |
-| **Trigger Emission** | An ensures clause that emits a named event; other rules chain from it via their `when` clause |
-| **Precondition** | A requirement that must be true for a rule to execute |
-| **Postcondition** | An assertion about what becomes true after a rule executes |
-| **`when` clause (field)** | Clause on a field declaration tying its presence to lifecycle state: `field: Type when status = value1 \| value2`. The field is present only in the listed states. The referenced status field must have a `transitions` block. Orthogonal to `?` (genuine optionality) |
-| **Presence obligation** | When a rule transitions an entity into a field's `when` set (source state outside, target state inside), the rule must set the field |
-| **Absence obligation** | When a rule transitions an entity out of a field's `when` set (source state inside, target state outside), the rule must clear the field |
-| **Derived value `when` inference** | The checker infers `when` sets for derived values by intersecting the `when` sets of their inputs. Authors may optionally annotate with an explicit `when` clause, verified against the inference. The checker exports inferred `when` sets as structured data |
-| **Black Box Function** | Domain logic referenced but not defined in the spec; pure and deterministic. Always use free-standing call syntax, never dot-method syntax. For collection-operating functions, the collection is the first argument: `filter(events, predicate)`. Common examples include `hash()`, `verify()`, `filter()`, `grouped_by()` |
-| **External Entity** | An entity managed by another specification; referenced but not governed here |
-| **Config** | Configurable parameters for a specification, referenced via `config.field` |
-| **Default** | A named entity instance used as seed data or base configuration |
-| **Deferred Specification** | Complex logic defined in a separate file |
-| **Open Question** | An unresolved design decision |
-| **Entity Collection** | Pluralised type name referring to all instances of that entity (e.g., `Users` for all `User` instances) |
-| **Exists** | Keyword for checking entity existence (`exists x`) or asserting removal (`not exists x`) |
-| **`within`** | Clause in actor declarations that names the required context type; also a keyword in `identified_by` expressions that resolves to the surface's context entity |
-| **`this`** | The instance of the enclosing type; valid in entity declarations and actor `identified_by` expressions |
-| **Enum** | A set of values. **Named enums** (`enum Recommendation { ... }`) have type identity and are reusable across fields and entities. **Inline enums** (`status: pending \| active`) are anonymous, scoped to a single field, and cannot be compared across fields. Enum literals referencing external standards may use backtick quoting (`` `de-CH-1996` ``) to preserve the standard's canonical form; quoted and unquoted literals are distinct values with no implicit normalisation |
-| **Transition Graph** | An authoritative, opt-in declaration of valid lifecycle transitions for an enum status field. Declared inside the entity body with `transitions field_name { ... }` using `->` edge notation and a `terminal:` clause. When present, rules producing transitions not in the graph are validation errors. Entities without a graph derive transition validity from rules alone |
-| **Discard Binding** | `_` used where a binding is syntactically required but the value is not needed |
-| **Actor** | An entity type that can interact with surfaces, declared with explicit identity mapping |
-| **`facing`** | Surface clause naming the external party on the other side of the boundary |
-| **Surface** | A boundary contract between two parties specifying what each side exposes and provides, with optional `contracts:` clause for programmatic integration obligations |
-| **Contract** | A named, direction-agnostic obligation declared at module level with `contract Name { ... }`. Surfaces reference contracts in a `contracts:` clause with `demands`/`fulfils` direction markers. Identity determined by module-qualified name |
-| **`demands`** | Direction marker in a `contracts:` clause indicating the counterpart must implement this contract |
-| **`fulfils`** | Direction marker in a `contracts:` clause indicating this surface supplies the contract's operations |
-| **Invariant** | A named, scoped assertion about a property. Two syntactic forms: `@invariant Name` (prose annotation, in contracts) and `invariant Name { expression }` (expression-bearing, at top-level and entity-level). Expression-bearing invariants are logical assertions over entity state, not runtime checks. Distinct from `@guarantee`, which annotates properties of the boundary as a whole |
-| **`@guarantee`** | Named prose annotation on a surface asserting a property of the boundary as a whole. PascalCase name required, unique within the surface. Structurally validated by the checker; prose content is not evaluated. Distinct from `@invariant` (scoped to a contract) and expression-bearing `invariant Name { }` (machine-readable) |
-| **`@guidance`** | Unnamed prose annotation providing non-normative implementation advice. Permitted in contracts, rules and surfaces. Must appear after all structural clauses and after all other annotations in its containing construct. Structurally validated; prose content is not evaluated |
-| **`implies`** | Boolean operator. `a implies b` is `not a or b`. Lowest boolean precedence, binding looser than `and` and `or`. Available in all expression contexts |
-| **Config reference** | A qualified reference in a config default (`param: Type = other/config.param`) that aliases a parameter from an imported module. Supports expression-form defaults with arithmetic operators |
+| Term                               | Definition                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Given (module)**                 | Entity instances a module operates on, declared with `given { ... }`; inherited by all rules in the module. Binds singleton instances at module scope. Contrast with **Context**, which is parametric                                                                                                                                                                                                                                                                                |
+| **Context (surface)**              | Parametric scope binding for a boundary contract, declared with `context` inside a surface. Creates one surface instance per matching entity. Contrast with **Given**, which binds singleton instances at module scope                                                                                                                                                                                                                                                               |
+| **Entity**                         | A domain concept with identity and lifecycle                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| **Value**                          | Structured data without identity, compared by structure                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| **Sum Type**                       | Entity constrained to exactly one of several variants via a discriminator field                                                                                                                                                                                                                                                                                                                                                                                                      |
+| **Discriminator**                  | Field whose pipe-separated capitalised values name the variants                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| **Variant**                        | One alternative in a sum type, declared with `variant X : Base { ... }`                                                                                                                                                                                                                                                                                                                                                                                                              |
+| **Type Guard**                     | Condition (`requires:` or `if`) that narrows to a variant, unlocking its fields                                                                                                                                                                                                                                                                                                                                                                                                      |
+| **Field**                          | Data stored on an entity or value                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| **Relationship**                   | Navigation from one entity to related entities. Unordered relationships produce `Set`; ordered relationships produce `Sequence`. Declaration syntax for ordered relationships is pending                                                                                                                                                                                                                                                                                             |
+| **Projection**                     | A filtered view of a relationship. Preserves the ordering of the source collection: a projection of a `Sequence` is a `Sequence`                                                                                                                                                                                                                                                                                                                                                     |
+| **Sequence**                       | Ordered collection type that will be produced by ordered relationships and their projections when declaration syntax is introduced (pending follow-up ALP). A subtype of `Set`: assignable where an unordered collection is expected, but not the reverse. Distinct from `List<T>`, which is a compound field type declared explicitly. Ordering propagates through `where` and field extraction; set arithmetic (`+`, `-`) and `.unique` produce unordered results                  |
+| **Ordered collection**             | A collection whose elements have a meaningful sequence (intrinsic order). `Sequence` and `List<T>` are the two ordered collection types. `.first`, `.last` and deterministic `for` iteration are restricted to ordered collections                                                                                                                                                                                                                                                   |
+| **Derived Value**                  | A computed value based on other fields                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| **Parameterised Derived Value**    | A derived value that takes arguments, e.g. `can_use_feature(f): f in plan.features`                                                                                                                                                                                                                                                                                                                                                                                                  |
+| **Rule**                           | A specification of behaviour triggered by some condition                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| **Trigger**                        | The condition that causes a rule to fire                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| **Trigger Emission**               | An ensures clause that emits a named event; other rules chain from it via their `when` clause                                                                                                                                                                                                                                                                                                                                                                                        |
+| **Precondition**                   | A requirement that must be true for a rule to execute                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| **Postcondition**                  | An assertion about what becomes true after a rule executes                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| **`when` clause (field)**          | Clause on a field declaration tying its presence to lifecycle state: `field: Type when status = value1 \| value2`. The field is present only in the listed states. The referenced status field must have a `transitions` block. Orthogonal to `?` (genuine optionality)                                                                                                                                                                                                              |
+| **Presence obligation**            | When a rule transitions an entity into a field's `when` set (source state outside, target state inside), the rule must set the field                                                                                                                                                                                                                                                                                                                                                 |
+| **Absence obligation**             | When a rule transitions an entity out of a field's `when` set (source state inside, target state outside), the rule must clear the field                                                                                                                                                                                                                                                                                                                                             |
+| **Derived value `when` inference** | The checker infers `when` sets for derived values by intersecting the `when` sets of their inputs. Authors may optionally annotate with an explicit `when` clause, verified against the inference. The checker exports inferred `when` sets as structured data                                                                                                                                                                                                                       |
+| **Black Box Function**             | Domain logic referenced but not defined in the spec; pure and deterministic. Always use free-standing call syntax, never dot-method syntax. For collection-operating functions, the collection is the first argument: `filter(events, predicate)`. Common examples include `hash()`, `verify()`, `filter()`, `grouped_by()`                                                                                                                                                          |
+| **External Entity**                | An entity managed by another specification; referenced but not governed here                                                                                                                                                                                                                                                                                                                                                                                                         |
+| **Config**                         | Configurable parameters for a specification, referenced via `config.field`                                                                                                                                                                                                                                                                                                                                                                                                           |
+| **Default**                        | A named entity instance used as seed data or base configuration                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| **Deferred Specification**         | Complex logic defined in a separate file                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| **Open Question**                  | An unresolved design decision                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| **Entity Collection**              | Pluralised type name referring to all instances of that entity (e.g., `Users` for all `User` instances)                                                                                                                                                                                                                                                                                                                                                                              |
+| **Exists**                         | Keyword for checking entity existence (`exists x`) or asserting removal (`not exists x`)                                                                                                                                                                                                                                                                                                                                                                                             |
+| **`within`**                       | Clause in actor declarations that names the required context type; also a keyword in `identified_by` expressions that resolves to the surface's context entity                                                                                                                                                                                                                                                                                                                       |
+| **`this`**                         | The instance of the enclosing type; valid in entity declarations and actor `identified_by` expressions                                                                                                                                                                                                                                                                                                                                                                               |
+| **Enum**                           | A set of values. **Named enums** (`enum Recommendation { ... }`) have type identity and are reusable across fields and entities. **Inline enums** (`status: pending \| active`) are anonymous, scoped to a single field, and cannot be compared across fields. Enum literals referencing external standards may use backtick quoting (`` `de-CH-1996` ``) to preserve the standard's canonical form; quoted and unquoted literals are distinct values with no implicit normalisation |
+| **Transition Graph**               | An authoritative, opt-in declaration of valid lifecycle transitions for an enum status field. Declared inside the entity body with `transitions field_name { ... }` using `->` edge notation and a `terminal:` clause. When present, rules producing transitions not in the graph are validation errors. Entities without a graph derive transition validity from rules alone                                                                                                        |
+| **Discard Binding**                | `_` used where a binding is syntactically required but the value is not needed                                                                                                                                                                                                                                                                                                                                                                                                       |
+| **Actor**                          | An entity type that can interact with surfaces, declared with explicit identity mapping                                                                                                                                                                                                                                                                                                                                                                                              |
+| **`facing`**                       | Surface clause naming the external party on the other side of the boundary                                                                                                                                                                                                                                                                                                                                                                                                           |
+| **Surface**                        | A boundary contract between two parties specifying what each side exposes and provides, with optional `contracts:` clause for programmatic integration obligations                                                                                                                                                                                                                                                                                                                   |
+| **Contract**                       | A named, direction-agnostic obligation declared at module level with `contract Name { ... }`. Surfaces reference contracts in a `contracts:` clause with `demands`/`fulfils` direction markers. Identity determined by module-qualified name                                                                                                                                                                                                                                         |
+| **`demands`**                      | Direction marker in a `contracts:` clause indicating the counterpart must implement this contract                                                                                                                                                                                                                                                                                                                                                                                    |
+| **`fulfils`**                      | Direction marker in a `contracts:` clause indicating this surface supplies the contract's operations                                                                                                                                                                                                                                                                                                                                                                                 |
+| **Invariant**                      | A named, scoped assertion about a property. Two syntactic forms: `@invariant Name` (prose annotation, in contracts) and `invariant Name { expression }` (expression-bearing, at top-level and entity-level). Expression-bearing invariants are logical assertions over entity state, not runtime checks. Distinct from `@guarantee`, which annotates properties of the boundary as a whole                                                                                           |
+| **`@guarantee`**                   | Named prose annotation on a surface asserting a property of the boundary as a whole. PascalCase name required, unique within the surface. Structurally validated by the checker; prose content is not evaluated. Distinct from `@invariant` (scoped to a contract) and expression-bearing `invariant Name { }` (machine-readable)                                                                                                                                                    |
+| **`@guidance`**                    | Unnamed prose annotation providing non-normative implementation advice. Permitted in contracts, rules and surfaces. Must appear after all structural clauses and after all other annotations in its containing construct. Structurally validated; prose content is not evaluated                                                                                                                                                                                                     |
+| **`implies`**                      | Boolean operator. `a implies b` is `not a or b`. Lowest boolean precedence, binding looser than `and` and `or`. Available in all expression contexts                                                                                                                                                                                                                                                                                                                                 |
+| **Config reference**               | A qualified reference in a config default (`param: Type = other/config.param`) that aliases a parameter from an imported module. Supports expression-form defaults with arithmetic operators                                                                                                                                                                                                                                                                                         |

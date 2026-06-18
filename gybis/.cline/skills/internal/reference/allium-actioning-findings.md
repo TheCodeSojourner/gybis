@@ -19,6 +19,15 @@ allium check <file>
 λ(severity, order, error(block_write) > warning(human_decision) > info(advisory))
 λ(present, [E/W/I] {code}@line({line}): {message} → suggested_fix(interpretation))
 
+### Codeless Diagnostic Caveat
+
+λ(code, type, Diagnostic.code ≡ Option<&'static str> | .with_code(…) opt-in | universe ¬enumerable)
+λ(consumer, contract, code = none → kind ≔ "check:_uncoded" ∧ preserve(severity, location, message))
+λ(consumer, fallback, "check:_uncoded" → prose_heuristic_synthesis)
+
+Any code path dispatching on `code` MUST implement a codeless fallback. `internal/allium-normalize` emits these as `kind: "check:_uncoded"`; downstream consumers (e.g. `gybis-spec-check`) route through prose-heuristic synthesis rather than category-specific dispatch.
+
+
 **Common diagnostics:**
 
 λ(diag, missing_ensures, ¬ensures: → "Rule has no outcome — what happens after [trigger]?")

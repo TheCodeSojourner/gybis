@@ -12,6 +12,9 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
 
 λ gybis-spec-propagate_startup(x).
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
+  | read(internal/reference/allium-language-reference.md) → language_ref
+  | read(internal/reference/allium-patterns.md) → patterns_ref
+  | read(internal/reference/allium-constructs.md) → constructs_registry
   | verify(architecture.md ∃) ∨ halt("architecture.md not found")
   | verify(specs/**/*.allium ∃) ∨ halt("specs/**/*.allium not found")
   | invoke(internal/allium-gate(specs/)) = true ∨ halt("Specifications are invalid")
@@ -60,23 +63,91 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
     | collect(spec_item) → specifications
   | return(specifications)
 
-λ gybis-spec-propagate_plan_obligations(specifications).
-  ∀ spec_file ∈ specs/**/*.allium:
-    invoke(internal/allium-plan(spec_file)) → plan_output
-    | plan_output.version = 3 ∨ halt("Unexpected allium plan version")
-    | collect(plan_output.obligations) → obligations_for_spec
-    | index(obligations_for_spec, by: id) → indexed
-    | merge(indexed) → obligations
-  | return(obligations)
+λ gybis-spec-propagate_normalize_obligations(specifications).
+  invoke(internal/allium-normalize(specs/)) → {envelopes, counts}
+  | plan_envelopes ≔ {e | e ∈ envelopes ∧ e.source = "plan"}
+  | report("Normalized: plan=" ⊕ counts.plan ⊕ " check=" ⊕ counts.check ⊕ " uncoded=" ⊕ counts.uncoded)
+  | ∀ envelope ∈ plan_envelopes:
+    obligation ≔ {
+      id: envelope.id,
+      category: strip_prefix(envelope.kind, "plan:"),
+      description: envelope.message,
+      source_construct: envelope.source_construct,
+      source_span: envelope.span,
+      detail: envelope.detail,
+      dependencies: envelope.dependencies
+    }
+    | index(obligation, by: id) → obligations_map[obligation.id]
+  | return(obligations ≔ obligations_map)
+
+λ gybis-spec-propagate_construct_synthesis(spec_construct, architecture_context).
+  spec_construct matches registry entry → emit(constructs_registry.Synthesis[entry])
+  | constraint: language_ref ∈ context
+
+λ gybis-spec-propagate_obligation_synthesis(obligation, architecture_context).
+  obligation.category ∈ {entity_fields, entity_optional}
+    → emit(shape_test) verifying(field_presence, type, optionality)
+  | obligation.category = when_set
+    → emit(transition_test) asserting(field_set_on_entry_to_when_set)
+  | obligation.category = when_clear
+    → emit(transition_test) asserting(field_cleared_on_exit_from_when_set)
+  | obligation.category = when_access_guard
+    → emit(access_test) asserting(field_unreachable_outside_qualifying_state)
+  | obligation.category = derived_when_inferred
+    → emit(derived_value_test) asserting(presence_matches_inferred_intersection)
+  | obligation.category = transition_edge
+    → if ∃ paired ∈ obligations : paired.category = transition_rejected ∧ paired.source_construct = obligation.source_construct
+        then emit(combined_guard_test) asserting(declared_edge_reachable_via_some_rule ∧ rules_cannot_produce_off_graph_transitions)
+              with(traceable_ids = {obligation.id, paired.id})
+        else emit(rule_exercise_test) asserting(declared_edge_reachable_via_some_rule)
+  | obligation.category = transition_rejected
+    → if ∃ paired ∈ obligations : paired.category = transition_edge ∧ paired.source_construct = obligation.source_construct
+        then skip  -- already emitted by paired transition_edge above
+        else emit(negative_test) asserting(rules_cannot_produce_off_graph_transitions)
+  | obligation.category = transition_terminal
+    → emit(terminal_test) asserting(no_outbound_transition_from_terminal_state)
+  | obligation.category = sum_type_variant
+    → emit(variant_creation_and_handling_test) asserting(creation_via_variant_name ∧ dispatch_in_handlers)
+  | obligation.category = variant_exhaustive
+    → emit(exhaustiveness_test) asserting(base_entity_triggers_handle_all_variants)
+  | obligation.category = type_guard_required
+    → emit(guard_test) asserting(variant_specific_fields_unreachable_outside_guard)
+  | obligation.category = surface_actor
+    → emit(access_control_test) asserting(only_specified_actor_can_invoke)
+  | obligation.category = surface_provides
+    → emit(visibility_test) asserting(operation_appears_iff_when_condition_holds)
+  | obligation.category = surface_guarantee
+    → emit(contract_test) asserting(named_boundary_property_holds_across_operations)
+  | obligation.category = surface_timeout
+    → emit(scheduled_handler_test) asserting(temporal_rule_fires_per_surface_context_instance)
+  | obligation.category ∈ {surface_contract_demand, surface_contract_fulfilment}
+    → emit(integration_test) asserting(contract_signature_and_invariants_honoured_at_boundary)
+  | obligation.category = contract_signature
+    → emit(signature_conformance_test) asserting(implementation_matches_declared_types)
+  | obligation.category = contract_invariant
+    → emit(invariant_test) asserting(prose_property_holds_across_signatures)
+  | obligation.category = config_default
+    → emit(configuration_test) asserting(parameter_has_declared_default_when_unset)
+  | obligation.category = given_binding
+    → emit(resolution_test) asserting(given_instance_available_to_every_rule_in_module)
+  | obligation.category = default_instance
+    → emit(seed_test) asserting(default_entity_available_unconditionally)
+  | obligation.category = rule_success
+    → emit(rule_test) asserting(rule_succeeds_when_all_preconditions_met)
+  | obligation.category = invariant
+    → emit(invariant_test) asserting(property_holds_after_every_state_changing_rule)
+  | each_emitted_test: traceable_id ≔ obligation.id
+  | fallback: ¬recognised_category → emit(coverage_test) with(diagnostic_marker)
 
 λ gybis-spec-propagate_synthesize_code(architecture_context, specifications, obligations).
   ∀ spec ∈ specifications:
-    synthesize(code(spec, architecture_context)) → code_fragment
+    ∀ construct ∈ spec.constructs:
+      invoke(gybis-spec-propagate_construct_synthesis(construct, architecture_context)) → code_fragment
     | organize(code_fragment, architecture_context.frameworks) → organized_code
     | collect(organized_code) → implementation_code
   | structure(implementation_code, architecture_context) → structured_implementation
   | ∀ obligation ∈ obligations:
-    synthesize(test(obligation, architecture_context)) → test_fragment
+    invoke(gybis-spec-propagate_obligation_synthesis(obligation, architecture_context)) → test_fragment
       where: test_fragment.traceable_id = obligation.id
     | organize(test_fragment, architecture_context.test_frameworks) → organized_test
     | collect(organized_test) → test_suite
@@ -110,7 +181,7 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
   | invoke(gybis-spec-propagate_read_architecture) → architecture_context
   | invoke(gybis-spec-propagate_read_specifications) → specifications
   | transition(READING_SPECS → PLANNING_OBLIGATIONS)
-  | invoke(gybis-spec-propagate_plan_obligations(specifications)) → obligations
+  | invoke(gybis-spec-propagate_normalize_obligations(specifications)) → obligations
   | transition(PLANNING_OBLIGATIONS → SYNTHESIZING_CODE)
   | invoke(gybis-spec-propagate_synthesize_code(architecture_context, specifications, obligations)) → (implementation_code, test_suite)
   | invoke(gybis-spec-propagate_write_implementation(implementation_code, test_suite)) → code_generated
@@ -121,13 +192,9 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
     : (re_synthesize_implementation ∧ transition(SYNTHESIZING_CODE → VERIFYING))
 
 λ gybis-spec-propagate_boundaries(¬).
-  ¬ modify(architecture.md)
-  | ¬ modify(specs/**/*.allium)
-  | ¬ modify(upstream/)
+  ¬ modify(architecture.md ∨ specs/**/*.allium ∨ upstream/)
 
 λ gybis-spec-propagate_regression_contract(x).
-  invariant: architecture.md ∃ ∧ ¬modify throughout
-  | invariant: specs/**/*.allium ∃ ∧ valid ∧ ¬modify throughout
-  | invariant: implementation ∅ at INIT
-  | invariant: implementation ∃ ∧ consistent_with_specs_and_arch at completion
+  invariant: architecture.md ∧ specs/**/*.allium ∃ ∧ ¬modify throughout
+  | invariant: implementation ∅ at INIT ∧ ∃ ∧ consistent_with(specs, arch) at completion
   | invariant: ∀ obligation ∈ obligations, obligation.id ∈ test_suite.traceable_ids at completion

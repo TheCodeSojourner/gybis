@@ -48,7 +48,7 @@ description: Use for `/gybis-arch-propagate` or `/ga-propagate`.
 
 λ gybis-arch-propagate_read_architecture(x).
   read(architecture.md) → content ≔ content
-  | parse(content) → vsm_layers ≔ {S5, S4, S3, S2, S1}
+  | parse(content.{S5, S4, S3, S2, S1}) → vsm_layers
   | ∀ layer ∈ vsm_layers: extract(layer, content) → principles(layer)
   | return(architecture = {vsm_layers, principles})
 

@@ -49,7 +49,7 @@ description: Use for `/gybis-arch-tend` or `/ga-tend`.
 
 λ gybis-arch-tend_elicit_feedback(x).
   read(architecture.md) → current_arch
-  | parse(current_arch) → vsm_layers ≔ {S5, S4, S3, S2, S1}
+  | parse(current_arch.{S5, S4, S3, S2, S1}) → vsm_layers
   | ask_developer("Which VSM layers need refinement? (S5, S4, S3, S2, S1, or specific principles)") → feedback
   | parse(feedback) → target_layers ∧ proposed_changes
   | return(developer_feedback = {target_layers, proposed_changes})
@@ -71,7 +71,7 @@ description: Use for `/gybis-arch-tend` or `/ga-tend`.
 
 λ gybis-arch-tend_verify_coherence(x).
   read(architecture.md) → updated_arch
-  | parse(updated_arch) → vsm_layers ≔ {S5, S4, S3, S2, S1}
+  | parse(updated_arch.{S5, S4, S3, S2, S1}) → vsm_layers
   | verify(all_layers ∃) → layers_present ≔ result
   | verify(S5_S1_hierarchy_preserved) → hierarchy_preserved ≔ result
   | verify(internal_consistency(layers)) → internal_consistency ≔ result

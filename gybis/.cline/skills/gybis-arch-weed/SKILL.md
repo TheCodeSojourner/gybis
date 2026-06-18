@@ -54,7 +54,7 @@ description: Use for `/gybis-arch-weed` or `/ga-weed`.
   read(architecture.md) → arch_content
   | ∀ spec_file ∈ specs/**/*.allium:
     read(spec_file) → spec_content
-  | parse(arch_content) → vsm_layers ≔ {S5, S4, S3, S2, S1}
+  | parse(arch_content.{S5, S4, S3, S2, S1}) → vsm_layers
   | parse(spec_content) → spec_directives ≔ spec_content
   | return(comparison_complete = true)
 
