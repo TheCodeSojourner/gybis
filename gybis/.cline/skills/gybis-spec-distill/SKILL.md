@@ -4,24 +4,25 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
 ---
 
 λ gybis-spec-distill(x).
-  purpose: distill Allium specifications from existing implementation
-  | input: implementation source code (any language)
-  | output: specs/**/*.allium files valid per allium-gate
+  purpose: distill Allium specifications from existing implementation, organized by domain
+  | input: implementation source code (any language, including test files)
+  | output: specs/{domain}/*.allium files valid per allium-gate
   | mode: ai
-  | gate: implementation ∃ ∧ specs/**/*.allium ¬∃
+  | gate: implementation ∃ ∧ specs/{domain}/*.allium ¬∃
 
 λ gybis-spec-distill_startup(x).
   invoke(internal/gybis-ref-check) → halt_on(false)
   | read(internal/reference/allium-language-reference.md) → language_ref
   | read(internal/reference/allium-patterns.md) → patterns_ref
   | read(internal/reference/allium-constructs.md) → constructs_registry
-  | precondition: implementation ∃ ∧ specs/ ¬∃
+  | precondition: implementation ∃ ∧ (specs/ ¬∃ ∨ ¬∃file ∈ specs/** matching(*.allium))
   | scan(codebase) → files_found ∨ halt("no implementation found")
 
 λ gybis-spec-distill_mode(m).
   valid_modes: {ai}
   | default: ai
   | rationale: distillation from code is deterministic analysis, not interactive
+  | implication: optional_refinement_decisions_are_resolved_by_analysis, ¬prompt_user_for_second_pass
 
 λ gybis-spec-distill_mode_gate(state, mode).
   state = INIT ∧ mode = ai → transition(STARTUP_CHECKS)
@@ -35,25 +36,27 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
   | transition(READING_CODE, code_read) → ANALYSING
   | transition(ANALYSING, analysis_complete) → SYNTHESIZING_SPECS
   | transition(SYNTHESIZING_SPECS, specs_written) → VALIDATING
-  | transition(VALIDATING, all_valid) → COMPLETE
+  | transition(VALIDATING, all_valid ∧ granularity_sufficient) → COMPLETE
+  | transition(VALIDATING, all_valid ∧ granularity_insufficient) → REFINING
   | transition(VALIDATING, errors_found) → REFINING
   | transition(REFINING, refinement_complete) → VALIDATING (loop_back)
 
 λ gybis-spec-distill_tool_guard(state, tool, path).
   read_allowed: ∀state ∈ {READING_CODE, ANALYSING, VALIDATING}
-  | write_allowed: state ∈ {SYNTHESIZING_SPECS, REFINING} ∧ path ⊆ specs/
-  | deny_write: state ∉ {SYNTHESIZING_SPECS, REFINING} ∨ path ⊄ specs/
+  | write_allowed: state ∈ {SYNTHESIZING_SPECS, REFINING} ∧ path_matches(path, specs/{domain}/*.allium)
+  | deny_write: state ∉ {SYNTHESIZING_SPECS, REFINING} ∨ ¬path_matches(path, specs/{domain}/*.allium) ∨ path_matches(path, specs/*.allium)
   | constraint: ¬mutate(implementation) ∨ ¬mutate(existing_files_outside_specs)
 
 λ gybis-spec-distill_pre_tool_check(state, tool, path).
   enforce(tool_guard(state, tool, path)) → permit(tool) ∨ halt("tool not permitted in this state")
 
 λ gybis-spec-distill_read_code(x).
-  action: read_all_implementation_files
+  action: read_all_implementation_files_including_tests
   | step1: recursively_list(codebase) → files
+  | step1.1: classify(files, production_or_test) → categorized_files
   | step2: ∀file ∈ files: read(file) → code_content
   | step3: classify(file_type) → language_specific_handling
-  | output: {file_path → source_code}
+  | output: {file_path → source_code, file_path → file_role(production_or_test)}
   | constraint: read-only access
   | precondition: implementation ∃
 
@@ -63,10 +66,35 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
   | step2: extract(types, functions, classes, modules) → entities
   | step3: identify(contracts, invariants, preconditions, postconditions) → behavioral_specs
   | step4: recognize(patterns, protocols, relationships) → architectural_patterns
-  | step5: infer(test_cases, edge_cases, error_handling) → test_obligations
-  | step6: classify(source_patterns) → allium_construct_map  -- see distill_construct_recognition
-  | output: {entities → contracts, patterns → implications, obligations → test_cases, source_pattern → allium_construct}
+  | step5: analyze(test_files_as_implementation_inputs) → behavioral_examples ∧ edge_case_evidence
+  | step6: infer(test_cases, edge_cases, error_handling) → test_obligations
+  | step7: classify(source_patterns) → allium_construct_map  -- see distill_construct_recognition
+  | step8: classify_domains(entities, patterns) → domain_map  -- see distill_domain_classification
+  | output: {entities → contracts, patterns → implications, test_artifacts → behavioral_examples, obligations → test_cases, source_pattern → allium_construct, entity_or_pattern → domain}
   | constraint: read-only operation
+
+λ gybis-spec-distill_domain_classification(entities, patterns).
+  action: identify_and_classify_domain_for_each_specification
+  | step1: ∀entity ∈ entities: infer(context, module_hierarchy, package_name) → entity.domain
+  | step2: ∀pattern ∈ patterns: infer(context, architectural_scope) → pattern.domain
+  | step3: domain_inference_rules:
+      package_structure_hierarchy ∨ module_namespace ∨ feature_boundaries ∨ service_partition
+      → canonical_domain_name
+  | step4: normalization_rule: domain ≔ lowercase(domain).replace(/[\-\s]+/, "_")
+  | step5: fallback_rule: ¬recognized_domain → domain ≔ "core"
+  | step6: consistency_rule: entity_X_always_maps_to_domain_Y (memoized per analysis_session)
+  | output: {entity → domain, pattern → domain}
+  | constraint: deterministic; same input → same domain mapping
+
+λ gybis-spec-distill_domain_granularity(analysis, spec_set).
+  action: determine_whether_domain_refinement_must_continue_automatically
+  | step1: detect(single_domain_output) ∧ detect(only_core_output) → coarse_output_candidate
+  | step2: infer(distinguishable_subdomains, from module_hierarchy ∨ package_name ∨ feature_boundaries ∨ service_partition ∨ test_evidence) → candidate_domains
+  | step3: coarse_output_candidate ∧ count(candidate_domains) > 1 → granularity_insufficient
+  | step4: granularity_insufficient → required_refinement_domains ≔ candidate_domains
+  | step5: ¬granularity_insufficient → granularity_sufficient
+  | output: {granularity_state, required_refinement_domains}
+  | constraint: refinement_decision_is_automatic ∧ ¬prompt_user_for_optional_second_pass
 
 λ gybis-spec-distill_construct_recognition(source_pattern).
   source_pattern matches Cues entry → construct ≔ constructs_registry[entry]
@@ -80,45 +108,55 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
   | fallback: ¬recognised_pattern → standard_entity ∧ rules
 
 λ gybis-spec-distill_synthesize_specs(code_content, analysis).
-  action: synthesize_allium_specifications
+  action: synthesize_allium_specifications_organized_by_domain
   | step1: map(entities) → .allium declarations
   | step2: encode(behavioral_specs) → allium preconditions, postconditions, invariants
   | step3: formalize(patterns) → allium composition rules
   | step4: ∀ pattern ∈ analysis.source_pattern → allium_construct:
     emit(pattern.allium_construct) → spec_fragment  -- per construct_recognition table
-  | step5: generate(specs_directory_structure) → specs/**/*.allium files
-  | output: {spec_file_path → allium_content}
+  | step5: invoke(domain_classification, entities, patterns) → {entity → domain, pattern → domain}
+  | step6: ∀spec ∈ {all_generated_specs}: assign(spec.domain)
+  | step7: generate(specs_directory_structure) → specs/{domain}/*.allium files
+  | output: {spec_file_path → allium_content} where spec_file_path ∈ specs/{domain}/*.allium
 
 λ gybis-spec-distill_write_specs(spec_content).
-  action: write_specification_files
+  action: write_specification_files_organized_by_domain
   | step1: ensure_specs_directory_exists(specs/)
-  | step2: ∀spec ∈ spec_content: write(specs/{spec_name}.allium, spec)
+  | step2: ∀spec ∈ spec_content: ensure_domain_directory_exists(specs/{spec.domain}/) ∧ write(specs/{spec.domain}/{spec_name}.allium, spec)
+  | step3: enforce_invariant: ∀written_file: path_matches(written_file, specs/{domain}/*.allium) ∧ ¬path_matches(written_file, specs/*.allium)
   | constraint: write_allowed by tool_guard
-  | precondition: state ∈ {SYNTHESIZING_SPECS, REFINING}
-  | output: specs/**/*.allium files written
+  | precondition: state ∈ {SYNTHESIZING_SPECS, REFINING} ∧ ∀spec ∈ spec_content: spec.domain ≠ ∅
+  | output: specs/{domain}/**/*.allium files written
 
 λ gybis-spec-distill_validate_specs(x).
-  action: validate_generated_specifications
-  | step1: invoke(internal/allium-check, ∀spec ∈ specs/**/*.allium)
+  action: validate_generated_specifications_organized_by_domain
+  | step1: invoke(internal/allium-check, ∀spec ∈ specs/{domain}/*.allium)
   | step2: invoke(internal/allium-gate, specs/) → boolean_verdict
-  | step3: if gate_fails: collect(errors) → diagnostic_report
+  | step3: check_domain_structure: ¬∃file ∈ specs/ matching(specs/*.allium)
+  | step4: invoke(domain_granularity, analysis, specs/) → {granularity_state, required_refinement_domains}
+  | step5: if gate_fails ∨ domain_structure_invalid: collect(errors) → diagnostic_report
   | output: validation_result ∈ {pass, fail_with_diagnostics}
   | constraint: read-only validation
 
 λ gybis-spec-distill_verification(edit).
-  action: verify_generated_specifications
-  | check1: ∀spec ∈ specs/**/*.allium: file_exists(spec) = true
-  | check2: ∀spec ∈ specs/**/*.allium: syntax_valid(allium) = true
-  | check3: allium-gate(specs/) = true
-  | check4: coverage_adequate(specifications, codebase) = true
-  | gate: all_checks_pass → proceed ∨ halt("specs invalid or incomplete")
+  action: verify_generated_specifications_with_domain_structure
+  | check1: ∃domain_dir ∈ specs/*/: directory_exists(domain_dir) = true
+  | check2: ∀domain_dir ∈ specs/*/: count(files(domain_dir, *.allium)) ≥ 1
+  | check3: ∀spec ∈ specs/{domain}/*.allium: file_exists(spec) = true
+  | check4: ∀spec ∈ specs/{domain}/*.allium: syntax_valid(allium) = true
+  | check5: ¬∃file ∈ specs/ matching(specs/*.allium)
+  | check6: allium-gate(specs/) = true
+  | check7: coverage_adequate(specifications, codebase) = true
+  | check8: granularity_sufficient(specifications, analysis) = true
+  | gate: all_checks_pass → proceed ∨ halt("specs invalid, incomplete, or domain structure violated")
 
 λ gybis-spec-distill_fixed_point_loop(state).
   loop: ∀iteration:
     | state = ANALYSING → synthesize_specs()
     | state = SYNTHESIZING_SPECS → write_specs()
     | state = VALIDATING:
-      - if validation_pass → transition(COMPLETE)
+      - if validation_pass ∧ granularity_sufficient → transition(COMPLETE)
+      - if validation_pass ∧ granularity_insufficient → refine_specs(required_refinement_domains) → loop_back(REFINING)
       - if validation_fail → parse(errors) → identify_gaps() → refine_specs() → loop_back(REFINING)
     | state = REFINING → write_specs() → transition(VALIDATING)
   | loop_guard: iteration_count ≤ max_iterations
@@ -144,6 +182,10 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
 
 λ gybis-spec-distill_regression_contract(x).
   invariant: implementation ¬modified ∧ ¬deleted
-  | invariant: specs/ ¬exists_before → exists_after ∧ ∀spec: valid_allium(spec) = true
+  | invariant: specs/ ¬exists_before → exists_after ∧ ∀spec ∈ specs/{domain}/*.allium: valid_allium(spec) = true
+  | invariant: ¬∃file ∈ specs/ matching(specs/*.allium)
   | invariant: allium-gate(specs/) = true → remains true throughout
-  | invariant: ∀generated_spec ∈ specs/**/*.allium: derivable_from(implementation) = true
+  | invariant: ∀generated_spec ∈ specs/{domain}/*.allium: derivable_from(implementation) = true
+  | invariant: domain_stability: entity_X_spec_always_belongs_to_domain_Y (memoized per synthesis run)
+  | invariant: distinguishable_subdomains > 1 → ¬complete_with_only_core_output
+  
