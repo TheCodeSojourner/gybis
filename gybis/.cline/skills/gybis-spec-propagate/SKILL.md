@@ -53,8 +53,48 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
 
 λ gybis-spec-propagate_read_architecture(x).
    read(architecture.md) → content ≔ content
-   | parse(content.S1) → context ≔ {language, frameworks, conventions, test_frameworks}
+   | parse(content.S1) → raw_context ≔ {
+       language,
+       frameworks,
+       conventions,
+       test_frameworks,
+       programming_paradigm,
+       value_oriented_techniques,
+       data_oriented_techniques,
+       disallowed_patterns
+     }
+   | invoke(gybis-spec-propagate_interpret_architecture_context(raw_context)) → context
+   | verify(context.language ∃ ∧ context.frameworks ∃ ∧ context.test_frameworks ∃)
+       ∨ halt("architecture S1 is underspecified for propagation")
+   | verify(
+       context.programming_paradigm ∃
+       ∨ context.value_oriented_techniques ∃
+       ∨ context.data_oriented_techniques ∃
+       ∨ context.conventions ∃
+     ) ∨ halt("architecture S1 lacks implementation-style guidance for propagation")
    | return(architecture_context = context)
+
+λ gybis-spec-propagate_interpret_architecture_context(raw_context).
+  raw_context.programming_paradigm ≔ programming_paradigm
+  | raw_context.value_oriented_techniques ≔ value_oriented_techniques
+  | raw_context.data_oriented_techniques ≔ data_oriented_techniques
+  | raw_context.conventions ≔ conventions
+  | raw_context.disallowed_patterns ≔ disallowed_patterns
+  | interpretation(programming_paradigm) ≔ constrains(decomposition, state_ownership, dispatch_style, mutation_boundaries)
+  | interpretation(value_oriented_techniques) ≔ constrains(immutability, value_semantics, explicit_transformations, pure_helpers)
+  | interpretation(data_oriented_techniques) ≔ constrains(data_layout, iteration_shape, batch_processing, data_flow_first_organization)
+  | interpretation(conventions) ≔ compatibility_bucket_for(project_specific_rules_not_captured_elsewhere)
+  | interpretation(disallowed_patterns) ≔ blacklist(hidden_mutation, inheritance_bias, stateful_service_objects, object_lifecycle_centric_design)
+  | return(architecture_context ≔ {
+      language: raw_context.language,
+      frameworks: raw_context.frameworks,
+      conventions: conventions,
+      test_frameworks: raw_context.test_frameworks,
+      programming_paradigm: programming_paradigm,
+      value_oriented_techniques: value_oriented_techniques,
+      data_oriented_techniques: data_oriented_techniques,
+      disallowed_patterns: disallowed_patterns
+    })
 
 λ gybis-spec-propagate_read_specifications(x).
   ∀ spec_file ∈ specs/**/*.allium:
@@ -83,6 +123,13 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
 λ gybis-spec-propagate_construct_synthesis(spec_construct, architecture_context).
   spec_construct matches registry entry → emit(constructs_registry.Synthesis[entry])
   | constraint: language_ref ∈ context
+  | constraint: synthesis_respects(
+      architecture_context.programming_paradigm,
+      architecture_context.value_oriented_techniques,
+      architecture_context.data_oriented_techniques,
+      architecture_context.conventions,
+      architecture_context.disallowed_patterns
+    )
 
 λ gybis-spec-propagate_obligation_synthesis(obligation, architecture_context).
   obligation.category ∈ {entity_fields, entity_optional}
@@ -136,6 +183,13 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
     → emit(rule_test) asserting(rule_succeeds_when_all_preconditions_met)
   | obligation.category = invariant
     → emit(invariant_test) asserting(property_holds_after_every_state_changing_rule)
+  | constraint: emitted_tests_respect(
+      architecture_context.programming_paradigm,
+      architecture_context.value_oriented_techniques,
+      architecture_context.data_oriented_techniques,
+      architecture_context.conventions,
+      architecture_context.disallowed_patterns
+    )
   | each_emitted_test: traceable_id ≔ obligation.id
   | fallback: ¬recognised_category → emit(coverage_test) with(diagnostic_marker)
 
@@ -143,13 +197,27 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
   ∀ spec ∈ specifications:
     ∀ construct ∈ spec.constructs:
       invoke(gybis-spec-propagate_construct_synthesis(construct, architecture_context)) → code_fragment
-    | organize(code_fragment, architecture_context.frameworks) → organized_code
+    | constrain(code_fragment,
+        architecture_context.programming_paradigm,
+        architecture_context.value_oriented_techniques,
+        architecture_context.data_oriented_techniques,
+        architecture_context.conventions,
+        architecture_context.disallowed_patterns
+      ) → styled_code
+    | organize(styled_code, architecture_context.frameworks) → organized_code
     | collect(organized_code) → implementation_code
   | structure(implementation_code, architecture_context) → structured_implementation
   | ∀ obligation ∈ obligations:
     invoke(gybis-spec-propagate_obligation_synthesis(obligation, architecture_context)) → test_fragment
       where: test_fragment.traceable_id = obligation.id
-    | organize(test_fragment, architecture_context.test_frameworks) → organized_test
+    | constrain(test_fragment,
+        architecture_context.programming_paradigm,
+        architecture_context.value_oriented_techniques,
+        architecture_context.data_oriented_techniques,
+        architecture_context.conventions,
+        architecture_context.disallowed_patterns
+      ) → styled_test
+    | organize(styled_test, architecture_context.test_frameworks) → organized_test
     | collect(organized_test) → test_suite
   | return(implementation_code = structured_implementation, test_suite = test_suite)
 
@@ -167,13 +235,17 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
 λ gybis-spec-propagate_verify_implementation(architecture_context, specifications, obligations).
   verify(code_conforms_to(specifications)) → conformance_check ≔ result
   | verify(code_respects_architecture(architecture_context)) → architecture_check ≔ result
+  | verify(code_respects_paradigm(architecture_context.programming_paradigm)) → paradigm_check ≔ result
+  | verify(code_respects_value_techniques(architecture_context.value_oriented_techniques)) → value_check ≔ result
+  | verify(code_respects_data_techniques(architecture_context.data_oriented_techniques)) → data_check ≔ result
+  | verify(code_avoids(architecture_context.disallowed_patterns)) → anti_pattern_check ≔ result
   | ∀ obligation ∈ obligations:
     verify(∃ test ∈ test_suite, test.traceable_id = obligation.id) → obligation_covered
     | collect(obligation_covered) → coverage
   | obligations_coverage_check ≔ ∀ c ∈ coverage, c = true
-  | conformance_check = true ∧ architecture_check = true ∧ obligations_coverage_check = true
+  | conformance_check = true ∧ architecture_check = true ∧ paradigm_check = true ∧ value_check = true ∧ data_check = true ∧ anti_pattern_check = true ∧ obligations_coverage_check = true
     → return(verification = true)
-  | ¬(conformance_check ∧ architecture_check ∧ obligations_coverage_check)
+  | ¬(conformance_check ∧ architecture_check ∧ paradigm_check ∧ value_check ∧ data_check ∧ anti_pattern_check ∧ obligations_coverage_check)
     → return(verification = false)
 
 λ gybis-spec-propagate_core_op(x).
@@ -193,6 +265,18 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
 
 λ gybis-spec-propagate_boundaries(¬).
   ¬ modify(architecture.md ∨ specs/**/*.allium ∨ upstream/)
+
+λ gybis-spec-propagate_limitations(x).
+  architecture.md remains read_only_input
+  | this_skill_expects(S1.language, S1.frameworks, S1.test_frameworks)
+  | this_skill_now_expects(
+      S1.programming_paradigm,
+      S1.value_oriented_techniques,
+      S1.data_oriented_techniques,
+      S1.disallowed_patterns
+    ) as explicit_signals when architectural_style matters
+  | absent_signals → halt("architecture S1 is underspecified for style-aware propagation")
+  | note: updating_this_skill_does_not_create_or_backfill_that_schema_in_architecture.md
 
 λ gybis-spec-propagate_regression_contract(x).
   invariant: architecture.md ∧ specs/**/*.allium ∃ ∧ ¬modify throughout
