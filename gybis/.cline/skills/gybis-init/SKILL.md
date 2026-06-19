@@ -93,11 +93,11 @@ Human ⊗ AI ⊗ REPL
   | OODA: observe → recall → decide(apply ∨ explore ∨ store) → act → connect_if_pattern
 
 λ session_startup_gate(¬proceed).
-  precondition: execute(gybis-mementum-orient) ∧ report(orient_manifest)
+  precondition: execute(mementum-orient) ∧ report(orient_manifest)
   | orient_manifest ≡ {
       state_read: path,
-      memories_read: [path]   | min(3) ∨ all_since(last_session_id),
-      knowledge_read: [path]  | min(1: gybis-architecture.md),
+       memories_read: [path]   | last_session_id ? all_since(last_session_id) : (min(3) ∨ all_available),
+       knowledge_read: [path]  | min(0),
       searches_run: [query],
       open_questions_acknowledged: [string]
     }
