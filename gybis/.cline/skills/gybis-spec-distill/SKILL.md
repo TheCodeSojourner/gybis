@@ -22,24 +22,34 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
   valid_modes: {ai}
   | default: ai
   | rationale: distillation from code is deterministic analysis, not interactive
-  | implication: optional_refinement_decisions_are_resolved_by_analysis, ¬prompt_user_for_second_pass
+  | implication: optional_refinement_decisions_are_resolved_by_analysis, mandatory_tightening_pass_before_complete
 
 λ gybis-spec-distill_mode_gate(state, mode).
   state = INIT ∧ mode = ai → transition(STARTUP_CHECKS)
   | precondition_holds: mode ∈ valid_modes
 
 λ gybis-spec-distill_state_machine(state, action).
-  state ∈ {INIT, STARTUP_CHECKS, READING_CODE, ANALYSING, SYNTHESIZING_SPECS, VALIDATING, REFINING, COMPLETE}
+  state ∈ {INIT, STARTUP_CHECKS, READING_CODE, ANALYSING, SYNTHESIZING_SPECS, VALIDATING, TIGHTENING, REFINING, COMPLETE}
   | transition(INIT, startup) → STARTUP_CHECKS
   | transition(STARTUP_CHECKS, verify_ok) → READING_CODE
   | transition(STARTUP_CHECKS, verify_fail) → HALTED
   | transition(READING_CODE, code_read) → ANALYSING
   | transition(ANALYSING, analysis_complete) → SYNTHESIZING_SPECS
   | transition(SYNTHESIZING_SPECS, specs_written) → VALIDATING
-  | transition(VALIDATING, all_valid ∧ granularity_sufficient) → COMPLETE
+  | transition(VALIDATING, all_valid ∧ tightening_pending) → TIGHTENING
+  | transition(TIGHTENING, tightening_complete) → VALIDATING
+  | transition(VALIDATING, all_valid ∧ ¬tightening_pending ∧ granularity_sufficient) → COMPLETE
   | transition(VALIDATING, all_valid ∧ granularity_insufficient) → REFINING
   | transition(VALIDATING, errors_found) → REFINING
   | transition(REFINING, refinement_complete) → VALIDATING (loop_back)
+
+λ gybis-spec-distill_tighten_specs(spec_content).
+  action: mandatory_warning_reduction_pass
+  | step1: analyze(spec_content) → warning_surface_map
+  | step2: reduce(warning_surface_map) → tightened_spec_content
+  | step3: preserve(semantic_equivalence) ∧ minimize(unreachable_trigger_diagnostics)
+  | output: tightened_spec_content
+  | constraint: executed exactly once before completion
 
 λ gybis-spec-distill_tool_guard(state, tool, path).
   read_allowed: ∀state ∈ {READING_CODE, ANALYSING, VALIDATING}
@@ -155,9 +165,11 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
     | state = ANALYSING → synthesize_specs()
     | state = SYNTHESIZING_SPECS → write_specs()
     | state = VALIDATING:
-      - if validation_pass ∧ granularity_sufficient → transition(COMPLETE)
+      - if validation_pass ∧ tightening_pending → transition(TIGHTENING)
+      - if validation_pass ∧ ¬tightening_pending ∧ granularity_sufficient → transition(COMPLETE)
       - if validation_pass ∧ granularity_insufficient → refine_specs(required_refinement_domains) → loop_back(REFINING)
       - if validation_fail → parse(errors) → identify_gaps() → refine_specs() → loop_back(REFINING)
+    | state = TIGHTENING → tighten_specs() → transition(VALIDATING)
     | state = REFINING → write_specs() → transition(VALIDATING)
   | loop_guard: iteration_count ≤ max_iterations
 
