@@ -6,7 +6,7 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
 λ gybis-spec-distill(x).
   purpose: distill Allium specifications from existing implementation, organized by domain
   | input: implementation source code (any language, including test files)
-  | output: specs/{domain}/*.allium files valid per allium-gate
+  | output: specs/{domain}/*.allium files valid per invoke(internal/allium-gate, specs/)
   | mode: ai
   | gate: implementation ∃ ∧ specs/{domain}/*.allium ¬∃
 
@@ -145,7 +145,7 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
   | check3: ∀spec ∈ specs/{domain}/*.allium: file_exists(spec) = true
   | check4: ∀spec ∈ specs/{domain}/*.allium: syntax_valid(allium) = true
   | check5: ¬∃file ∈ specs/ matching(specs/*.allium)
-  | check6: allium-gate(specs/) = true
+  | check6: invoke(internal/allium-gate, specs/) = true
   | check7: coverage_adequate(specifications, codebase) = true
   | check8: granularity_sufficient(specifications, analysis) = true
   | gate: all_checks_pass → proceed ∨ halt("specs invalid, incomplete, or domain structure violated")
@@ -184,7 +184,7 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
   invariant: implementation ¬modified ∧ ¬deleted
   | invariant: specs/ ¬exists_before → exists_after ∧ ∀spec ∈ specs/{domain}/*.allium: valid_allium(spec) = true
   | invariant: ¬∃file ∈ specs/ matching(specs/*.allium)
-  | invariant: allium-gate(specs/) = true → remains true throughout
+  | invariant: invoke(internal/allium-gate, specs/) = true → remains true throughout
   | invariant: ∀generated_spec ∈ specs/{domain}/*.allium: derivable_from(implementation) = true
   | invariant: domain_stability: entity_X_spec_always_belongs_to_domain_Y (memoized per synthesis run)
   | invariant: distinguishable_subdomains > 1 → ¬complete_with_only_core_output
