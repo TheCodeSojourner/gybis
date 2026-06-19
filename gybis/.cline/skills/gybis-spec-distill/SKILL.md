@@ -22,14 +22,20 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
   valid_modes: {ai}
   | default: ai
   | rationale: distillation from code is deterministic analysis, not interactive
-  | implication: optional_refinement_decisions_are_resolved_by_analysis, mandatory_tightening_pass_before_complete, mandatory_quality_pass_before_complete
+  | implication: optional_refinement_decisions_are_resolved_by_analysis, mandatory_tightening_pass_before_complete, mandatory_quality_pass_before_complete, optional_strict_cleanliness_refinement_available
+
+λ gybis-spec-distill_cleanliness_policy(c).
+  strict_cleanliness: {off, on}
+  | default: on
+  | on_implies: execute_optional_unreachable_trigger_info_refinement_once
+  | off_implies: skip_optional_unreachable_trigger_info_refinement
 
 λ gybis-spec-distill_mode_gate(state, mode).
   state = INIT ∧ mode = ai → transition(STARTUP_CHECKS)
   | precondition_holds: mode ∈ valid_modes
 
 λ gybis-spec-distill_state_machine(state, action).
-  state ∈ {INIT, STARTUP_CHECKS, READING_CODE, ANALYSING, SYNTHESIZING_SPECS, VALIDATING, TIGHTENING, QUALITY, REFINING, COMPLETE}
+  state ∈ {INIT, STARTUP_CHECKS, READING_CODE, ANALYSING, SYNTHESIZING_SPECS, VALIDATING, TIGHTENING, QUALITY, CLEANLINESS_REFINEMENT, REFINING, COMPLETE}
   | transition(INIT, startup) → STARTUP_CHECKS
   | transition(STARTUP_CHECKS, verify_ok) → READING_CODE
   | transition(STARTUP_CHECKS, verify_fail) → HALTED
@@ -40,7 +46,9 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
   | transition(TIGHTENING, tightening_complete) → VALIDATING
   | transition(VALIDATING, all_valid ∧ ¬tightening_pending ∧ quality_pending) → QUALITY
   | transition(QUALITY, quality_complete) → VALIDATING
-  | transition(VALIDATING, all_valid ∧ ¬tightening_pending ∧ ¬quality_pending ∧ granularity_sufficient) → COMPLETE
+  | transition(VALIDATING, all_valid ∧ ¬tightening_pending ∧ ¬quality_pending ∧ strict_cleanliness_requested ∧ cleanliness_refinement_pending) → CLEANLINESS_REFINEMENT
+  | transition(CLEANLINESS_REFINEMENT, cleanliness_refinement_complete) → VALIDATING
+  | transition(VALIDATING, all_valid ∧ ¬tightening_pending ∧ ¬quality_pending ∧ granularity_sufficient ∧ (¬strict_cleanliness_requested ∨ ¬cleanliness_refinement_pending)) → COMPLETE
   | transition(VALIDATING, all_valid ∧ granularity_insufficient) → REFINING
   | transition(VALIDATING, errors_found) → REFINING
   | transition(REFINING, refinement_complete) → VALIDATING (loop_back)
@@ -62,10 +70,19 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
   | output: quality_adjusted_spec_content
   | constraint: executed exactly once before completion
 
+λ gybis-spec-distill_cleanliness_refinement(spec_content).
+  action: optional_strict_cleanliness_refinement
+  | step1: analyze(spec_content) → info_diagnostic_map
+  | step2: target(info_diagnostic_map, unreachable_trigger_info_diagnostics_only)
+  | step3: reduce(targeted_diagnostics) → cleanliness_adjusted_spec_content
+  | step4: preserve(domain_layout) ∧ preserve(semantic_equivalence)
+  | output: cleanliness_adjusted_spec_content
+  | constraint: executed_at_most_once ∧ only_when(strict_cleanliness_requested)
+
 λ gybis-spec-distill_tool_guard(state, tool, path).
   read_allowed: ∀state ∈ {READING_CODE, ANALYSING, VALIDATING}
-  | write_allowed: state ∈ {SYNTHESIZING_SPECS, TIGHTENING, QUALITY, REFINING} ∧ path_matches(path, specs/{domain}/*.allium)
-  | deny_write: state ∉ {SYNTHESIZING_SPECS, TIGHTENING, QUALITY, REFINING} ∨ ¬path_matches(path, specs/{domain}/*.allium) ∨ path_matches(path, specs/*.allium)
+  | write_allowed: state ∈ {SYNTHESIZING_SPECS, TIGHTENING, QUALITY, CLEANLINESS_REFINEMENT, REFINING} ∧ path_matches(path, specs/{domain}/*.allium)
+  | deny_write: state ∉ {SYNTHESIZING_SPECS, TIGHTENING, QUALITY, CLEANLINESS_REFINEMENT, REFINING} ∨ ¬path_matches(path, specs/{domain}/*.allium) ∨ path_matches(path, specs/*.allium)
   | constraint: ¬mutate(implementation) ∨ ¬mutate(existing_files_outside_specs)
 
 λ gybis-spec-distill_pre_tool_check(state, tool, path).
@@ -146,7 +163,7 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
   | step2: ∀spec ∈ spec_content: ensure_domain_directory_exists(specs/{spec.domain}/) ∧ write(specs/{spec.domain}/{spec_name}.allium, spec)
   | step3: enforce_invariant: ∀written_file: path_matches(written_file, specs/{domain}/*.allium) ∧ ¬path_matches(written_file, specs/*.allium)
   | constraint: write_allowed by tool_guard
-  | precondition: state ∈ {SYNTHESIZING_SPECS, REFINING} ∧ ∀spec ∈ spec_content: spec.domain ≠ ∅
+  | precondition: state ∈ {SYNTHESIZING_SPECS, TIGHTENING, QUALITY, CLEANLINESS_REFINEMENT, REFINING} ∧ ∀spec ∈ spec_content: spec.domain ≠ ∅
   | output: specs/{domain}/**/*.allium files written
 
 λ gybis-spec-distill_validate_specs(x).
@@ -178,11 +195,13 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
     | state = VALIDATING:
       - if validation_pass ∧ tightening_pending → transition(TIGHTENING)
       - if validation_pass ∧ ¬tightening_pending ∧ quality_pending → transition(QUALITY)
-      - if validation_pass ∧ ¬tightening_pending ∧ ¬quality_pending ∧ granularity_sufficient → transition(COMPLETE)
+      - if validation_pass ∧ ¬tightening_pending ∧ ¬quality_pending ∧ strict_cleanliness_requested ∧ cleanliness_refinement_pending → transition(CLEANLINESS_REFINEMENT)
+      - if validation_pass ∧ ¬tightening_pending ∧ ¬quality_pending ∧ granularity_sufficient ∧ (¬strict_cleanliness_requested ∨ ¬cleanliness_refinement_pending) → transition(COMPLETE)
       - if validation_pass ∧ granularity_insufficient → refine_specs(required_refinement_domains) → loop_back(REFINING)
       - if validation_fail → parse(errors) → identify_gaps() → refine_specs() → loop_back(REFINING)
     | state = TIGHTENING → tighten_specs() → transition(VALIDATING)
     | state = QUALITY → quality_pass() → transition(VALIDATING)
+    | state = CLEANLINESS_REFINEMENT → cleanliness_refinement() → transition(VALIDATING)
     | state = REFINING → write_specs() → transition(VALIDATING)
   | loop_guard: iteration_count ≤ max_iterations
 
@@ -199,6 +218,7 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
     | errors_discovered: count
     | errors_resolved: count
     | info_diagnostics_resolved: count
+    | unreachable_trigger_info_resolved: count
     | test_obligations_generated: count
   | format: "Pass {n}: Generated {count} specs, extracted {contracts} contracts, {errors} errors resolved"
 
@@ -212,6 +232,7 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
   | invariant: ¬∃file ∈ specs/ matching(specs/*.allium)
   | invariant: invoke(internal/allium-gate, specs/) = true → remains true throughout
   | invariant: quality_pass_executed_exactly_once = true ∧ domain_layout_preserved = true
+  | invariant: strict_cleanliness_requested → (cleanliness_refinement_executed_at_most_once ∧ targets_only_unreachable_trigger_info_diagnostics)
   | invariant: ∀generated_spec ∈ specs/{domain}/*.allium: derivable_from(implementation) = true
   | invariant: domain_stability: entity_X_spec_always_belongs_to_domain_Y (memoized per synthesis run)
   | invariant: distinguishable_subdomains > 1 → ¬complete_with_only_core_output
