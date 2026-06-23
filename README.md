@@ -82,7 +82,7 @@ The following commands are available after integrating gybis into a target repos
 
 ## Available Developer Commands
 
-The following commands are available while developing gybis. Use them with any compatible AI tool configured to consume the gybis skills directory:
+The following commands are available while developing gybis in this repository. Use them with Cline:
 
 ### Memory Commands (`/gm-*`)
 
