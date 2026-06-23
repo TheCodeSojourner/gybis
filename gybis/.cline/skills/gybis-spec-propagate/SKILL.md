@@ -54,43 +54,69 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
 λ gybis-spec-propagate_read_architecture(x).
    read(architecture.md) → content ≔ content
    | parse(content.S1) → raw_context ≔ {
-       language,
-       frameworks,
-       conventions,
-       test_frameworks,
-       programming_paradigm,
+    programming_language_version,
+    test_framework,
+    build_system,
+    paradigm_preference,
+    package_manager,
+    deployment_method,
+    ci_cd,
+    linter_formatter,
+    interface_types,
+    architectural_pattern,
+    conventions,
        value_oriented_techniques,
        data_oriented_techniques,
        disallowed_patterns
      }
    | invoke(gybis-spec-propagate_interpret_architecture_context(raw_context)) → context
-   | verify(context.language ∃ ∧ context.frameworks ∃ ∧ context.test_frameworks ∃)
+  | verify(context.programming_language_version ∃ ∧ context.test_framework ∃ ∧ context.build_system ∃ ∧ context.paradigm_preference ∈ {OOP, FP})
        ∨ halt("architecture S1 is underspecified for propagation")
-   | verify(
-       context.programming_paradigm ∃
-       ∨ context.value_oriented_techniques ∃
-       ∨ context.data_oriented_techniques ∃
-       ∨ context.conventions ∃
-     ) ∨ halt("architecture S1 lacks implementation-style guidance for propagation")
+  | verify(compatible(context.test_framework, context.programming_language_version))
+    ∨ halt("architecture S1 has incompatible test framework and language version")
+  | verify(coherent(context.build_system, context.package_manager, context.ci_cd, context.deployment_method))
+    ∨ halt("architecture S1 has incoherent build/package/deployment/tooling signals")
    | return(architecture_context = context)
 
 λ gybis-spec-propagate_interpret_architecture_context(raw_context).
-  raw_context.programming_paradigm ≔ programming_paradigm
+  raw_context.paradigm_preference ≔ paradigm_preference
+  | raw_context.programming_language_version ≔ programming_language_version
+  | raw_context.test_framework ≔ test_framework
+  | raw_context.build_system ≔ build_system
+  | raw_context.package_manager ≔ package_manager
+  | raw_context.deployment_method ≔ deployment_method
+  | raw_context.ci_cd ≔ ci_cd
+  | raw_context.linter_formatter ≔ linter_formatter
+  | raw_context.interface_types ≔ interface_types
+  | raw_context.architectural_pattern ≔ architectural_pattern
   | raw_context.value_oriented_techniques ≔ value_oriented_techniques
   | raw_context.data_oriented_techniques ≔ data_oriented_techniques
   | raw_context.conventions ≔ conventions
   | raw_context.disallowed_patterns ≔ disallowed_patterns
-  | interpretation(programming_paradigm) ≔ constrains(decomposition, state_ownership, dispatch_style, mutation_boundaries)
+  | interpretation(paradigm_preference) ≔ constrains(decomposition, state_ownership, dispatch_style, mutation_boundaries)
+  | interpretation(build_system) ≔ constrains(module_organization, import_resolution, test_discovery)
+  | interpretation(package_manager) ≔ constrains(dependency_resolution, version_locking, transitive_closure)
+  | interpretation(deployment_method) ≔ constrains(runtime_environment, data_persistence, process_lifecycle)
+  | interpretation(ci_cd) ≔ constrains(build_triggers, artifact_staging, rollback_semantics)
+  | interpretation(linter_formatter) ≔ constrains(style_enforcement, type_checking, static_analysis_gates)
+  | interpretation(interface_types) ≔ constrains(api_surface, serialization_format, versioning_strategy)
+  | interpretation(architectural_pattern) ≔ constrains(layering, delegation_chains, module_boundaries)
   | interpretation(value_oriented_techniques) ≔ constrains(immutability, value_semantics, explicit_transformations, pure_helpers)
   | interpretation(data_oriented_techniques) ≔ constrains(data_layout, iteration_shape, batch_processing, data_flow_first_organization)
   | interpretation(conventions) ≔ compatibility_bucket_for(project_specific_rules_not_captured_elsewhere)
   | interpretation(disallowed_patterns) ≔ blacklist(hidden_mutation, inheritance_bias, stateful_service_objects, object_lifecycle_centric_design)
   | return(architecture_context ≔ {
-      language: raw_context.language,
-      frameworks: raw_context.frameworks,
+    programming_language_version: programming_language_version,
+    test_framework: test_framework,
+    build_system: build_system,
+    paradigm_preference: paradigm_preference,
+    package_manager: package_manager,
+    deployment_method: deployment_method,
+    ci_cd: ci_cd,
+    linter_formatter: linter_formatter,
+    interface_types: interface_types,
+    architectural_pattern: architectural_pattern,
       conventions: conventions,
-      test_frameworks: raw_context.test_frameworks,
-      programming_paradigm: programming_paradigm,
       value_oriented_techniques: value_oriented_techniques,
       data_oriented_techniques: data_oriented_techniques,
       disallowed_patterns: disallowed_patterns
@@ -124,7 +150,7 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
   spec_construct matches registry entry → emit(constructs_registry.Synthesis[entry])
   | constraint: language_ref ∈ context
   | constraint: synthesis_respects(
-      architecture_context.programming_paradigm,
+  architecture_context.paradigm_preference,
       architecture_context.value_oriented_techniques,
       architecture_context.data_oriented_techniques,
       architecture_context.conventions,
@@ -184,7 +210,7 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
   | obligation.category = invariant
     → emit(invariant_test) asserting(property_holds_after_every_state_changing_rule)
   | constraint: emitted_tests_respect(
-      architecture_context.programming_paradigm,
+      architecture_context.paradigm_preference,
       architecture_context.value_oriented_techniques,
       architecture_context.data_oriented_techniques,
       architecture_context.conventions,
@@ -198,26 +224,26 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
     ∀ construct ∈ spec.constructs:
       invoke(gybis-spec-propagate_construct_synthesis(construct, architecture_context)) → code_fragment
     | constrain(code_fragment,
-        architecture_context.programming_paradigm,
+        architecture_context.paradigm_preference,
         architecture_context.value_oriented_techniques,
         architecture_context.data_oriented_techniques,
         architecture_context.conventions,
         architecture_context.disallowed_patterns
       ) → styled_code
-    | organize(styled_code, architecture_context.frameworks) → organized_code
+    | organize(styled_code, architecture_context.build_system) → organized_code
     | collect(organized_code) → implementation_code
   | structure(implementation_code, architecture_context) → structured_implementation
   | ∀ obligation ∈ obligations:
     invoke(gybis-spec-propagate_obligation_synthesis(obligation, architecture_context)) → test_fragment
       where: test_fragment.traceable_id = obligation.id
     | constrain(test_fragment,
-        architecture_context.programming_paradigm,
+        architecture_context.paradigm_preference,
         architecture_context.value_oriented_techniques,
         architecture_context.data_oriented_techniques,
         architecture_context.conventions,
         architecture_context.disallowed_patterns
       ) → styled_test
-    | organize(styled_test, architecture_context.test_frameworks) → organized_test
+    | organize(styled_test, architecture_context.test_framework) → organized_test
     | collect(organized_test) → test_suite
   | return(implementation_code = structured_implementation, test_suite = test_suite)
 
@@ -235,7 +261,7 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
 λ gybis-spec-propagate_verify_implementation(architecture_context, specifications, obligations).
   verify(code_conforms_to(specifications)) → conformance_check ≔ result
   | verify(code_respects_architecture(architecture_context)) → architecture_check ≔ result
-  | verify(code_respects_paradigm(architecture_context.programming_paradigm)) → paradigm_check ≔ result
+  | verify(code_respects_paradigm_preference(architecture_context.paradigm_preference)) → paradigm_check ≔ result
   | verify(code_respects_value_techniques(architecture_context.value_oriented_techniques)) → value_check ≔ result
   | verify(code_respects_data_techniques(architecture_context.data_oriented_techniques)) → data_check ≔ result
   | verify(code_avoids(architecture_context.disallowed_patterns)) → anti_pattern_check ≔ result
@@ -268,14 +294,14 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
 
 λ gybis-spec-propagate_limitations(x).
   architecture.md remains read_only_input
-  | this_skill_expects(S1.language, S1.frameworks, S1.test_frameworks)
+  | S1_source_of_truth ≔ {lambda-arch-elicit.md, lambda-arch-distill.md}
+  | this_skill_expects(S1.programming_language_version, S1.test_framework, S1.build_system, S1.paradigm_preference)
   | this_skill_now_expects(
-      S1.programming_paradigm,
       S1.value_oriented_techniques,
       S1.data_oriented_techniques,
       S1.disallowed_patterns
-    ) as explicit_signals when architectural_style matters
-  | absent_signals → halt("architecture S1 is underspecified for style-aware propagation")
+    ) as additional_style_guidance when architectural_style matters
+  | absent_style_guidance → proceed_with_defaults
   | note: updating_this_skill_does_not_create_or_backfill_that_schema_in_architecture.md
 
 λ gybis-spec-propagate_regression_contract(x).
