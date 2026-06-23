@@ -16,7 +16,7 @@
 
 ## Overview
 
-**gybis** contains a collection of [Cline](https://github.com/cline/cline) artifacts (e.g., rules, skills), which when integrated into a new/existing repository, adds a **Developer-Command-Driven AI-Assisted Spec-Driven Software Development (SDD) Stack** to the new/existing repository. 
+**gybis** contains a collection of AI-assistant skills that can be integrated into repositories through tools that support a `skills/` directory, adding a **Developer-Command-Driven AI-Assisted Spec-Driven Software Development (SDD) Stack** to the new/existing repository. 
 
 The goal of **gybis** is to make it easy for developers to set up, utilize, and maintain their projects using an SDD workflow by providing a comprehensive set of resources and suggested usage practices.
 
@@ -37,7 +37,7 @@ The goal of **gybis** is to make it easy for developers to set up, utilize, and 
 
 ## Available User Commands
 
-The following commands are available after integrating gybis into a target repository. Use them with Cline:
+The following commands are available after integrating gybis into a target repository. Use them with any compatible AI tool configured to consume the gybis skills directory:
 
 ### Architecture Commands (`/ga-*`)
 
@@ -82,7 +82,7 @@ The following commands are available after integrating gybis into a target repos
 
 ## Available Developer Commands
 
-The following commands are available while developing gybis. Use them with Cline:
+The following commands are available while developing gybis. Use them with any compatible AI tool configured to consume the gybis skills directory:
 
 ### Memory Commands (`/gm-*`)
 
@@ -127,7 +127,7 @@ See the `gybis/GYBIS-README.md` for usage instructions, best practices, and work
 
 ## For gybis Developers: Upstream Derivation
 
-This repository is an integration layer over multiple upstream projects. The content under `.cline/` and `gybis/` is derived from pinned upstream commits, then adapted into one coherent developer-command-driven stack. gybis is not a direct mirror of any single upstream repository.
+This repository is an integration layer over multiple upstream projects. The content under `gybis/` is derived from pinned upstream commits, then adapted into one coherent developer-command-driven stack. The repository also uses a local `.cline/` workspace convention for skills during development, but gybis itself is not a direct mirror of any single upstream repository.
 
 ### General Derivation Approach
 
@@ -166,7 +166,7 @@ More generally, when any upstream pin is bumped, revalidate all affected derived
 
 #### Nucleus Lambda Compiler Workspace
 
-The following directory structure can be used with `cline` as a scratch workspace for testing and refining gybis rules/skills/references. This allows maintainers to experiment with the lambda compiler in a more free-form way before committing to specific derived files in the `gybis/` bundle.
+The following directory structure can be used as a scratch workspace for testing and refining gybis rules/skills/references. This repository currently uses `.cline/` for that local workspace convention, but other AI tools may map the same `skills/` content differently. This allows maintainers to experiment with the lambda compiler in a more free-form way before committing to specific derived files in the `gybis/` bundle.
 
 ```
 lambda-compile/
