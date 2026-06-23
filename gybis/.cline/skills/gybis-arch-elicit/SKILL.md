@@ -96,24 +96,27 @@ description: Use for `/gybis-arch-elicit` or `/ga-elicit`.
 λ gybis-arch-elicit_elicit_s1(x).
    action: elicit_operations_layer
    | purpose: S1 answers "what does your system concretely do" - tools, recipes, and implementation bindings
-   | prompt_strategy: structured interviewing building on S2; first capture programming language (version optional), then dynamically suggest suitable test frameworks based on the captured programming language, verify human choice, then elicit paradigm (OOP vs FP) with clarifying descriptions
+   | prompt_strategy: structured interviewing building on S2; first capture programming language version (required), then dynamically suggest suitable test frameworks based on the captured programming language version, verify human choice, then capture build system (required), then elicit paradigm (OOP vs FP) with clarifying descriptions
    | sample_questions:
-     - "What programming language do you want to use for this system? (Version is optional, e.g. C++, C#, Clojure, Rust, etc.)"
+     - "What programming language and version do you want to use for this system? (e.g. Python 3.12, TypeScript 5.6, C++20, Rust 1.78)"
      - "Based on your chosen language, I will suggest a few appropriate test frameworks. 
         Which test framework(s) do you prefer? (You can suggest your own — I will verify it is compatible with the language.)"
+     - "What build system do you want to use? (e.g. npm scripts, Maven, Gradle, Cargo, Make, Bazel)"
      - "Do you prefer an OOP-first or FP-first approach? 
         • OOP-first: mutable state, impure functions, class-based modeling, inheritance hierarchies, behavior attached to objects, imperative style.
         • FP-first: immutable state, pure functions by default, data-driven (plain records/maps/structs with separate behavior), function composition and pipelines, layered architecture with a thin impure outer layer for side effects, declarative style."
-     - "What are other tools/recipes are there (build system, CI/CD, linter/formatter, deployment, etc.)?"
+     - "What other tools/recipes are there (CI/CD, linter/formatter, deployment, package manager, interface types, architectural pattern, etc.)?"
    | capture: 
        user_response → extract(
-         programming_language (version optional),
+         programming_language_version (required),
          test_framework (AI_suggested + human_choice),
-         paradigm_preference (OOP | FP + details),
+         build_system (required),
+         paradigm_preference (OOP | FP + details, required),
          other_tools_recipes
        )
-       → verify(test_framework is_compatible_with programming_language)
-       → verify(other_tools_recipes is_compatible_with programming_language)
+       → verify(test_framework is_compatible_with programming_language_version)
+       → verify(build_system is_compatible_with programming_language_version)
+       → verify(other_tools_recipes is_compatible_with programming_language_version)
        → S1_lambda_draft
    | output: S1_operations_collected
 
@@ -142,7 +145,14 @@ description: Use for `/gybis-arch-elicit` or `/ga-elicit`.
   | check2: ∀layer ∈ {S5, S4, S3, S2, S1}: layer_defined(architecture.md) = true
   | check3: syntax_valid(lambda_notation) = true
   | check4: consistency_check(S5...S1) = coherent
-  | check5: all_layers_address_user_intent = true
+  | check5: S1.programming_language_version ≠ unknown(reason)
+  | check6: S1.test_framework ≠ unknown(reason)
+  | check7: S1.build_system ≠ unknown(reason)
+  | check8: S1.paradigm_preference ∈ {OOP, FP}
+  | check9: ∀field ∈ {package_manager, deployment_method, ci_cd, linter_formatter, interface_types, architectural_pattern}: defined(field) ∨ unknown(field, reason)
+  | check10: compatibility(test_framework, programming_language_version) = true
+  | check11: coherence(build_system, package_manager, ci_cd, deployment_method) = true
+  | check12: all_layers_address_user_intent = true
   | gate: all_checks_pass → proceed ∨ halt("architecture invalid or incomplete")
 
 λ gybis-arch-elicit_boundaries(¬).
