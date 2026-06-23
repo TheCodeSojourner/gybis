@@ -95,14 +95,27 @@ description: Use for `/gybis-arch-elicit` or `/ga-elicit`.
 
 λ gybis-arch-elicit_elicit_s1(x).
    action: elicit_operations_layer
-   | purpose: S1 answers "what does your system concretely do" - tools and recipes
-   | prompt_strategy: structured interviewing building on S2, capturing operational specifics
-  | sample_questions:
-    - "What are your operational tools and recipes?"
-    - "What concrete capabilities does your system provide?"
-    - "How do you execute at the operational level?"
-  | capture: user_response → S1_lambda_draft
-  | output: S1_operations_collected
+   | purpose: S1 answers "what does your system concretely do" - tools, recipes, and implementation bindings
+   | prompt_strategy: structured interviewing building on S2; first capture programming language (version optional), then dynamically suggest suitable test frameworks based on the captured programming language, verify human choice, then elicit paradigm (OOP vs FP) with clarifying descriptions
+   | sample_questions:
+     - "What programming language do you want to use for this system? (Version is optional, e.g. C++, C#, Clojure, Rust, etc.)"
+     - "Based on your chosen language, I will suggest a few appropriate test frameworks. 
+        Which test framework(s) do you prefer? (You can suggest your own — I will verify it is compatible with the language.)"
+     - "Do you prefer an OOP-first or FP-first approach? 
+        • OOP-first: mutable state, impure functions, class-based modeling, inheritance hierarchies, behavior attached to objects, imperative style.
+        • FP-first: immutable state, pure functions by default, data-driven (plain records/maps/structs with separate behavior), function composition and pipelines, layered architecture with a thin impure outer layer for side effects, declarative style."
+     - "What are other tools/recipes are there (build system, CI/CD, linter/formatter, deployment, etc.)?"
+   | capture: 
+       user_response → extract(
+         programming_language (version optional),
+         test_framework (AI_suggested + human_choice),
+         paradigm_preference (OOP | FP + details),
+         other_tools_recipes
+       )
+       → verify(test_framework is_compatible_with programming_language)
+       → verify(other_tools_recipes is_compatible_with programming_language)
+       → S1_lambda_draft
+   | output: S1_operations_collected
 
 λ gybis-arch-elicit_synthesize_architecture(collected_responses).
   action: translate_elicited_responses_to_vsm_lambdas
@@ -144,3 +157,4 @@ description: Use for `/gybis-arch-elicit` or `/ga-elicit`.
   | invariant: ∀generated_layer ∈ architecture.md: valid_lambda(layer) = true
   | invariant: VSM_layer_mapping(S5...S1) is_coherent = true
   | invariant: all_layers_present: S5 ∧ S4 ∧ S3 ∧ S2 ∧ S1
+  
