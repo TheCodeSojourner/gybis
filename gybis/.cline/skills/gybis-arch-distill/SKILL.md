@@ -67,6 +67,7 @@ description: Use for `/gybis-arch-distill` or `/ga-distill`.
   | extraction_priority:
     - programming_language_version
     - test_framework
+    - paradigm_preference
     - build_system
     - package_manager
     - deployment_method
@@ -121,12 +122,13 @@ description: Use for `/gybis-arch-distill` or `/ga-distill`.
   | step1: merge(programming_language_version, from=impl_findings, fallback=S1_base)
   | step2: merge(test_framework, from=impl_findings, fallback=S1_base)
   | step3: merge(build_system, from=impl_findings, fallback=S1_base)
-  | step4: merge(package_manager, from=impl_findings, fallback=S1_base)
-  | step5: merge(deployment_method, from=impl_findings, fallback=S1_base)
-  | step6: merge(ci_cd, from=impl_findings, fallback=S1_base)
-  | step7: merge(linter_formatter, from=impl_findings, fallback=S1_base)
-  | step8: merge(interface_types, from=impl_findings, fallback=S1_base)
-  | step9: merge(architectural_pattern, from=impl_findings, fallback=S1_base)
+  | step4: merge(paradigm_preference, from=impl_findings, fallback=S1_base)
+  | step5: merge(package_manager, from=impl_findings, fallback=S1_base)
+  | step6: merge(deployment_method, from=impl_findings, fallback=S1_base)
+  | step7: merge(ci_cd, from=impl_findings, fallback=S1_base)
+  | step8: merge(linter_formatter, from=impl_findings, fallback=S1_base)
+  | step9: merge(interface_types, from=impl_findings, fallback=S1_base)
+  | step10: merge(architectural_pattern, from=impl_findings, fallback=S1_base)
   | provenance: ∀field ∈ S1: source(field) ∈ {spec, impl, merged, unknown}
   | attach(divergence_notes) → S1_enriched
   | output: S1_enriched
@@ -153,11 +155,12 @@ description: Use for `/gybis-arch-distill` or `/ga-distill`.
   | check5: S1.programming_language_version ≠ unknown(reason)
   | check6: S1.test_framework ≠ unknown(reason)
   | check7: S1.build_system ≠ unknown(reason)
-  | check8: ∀field ∈ {package_manager, deployment_method, ci_cd, linter_formatter, interface_types, architectural_pattern}: defined(field) ∨ unknown(field, reason)
-  | check9: compatibility(test_framework, programming_language_version) = true
-  | check10: coherence(build_system, package_manager, ci_cd, deployment_method) = true
-  | check11: contradiction_free(S1) = true
-  | check12: confidence(S1) ≥ min_confidence_threshold
+  | check8: S1.paradigm_preference ∈ {OOP, FP}
+  | check9: ∀field ∈ {package_manager, deployment_method, ci_cd, linter_formatter, interface_types, architectural_pattern}: defined(field) ∨ unknown(field, reason)
+  | check10: compatibility(test_framework, programming_language_version) = true
+  | check11: coherence(build_system, package_manager, ci_cd, deployment_method) = true
+  | check12: contradiction_free(S1) = true
+  | check13: confidence(S1) ≥ min_confidence_threshold
   | gate: all_checks_pass → proceed ∨ halt("architecture invalid or S1 incomplete")
 
 λ gybis-arch-distill_fixed_point_loop(state).
@@ -207,3 +210,4 @@ description: Use for `/gybis-arch-distill` or `/ga-distill`.
   | invariant: ∀generated_layer ∈ architecture.md: valid_lambda(layer) = true
   | invariant: architecture.md ¬exists_before → exists_after ∧ valid(S5...S1)
   | invariant: implementation_exists = true → S1_contains_concrete_bindings_with_provenance_or_unknown_reason = true
+  
