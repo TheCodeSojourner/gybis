@@ -163,7 +163,7 @@ architecture > specification > tests > code
 | `/gybis-init`                                                    | Initialize gybis AI context                   |
 | `/gybis-memory-orient` (`/gm-orient`)                            | Restore prev AI context                       |
 | `/gybis-memory-recall {topic}` (`/gm-recall {topic}`)            | Recall topic/summarize-latest                 |
-| `/gybis-memory-store {insight}` (`/gm-store {insight}`)          | Store insight                                 |
+| `/gybis-memory-store {insight}` (`/gm-store {insight}`)          | Store insight, or prompt for one              |
 | `/gybis-memory-synthesize` (`/gm-synthesize`)                    | Synthesize knowledge                          |
 | `/gybis-spec-check` (`/gs-check {concern\|domain\|all}`)         | Check/Update syntax until valid               |
 | `/gybis-spec-describe` (`/gs-describe {concern\|domain\|all}`)   | Describe in non-tech prose                    |
