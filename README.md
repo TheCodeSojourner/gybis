@@ -110,10 +110,11 @@ gybis tries to follow [Clojure's](https://github.com/clojure/clojure) versioning
 
 ## For gybis Users
 
-To install gybis in a target repository execute the following command while currently in the target repository:
+To install gybis in a target repository execute the following commands while currently in the target repository:
 
 ```bash
-cp -ra <pathToGybisDirectory>/gybis/. .
+cp -ra <pathToGybisDirectory>/gybis/* . # e.g., `cp -ra ~/Downloads/gybis/gybis/* .`
+mv skills <aiToolDirectory> # e.g., .cline for Cline, .github for GitHub Copilot
 ```
 
 See the `gybis/GYBIS-README.md` for usage instructions, best practices, and workflow suggestions.
