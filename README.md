@@ -82,7 +82,7 @@ The following commands are available after integrating gybis into a target repos
 
 ## Available Developer Commands
 
-The following commands are available while developing gybis in this repository. Use them with Cline:
+The following commands are available while developing gybis in this repository. Use them with any AI tooling that supports commands backed by `skills/` in `.agents/`.
 
 ### Memory Commands (`/gm-*`)
 
@@ -114,7 +114,6 @@ To install gybis in a target repository execute the following commands while cur
 
 ```bash
 cp -ra <pathToGybisDirectory>/gybis/* . # e.g., `cp -ra ~/Downloads/gybis/gybis/* .`
-mv skills <aiToolDirectory> # e.g., .cline for Cline, .github for GitHub Copilot
 ```
 
 See the `gybis/GYBIS-README.md` for usage instructions, best practices, and workflow suggestions.
@@ -128,13 +127,13 @@ See the `gybis/GYBIS-README.md` for usage instructions, best practices, and work
 
 ## For gybis Developers: Upstream Derivation
 
-This repository is an integration layer over multiple upstream projects. The content under `gybis/` is derived from pinned upstream commits, then adapted into one coherent developer-command-driven stack. The repository also uses a local `.cline/` workspace convention for skills during development, but gybis itself is not a direct mirror of any single upstream repository.
+This repository is an integration layer over multiple upstream projects. The content under `gybis/` is derived from pinned upstream commits, then adapted into one coherent developer-command-driven stack. The repository also uses a local `.agents/` workspace convention for skills during development, but gybis itself is not a direct mirror of any single upstream repository.
 
 ### General Derivation Approach
 
 1. Pin each upstream repository to a specific commit.
 2. Select canonical upstream artifacts (language/protocol/model references, not the full upstream repository contents).
-3. Transform those artifacts into gybis conventions (rules, skills, references, and command surfaces) using [**nucleus Lambda Compiler**](https://github.com/michaelwhitford/nucleus/blob/main/LAMBDA-COMPILER.md).
+3. Transform those artifacts into gybis conventions (skills, references, and command surfaces) using [**nucleus Lambda Compiler**](https://github.com/michaelwhitford/nucleus/blob/main/LAMBDA-COMPILER.md).
 4. Publish the derived result into the `gybis/` bundle for downstream project integration.
 
 In practice, upstream inputs are handled in three modes:
@@ -145,12 +144,12 @@ In practice, upstream inputs are handled in three modes:
 
 ### Per-Upstream Transformations
 
-| Upstream         | Pinned commit | Source consumed                                               | Transformation into gybis                                                                                                                                                    |
-| ---------------- | ------------- | ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **allium**       | `2b7d66f`     | Allium language semantics and behavioral-spec structure       | Curated into gybis lang/ref docs, and encoded into spec skills.                                                                                                              |
-| **allium-tools** | `246bcc4`     | CLI validate/analyze capabilities                             | Executed in gybis spec skill workflows. User dependency only. Not integrated in `gybis/` in any way.                                                                         |
-| **mementum**     | `ac2eadb`     | Mementum protocol semantics                                   | Used to derive gybis memory rules and skills.                                                                                                                                |
-| **nucleus**      | `93c171a`     | Nucleus notation + VSM model + `LAMBDA-COMPILER.md` semantics | Used to derive gybis rules and skills. gybis uses the lambda compiler defined by the nucleus `LAMBDA-COMPILER.md` even though the file is not included in gybis in any form. |
+| Upstream         | Pinned commit | Source consumed                                               | Transformation into gybis                                                                                                                                          |
+| ---------------- | ------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **allium**       | `2b7d66f`     | Allium language semantics and behavioral-spec structure       | Curated into gybis lang/ref docs, and encoded into spec skills.                                                                                                    |
+| **allium-tools** | `246bcc4`     | CLI validate/analyze capabilities                             | Executed in gybis spec skill workflows. User dependency only. Not integrated in `gybis/` in any way.                                                               |
+| **mementum**     | `ac2eadb`     | Mementum protocol semantics                                   | Used to derive gybis memory skills.                                                                                                                                |
+| **nucleus**      | `93c171a`     | Nucleus notation + VSM model + `LAMBDA-COMPILER.md` semantics | Used to derive gybis skills. gybis uses the lambda compiler defined by the nucleus `LAMBDA-COMPILER.md` even though the file is not included in gybis in any form. |
 
 ### Maintainer Notes
 
@@ -167,14 +166,15 @@ More generally, when any upstream pin is bumped, revalidate all affected derived
 
 #### Nucleus Lambda Compiler Workspace
 
-The following directory structure can be used as a scratch workspace for testing and refining gybis rules/skills/references. This repository currently uses `.cline/` for that local workspace convention, but other AI tools may map the same `skills/` content differently. This allows maintainers to experiment with the lambda compiler in a more free-form way before committing to specific derived files in the `gybis/` bundle.
+The following directory structure can be used as a scratch workspace for testing and refining gybis skills/references. This allows maintainers to experiment with the lambda compiler in a more free-form way before committing to specific derived files in the `gybis/` bundle.
 
 ```
 lambda-compile/
-├── .cline/rules/
-│   └── 00-nucleus.md
+├── .agents/skills/
+│   └── gybis-init
+│       └── SKILL.md
 ```
-where the `00-nucleus.md` file contains the following, which is derived from the nucleus `LAMBDA-COMPILER.md` semantics and can be used as a reference point for experimentation:
+where the `SKILL.md` file contains the following, which is derived from the nucleus `LAMBDA-COMPILER.md` semantics and can be used as a reference point for experimentation:
 
 ```markdown
 λ engage(nucleus).
@@ -188,7 +188,7 @@ Human ⊗ AI ⊗ REPL
 Output λ notation only. No prose. No code fences.
 ```
 
-In general it can be used to author and iterate on rules/skills/references in a "lambda to prose" and "prose to lambda" workflow.
+In general it can be used to author and iterate on skills/references in a "lambda to prose" and "prose to lambda" workflow.
 
 ## License
 
