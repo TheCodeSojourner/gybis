@@ -16,6 +16,8 @@
 
 This repository is structured for **development with the Gybis stack**, following a disciplined architecture-first methodology where durability, hierarchy, and behavioral truth guide every decision.
 
+When gybis is installed into a target repository, its command implementations are shipped in the bundled `.agents/skills/` directory.
+
 gybis is a **developer-command-driven, AI-assisted Spec-Driven Development (SDD) stack**. It is designed to help you define architecture and behavioral specifications first, then implement and validate code against those specifications with full human oversight.
 
 ## What gybis Is and Why It Exists

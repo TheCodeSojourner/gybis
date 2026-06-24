@@ -16,7 +16,7 @@
 
 ## Overview
 
-**gybis** contains a collection of AI-assistant skills that can be integrated into repositories through tools that support a `skills/` directory, adding a **Developer-Command-Driven AI-Assisted Spec-Driven Software Development (SDD) Stack** to the new/existing repository. 
+**gybis** contains a collection of AI-assistant skills that can be integrated into repositories through tools that support a bundled `.agents/skills/` directory, adding a **Developer-Command-Driven AI-Assisted Spec-Driven Software Development (SDD) Stack** to the new/existing repository. 
 
 The goal of **gybis** is to make it easy for developers to set up, utilize, and maintain their projects using an SDD workflow by providing a comprehensive set of resources and suggested usage practices.
 
@@ -37,7 +37,7 @@ The goal of **gybis** is to make it easy for developers to set up, utilize, and 
 
 ## Available User Commands
 
-The following commands are available after integrating gybis into a target repository. Use them with any compatible AI tool configured to consume the gybis skills directory:
+The following commands are available after integrating gybis into a target repository. Use them with any compatible AI tool configured to consume the bundled gybis `.agents/skills/` directory:
 
 ### Architecture Commands (`/ga-*`)
 
@@ -113,8 +113,10 @@ gybis tries to follow [Clojure's](https://github.com/clojure/clojure) versioning
 To install gybis in a target repository execute the following commands while currently in the target repository:
 
 ```bash
-cp -ra <pathToGybisDirectory>/gybis/* . # e.g., `cp -ra ~/Downloads/gybis/gybis/* .`
+cp -ra <pathToGybisDirectory>/gybis/. . # e.g., `cp -ra ~/Downloads/gybis/gybis/. .`
 ```
+
+This copies the complete gybis bundle, including the hidden `.agents/skills/` directory that provides the command implementations.
 
 See the `gybis/GYBIS-README.md` for usage instructions, best practices, and workflow suggestions.
 
@@ -127,7 +129,7 @@ See the `gybis/GYBIS-README.md` for usage instructions, best practices, and work
 
 ## For gybis Developers: Upstream Derivation
 
-This repository is an integration layer over multiple upstream projects. The content under `gybis/` is derived from pinned upstream commits, then adapted into one coherent developer-command-driven stack. The repository also uses a local `.agents/` workspace convention for skills during development, but gybis itself is not a direct mirror of any single upstream repository.
+This repository is an integration layer over multiple upstream projects. The content under `gybis/` is derived from pinned upstream commits, then adapted into one coherent developer-command-driven stack. The distributed gybis bundle now ships its commands under `.agents/skills/`, and this repository uses the same layout during local development. gybis is not a direct mirror of any single upstream repository.
 
 ### General Derivation Approach
 

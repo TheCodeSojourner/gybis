@@ -56,7 +56,7 @@
 - All 26 commands properly documented and organized
 - User Commands table: 7 arch + 6 memory/session + 7 spec + 1 help = 21 commands
 - Developer Commands table: 6 memory + 1 help (plus /gybis-init, /gybis-fini, /gybis-help shared with users)
-- **Tool-agnostic positioning established**: gybis skills work with any AI tool supporting `skills/` directory; `.agents/` is this repo's local workspace convention
+- **Tool-agnostic positioning established**: gybis skills work with any AI tool supporting `skills/` directories; the distributed bundle now ships them under `.agents/skills/`
 - Monitor for: New skills added to gybis/.agents/skills/ directory
 - Monitor for: Command descriptions staying current with skill implementations
 - Monitor for: gybis skills integration into non-Cline tools
@@ -64,17 +64,17 @@
 ## Session Closeout
 - **last_session_id**: session-10
 - **current_timestamp**: 2026-06-24T10:57:55-06:00
-- **recover**: Verify whether the README install snippet should include `mv skills <aiToolDirectory>` and restore if removal was unintentional.
+- **recover**: Re-scan for any remaining docs or automation outside this repo that still assume `gybis/skills/` instead of `gybis/.agents/skills/`.
 - **task**:
-  - Finalize `.agents` migration session by running gybis-fini closeout and persisting feed-forward context.
+  - Complete the bundle migration from `gybis/skills/` to `gybis/.agents/skills/` and align docs with the new hidden-directory install flow.
 - **questions**:
-  - Was removal of the `mv skills <aiToolDirectory>` install line in README intentional?
+  - Do any downstream tools still hardcode a root `skills/` path and need a compatibility shim or follow-up migration note?
 - **decisions**:
   - Per gybis-fini, performed synthesis by updating stale tool-agnostic memory from `.cline` to `.agents` references.
-  - Kept README content unchanged during closeout; capture potential install-snippet drift as recovery work.
-  - Limit termination commit scope to `mementum/` artifacts only.
+  - Moved the distributed bundle from `gybis/skills/` to `gybis/.agents/skills/`.
+  - Updated README install instructions to use `cp -ra <pathToGybisDirectory>/gybis/. .` so hidden bundle content is copied.
 - **next**:
-  1. Verify and, if needed, restore README install instructions so both copy and move steps are explicit.
-  2. Continue keeping mementum memories/state aligned with `.agents` workspace convention.
+  1. Sweep for downstream tooling assumptions that may still expect a root `skills/` directory.
+  2. Keep docs and mementum notes aligned with the shipped `.agents/skills/` bundle layout.
 
 ⏹→state.md
