@@ -1,3 +1,4 @@
+✅ session-12 | 2026-06-24 allium sync + recommended loops lambda protocol finalized; compression safety audit recorded
 ✅ session-11 | 2026-06-24 bundle skills moved to `gybis/.agents/skills`; install/docs/state aligned
 ✅ session-8 | 2026-06-24 gybis-init: orient manifest prepared from state, memories, and knowledge
 ✅ session-9 | 2026-06-24 README.md updated for .agents development workspace convention
@@ -12,16 +13,16 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-06-24T11:58:54-06:00
-- **Sessions**: 12 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout, session-11 bundle .agents migration)
-- **Status**: Session-11 terminated — gybis-fini complete
+- **Last updated**: 2026-06-24T13:15:20-06:00
+- **Sessions**: 13 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout, session-11 bundle .agents migration, session-12 allium sync + loop protocol refinement)
+- **Status**: Session-12 terminated — gybis-fini complete
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
 - **Core stack**: Nucleus (math notation base context) + Allium (behavioral DSL) + Mementum (persistent memory)
 - **Architecture**: VSM derivative (5-layer architectural spec)
 - **GitHub**: TheCodeSojourner/gybis
-- **Latest work**: Session-11 moved the distributed bundle to `gybis/.agents/skills/`, updated install/docs, and persisted the migration context in mementum
+- **Latest work**: Session-12 aligned allium pin references, finalized AI-first lambda loop protocol, and completed internal-reference compression safety classification
 
 ## Recent Activity
 - Initial commit: README with project definition, glossary, overview
@@ -56,6 +57,12 @@
   - Updated install/docs to use `cp -ra <pathToGybisDirectory>/gybis/. .` so hidden bundle content is copied
   - Stored reusable memory: `mementum/memories/gybis-hidden-bundle-copy.md`
   - Updated state closeout for the external compatibility follow-up
+- Session-12 (2026-06-24): allium sync and loop protocol refinement
+  - Corrected/validated allium upstream pin usage against commit `493a2de`
+  - Reworked `gybis/.agents/skills/internal/reference/recommended-loops.md` into AI-first lambda protocol form
+  - Added/retained explicit guardrail that `/gybis-spec-elicit` does not exist
+  - Audited internal reference docs for safe vs risky lambda compression targets
+  - Left codebase unchanged after final user directive to keep current state
 
 ## Feed-Forward Signals
 - README.md now synchronized with actual gybis/.agents/skills/ directory
@@ -69,21 +76,22 @@
 - Monitor for: gybis skills integration into non-Cline tools
 
 ## Session Closeout
-- **last_session_id**: session-11
-- **current_timestamp**: 2026-06-24T11:58:54-06:00
-- **recover**: Audit downstream tools or manifests outside this repo for hardcoded root `skills/` assumptions.
+- **last_session_id**: session-12
+- **current_timestamp**: 2026-06-24T13:15:20-06:00
+- **recover**: If desired, lambda-compress only policy/protocol references first and preserve canonical syntax/example references as primary artifacts.
 - **task**:
-  - Close out the `gybis/.agents/skills/` bundle migration and persist feed-forward context for hidden-directory installs.
+  - Close out the allium-sync and recommended-loops refinement session with AI-first protocol compression and safe-compression guidance.
 - **questions**:
-  - Do any downstream tools still hardcode a root `skills/` path and therefore need a compatibility shim or migration note?
+  - Which additional internal references can be safely lambda-compressed without losing retrieval precision?
+  - Should recommended loops include any spec-side elicit command path?
 - **decisions**:
-  - Per gybis-fini, performed synthesis by updating stale tool-agnostic memory from `.cline` to `.agents` references.
-  - Moved the distributed bundle from `gybis/skills/` to `gybis/.agents/skills/`.
-  - Updated README install instructions to use `cp -ra <pathToGybisDirectory>/gybis/. .` so hidden bundle content is copied.
-  - Stored `mementum/memories/gybis-hidden-bundle-copy.md` so future sessions preserve the hidden-directory copy rule.
+  - Aligned allium pin references to commit `493a2de` where relevant.
+  - Kept explicit no-spec fallback as `/gybis-arch-elicit` → `/gybis-arch-propagate` → `/gybis-spec-tend` and constraint `¬exists(/gybis-spec-elicit)`.
+  - Finalized `recommended-loops.md` as compact AI-first lambda protocol with preserved invariants and guardrails.
+  - Classified compression safety: policy/protocol references mostly safe; canonical language/patterns/construct registries not safe for full replacement.
   - Deferred any git commit to the normal user-controlled workflow.
 - **next**:
-  1. Audit downstream tools or manifests outside this repo for hardcoded root `skills/` assumptions.
-  2. If a downstream hardcoded path is found, decide between a compatibility shim and a migration note.
+  1. If continuing compression, apply non-destructive lambda overlays to policy/protocol docs first.
+  2. Keep canonical grammar/examples references as source-of-truth artifacts.
 
 ⏹→state.md
