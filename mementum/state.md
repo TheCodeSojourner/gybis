@@ -1,3 +1,4 @@
+✅ session-11 | 2026-06-24 bundle skills moved to `gybis/.agents/skills`; install/docs/state aligned
 ✅ session-8 | 2026-06-24 gybis-init: orient manifest prepared from state, memories, and knowledge
 ✅ session-9 | 2026-06-24 README.md updated for .agents development workspace convention
 ✅ session-10 | 2026-06-24 gybis-fini: synthesized memory, updated state closeout, prepared termination commit
@@ -11,16 +12,16 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-06-24T10:57:55-06:00
-- **Sessions**: 11 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout)
-- **Status**: Session-10 terminated — gybis-fini complete
+- **Last updated**: 2026-06-24T11:58:54-06:00
+- **Sessions**: 12 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout, session-11 bundle .agents migration)
+- **Status**: Session-11 terminated — gybis-fini complete
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
 - **Core stack**: Nucleus (math notation base context) + Allium (behavioral DSL) + Mementum (persistent memory)
 - **Architecture**: VSM derivative (5-layer architectural spec)
 - **GitHub**: TheCodeSojourner/gybis
-- **Latest work**: Session-10 finalized mementum closeout and aligned tool-agnostic memory to .agents convention
+- **Latest work**: Session-11 moved the distributed bundle to `gybis/.agents/skills/`, updated install/docs, and persisted the migration context in mementum
 
 ## Recent Activity
 - Initial commit: README with project definition, glossary, overview
@@ -50,9 +51,15 @@
   - Read state and related memories/knowledge, searched for stale `.cline` drift
   - Synthesized and updated `mementum/memories/gybis-tool-agnostic.md` to `.agents`
   - Upserted state closeout with task/questions/decisions/next and recovery hook
+- Session-11 (2026-06-24): bundle `.agents/skills` migration completed
+  - Moved the distributed bundle from `gybis/skills/` to `gybis/.agents/skills/`
+  - Updated install/docs to use `cp -ra <pathToGybisDirectory>/gybis/. .` so hidden bundle content is copied
+  - Stored reusable memory: `mementum/memories/gybis-hidden-bundle-copy.md`
+  - Updated state closeout for the external compatibility follow-up
 
 ## Feed-Forward Signals
 - README.md now synchronized with actual gybis/.agents/skills/ directory
+- Hidden bundle layouts require `cp -ra <bundle>/. .`; `*` globs skip `.agents/`
 - All 26 commands properly documented and organized
 - User Commands table: 7 arch + 6 memory/session + 7 spec + 1 help = 21 commands
 - Developer Commands table: 6 memory + 1 help (plus /gybis-init, /gybis-fini, /gybis-help shared with users)
@@ -62,19 +69,21 @@
 - Monitor for: gybis skills integration into non-Cline tools
 
 ## Session Closeout
-- **last_session_id**: session-10
-- **current_timestamp**: 2026-06-24T10:57:55-06:00
-- **recover**: Re-scan for any remaining docs or automation outside this repo that still assume `gybis/skills/` instead of `gybis/.agents/skills/`.
+- **last_session_id**: session-11
+- **current_timestamp**: 2026-06-24T11:58:54-06:00
+- **recover**: Audit downstream tools or manifests outside this repo for hardcoded root `skills/` assumptions.
 - **task**:
-  - Complete the bundle migration from `gybis/skills/` to `gybis/.agents/skills/` and align docs with the new hidden-directory install flow.
+  - Close out the `gybis/.agents/skills/` bundle migration and persist feed-forward context for hidden-directory installs.
 - **questions**:
-  - Do any downstream tools still hardcode a root `skills/` path and need a compatibility shim or follow-up migration note?
+  - Do any downstream tools still hardcode a root `skills/` path and therefore need a compatibility shim or migration note?
 - **decisions**:
   - Per gybis-fini, performed synthesis by updating stale tool-agnostic memory from `.cline` to `.agents` references.
   - Moved the distributed bundle from `gybis/skills/` to `gybis/.agents/skills/`.
   - Updated README install instructions to use `cp -ra <pathToGybisDirectory>/gybis/. .` so hidden bundle content is copied.
+  - Stored `mementum/memories/gybis-hidden-bundle-copy.md` so future sessions preserve the hidden-directory copy rule.
+  - Deferred any git commit to the normal user-controlled workflow.
 - **next**:
-  1. Sweep for downstream tooling assumptions that may still expect a root `skills/` directory.
-  2. Keep docs and mementum notes aligned with the shipped `.agents/skills/` bundle layout.
+  1. Audit downstream tools or manifests outside this repo for hardcoded root `skills/` assumptions.
+  2. If a downstream hardcoded path is found, decide between a compatibility shim and a migration note.
 
 ⏹→state.md
