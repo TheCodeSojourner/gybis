@@ -11,6 +11,11 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
   | gate: architecture.md ∃ ∧ specs/**/*.allium ∃ ∧ allium_gate = true ∧ implementation ∃
   | derivation: test_obligations ≔ allium-normalize(specs/) → {envelopes | source = "plan"} → deterministic obligation enumeration
 
+λ gybis-spec-weed_loop_role(x).
+  role: verify(convergence)
+  | meaning: validate spec, tests, and implementation alignment and classify divergence direction
+  | suggested_next: divergence(code_wrong) → fix_code | divergence(spec_wrong) → invoke(/gybis-spec-tend) → invoke(/gybis-spec-propagate)
+
 λ gybis-spec-weed_startup(x).
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
   | verify(architecture.md ∃) ∨ halt("architecture.md not found")
@@ -19,6 +24,7 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
   | verify(implementation ∃) ∨ halt("Implementation not found")
   | read(internal/reference/allium-language-reference.md) → language_ref
   | read(internal/reference/allium-patterns.md) → patterns_ref
+  | read(internal/reference/recommended-loops.md) → loops_ref
   | read(internal/reference/allium-constructs.md) → constructs_registry
   | read(internal/reference/vsm-guide.md) → vsm_reference
   | transition(INIT → STARTUP_CHECKS)

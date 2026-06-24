@@ -122,7 +122,7 @@ See the `gybis/GYBIS-README.md` for usage instructions, best practices, and work
 
 ## Upstream Repositories
 
-* [**allium**](https://github.com/juxt/allium) [Commit 82da292] - Behavioral specification
+* [**allium**](https://github.com/juxt/allium) [Commit 493a2de] - Behavioral specification
 * [**allium-tools**](https://github.com/juxt/allium-tools) [Commit d368771] - Behavioral specification CLI tools
 * [**mementum**](https://github.com/michaelwhitford/mementum) [Commit ac2eadb] - AI Session Persistent memory
 * [**nucleus**](https://github.com/michaelwhitford/nucleus) [Commit 93c171a] - AI base context, and VSM architectural specifications
@@ -148,7 +148,7 @@ In practice, upstream inputs are handled in three modes:
 
 | Upstream         | Pinned commit | Source consumed                                               | Transformation into gybis                                                                                                                                          |
 | ---------------- | ------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **allium**       | `2b7d66f`     | Allium language semantics and behavioral-spec structure       | Curated into gybis lang/ref docs, and encoded into spec skills.                                                                                                    |
+| **allium**       | `493a2de`     | Allium language semantics and behavioral-spec structure       | Curated into gybis lang/ref docs, and encoded into spec skills.                                                                                                    |
 | **allium-tools** | `246bcc4`     | CLI validate/analyze capabilities                             | Executed in gybis spec skill workflows. User dependency only. Not integrated in `gybis/` in any way.                                                               |
 | **mementum**     | `ac2eadb`     | Mementum protocol semantics                                   | Used to derive gybis memory skills.                                                                                                                                |
 | **nucleus**      | `93c171a`     | Nucleus notation + VSM model + `LAMBDA-COMPILER.md` semantics | Used to derive gybis skills. gybis uses the lambda compiler defined by the nucleus `LAMBDA-COMPILER.md` even though the file is not included in gybis in any form. |

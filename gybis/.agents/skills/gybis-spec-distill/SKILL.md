@@ -10,10 +10,16 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
   | mode: ai
   | gate: implementation ∃ ∧ specs/{domain}/*.allium ¬∃
 
+λ gybis-spec-distill_loop_role(x).
+  role: loop_entry(code_first)
+  | meaning: distill captures observed behavior into durable specification context
+  | suggested_next: review(intended_vs_accidental_behavior) → invoke(/gybis-spec-propagate) → run_tests_against_existing_code → invoke(/gybis-spec-weed)
+
 λ gybis-spec-distill_startup(x).
   invoke(internal/gybis-ref-check) → halt_on(false)
   | read(internal/reference/allium-language-reference.md) → language_ref
   | read(internal/reference/allium-patterns.md) → patterns_ref
+  | read(internal/reference/recommended-loops.md) → loops_ref
   | read(internal/reference/allium-constructs.md) → constructs_registry
   | precondition: implementation ∃ ∧ (specs/ ¬∃ ∨ ¬∃file ∈ specs/** matching(*.allium))
   | scan(codebase) → files_found ∨ halt("no implementation found")

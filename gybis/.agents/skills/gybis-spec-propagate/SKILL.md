@@ -10,10 +10,16 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
   | mode: ai
   | gate: architecture.md ∃ ∧ specs/**/*.allium ∃ ∧ allium_gate = true
 
+λ gybis-spec-propagate_loop_role(x).
+  role: take_action(spec_to_tests)
+  | meaning: project behavior from spec into executable test contract
+  | suggested_next: implement_against_generated_tests → run_tests → invoke(/gybis-spec-weed)
+
 λ gybis-spec-propagate_startup(x).
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
   | read(internal/reference/allium-language-reference.md) → language_ref
   | read(internal/reference/allium-patterns.md) → patterns_ref
+  | read(internal/reference/recommended-loops.md) → loops_ref
   | read(internal/reference/allium-constructs.md) → constructs_registry
   | verify(architecture.md ∃) ∨ halt("architecture.md not found")
   | verify(specs/**/*.allium ∃) ∨ halt("specs/**/*.allium not found")

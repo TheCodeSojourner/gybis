@@ -287,7 +287,65 @@ rule InterviewExpires {
 
 ---
 
-## Pattern 9: Black Box Functions (Free-Standing)
+## Pattern 9: External API Client (Demands Side)
+
+When your specification is the client calling out to an external typed API,
+model the boundary with a module-level contract and reference it with `demands`
+from the calling surface.
+
+```allium
+-- allium: 3
+
+external entity GeocodingService {}
+
+value Address {
+    street: String
+    city: String
+    country: String
+}
+
+value LatLng {
+    latitude: Decimal
+    longitude: Decimal
+}
+
+value GeocodeResult {
+    location: LatLng
+    precision: String
+}
+
+contract GeocodingApi {
+    geocode: (address: Address) -> GeocodeResult?
+    reverse_geocode: (location: LatLng) -> Address?
+}
+
+entity Place {
+    name: String
+    address: Address
+    status: unresolved | resolved | unlocatable
+    coordinates: LatLng? when status = resolved
+
+    transitions status {
+        unresolved -> resolved
+        unresolved -> unlocatable
+        terminal: resolved, unlocatable
+    }
+}
+
+surface GeocodingClient {
+    facing provider: GeocodingService
+
+    contracts:
+        demands GeocodingApi
+
+    @guarantee ExternalBoundaryTyped
+        -- The caller requires typed geocoding operations from the provider.
+}
+```
+
+---
+
+## Pattern 10: Black Box Functions (Free-Standing)
 
 Domain ops opaque to spec — free-standing call syntax, not dot-methods.
 
@@ -320,7 +378,7 @@ rule RankCandidates {
 
 ---
 
-## Pattern 10: Entity-Level + Module-Level Invariants
+## Pattern 11: Entity-Level + Module-Level Invariants
 
 Encode properties that hold regardless of which rule fires.
 

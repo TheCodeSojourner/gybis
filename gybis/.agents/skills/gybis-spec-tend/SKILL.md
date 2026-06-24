@@ -10,10 +10,16 @@ description: Use for `/gybis-spec-tend` or `/gs-tend`.
   | mode: mixed
   | gate: specs/**/*.allium ∃ ∧ allium_gate = true
 
+λ gybis-spec-tend_loop_role(x).
+  role: reenter_gather_context
+  | meaning: revise specification intent when verification reveals ambiguity or incorrect behavior contract
+  | suggested_next: invoke(/gybis-spec-propagate) → run_tests → invoke(/gybis-spec-weed)
+
 λ gybis-spec-tend_startup(x).
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
   | read(internal/reference/allium-language-reference.md) → language_ref
   | read(internal/reference/allium-patterns.md) → patterns_ref
+  | read(internal/reference/recommended-loops.md) → loops_ref
   | read(internal/reference/allium-constructs.md) → constructs_registry
   | verify(specs/**/*.allium ∃) ∨ halt("specs/**/*.allium not found")
   | invoke(internal/allium-gate(specs/)) = true ∨ halt("Specifications are invalid")
