@@ -1,120 +1,98 @@
-# Recommended loops
+# Recommended loops (AI protocol)
 
-Allium keeps three artifacts in agreement: the spec (intended behavior), the tests (the executable contract), and the code (the implementation). Productive work is driving those three to convergence and keeping them there as things change. This is a loop, not a pipeline.
+λ loops_scope(x).
+  artifact: spec ∧ tests ∧ code
+  | objective: convergence(spec, tests, code)
+  | mode: ai_first | prose_minimal
 
-This reference focuses on the gybis spec loop.
+λ entry_gate(x).
+  entry ∈ {spec_ready, code_first, no_spec}
+  | spec_ready → /gybis-spec-tend
+  | code_first → /gybis-spec-distill
+  | no_spec → /gybis-arch-elicit → /gybis-arch-propagate → /gybis-spec-tend
+  | constraint: ¬exists(/gybis-spec-elicit)
 
-Two practical entry conditions:
-- spec-ready: a spec already exists and you refine it with `/gybis-spec-tend`
-- code-first: derive a candidate spec from code with `/gybis-spec-distill`
+λ loop_phases(x).
+  gather_context → take_action → verify → repeat
+  | gather_context: /gybis-spec-tend ∨ /gybis-spec-distill
+  | take_action: /gybis-spec-propagate → implement
+  | verify: run_tests ∧ /gybis-spec-weed ∧ cli_structural_checks
+  | repeat: loop_until(convergence_invariant ∨ iteration_budget_exhausted)
 
-Note: gybis does not provide `/gybis-spec-elicit`. If no spec exists yet, create it through the architecture flow first (`/gybis-arch-elicit` -> `/gybis-arch-propagate`), then continue with this spec loop.
+λ convergence_invariant(x).
+  done ⇔ tests_pass
+          ∧ weed_clean(/gybis-spec-weed)
+          ∧ open_questions = 0
+          ∧ (mode = code_first → distill_delta = ∅ via /gybis-spec-distill)
 
-## The loop: gather context -> take action -> verify -> repeat
+λ divergence_triage(result).
+  result = failing_tests
+    → classify(code_bug ∨ spec_wrong)
+  | code_bug → fix_code → run_tests
+  | spec_wrong → /gybis-spec-tend → /gybis-spec-propagate → run_tests
+  | result = weed_divergence
+    → classify(code_bug ∨ spec_wrong)
+      | code_bug → fix_code
+      | spec_wrong → /gybis-spec-tend → /gybis-spec-propagate
+  | result = ambiguity
+    → escalate_human
+      ∧ register_open_question
+      ∧ /gybis-spec-tend
 
-An autonomous agent works a task as a recursive goal: it gathers context, takes action, verifies the result, and repeats until the goal is met. The phase that decides quality is verification, a feedback signal the loop can trust. Allium strengthens the two hardest phases, context and verification:
+λ loop_A_spec_ready(x).
+  precondition: spec_exists
+  | tick:
+      /gybis-spec-tend
+      → /gybis-spec-propagate
+      → confirm_new_tests_fail(red_step)
+      → implement
+      → run_tests
+      → /gybis-spec-weed
+      → evaluate(convergence_invariant)
 
-| Phase          | What you do                                                                                          | What Allium contributes                                                                             |
-| -------------- | ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| Gather context | spec-ready `/gybis-spec-tend`, or code-first `/gybis-spec-distill` -> the spec                       | The spec is the context, and it persists across sessions; no drift versus re-reading code each time |
-| Take action    | `/gybis-spec-propagate` -> tests, then implement code                                                | Tests are generated from the spec as the contract; code is written against them                     |
-| Verify         | run tests (must pass), then `/gybis-spec-weed` for spec<->code alignment, then CLI structural checks | A behavioral pass/fail signal, not merely unit tests green                                          |
-| Repeat         | iterate until convergence is met                                                                     | The convergence invariant below is the goal                                                         |
+λ loop_B_code_first(x).
+  precondition: code_exists
+  | tick:
+      /gybis-spec-distill
+      → review(intended_vs_accidental)
+      → /gybis-spec-propagate
+      → run_tests_against_existing_code
+      → divergence_triage
+      → /gybis-spec-weed
+      → evaluate(convergence_invariant)
 
-The point is not command order; it is that an autonomous loop is only as good as the signal it verifies against. Allium supplies a behavior-level signal: tests projected from intent plus alignment and structural checks.
+λ autonomous_tick(x).
+  phase_1: choose_entry(spec_ready ∨ code_first ∨ no_spec)
+  | phase_2: execute(loop_phases)
+  | phase_3: evaluate(convergence_invariant)
+  | exit: convergence_invariant ∨ iteration_budget_exhausted
 
-## The convergence invariant
+λ guardrails(x).
+  ¬weaken_generated_tests
+  | red_step_required(spec_ready)
+  | ambiguity → escalate_human | ¬guess
+  | respect_config_parameters | ¬magic_numbers_against_spec
+  | when_spec_correct → fix_code_not_contract
 
-The loop is done for a unit of work when:
+λ telemetry_state(x).
+  track: {
+    tests_status,
+    weed_verdict,
+    open_questions_count,
+    distill_delta
+  }
 
-- tests pass: implementation satisfies the spec's obligations
-- `/gybis-spec-weed` reports no divergence: spec and code agree about behavior
-- no open questions remain: ambiguities were resolved, not guessed
-- (code-first only) a fresh `/gybis-spec-distill` pass surfaces nothing new
+λ produce_code_prompt(x).
+  input: <spec>.allium ∧ <tests>
+  | directive:
+      implement_behavior_from_spec
+      ∧ make_tests_pass
+      ∧ obey(when, requires, ensures)
+      ∧ ¬edit_tests_to_force_green
+      ∧ test_looks_wrong → stop ∧ route_to(/gybis-spec-tend)
 
-While any of these is false, there is work left.
-
-Convergence governs the whole loop, not only verify. Ordinary test-driven coding has an inner arc, implement <-> run tests, that drives code toward a fixed contract. Allium adds an outer arc: verify can feed back into context, not only action. If `/gybis-spec-weed` shows the spec (not code) is wrong, or a test reveals ambiguity, re-enter gather-context with `/gybis-spec-tend` (or ask the human), then re-run `/gybis-spec-propagate`.
-
-## The skills as loop operators
-
-| Skill                   | Moves         | Direction                             |
-| ----------------------- | ------------- | ------------------------------------- |
-| `/gybis-spec-distill`   | code -> spec  | write spec (backward)                 |
-| `/gybis-spec-propagate` | spec -> tests | project spec into contract            |
-| implement               | tests -> code | ordinary coding, not an Allium skill  |
-| `/gybis-spec-weed`      | code <-> spec | reconcile divergence either direction |
-| `/gybis-spec-tend`      | edits spec    | re-enter the loop after change        |
-
-The implementation step is plain coding. Allium produces the spec and tests; those hold hand-written code to specified behavior.
-
-## Loop A: spec-first (forward, from intent)
-
-When to use: new feature or greenfield work where a spec is already available.
-
-```
-until (tests pass and weed clean and no open questions):
-  1) /gybis-spec-tend -> spec (or confirm existing spec still captures intent)
-  2) /gybis-spec-propagate -> tests for new behavior
-  3) run new tests and confirm they fail (red)
-  4) implement from spec + failing tests
-  5) run tests
-     - failing: fix code, continue
-     - test appears wrong: /gybis-spec-tend spec, then /gybis-spec-propagate
-  6) /gybis-spec-weed for spec<->code alignment
-     - divergence: reconcile; if intent changed, /gybis-spec-tend
-     - open question: ask human, then /gybis-spec-tend
-```
-
-Never weaken a generated test to pass. If a generated test appears wrong, fix spec and re-propagate.
-
-## Loop B: code-first (backward, from existing code)
-
-When to use: existing/unfamiliar codebase you need to capture, verify, or change safely.
-
-```
-until (distill finds nothing new and failures triaged and weed clean):
-  1) /gybis-spec-distill <area> -> candidate spec of current behavior
-  2) review intended vs accidental behavior
-  3) /gybis-spec-propagate -> tests
-  4) run tests against existing code
-     - pass: behavior captured
-     - fail: triage code bug vs spec wrong
-       * code bug: fix code
-       * spec wrong: /gybis-spec-tend, then /gybis-spec-propagate
-  5) /gybis-spec-weed to reconcile remaining divergence
-  6) expand to next area and repeat
-```
-
-In code-first, passing tests against existing code is the expected confirmation signal; failures are information to classify.
-
-## Running the loop autonomously
-
-Per tick:
-1. Advance spec: `/gybis-spec-distill` on first tick for code-first, or `/gybis-spec-tend` for spec-ready work; use `/gybis-spec-tend` thereafter if needed.
-2. Run `/gybis-spec-propagate` if spec changed.
-3. Implement/fix code toward green (spec-first) or triage failures (code-first).
-4. Run `/gybis-spec-weed` for alignment.
-5. Re-evaluate convergence invariant.
-
-Exit conditions:
-- convergence invariant satisfied, or
-- bounded iteration budget exhausted.
-
-Guardrails:
-- confirm generated tests fail before implementing in spec-first flow
-- never edit generated tests to force green
-- escalate ambiguity to human instead of guessing
-- honor config parameters in code, avoid magic numbers where spec uses config
-- fix code, not contract, when spec is correct
-
-Track across ticks: test pass/fail counts, `/gybis-spec-weed` verdict, open question count, and whether latest `/gybis-spec-distill` surfaced anything new.
-
-## Produce-code prompt
-
-Implement behavior in `<spec>.allium`. The generated tests in `<tests>` are the contract and must pass. Follow the spec's `when`/`requires`/`ensures` semantics. Do not weaken or edit tests to go green; if a test looks wrong, stop and revisit spec.
-
-## Related
-
-- [Assessing specs](./allium-assessing-specs.md)
-- [Actioning findings](./allium-actioning-findings.md)
+λ related(x).
+  refs: {
+    ./allium-assessing-specs.md,
+    ./allium-actioning-findings.md
+  }
