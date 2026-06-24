@@ -1,3 +1,5 @@
+✅ session-8 | 2026-06-24 gybis-init: orient manifest prepared from state, memories, and knowledge
+✅ session-9 | 2026-06-24 README.md updated for .agents development workspace convention
 ✅ session-7 | 2026-06-23 gybis-init: mementum orient complete, session initialized
 ✅ session-6 | 2026-06-23 README.md clarified tool-agnostic positioning, memory stored, session terminated
 ✅ session-5 | 2026-06-17 README.md commands table synchronized with actual skills
@@ -8,16 +10,16 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-06-23T15:13
-- **Sessions**: 8 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow)
-- **Status**: Session-7 in progress — gybis-init active
+- **Last updated**: 2026-06-24T11:00:00-06:00
+- **Sessions**: 10 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration)
+- **Status**: Session-9 in progress — README .agents migration applied
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
 - **Core stack**: Nucleus (math notation base context) + Allium (behavioral DSL) + Mementum (persistent memory)
 - **Architecture**: VSM derivative (5-layer architectural spec)
 - **GitHub**: TheCodeSojourner/gybis
-- **Latest work**: Session-5 synchronized README.md User and Developer Commands tables with actual gybis/.cline/skills/
+- **Latest work**: Session-9 updated README from Cline/.cline dev wording to .agents local convention
 
 ## Recent Activity
 - Initial commit: README with project definition, glossary, overview
@@ -35,6 +37,14 @@
   - Commit c557f72: Clarified gybis skills are tool-agnostic, not Cline-specific
   - Commit c0b5023: Clarified Developer Commands section is for Cline in this repo
   - Memory stored: gybis-tool-agnostic.md — distinguishes user-facing skills (tool-agnostic) from dev workflow (Cline-specific)
+- Session-8 (2026-06-24): gybis-init orientation run against local mementum context
+  - Read state bootloader, then followed related memories and knowledge page
+  - Ran targeted search for "Cline" in README and open-question markers in mementum
+  - Prepared orient manifest required by session_startup_gate
+- Session-9 (2026-06-24): README migration for .agents local development convention
+  - Replaced developer-command intro wording to remove Cline-only framing
+  - Replaced .cline references with .agents in install example and derivation notes
+  - Updated lambda workspace tree example from .cline/rules to .agents/rules
 
 ## Feed-Forward Signals
 - README.md now fully synchronized with actual gybis/.cline/skills/ directory
