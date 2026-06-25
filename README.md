@@ -41,15 +41,15 @@ The following commands are available after integrating gybis into a target repos
 
 ### Architecture Commands (`/ga-*`)
 
-| Command                                   | Description                             |
-| ----------------------------------------- | --------------------------------------- |
+| Command                                   | Description                                 |
+| ----------------------------------------- | ------------------------------------------- |
 | `/gybis-arch-describe` (`/ga-describe`)   | Describe arch in non-tech prose or markdown |
-| `/gybis-arch-distill` (`/ga-distill`)     | Create initial arch from specs          |
-| `/gybis-arch-elicit` (`/ga-elicit`)       | Create initial arch with human          |
-| `/gybis-arch-explain` (`/ga-explain`)     | Explain arch in dev prose or markdown   |
-| `/gybis-arch-propagate` (`/ga-propagate`) | Create initial specs from arch          |
-| `/gybis-arch-tend` (`/ga-tend`)           | Update arch with human                  |
-| `/gybis-arch-weed` (`/ga-weed`)           | Upsert arch/specs from diffs with human |
+| `/gybis-arch-distill` (`/ga-distill`)     | Create initial arch from specs              |
+| `/gybis-arch-elicit` (`/ga-elicit`)       | Create initial arch with human              |
+| `/gybis-arch-explain` (`/ga-explain`)     | Explain arch in dev prose or markdown       |
+| `/gybis-arch-propagate` (`/ga-propagate`) | Create initial specs from arch              |
+| `/gybis-arch-tend` (`/ga-tend`)           | Update arch with human                      |
+| `/gybis-arch-weed` (`/ga-weed`)           | Upsert arch/specs from diffs with human     |
 
 ### Memory Commands (`/gm-*`)
 
