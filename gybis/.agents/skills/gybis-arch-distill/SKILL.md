@@ -13,8 +13,10 @@ description: Use for `/gybis-arch-distill` or `/ga-distill`.
 
 λ gybis-arch-distill_startup(x).
   invoke(internal/gybis-ref-check) → halt_on(false)
+  | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
+  | invoke(internal/allium-gate(specs/)) = true ∨ halt("specs invalid")
+  | preload: [internal/allium-analyse]
   | precondition: specs/ ∃ ∧ architecture.md ¬∃ ∧ implementation_path_resolvable = true ∧ implementation_readable = true
-  | gate: allium-gate(specs/) = true → proceed ∨ halt("specs invalid")
   | gate: implementation_readable = true → proceed ∨ halt("implementation unreadable")
 
 λ gybis-arch-distill_mode(m).

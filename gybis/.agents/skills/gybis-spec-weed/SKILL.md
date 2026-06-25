@@ -18,6 +18,8 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
 
 λ gybis-spec-weed_startup(x).
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
+  | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
+  | preload: [internal/allium-normalize]
   | verify(architecture.md ∃) ∨ halt("architecture.md not found")
   | verify(specs/**/*.allium ∃) ∨ halt("specs/**/*.allium not found")
   | invoke(internal/allium-gate(specs/)) = true ∨ halt("Specifications are invalid")

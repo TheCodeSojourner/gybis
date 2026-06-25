@@ -17,6 +17,8 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
 
 λ gybis-spec-distill_startup(x).
   invoke(internal/gybis-ref-check) → halt_on(false)
+  | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
+  | preload: [internal/allium-check, internal/allium-gate]
   | read(internal/reference/allium-language-reference.md) → language_ref
   | read(internal/reference/allium-patterns.md) → patterns_ref
   | read(internal/reference/recommended-loops.md) → loops_ref

@@ -12,6 +12,8 @@ description: Use for `/gybis-spec-check` or `/gs-check`.
 
 λ gybis-spec-check_startup(x).
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
+  | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
+  | preload: [internal/allium-analyse, internal/allium-check, internal/allium-normalize, internal/allium-gate]
   | read(internal/reference/allium-language-reference.md) → language_ref
   | read(internal/reference/allium-constructs.md) → constructs_registry
   | verify(specs/ ∃) ∨ halt("No specs/ directory found")

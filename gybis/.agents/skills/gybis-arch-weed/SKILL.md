@@ -12,6 +12,7 @@ description: Use for `/gybis-arch-weed` or `/ga-weed`.
 
 λ gybis-arch-weed_startup(x).
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
+  | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
   | verify(architecture.md ∃) ∨ halt("architecture.md not found")
   | verify(specs/**/*.allium ∃) ∨ halt("specs/**/*.allium not found")
   | invoke(internal/allium-gate(specs/)) = true ∨ halt("Specifications are invalid")

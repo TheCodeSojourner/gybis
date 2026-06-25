@@ -12,6 +12,7 @@ description: Use for `/gybis-spec-describe` or `/gs-describe`.
 
 λ gybis-spec-describe_startup(x).
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference files not available")
+  | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
   | invoke(internal/allium-gate) → true ∨ halt("Specification integrity check failed")
   | read(internal/reference/allium-language-reference.md) → language_ref
   | read(internal/reference/allium-constructs.md) → constructs_registry

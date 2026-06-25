@@ -12,6 +12,8 @@ description: Use for `/gybis-arch-propagate` or `/ga-propagate`.
 
 λ gybis-arch-propagate_startup(x).
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
+  | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
+  | preload: [internal/allium-analyse, internal/allium-check, internal/allium-gate]
   | verify(architecture.md ∃) ∨ halt("architecture.md not found")
   | verify(specs/**/*.allium ∅) ∨ halt("specs/**/*.allium already exist")
   | transition(INIT → STARTUP_CHECKS)

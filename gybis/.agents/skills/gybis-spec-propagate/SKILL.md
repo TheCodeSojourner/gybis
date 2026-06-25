@@ -17,6 +17,8 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
 
 λ gybis-spec-propagate_startup(x).
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
+  | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
+  | preload: [internal/allium-normalize]
   | read(internal/reference/allium-language-reference.md) → language_ref
   | read(internal/reference/allium-patterns.md) → patterns_ref
   | read(internal/reference/recommended-loops.md) → loops_ref
