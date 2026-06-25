@@ -1,3 +1,5 @@
+✅ session-16 | 2026-06-25 describe/explain skills gained explicit response-vs-markdown output modes
+✅ session-15 | 2026-06-25 gybis-init: orient manifest prepared from state, memories, knowledge, and open questions
 ✅ session-14 | 2026-06-25 spec orientation scope corrected: keep orientation handling only in gybis-spec-propagate and gybis-spec-weed
 ✅ session-13 | 2026-06-25 gybis-internal-skill-check created; 10 user-facing skills updated with explicit allium-* startup invocations + preload declarations
 ✅ session-12 | 2026-06-24 allium sync + recommended loops lambda protocol finalized; compression safety audit recorded
@@ -15,16 +17,16 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-06-25T12:27:11-06:00
-- **Sessions**: 14 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout, session-11 bundle .agents migration, session-12 allium sync + loop protocol refinement, session-13 internal skill check updates, session-14 spec orientation scope correction)
-- **Status**: Session-14 terminated — gybis-fini complete
+- **Last updated**: 2026-06-25T12:58:45-06:00
+- **Sessions**: 16 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout, session-11 bundle .agents migration, session-12 allium sync + loop protocol refinement, session-13 internal skill check updates, session-14 spec orientation scope correction, session-15 init workflow, session-16 describe/explain output modes)
+- **Status**: Session-16 terminated — gybis-fini complete
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
 - **Core stack**: Nucleus (math notation base context) + Allium (behavioral DSL) + Mementum (persistent memory)
 - **Architecture**: VSM derivative (5-layer architectural spec)
 - **GitHub**: TheCodeSojourner/gybis
-- **Latest work**: Session-12 aligned allium pin references, finalized AI-first lambda loop protocol, and completed internal-reference compression safety classification
+- **Latest work**: Session-16 added explicit human-selected response/markdown output modes to the four describe/explain skills, with repo-root markdown guards and synced command-table wording.
 
 ## Recent Activity
 - Initial commit: README with project definition, glossary, overview
@@ -69,6 +71,15 @@
   - Reviewed gybis-spec skill orientation coupling and user intent
   - Confirmed orientation handling should remain only in `gybis-spec-propagate` and `gybis-spec-weed`
   - Stored synthesis memory: `mementum/memories/spec-orientation-scope.md`
+- Session-15 (2026-06-25): gybis-init orientation run
+  - Read `mementum/state.md` as bootloader, then followed recent memory and knowledge pointers
+  - Acknowledged open questions carried from session-14 closeout
+  - Prepared orient manifest required by `session_startup_gate`
+- Session-16 (2026-06-25): describe/explain output mode implementation
+  - Updated `gybis-arch-describe`, `gybis-arch-explain`, `gybis-spec-describe`, and `gybis-spec-explain`
+  - Added five explicit output modes, repo-root `.md` path validation, overwrite confirmation, and conventional filenames
+  - Synced README command tables to mention prose or markdown output
+  - Stored reusable memory: `mementum/memories/describe-explain-output-modes.md`
 
 ## Feed-Forward Signals
 - README.md now synchronized with actual gybis/.agents/skills/ directory
@@ -81,24 +92,26 @@
 - Monitor for: Command descriptions staying current with skill implementations
 - Monitor for: gybis skills integration into non-Cline tools
 - Monitor for: orientation/language implication logic drifting into non-propagate/non-weed gybis-spec skills
+- Monitor for: output-mode wording drifting across the four describe/explain skills
 
 ## Session Closeout
-- **last_session_id**: session-14
-- **current_timestamp**: 2026-06-25T12:27:11-06:00
-- **recover**: Revalidate that only `gybis-spec-propagate` and `gybis-spec-weed` consume orientation/language implications from `architecture.md` before adding spec-skill enhancements.
+- **last_session_id**: session-16
+- **current_timestamp**: 2026-06-25T12:58:45-06:00
+- **recover**: Manually exercise one architecture and one specification describe/explain command to validate prompt wording and overwrite flow.
 - **task**:
-  - Close out the spec-skill scope correction session by confirming orientation concerns are localized to propagate/weed and synthesizing that decision into memory.
+  - Add explicit human-selected response/markdown output modes to the four describe/explain skills and synchronize the command tables.
 - **questions**:
-  - Should `gybis-spec-weed` keep orientation as an interactive correction choice or derive only from `architecture.md`?
-  - Should a lightweight lint/check guard be added later to prevent orientation clauses from reappearing in non-propagate/non-weed spec skills?
+  - Should a future skill-consistency check assert the same five output mode labels across all four describe/explain skills?
+  - Should a live manual exercise be added later to validate prompt wording and overwrite behavior in actual agent runs?
 - **decisions**:
-  - Accepted corrected scope: most gybis-spec skills do not need FP/OOP orientation or language implications.
-  - Retained orientation-aware behavior only in `gybis-spec-propagate` and `gybis-spec-weed`.
-  - Kept `architecture.md` as orientation input source for the two orientation-aware spec workflows.
-  - Added memory `mementum/memories/spec-orientation-scope.md` as feed-forward guidance.
+  - Standardized five modes: `response_only`, `prompted_file_only`, `default_file_only`, `response_and_prompted_file`, and `response_and_default_file`.
+  - Restricted prompted output targets to repo-root `.md` filenames and rejected subpaths.
+  - Chose conventional filenames `arch-describe.md`, `arch-explain.md`, `spec-describe.md`, and `spec-explain.md`.
+  - Required explicit overwrite approval before replacing an existing markdown output file.
+  - Added memory `mementum/memories/describe-explain-output-modes.md` as feed-forward guidance.
   - Deferred git commit to the normal user-controlled workflow.
 - **next**:
-  1. If new spec-skill changes are requested, gate orientation additions to propagate/weed unless scope is explicitly widened.
-  2. Consider adding a non-blocking repository check to detect orientation terms in non-propagate/non-weed gybis-spec skills.
+  1. Manually exercise one architecture and one specification describe/explain command to validate prompt wording and overwrite flow.
+  2. Consider adding a non-blocking skill-consistency check to keep the four output-mode contracts synchronized.
 
 ⏹→state.md
