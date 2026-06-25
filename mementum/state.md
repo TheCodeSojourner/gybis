@@ -1,3 +1,4 @@
+✅ session-13 | 2026-06-25 gybis-internal-skill-check created; 10 user-facing skills updated with explicit allium-* startup invocations + preload declarations
 ✅ session-12 | 2026-06-24 allium sync + recommended loops lambda protocol finalized; compression safety audit recorded
 ✅ session-11 | 2026-06-24 bundle skills moved to `gybis/.agents/skills`; install/docs/state aligned
 ✅ session-8 | 2026-06-24 gybis-init: orient manifest prepared from state, memories, and knowledge
