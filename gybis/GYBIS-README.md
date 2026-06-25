@@ -81,6 +81,8 @@ Specifications describe code **behavior**, not implementation.
 - **Do not implement before specifying.** Implementation details are replaceable; specifications are the system's source of truth.
 - **Workflow:** propagate or distill → check → tend → weed.
 - **Governance flows:** AI is governed by formalized behavior; behavior is governed by architecture.
+- **Architecture alignment:** Only `/gybis-spec-propagate` and `/gybis-spec-weed` 
+  apply architectural preferences; other spec skills are architecture-agnostic.
 
 ---
 
