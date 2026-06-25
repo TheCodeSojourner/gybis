@@ -1,3 +1,4 @@
+✅ session-14 | 2026-06-25 spec orientation scope corrected: keep orientation handling only in gybis-spec-propagate and gybis-spec-weed
 ✅ session-13 | 2026-06-25 gybis-internal-skill-check created; 10 user-facing skills updated with explicit allium-* startup invocations + preload declarations
 ✅ session-12 | 2026-06-24 allium sync + recommended loops lambda protocol finalized; compression safety audit recorded
 ✅ session-11 | 2026-06-24 bundle skills moved to `gybis/.agents/skills`; install/docs/state aligned
@@ -14,9 +15,9 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-06-24T13:15:20-06:00
-- **Sessions**: 13 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout, session-11 bundle .agents migration, session-12 allium sync + loop protocol refinement)
-- **Status**: Session-12 terminated — gybis-fini complete
+- **Last updated**: 2026-06-25T12:27:11-06:00
+- **Sessions**: 14 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout, session-11 bundle .agents migration, session-12 allium sync + loop protocol refinement, session-13 internal skill check updates, session-14 spec orientation scope correction)
+- **Status**: Session-14 terminated — gybis-fini complete
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
@@ -64,6 +65,10 @@
   - Added/retained explicit guardrail that `/gybis-spec-elicit` does not exist
   - Audited internal reference docs for safe vs risky lambda compression targets
   - Left codebase unchanged after final user directive to keep current state
+- Session-14 (2026-06-25): spec orientation scope correction
+  - Reviewed gybis-spec skill orientation coupling and user intent
+  - Confirmed orientation handling should remain only in `gybis-spec-propagate` and `gybis-spec-weed`
+  - Stored synthesis memory: `mementum/memories/spec-orientation-scope.md`
 
 ## Feed-Forward Signals
 - README.md now synchronized with actual gybis/.agents/skills/ directory
@@ -75,24 +80,25 @@
 - Monitor for: New skills added to gybis/.agents/skills/ directory
 - Monitor for: Command descriptions staying current with skill implementations
 - Monitor for: gybis skills integration into non-Cline tools
+- Monitor for: orientation/language implication logic drifting into non-propagate/non-weed gybis-spec skills
 
 ## Session Closeout
-- **last_session_id**: session-12
-- **current_timestamp**: 2026-06-24T13:15:20-06:00
-- **recover**: If desired, lambda-compress only policy/protocol references first and preserve canonical syntax/example references as primary artifacts.
+- **last_session_id**: session-14
+- **current_timestamp**: 2026-06-25T12:27:11-06:00
+- **recover**: Revalidate that only `gybis-spec-propagate` and `gybis-spec-weed` consume orientation/language implications from `architecture.md` before adding spec-skill enhancements.
 - **task**:
-  - Close out the allium-sync and recommended-loops refinement session with AI-first protocol compression and safe-compression guidance.
+  - Close out the spec-skill scope correction session by confirming orientation concerns are localized to propagate/weed and synthesizing that decision into memory.
 - **questions**:
-  - Which additional internal references can be safely lambda-compressed without losing retrieval precision?
-  - Should recommended loops include any spec-side elicit command path?
+  - Should `gybis-spec-weed` keep orientation as an interactive correction choice or derive only from `architecture.md`?
+  - Should a lightweight lint/check guard be added later to prevent orientation clauses from reappearing in non-propagate/non-weed spec skills?
 - **decisions**:
-  - Aligned allium pin references to commit `493a2de` where relevant.
-  - Kept explicit no-spec fallback as `/gybis-arch-elicit` → `/gybis-arch-propagate` → `/gybis-spec-tend` and constraint `¬exists(/gybis-spec-elicit)`.
-  - Finalized `recommended-loops.md` as compact AI-first lambda protocol with preserved invariants and guardrails.
-  - Classified compression safety: policy/protocol references mostly safe; canonical language/patterns/construct registries not safe for full replacement.
-  - Deferred any git commit to the normal user-controlled workflow.
+  - Accepted corrected scope: most gybis-spec skills do not need FP/OOP orientation or language implications.
+  - Retained orientation-aware behavior only in `gybis-spec-propagate` and `gybis-spec-weed`.
+  - Kept `architecture.md` as orientation input source for the two orientation-aware spec workflows.
+  - Added memory `mementum/memories/spec-orientation-scope.md` as feed-forward guidance.
+  - Deferred git commit to the normal user-controlled workflow.
 - **next**:
-  1. If continuing compression, apply non-destructive lambda overlays to policy/protocol docs first.
-  2. Keep canonical grammar/examples references as source-of-truth artifacts.
+  1. If new spec-skill changes are requested, gate orientation additions to propagate/weed unless scope is explicitly widened.
+  2. Consider adding a non-blocking repository check to detect orientation terms in non-propagate/non-weed gybis-spec skills.
 
 ⏹→state.md
