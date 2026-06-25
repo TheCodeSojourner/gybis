@@ -78,13 +78,30 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
        disallowed_patterns
      }
    | invoke(gybis-spec-propagate_interpret_architecture_context(raw_context)) → context
-  | verify(context.programming_language_version ∃ ∧ context.test_framework ∃ ∧ context.build_system ∃ ∧ context.paradigm_preference ∈ {OOP, FP})
+  | verify(context.programming_language_version ∃ ∧ context.test_framework ∃ ∧ context.build_system ∃)
        ∨ halt("architecture S1 is underspecified for propagation")
   | verify(compatible(context.test_framework, context.programming_language_version))
     ∨ halt("architecture S1 has incompatible test framework and language version")
   | verify(coherent(context.build_system, context.package_manager, context.ci_cd, context.deployment_method))
     ∨ halt("architecture S1 has incoherent build/package/deployment/tooling signals")
-   | return(architecture_context = context)
+   | invoke(gybis-spec-propagate_orientation_guidance(context)) → orientation_guidance
+   | return(architecture_context = context ∧ orientation_guidance = orientation_guidance)
+
+λ gybis-spec-propagate_orientation_guidance(context).
+  context.paradigm_preference ∈ {OOP, FP}
+    ? selected_orientation ≔ context.paradigm_preference
+    : selected_orientation ≔ unknown("missing paradigm_preference")
+  | spec_implications:
+    - OOP: data-shape emphasis on entities/objects, behavior composition via methods/services, boundary style via object contracts
+    - FP: data-shape emphasis on immutable values, behavior composition via pure functions/pipelines, boundary style via function/data contracts
+    - unknown: neutral_guidance ∧ unresolved_orientation_marker
+  | language_guidance:
+    - OOP: C++ (classes/RAII), C# (classes/interfaces/DI), Clojure (protocols/records + Java interop boundary)
+    - FP: C++ (immutable values + composition), C# (records + pure functions/LINQ), Clojure (immutable maps + pure functions/transducers)
+    - unknown: C++/C#/Clojure neutral defaults + unresolved marker
+  | gaps: missing(paradigm_preference) → explicit_gap_report
+  | orthogonality: error_model_style is a separate axis from FP/OOP orientation
+  | return({selected_orientation, spec_implications, language_guidance, gaps})
 
 λ gybis-spec-propagate_interpret_architecture_context(raw_context).
   raw_context.paradigm_preference ≔ paradigm_preference
@@ -241,6 +258,7 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
     | organize(styled_code, architecture_context.build_system) → organized_code
     | collect(organized_code) → implementation_code
   | structure(implementation_code, architecture_context) → structured_implementation
+  | propagate(orientation_guidance, into={implementation_code, test_suite})
   | ∀ obligation ∈ obligations:
     invoke(gybis-spec-propagate_obligation_synthesis(obligation, architecture_context)) → test_fragment
       where: test_fragment.traceable_id = obligation.id
@@ -293,6 +311,7 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
   | invoke(gybis-spec-propagate_write_implementation(implementation_code, test_suite)) → code_generated
   | transition(SYNTHESIZING_CODE → VERIFYING)
   | invoke(gybis-spec-propagate_verify_implementation(architecture_context, specifications, obligations)) → verification
+  | include(orientation_output: architecture_context.orientation_guidance)
   | verification = true
     ? transition(VERIFYING → COMPLETE)
     : (re_synthesize_implementation ∧ transition(SYNTHESIZING_CODE → VERIFYING))

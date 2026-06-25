@@ -163,8 +163,13 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
     ? (ask_developer("Backtick-quoted enum literal at " ⊕ divergence.obligation.source_construct ⊕ " is normalised by code (lowercased / snake_cased / canonical form altered). Per language_ref byte-exact UTF-8 comparison applies. Correct: [spec/code/investigate]?") → decision)
   | divergence.type = "arch_missing_in_code"
     ? (ask_developer("For arch " ⊕ divergence.principle ⊕ " not in code. Correct: [arch/code/investigate]?") → decision)
+  | ask_developer("Orientation for this correction? [FP-oriented/OOP-oriented/keep-current]") → orientation_choice
+  | orientation_guidance:
+    - OOP-oriented: spec implications = {data shape: entities/objects, behavior composition: methods/services, boundary style: object contracts}; C++ (classes/RAII), C# (classes/interfaces/DI), Clojure (protocols/records + Java interop boundary)
+    - FP-oriented: spec implications = {data shape: immutable values, behavior composition: pure functions/pipelines, boundary style: function/data contracts}; C++ (immutable values + composition), C# (records + pure functions/LINQ), Clojure (immutable maps + pure functions/transducers)
+  | orthogonality: error_model_style is a separate axis from FP/OOP orientation
   | decision ∈ {spec, code, arch, investigate}
-  | return(resolve_mode = decision)
+  | return(resolve_mode = decision ∧ orientation_choice = orientation_choice)
 
 λ gybis-spec-weed_correct_divergence(divergence, resolve_mode).
   resolve_mode = spec
