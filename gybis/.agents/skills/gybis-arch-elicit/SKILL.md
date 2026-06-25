@@ -96,15 +96,16 @@ description: Use for `/gybis-arch-elicit` or `/ga-elicit`.
 λ gybis-arch-elicit_elicit_s1(x).
    action: elicit_operations_layer
    | purpose: S1 answers "what does your system concretely do" - tools, recipes, and implementation bindings
-   | prompt_strategy: structured interviewing building on S2; first capture programming language version (required), then dynamically suggest suitable test frameworks based on the captured programming language version, verify human choice, then capture build system (required), then elicit paradigm (OOP vs FP) with clarifying descriptions
+  | prompt_strategy: structured interviewing building on S2; first capture programming language version (required), then dynamically suggest suitable test frameworks based on the captured programming language version, verify human choice, then capture build system (required), then elicit orientation choice (FP-oriented vs OOP-oriented)
+  | orientation_language_guidance:
+    - OOP-oriented: C++ (classes/RAII), C# (classes/interfaces/DI), Clojure (protocols/records + Java interop boundary)
+    - FP-oriented: C++ (immutable values + composition), C# (records + pure functions/LINQ), Clojure (immutable maps + pure functions/transducers)
    | sample_questions:
      - "What programming language and version do you want to use for this system? (e.g. Python 3.12, TypeScript 5.6, C++20, Rust 1.78)"
      - "Based on your chosen language, I will suggest a few appropriate test frameworks. 
         Which test framework(s) do you prefer? (You can suggest your own — I will verify it is compatible with the language.)"
      - "What build system do you want to use? (e.g. npm scripts, Maven, Gradle, Cargo, Make, Bazel)"
-     - "Do you prefer an OOP-first or FP-first approach? 
-        • OOP-first: mutable state, impure functions, class-based modeling, inheritance hierarchies, behavior attached to objects, imperative style.
-        • FP-first: immutable state, pure functions by default, data-driven (plain records/maps/structs with separate behavior), function composition and pipelines, layered architecture with a thin impure outer layer for side effects, declarative style."
+      - "Choose architecture orientation: FP-oriented or OOP-oriented?"
      - "What other tools/recipes are there (CI/CD, linter/formatter, deployment, package manager, interface types, architectural pattern, etc.)?"
    | capture: 
        user_response → extract(

@@ -140,6 +140,14 @@ description: Use for `/gybis-arch-distill` or `/ga-distill`.
   | step1: bind(vsm_base.S5, vsm_base.S4, vsm_base.S3, vsm_base.S2, S1_enriched) → vsm_layers
   | output: {S5 → lambda, S4 → lambda, S3 → lambda, S2 → lambda, S1 → lambda}
 
+λ gybis-arch-distill_orientation_output(S1_enriched).
+  report_orientation: S1_enriched.paradigm_preference ∈ {FP, OOP} ∨ unknown("missing paradigm_preference")
+  | language_guidance:
+    - OOP: C++ (classes/RAII), C# (classes/interfaces/DI), Clojure (protocols/records + Java interop boundary)
+    - FP: C++ (immutable values + composition), C# (records + pure functions/LINQ), Clojure (immutable maps + pure functions/transducers)
+  | gaps: missing(programming_language_version ∨ paradigm_preference) → explicit_gap_report
+  | orthogonality: error_model_style is a separate axis from FP/OOP orientation
+
 λ gybis-arch-distill_write_architecture(vsm_layers).
   action: write_architecture_file
   | step1: assemble(vsm_layers) → architecture_content
@@ -195,6 +203,8 @@ description: Use for `/gybis-arch-distill` or `/ga-distill`.
     | refinement_iterations: count
     | issues_discovered: count
     | issues_resolved: count
+    | orientation: {FP ∨ OOP ∨ unknown}
+    | orientation_gaps: count
   | format: "Pass {n}: Synthesized {count} VSM layers, identified {patterns} patterns, populated {s1_count} S1 fields ({confidence} confidence), resolved {issues} issues"
 
 λ gybis-arch-distill_boundaries(¬).

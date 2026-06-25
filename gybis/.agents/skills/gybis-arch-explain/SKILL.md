@@ -13,7 +13,16 @@ description: Use for `/gybis-arch-explain` or `/ga-explain`.
 λ gybis-arch-explain_startup(x).
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference files not available")
   | read(architecture.md) → content ∧ parse(content.{S5, S4, S3, S2, S1}) → vsm_layers
+  | parse(content.S1.paradigm_preference) → orientation_or_unknown
   | read(internal/reference/vsm-guide.md) → exists | halt("VSM reference unavailable")
+
+λ gybis-arch-explain_orientation_output(x).
+  report_orientation: selected_orientation ∈ {FP, OOP} ∨ unknown("missing S1.paradigm_preference")
+  | language_guidance:
+    - OOP: C++ (classes/RAII), C# (classes/interfaces/DI), Clojure (protocols/records + Java interop boundary)
+    - FP: C++ (immutable values + composition), C# (records + pure functions/LINQ), Clojure (immutable maps + pure functions/transducers)
+  | gaps: missing(programming_language_version ∨ paradigm_preference) → explicit_gap_report
+  | orthogonality: error_model_style is a separate axis from FP/OOP orientation
 
 λ gybis-arch-explain_prerequisites(x).
   gate(architecture.md) → exists ∧ complete
@@ -72,6 +81,7 @@ description: Use for `/gybis-arch-explain` or `/ga-explain`.
   | plain_english(developer) | technical_vocabulary ∧ pattern_names ∧ code_examples
   | ¬invent(¬exists(root/architecture.md ∨ refs)) | only explain what exists
   | flag(gap ∨ empty ∨ underdeveloped) ∧ ¬speculate | highlight unknowns without guessing
+  | include(orientation_output: selected_orientation_or_unknown ∧ C++/C#/Clojure_guidance ∧ explicit_gaps)
   | ¬modify(other_files) ∧ ¬write(files) | read_only mode
   | output → AI_response ∧ ¬file
 

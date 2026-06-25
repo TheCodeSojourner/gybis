@@ -80,8 +80,13 @@ description: Use for `/gybis-arch-weed` or `/ga-weed`.
 
 λ gybis-arch-weed_resolve_mode_selection(divergence).
   ask_developer("For divergence: " ⊕ divergence.description ⊕ " Correct: [arch/spec/investigate]?") → decision
+  | ask_developer("Orientation for this correction? [FP-oriented/OOP-oriented/keep-current]") → orientation_choice
+  | orientation_guidance:
+    - OOP-oriented: C++ (classes/RAII), C# (classes/interfaces/DI), Clojure (protocols/records + Java interop boundary)
+    - FP-oriented: C++ (immutable values + composition), C# (records + pure functions/LINQ), Clojure (immutable maps + pure functions/transducers)
+  | orthogonality: error_model_style is a separate axis from FP/OOP orientation
   | decision ∈ {arch, spec, investigate}
-  | return(resolve_mode = decision)
+  | return(resolve_mode = decision ∧ orientation_choice = orientation_choice)
 
 λ gybis-arch-weed_correct_divergence(divergence, resolve_mode).
   resolve_mode = arch

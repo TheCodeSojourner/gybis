@@ -51,8 +51,17 @@ description: Use for `/gybis-arch-propagate` or `/ga-propagate`.
 λ gybis-arch-propagate_read_architecture(x).
   read(architecture.md) → content ≔ content
   | parse(content.{S5, S4, S3, S2, S1}) → vsm_layers
+  | parse(content.S1.paradigm_preference) → orientation_or_unknown
   | ∀ layer ∈ vsm_layers: extract(layer, content) → principles(layer)
-  | return(architecture = {vsm_layers, principles})
+  | return(architecture = {vsm_layers, principles, orientation_or_unknown})
+
+λ gybis-arch-propagate_orientation_output(architecture).
+  report_orientation: architecture.orientation_or_unknown ∈ {FP, OOP} ∨ unknown("missing S1.paradigm_preference")
+  | language_guidance:
+    - OOP: C++ (classes/RAII), C# (classes/interfaces/DI), Clojure (protocols/records + Java interop boundary)
+    - FP: C++ (immutable values + composition), C# (records + pure functions/LINQ), Clojure (immutable maps + pure functions/transducers)
+  | gaps: missing(programming_language_version ∨ paradigm_preference) → explicit_gap_report
+  | orthogonality: error_model_style is a separate axis from FP/OOP orientation
 
 λ gybis-arch-propagate_translate_to_specs(architecture).
   ∀ layer ∈ architecture.vsm_layers:
@@ -85,6 +94,7 @@ description: Use for `/gybis-arch-propagate` or `/ga-propagate`.
   | invoke(gybis-arch-propagate_write_specs(spec_directives)) → specs_written
   | transition(WRITING_SPECS → VERIFYING)
   | invoke(gybis-arch-propagate_verify_specs) → verification
+  | include(orientation_output from architecture)
   | verification = true
     ? transition(VERIFYING → COMPLETE)
     : (re_synthesize_failed_specs ∧ transition(WRITING_SPECS → VERIFYING))

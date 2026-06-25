@@ -51,13 +51,24 @@ description: Use for `/gybis-arch-tend` or `/ga-tend`.
   read(architecture.md) → current_arch
   | parse(current_arch.{S5, S4, S3, S2, S1}) → vsm_layers
   | ask_developer("Which VSM layers need refinement? (S5, S4, S3, S2, S1, or specific principles)") → feedback
+  | ask_developer("Orientation for this architecture update? [FP-oriented/OOP-oriented/keep-current]") → orientation_choice
   | parse(feedback) → target_layers ∧ proposed_changes
-  | return(developer_feedback = {target_layers, proposed_changes})
+  | return(developer_feedback = {target_layers, proposed_changes, orientation_choice})
+
+λ gybis-arch-tend_orientation_language_guidance(orientation_choice).
+  orientation_choice = OOP-oriented
+    ? guidance = {C++: classes/RAII, C#: classes/interfaces/DI, Clojure: protocols/records + Java interop boundary}
+  | orientation_choice = FP-oriented
+    ? guidance = {C++: immutable values + composition, C#: records + pure functions/LINQ, Clojure: immutable maps + pure functions/transducers}
+  | orientation_choice = keep-current
+    ? guidance = use(existing_architecture_orientation)
+  | orthogonality: error_model_style is a separate axis from FP/OOP orientation
 
 λ gybis-arch-tend_analyze_impact(developer_feedback).
   ∀ layer ∈ developer_feedback.target_layers:
     analyze(change_impact(layer, developer_feedback.proposed_changes)) → impact_analysis(layer)
     | check(hierarchical_consistency(layer, vsm_layers)) → consistency(layer)
+  | invoke(gybis-arch-tend_orientation_language_guidance(developer_feedback.orientation_choice)) → orientation_guidance
   | consolidate(impact_analysis, consistency) → impact_report
   | return(impact_analysis = impact_report)
 
