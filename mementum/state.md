@@ -95,9 +95,13 @@
 - Monitor for: output-mode wording drifting across the four describe/explain skills
 
 ## Session Closeout
-- **last_session_id**: session-16
-- **current_timestamp**: 2026-06-25T12:58:45-06:00
-- **recover**: Manually exercise one architecture and one specification describe/explain command to validate prompt wording and overwrite flow.
+- **last_session_id**: session-17
+- **current_timestamp**: 2026-06-25T14:15:00-06:00
+- **task**: Added "Architecture alignment" bullet to GYBIS-README.md Specification Philosophy section; clarified that only `/gybis-spec-propagate` and `/gybis-spec-weed` apply architectural preferences; other spec skills are architecture-agnostic
+- **questions**: —
+- **decisions**: Confirmed lighter-touch wording ("are" vs "remain"); integrated session-14 decision into documentation
+- **next**: [Commit GYBIS-README.md change, Monitor: New skills/command drift/output-mode consistency, Consider describe/explain output-mode README updates (deferred)]
+- **recover**: Commit GYBIS-README.md change with message "📋 architecture alignment: document spec skills scope"
 - **task**:
   - Add explicit human-selected response/markdown output modes to the four describe/explain skills and synchronize the command tables.
 - **questions**:
