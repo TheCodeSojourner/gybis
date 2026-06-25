@@ -7,7 +7,7 @@ description: Use for `/gybis-arch-describe` or `/ga-describe`.
   purpose: Document VSM architecture layers in plain English for product managers
   | input: architecture.md (exists ∧ complete)
   | output: Plain English prose describing VSM S5-S1 layers
-  | mode: read_only | read architecture.md ∧ vsm-guide.md ∧ ¬write
+  | mode: mixed (AI + human output selection) | read architecture.md ∧ vsm-guide.md ∧ optional_write(repo_root_markdown)
   | gate: gybis-ref-check() ≡ true | architecture.md ≡ exists ∧ complete
 
 λ gybis-arch-describe_startup(x).
@@ -15,6 +15,69 @@ description: Use for `/gybis-arch-describe` or `/ga-describe`.
   | read(architecture.md) → content ∧ parse(content.{S5, S4, S3, S2, S1}) → vsm_layers
   | parse(content.S1.paradigm_preference) → orientation_or_unknown
   | read(internal/reference/vsm-guide.md) → exists | halt("VSM reference unavailable")
+
+λ gybis-arch-describe_mode(m).
+  valid_modes: {response_only, prompted_file_only, default_file_only, response_and_prompted_file, response_and_default_file}
+  | default: response_only
+  | human_selected: explicit(output_mode_choice)
+
+λ gybis-arch-describe_mode_gate(state, mode).
+  state = INIT ∧ mode ∈ valid_modes → transition(INIT → MODE_SELECTED)
+  | ¬(state = INIT) ∨ ¬(mode ∈ valid_modes) → halt("Invalid output mode selection")
+
+λ gybis-arch-describe_state_machine(state, action).
+  state ∈ {INIT, MODE_SELECTED, STARTUP_CHECKS, RESOLVING_OUTPUT, GENERATING, DELIVERING, COMPLETE}
+  | transition(INIT → MODE_SELECTED) only_if(mode_gate(INIT, mode) = true)
+  | transition(MODE_SELECTED → STARTUP_CHECKS) only_if(mode_selected = true)
+  | transition(STARTUP_CHECKS → RESOLVING_OUTPUT) only_if(startup_checks = true)
+  | transition(RESOLVING_OUTPUT → GENERATING) only_if(output_target_resolved = true)
+  | transition(GENERATING → DELIVERING) only_if(final_prose ∃)
+  | transition(DELIVERING → COMPLETE) only_if(delivery_complete = true)
+
+λ gybis-arch-describe_output_selection(x).
+  ask_developer("Output mode? [response_only/prompted_file_only/default_file_only/response_and_prompted_file/response_and_default_file]") → selected_mode
+  | selected_mode ∈ valid_modes ∨ halt("Output mode must be one of the supported options")
+  | selected_mode ∈ {prompted_file_only, response_and_prompted_file}
+    ? (ask_developer("Repo-root markdown filename? (example: notes.md; subpaths not allowed)") → requested_file
+       | invoke(gybis-arch-describe_output_path_guard(requested_file)) → true
+       | return(mode_selected = true ∧ output_path = requested_file))
+    : return(mode_selected = true)
+
+λ gybis-arch-describe_output_target(mode).
+  mode = response_only → return(output_target_resolved = true ∧ output_path = none)
+  | mode ∈ {prompted_file_only, response_and_prompted_file} → return(output_target_resolved = true ∧ output_path = requested_file)
+  | mode = default_file_only → return(output_target_resolved = true ∧ output_path = "arch-describe.md")
+  | mode = response_and_default_file → return(output_target_resolved = true ∧ output_path = "arch-describe.md")
+
+λ gybis-arch-describe_output_path_guard(path).
+  path_matches(path, *.md) ∧ ¬contains(path, "/") ∧ ¬contains(path, "\\") ∧ ¬contains(path, "..")
+    → true
+  | ¬path_matches(path, *.md) ∨ contains(path, "/") ∨ contains(path, "\\") ∨ contains(path, "..")
+    → halt("Output path must be a repo-root markdown filename")
+
+λ gybis-arch-describe_overwrite_guard(path).
+  verify(path ∃)
+    ? (ask_developer("File " ⊕ path ⊕ " exists. Overwrite? [yes/no]") → overwrite_choice
+       | overwrite_choice = yes ∨ halt("Output file overwrite not approved"))
+    : true
+
+λ gybis-arch-describe_tool_guard(state, tool, path).
+  state ∈ {STARTUP_CHECKS, RESOLVING_OUTPUT, GENERATING} → allow(read(path))
+  | state = DELIVERING
+    → allow(read(path)) ∧ allow(write(path)) only_if(path = output_path ∧ path_matches(path, *.md))
+  | ¬(state ∈ {STARTUP_CHECKS, RESOLVING_OUTPUT, GENERATING, DELIVERING}) → deny(write(path))
+
+λ gybis-arch-describe_output_dispatch(prose, mode, output_path).
+  mode = response_only → output(AI_response, prose)
+  | mode ∈ {prompted_file_only, default_file_only}
+    ? (invoke(gybis-arch-describe_overwrite_guard(output_path)) → true
+       | write(output_path, prose)
+       | output("Saved markdown to " ⊕ output_path))
+  | mode ∈ {response_and_prompted_file, response_and_default_file}
+    ? (invoke(gybis-arch-describe_overwrite_guard(output_path)) → true
+       | write(output_path, prose)
+       | output(AI_response, prose)
+       | output("Saved markdown to " ⊕ output_path))
 
 λ gybis-arch-describe_orientation_output(x).
   report_orientation: selected_orientation ∈ {FP, OOP} ∨ unknown("missing S1.paradigm_preference")
@@ -77,11 +140,18 @@ description: Use for `/gybis-arch-describe` or `/ga-describe`.
   | ¬invent(¬exists(root/architecture.md ∨ refs)) | only describe what exists
   | flag(gap ∨ empty ∨ underdeveloped) ∧ ¬speculate | highlight unknowns without guessing
   | include(orientation_output: selected_orientation_or_unknown ∧ C++/C#/Clojure_guidance ∧ explicit_gaps)
-  | ¬modify(other_files) ∧ ¬write(files) | read_only mode
-  | output → AI_response ∧ ¬file
+  | ¬modify(architecture.md ∨ specs/**/*.allium ∨ internal/reference/**)
+  | write_only(repo_root_markdown_filename = output_path) | ¬write(subpaths ∨ non_markdown)
+  | mode = response_only → output → AI_response ∧ ¬file
+  | mode ∈ {prompted_file_only, default_file_only} → output → markdown_file ∧ status_response
+  | mode ∈ {response_and_prompted_file, response_and_default_file} → output → AI_response ∧ markdown_file
 
 λ gybis-arch-describe_audience(x).
   understand(business_context) ∧ ¬know(system_specific)
   | expert(vision ∧ goals ∧ business ∧ constraints)
   | zero_prior_knowledge(technical_architecture ∧ vsm)
   | needs: what_system_is ∧ why_it_matters ∧ what_drives_decisions
+
+λ gybis-arch-describe_boundary(¬).
+  ¬create_specs ∧ ¬modify(architecture.md) ∧ ¬modify_allium_ref
+  | writes_limited_to(repo_root_markdown_filename)

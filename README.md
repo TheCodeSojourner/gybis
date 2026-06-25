@@ -43,10 +43,10 @@ The following commands are available after integrating gybis into a target repos
 
 | Command                                   | Description                             |
 | ----------------------------------------- | --------------------------------------- |
-| `/gybis-arch-describe` (`/ga-describe`)   | Describe arch in non-tech prose         |
+| `/gybis-arch-describe` (`/ga-describe`)   | Describe arch in non-tech prose or markdown |
 | `/gybis-arch-distill` (`/ga-distill`)     | Create initial arch from specs          |
 | `/gybis-arch-elicit` (`/ga-elicit`)       | Create initial arch with human          |
-| `/gybis-arch-explain` (`/ga-explain`)     | Explain arch in dev prose               |
+| `/gybis-arch-explain` (`/ga-explain`)     | Explain arch in dev prose or markdown   |
 | `/gybis-arch-propagate` (`/ga-propagate`) | Create initial specs from arch          |
 | `/gybis-arch-tend` (`/ga-tend`)           | Update arch with human                  |
 | `/gybis-arch-weed` (`/ga-weed`)           | Upsert arch/specs from diffs with human |
@@ -67,9 +67,9 @@ The following commands are available after integrating gybis into a target repos
 | Command                                                          | Description                                   |
 | ---------------------------------------------------------------- | --------------------------------------------- |
 | `/gybis-spec-check` (`/gs-check {concern\|domain\|all}`)         | Check/update syntax until valid               |
-| `/gybis-spec-describe` (`/gs-describe {concern\|domain\|all}`)   | Describe in non-tech prose                    |
+| `/gybis-spec-describe` (`/gs-describe {concern\|domain\|all}`)   | Describe in non-tech prose or markdown        |
 | `/gybis-spec-distill` (`/gs-distill`)                            | Create initial specs from code/tests          |
-| `/gybis-spec-explain` (`/gs-explain {concern\|domain\|all}`)     | Explain in dev prose                          |
+| `/gybis-spec-explain` (`/gs-explain {concern\|domain\|all}`)     | Explain in dev prose or markdown              |
 | `/gybis-spec-propagate` (`/gs-propagate {concern\|domain\|all}`) | Create initial code/tests                     |
 | `/gybis-spec-tend` (`/gs-tend`)                                  | Update specs with human                       |
 | `/gybis-spec-weed` (`/gs-weed`)                                  | Upsert specs/code-tests from diffs with human |

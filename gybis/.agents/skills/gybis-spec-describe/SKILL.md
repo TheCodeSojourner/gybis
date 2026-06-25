@@ -7,7 +7,7 @@ description: Use for `/gybis-spec-describe` or `/gs-describe`.
   purpose: Document allium specifications in plain English for product managers
   | input: specs/**/*.allium (exists ∧ valid ∧ passes allium-gate)
   | output: Plain English prose describing specifications with business context
-  | mode: read_only | read specs ∧ vsm-guide.md ∧ ¬write
+  | mode: mixed (AI + human output selection) | read specs ∧ vsm-guide.md ∧ optional_write(repo_root_markdown)
   | gate: gybis-ref-check() ≡ true | allium-gate() ≡ true
 
 λ gybis-spec-describe_startup(x).
@@ -18,6 +18,69 @@ description: Use for `/gybis-spec-describe` or `/gs-describe`.
   | read(internal/reference/allium-constructs.md) → constructs_registry
   | read(internal/reference/vsm-guide.md) → vsm_reference
   | read(specs/**/*.allium) → exists ∧ parse | halt("No specifications found")
+
+λ gybis-spec-describe_mode(m).
+  valid_modes: {response_only, prompted_file_only, default_file_only, response_and_prompted_file, response_and_default_file}
+  | default: response_only
+  | human_selected: explicit(output_mode_choice)
+
+λ gybis-spec-describe_mode_gate(state, mode).
+  state = INIT ∧ mode ∈ valid_modes → transition(INIT → MODE_SELECTED)
+  | ¬(state = INIT) ∨ ¬(mode ∈ valid_modes) → halt("Invalid output mode selection")
+
+λ gybis-spec-describe_state_machine(state, action).
+  state ∈ {INIT, MODE_SELECTED, STARTUP_CHECKS, RESOLVING_OUTPUT, GENERATING, DELIVERING, COMPLETE}
+  | transition(INIT → MODE_SELECTED) only_if(mode_gate(INIT, mode) = true)
+  | transition(MODE_SELECTED → STARTUP_CHECKS) only_if(mode_selected = true)
+  | transition(STARTUP_CHECKS → RESOLVING_OUTPUT) only_if(startup_checks = true)
+  | transition(RESOLVING_OUTPUT → GENERATING) only_if(output_target_resolved = true)
+  | transition(GENERATING → DELIVERING) only_if(final_prose ∃)
+  | transition(DELIVERING → COMPLETE) only_if(delivery_complete = true)
+
+λ gybis-spec-describe_output_selection(x).
+  ask_developer("Output mode? [response_only/prompted_file_only/default_file_only/response_and_prompted_file/response_and_default_file]") → selected_mode
+  | selected_mode ∈ valid_modes ∨ halt("Output mode must be one of the supported options")
+  | selected_mode ∈ {prompted_file_only, response_and_prompted_file}
+    ? (ask_developer("Repo-root markdown filename? (example: notes.md; subpaths not allowed)") → requested_file
+       | invoke(gybis-spec-describe_output_path_guard(requested_file)) → true
+       | return(mode_selected = true ∧ output_path = requested_file))
+    : return(mode_selected = true)
+
+λ gybis-spec-describe_output_target(mode).
+  mode = response_only → return(output_target_resolved = true ∧ output_path = none)
+  | mode ∈ {prompted_file_only, response_and_prompted_file} → return(output_target_resolved = true ∧ output_path = requested_file)
+  | mode = default_file_only → return(output_target_resolved = true ∧ output_path = "spec-describe.md")
+  | mode = response_and_default_file → return(output_target_resolved = true ∧ output_path = "spec-describe.md")
+
+λ gybis-spec-describe_output_path_guard(path).
+  path_matches(path, *.md) ∧ ¬contains(path, "/") ∧ ¬contains(path, "\\") ∧ ¬contains(path, "..")
+    → true
+  | ¬path_matches(path, *.md) ∨ contains(path, "/") ∨ contains(path, "\\") ∨ contains(path, "..")
+    → halt("Output path must be a repo-root markdown filename")
+
+λ gybis-spec-describe_overwrite_guard(path).
+  verify(path ∃)
+    ? (ask_developer("File " ⊕ path ⊕ " exists. Overwrite? [yes/no]") → overwrite_choice
+       | overwrite_choice = yes ∨ halt("Output file overwrite not approved"))
+    : true
+
+λ gybis-spec-describe_tool_guard(state, tool, path).
+  state ∈ {STARTUP_CHECKS, RESOLVING_OUTPUT, GENERATING} → allow(read(path))
+  | state = DELIVERING
+    → allow(read(path)) ∧ allow(write(path)) only_if(path = output_path ∧ path_matches(path, *.md))
+  | ¬(state ∈ {STARTUP_CHECKS, RESOLVING_OUTPUT, GENERATING, DELIVERING}) → deny(write(path))
+
+λ gybis-spec-describe_output_dispatch(prose, mode, output_path).
+  mode = response_only → output(AI_response, prose)
+  | mode ∈ {prompted_file_only, default_file_only}
+    ? (invoke(gybis-spec-describe_overwrite_guard(output_path)) → true
+       | write(output_path, prose)
+       | output("Saved markdown to " ⊕ output_path))
+  | mode ∈ {response_and_prompted_file, response_and_default_file}
+    ? (invoke(gybis-spec-describe_overwrite_guard(output_path)) → true
+       | write(output_path, prose)
+       | output(AI_response, prose)
+       | output("Saved markdown to " ⊕ output_path))
 
 λ gybis-spec-describe_input(type).
   type ∈ {domain_concern, domain, all_specs} | default: all_specs
@@ -68,8 +131,12 @@ description: Use for `/gybis-spec-describe` or `/gs-describe`.
   | plain_english(product_manager) | business_vocabulary ∧ concrete_examples
   | ¬invent(¬exists(specs/**/*.allium ∨ refs)) | only describe what exists
   | flag(gap ∨ empty ∨ ambiguous) ∧ ¬speculate | highlight unknowns without guessing
-  | ¬modify(other_files) ∧ ¬write(files) | read_only mode
-  | output → AI_response ∧ ¬file
+  | ¬modify(specs/**/*.allium ∨ architecture.md ∨ internal/reference/**)
+  | write_only(repo_root_markdown_filename = output_path) | ¬write(subpaths ∨ non_markdown)
+  | mode = response_only → output → AI_response ∧ ¬file
+  | mode ∈ {prompted_file_only, default_file_only} → output → markdown_file ∧ status_response
+  | mode ∈ {response_and_prompted_file, response_and_default_file} → output → AI_response ∧ markdown_file
 
 λ gybis-spec-describe_boundary(¬).
-  ¬create_specs ∧ ¬modify_allium_ref ∧ ¬write_specs | read_only
+  ¬create_specs ∧ ¬modify_allium_ref ∧ ¬write_specs
+  | writes_limited_to(repo_root_markdown_filename)
