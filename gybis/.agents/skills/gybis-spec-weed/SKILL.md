@@ -20,13 +20,14 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
   | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
   | preload: [internal/allium-normalize]
+  | if(vocabulary.md ∃): preload(vocabulary.md) → vocab_terms ∧ vocab_check_enabled = true
   | verify(architecture.md ∃) ∨ halt("architecture.md not found")
   | verify(specs/**/*.allium ∃) ∨ halt("specs/**/*.allium not found")
   | invoke(internal/allium-gate(specs/)) = true ∨ halt("Specifications are invalid")
   | verify(implementation ∃) ∨ halt("Implementation not found")
   | read(internal/reference/allium-language-reference.md) → language_ref
   | read(internal/reference/allium-patterns.md) → patterns_ref
-  | read(internal/reference/recommended-loops.md) → loops_ref
+  | read(internal/reference/allium-recommended-loops.md) → loops_ref
   | read(internal/reference/allium-constructs.md) → constructs_registry
   | read(internal/reference/vsm-guide.md) → vsm_reference
   | transition(INIT → STARTUP_CHECKS)
@@ -81,6 +82,15 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
     }
     | merge(obligation.id, obligation) → obligations_map[obligation.id]
   | return(obligations ≔ obligations_map ∧ obligations_derived = true)
+
+λ gybis-spec-weed_check_vocabulary_terms(obligations, vocab_check_enabled, vocab_terms).
+  if(vocab_check_enabled):
+    ∀ obligation ∈ obligations:
+      ∀ term ∈ extract_terms(obligation.description):
+        canonical ≔ find_canonical_form(term, vocab_terms) ∨ null
+        | canonical ≠ null ∧ canonical ≠ term
+          ? collect({obligation.id, term, canonical, obligation.source_span}) → vocab_divergences
+  | return(vocab_divergences)
 
 λ gybis-spec-weed_compare_specs_code(obligations).
   recursively_read(implementation) → code_content
@@ -138,8 +148,10 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
 λ gybis-spec-weed_identify_divergences(x).
   return(divergences)
 
-λ gybis-spec-weed_resolve_mode_selection(divergence).
-  divergence.type = "obligation_missing_in_code"
+λ gybis-spec-weed_resolve_mode_selection(divergence, vocab_check_enabled, vocab_terms).
+  divergence.type = "vocab_term_mismatch"
+    ? (ask_developer("Non-canonical vocabulary term found in obligation. Term: '" ⊕ divergence.term ⊕ "', Canonical: '" ⊕ divergence.canonical ⊕ "'. Use canonical? [yes/no/skip]?") → decision)
+  | divergence.type = "obligation_missing_in_code"
     ? (ask_developer("Obligation " ⊕ divergence.obligation.id ⊕ " (" ⊕ divergence.obligation.category ⊕ "): " ⊕ divergence.obligation.description ⊕ " not found in code. Correct: [spec/code/investigate]?") → decision)
   | divergence.type = "obligation_contradicts_implementation"
     ? (ask_developer("Obligation " ⊕ divergence.obligation.id ⊕ " (" ⊕ divergence.obligation.category ⊕ "): " ⊕ divergence.obligation.description ⊕ " contradicted by code. Correct: [spec/code/investigate]?") → decision)
@@ -172,7 +184,11 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
   | return(resolve_mode = decision ∧ orientation_choice = orientation_choice)
 
 λ gybis-spec-weed_correct_divergence(divergence, resolve_mode).
-  resolve_mode = spec
+  divergence.type = "vocab_term_mismatch" ∧ resolve_mode = yes
+    ? (replace_term_in_obligation(divergence.obligation.id, divergence.term, divergence.canonical) → corrected
+       | upsert(target_spec_file, corrected) → result
+       | return(corrections_applied = true))
+  | resolve_mode = spec
     ? (ask_developer("Update spec to match code? (yes/no)") → approval
        | approval = yes
          ? (distill_from_code(divergence) → updated_spec

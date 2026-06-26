@@ -14,6 +14,7 @@ description: Use for `/gybis-spec-check` or `/gs-check`.
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
   | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
   | preload: [internal/allium-analyse, internal/allium-check, internal/allium-normalize, internal/allium-gate]
+  | if(vocabulary.md ∃): preload(vocabulary.md) → vocab_terms ∧ vocab_check_enabled = true
   | read(internal/reference/allium-language-reference.md) → language_ref
   | read(internal/reference/allium-constructs.md) → constructs_registry
   | verify(specs/ ∃) ∨ halt("No specs/ directory found")
@@ -30,13 +31,15 @@ description: Use for `/gybis-spec-check` or `/gs-check`.
   | ¬(state = INIT) ∨ ¬(mode ∈ {auto}) → halt("Invalid mode selection")
 
 λ gybis-spec-check_state_machine(state, action).
-  state ∈ {INIT, MODE_SELECTED, STARTUP_CHECKS, CHECKING_FILES, ANALYZING_SET, NORMALIZING, FIXING_ERRORS, VERIFYING, COMPLETE}
+  state ∈ {INIT, MODE_SELECTED, STARTUP_CHECKS, CHECKING_FILES, ANALYZING_SET, NORMALIZING, CHECKING_VOCABULARY, FIXING_ERRORS, VERIFYING, COMPLETE}
   | transition(INIT → MODE_SELECTED) only_if(mode_gate(INIT, mode) = true)
   | transition(MODE_SELECTED → STARTUP_CHECKS) only_if(startup_complete = true)
   | transition(STARTUP_CHECKS → CHECKING_FILES) only_if(startup_checks = true)
   | transition(CHECKING_FILES → ANALYZING_SET) only_if(per_file_diagnostics ∃)
   | transition(ANALYZING_SET → NORMALIZING) only_if(issues ∃)
-  | transition(NORMALIZING → FIXING_ERRORS) only_if(envelopes_derived = true)
+  | transition(NORMALIZING → CHECKING_VOCABULARY) only_if(envelopes_derived = true ∧ vocab_check_enabled = true)
+  | transition(NORMALIZING → FIXING_ERRORS) only_if(envelopes_derived = true ∧ vocab_check_enabled = false)
+  | transition(CHECKING_VOCABULARY → FIXING_ERRORS) only_if(vocab_issues_resolved = true)
   | transition(FIXING_ERRORS → VERIFYING) only_if(fixes_applied = true)
   | transition(VERIFYING → COMPLETE) only_if(allium_gate = true)
   | transition(ANALYZING_SET → COMPLETE) only_if(issues ∅ ∧ allium_gate = true)
@@ -71,6 +74,21 @@ description: Use for `/gybis-spec-check` or `/gs-check`.
   | uncoded_envelopes ≔ {e | e ∈ envelopes ∧ e.kind = "check:_uncoded"}
   | report("Normalized: check=" ⊕ counts.check ⊕ " analyse=" ⊕ counts.analyse ⊕ " uncoded=" ⊕ counts.uncoded)
   | return(envelopes ∧ envelopes_derived = true)
+
+λ gybis-spec-check_check_vocabulary(specs_content, vocab_terms).
+  ∀ file ∈ specs/**/*.allium:
+    extract_terms(file) → file_terms
+    | ∀ term ∈ file_terms:
+      canonical ≔ find_canonical_form(term, vocab_terms) ∨ null
+      | canonical ≠ null ∧ canonical ≠ term
+        ? ask_developer("Found '" ⊕ term ⊕ "' (non-canonical). Use '" ⊕ canonical ⊕ "'? [yes/no/skip]") → decision
+        | decision = yes
+          ? replace_term_in_file(file, term, canonical) → updated
+          : (decision = no
+             ? (ask_developer("Use custom term: ") → custom_term
+                | collect({term, custom_term, file}) → custom_replacements)
+             : skip)
+  | return(vocab_issues_resolved = true)
 
 λ gybis-spec-check_fix_errors(envelopes).
   ∀ envelope ∈ envelopes:

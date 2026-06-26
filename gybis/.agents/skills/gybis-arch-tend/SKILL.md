@@ -13,6 +13,7 @@ description: Use for `/gybis-arch-tend` or `/ga-tend`.
 λ gybis-arch-tend_startup(x).
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
   | verify(architecture.md ∃) ∨ halt("architecture.md not found")
+  | if(vocabulary.md ∃): preload(vocabulary.md) → vocab_terms ∧ vocab_available = true
   | read(internal/reference/vsm-guide.md) → vsm_reference
   | transition(INIT → STARTUP_CHECKS)
 
@@ -47,13 +48,17 @@ description: Use for `/gybis-arch-tend` or `/ga-tend`.
 λ gybis-arch-tend_pre_tool_check(state, tool, path).
   tool_guard(state, tool, path) = true ∨ halt("Tool not permitted in state " ⊕ state)
 
-λ gybis-arch-tend_elicit_feedback(x).
+λ gybis-arch-tend_elicit_feedback(x, vocab_available, vocab_terms).
   read(architecture.md) → current_arch
   | parse(current_arch.{S5, S4, S3, S2, S1}) → vsm_layers
-  | ask_developer("Which VSM layers need refinement? (S5, S4, S3, S2, S1, or specific principles)") → feedback
+  | vocab_context ≔ if(vocab_available): "Please use canonical vocabulary terms from vocabulary.md: [" ⊕ vocab_term_list(vocab_terms) ⊕ "]" : ""
+  | ask_developer("Which VSM layers need refinement? (S5, S4, S3, S2, S1, or specific principles) " ⊕ vocab_context) → feedback
   | ask_developer("Orientation for this architecture update? [FP-oriented/OOP-oriented/keep-current]") → orientation_choice
   | parse(feedback) → target_layers ∧ proposed_changes
-  | return(developer_feedback = {target_layers, proposed_changes, orientation_choice})
+  | flag_non_vocabulary_terms: if(vocab_available ∧ proposed_changes contains term ∉ vocab_terms):
+    ∀ non_vocab_term ∈ proposed_changes:
+      suggest_canonical_alternative(non_vocab_term, vocab_terms) ∨ ask_if_new_term_should_be_added
+  | return(developer_feedback = {target_layers, proposed_changes, orientation_choice, vocabulary_aligned})
 
 λ gybis-arch-tend_orientation_language_guidance(orientation_choice).
   orientation_choice = OOP-oriented

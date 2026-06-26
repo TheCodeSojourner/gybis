@@ -12,9 +12,11 @@ description: Use for `/gybis-arch-elicit` or `/ga-elicit`.
 
 λ gybis-arch-elicit_startup(x).
   invoke(internal/gybis-ref-check) → halt_on(false)
+  | verify(vocabulary.md ∃) ∨ halt("vocabulary.md not found. Run /gybis-vocab-elicit first to establish domain vocabulary, or /gybis-vocab-distill if working from existing specs/implementation.")
   | read(internal/reference/vsm-guide.md) → load_vsm_framework
+  | read(vocabulary.md) → load_vocabulary_context
   | precondition: architecture.md ¬∃
-  | load_context: VSM probing questions and layer definitions
+  | load_context: VSM probing questions and layer definitions, vocabulary terms for reference
 
 λ gybis-arch-elicit_mode(m).
   valid_modes: {mixed}
@@ -53,12 +55,15 @@ description: Use for `/gybis-arch-elicit` or `/ga-elicit`.
    action: elicit_identity_layer
    | purpose: S5 answers "what IS your system" - principles that survive everything
    | prompt_strategy: structured interviewing with VSM S5 context, eliciting unchanging principles
+   | vocabulary_constraint: reference vocabulary.md terms when discussing principles; use canonical terminology
   | sample_questions:
-    - "What are the unchanging principles that define your system?"
+    - "What are the unchanging principles that define your system? (Using our vocabulary: [core_terms])"
     - "What would make your system no longer be itself?"
     - "What values are inviolable?"
   | capture: user_response → S5_lambda_draft
-  | output: S5_principles_collected
+  | flag_non_vocabulary_terms: if(user_response contains term ∉ vocabulary.md):
+    suggest_canonical_alternative ∨ ask_if_new_term_should_be_added
+  | output: S5_principles_collected ∧ vocabulary_aligned
 
 λ gybis-arch-elicit_elicit_s4(x).
    action: elicit_intelligence_layer

@@ -33,4 +33,10 @@ CRITICAL CONSTRAINTS:
 | `/gybis-spec-propagate` (`/gs-propagate {concern\|domain\|all}`) | Create initial code/tests |
 | `/gybis-spec-tend` (`/gs-tend`) | Update specs with human |
 | `/gybis-spec-weed` (`/gs-weed`) | Upsert specs/code-tests from diffs with human |
+| `/gybis-vocab-check` (`/gv-check`) | Validate vocabulary.md syntax & semantics |
+| `/gybis-vocab-describe` (`/gv-describe`) | Describe vocabulary in business language |
+| `/gybis-vocab-distill` (`/gv-distill`) | Extract vocabulary from arch/specs/code |
+| `/gybis-vocab-elicit` (`/gv-elicit`) | Elicit vocabulary from domain experts |
+| `/gybis-vocab-explain` (`/gv-explain`) | Explain vocabulary for developers |
+| `/gybis-vocab-tend` (`/gv-tend`) | Update vocabulary with impact analysis |
 

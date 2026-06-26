@@ -19,9 +19,10 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
   invoke(internal/gybis-ref-check) → halt_on(false)
   | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
   | preload: [internal/allium-check, internal/allium-gate]
+  | if(vocabulary.md ∃): preload(vocabulary.md) → vocab_terms ∧ vocab_available = true
   | read(internal/reference/allium-language-reference.md) → language_ref
   | read(internal/reference/allium-patterns.md) → patterns_ref
-  | read(internal/reference/recommended-loops.md) → loops_ref
+  | read(internal/reference/allium-recommended-loops.md) → loops_ref
   | read(internal/reference/allium-constructs.md) → constructs_registry
   | precondition: implementation ∃ ∧ (specs/ ¬∃ ∨ ¬∃file ∈ specs/** matching(*.allium))
   | scan(codebase) → files_found ∨ halt("no implementation found")
@@ -153,16 +154,20 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
       ∧ accretion_preferred_over_breaking_changes
   | fallback: ¬recognised_pattern → standard_entity ∧ rules
 
-λ gybis-spec-distill_synthesize_specs(code_content, analysis).
+λ gybis-spec-distill_synthesize_specs(code_content, analysis, vocab_available, vocab_terms).
   action: synthesize_allium_specifications_organized_by_domain
   | step1: map(entities) → .allium declarations
   | step2: encode(behavioral_specs) → allium preconditions, postconditions, invariants
   | step3: formalize(patterns) → allium composition rules
   | step4: ∀ pattern ∈ analysis.source_pattern → allium_construct:
     emit(pattern.allium_construct) → spec_fragment  -- per construct_recognition table
-  | step5: invoke(domain_classification, entities, patterns) → {entity → domain, pattern → domain}
-  | step6: ∀spec ∈ {all_generated_specs}: assign(spec.domain)
-  | step7: generate(specs_directory_structure) → specs/{domain}/*.allium files
+  | step5: if(vocab_available):
+    ∀entity ∈ entities:
+      canonical_name ≔ find_canonical_form(entity.name, vocab_terms) ∨ entity.name
+      | entity.name ≔ canonical_name
+  | step6: invoke(domain_classification, entities, patterns) → {entity → domain, pattern → domain}
+  | step7: ∀spec ∈ {all_generated_specs}: assign(spec.domain)
+  | step8: generate(specs_directory_structure) → specs/{domain}/*.allium files
   | output: {spec_file_path → allium_content} where spec_file_path ∈ specs/{domain}/*.allium
 
 λ gybis-spec-distill_write_specs(spec_content).

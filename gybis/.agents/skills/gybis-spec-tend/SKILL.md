@@ -19,9 +19,10 @@ description: Use for `/gybis-spec-tend` or `/gs-tend`.
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
   | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
   | preload: [internal/allium-analyse, internal/allium-check]
+  | if(vocabulary.md ∃): preload(vocabulary.md) → vocab_terms ∧ vocab_available = true
   | read(internal/reference/allium-language-reference.md) → language_ref
   | read(internal/reference/allium-patterns.md) → patterns_ref
-  | read(internal/reference/recommended-loops.md) → loops_ref
+  | read(internal/reference/allium-recommended-loops.md) → loops_ref
   | read(internal/reference/allium-constructs.md) → constructs_registry
   | verify(specs/**/*.allium ∃) ∨ halt("specs/**/*.allium not found")
   | invoke(internal/allium-gate(specs/)) = true ∨ halt("Specifications are invalid")
@@ -58,13 +59,17 @@ description: Use for `/gybis-spec-tend` or `/gs-tend`.
 λ gybis-spec-tend_pre_tool_check(state, tool, path).
   tool_guard(state, tool, path) = true ∨ halt("Tool not permitted in state " ⊕ state)
 
-λ gybis-spec-tend_elicit_feedback(x).
+λ gybis-spec-tend_elicit_feedback(x, vocab_available, vocab_terms).
   ∀ spec_file ∈ specs/**/*.allium:
     read(spec_file) → content
   | summarize(all_specs) → spec_summary
-  | ask_developer("Which specifications need refinement? Describe the changes.") → feedback
+  | vocab_context ≔ if(vocab_available): "Please use canonical vocabulary terms from vocabulary.md: [" ⊕ vocab_term_list(vocab_terms) ⊕ "]" : ""
+  | ask_developer("Which specifications need refinement? Describe the changes. " ⊕ vocab_context) → feedback
   | parse(feedback) → target_specs ∧ proposed_changes
-  | return(developer_feedback = {target_specs, proposed_changes})
+  | flag_non_vocabulary_terms: if(vocab_available ∧ proposed_changes contains term ∉ vocab_terms):
+    ∀ non_vocab_term ∈ proposed_changes:
+      suggest_canonical_alternative(non_vocab_term, vocab_terms) ∨ ask_if_new_term_should_be_added
+  | return(developer_feedback = {target_specs, proposed_changes, vocabulary_aligned})
 
 λ gybis-spec-tend_analyze_impact(developer_feedback).
   ∀ target ∈ developer_feedback.target_specs:

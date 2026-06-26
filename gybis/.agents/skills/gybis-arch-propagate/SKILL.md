@@ -16,6 +16,7 @@ description: Use for `/gybis-arch-propagate` or `/ga-propagate`.
   | preload: [internal/allium-analyse, internal/allium-check, internal/allium-gate]
   | verify(architecture.md ∃) ∨ halt("architecture.md not found")
   | verify(specs/**/*.allium ∅) ∨ halt("specs/**/*.allium already exist")
+  | if(vocabulary.md ∃): preload(vocabulary.md) → vocab_terms ∧ vocab_loaded = true
   | transition(INIT → STARTUP_CHECKS)
 
 λ gybis-arch-propagate_mode(m).
@@ -63,10 +64,16 @@ description: Use for `/gybis-arch-propagate` or `/ga-propagate`.
   | gaps: missing(programming_language_version ∨ paradigm_preference) → explicit_gap_report
   | orthogonality: error_model_style is a separate axis from FP/OOP orientation
 
-λ gybis-arch-propagate_translate_to_specs(architecture).
+λ gybis-arch-propagate_translate_to_specs(architecture, vocab_loaded, vocab_terms).
   ∀ layer ∈ architecture.vsm_layers:
     ∀ principle ∈ architecture.principles(layer):
-      synthesize(spec_directive(principle, layer)) → directive
+      normalized_principle ≔ principle
+      | if(vocab_loaded = true):
+        ∀ term ∈ principle.terms:
+          canonical ≔ find_canonical_form(term, vocab_terms) ∨ term
+          | replace_in_principle(term, canonical) → normalized_principle
+      | synthesize(spec_directive(normalized_principle, layer)) → directive
+      | annotate_with_vocabulary_mapping(directive, vocab_terms) if(vocab_loaded = true)
       | collect(directive) → spec_directives
   | return(spec_directives)
 
@@ -89,7 +96,7 @@ description: Use for `/gybis-arch-propagate` or `/ga-propagate`.
 λ gybis-arch-propagate_core_op(x).
   transition(READING_ARCH → TRANSLATING)
   | invoke(gybis-arch-propagate_read_architecture) → architecture
-  | invoke(gybis-arch-propagate_translate_to_specs(architecture)) → spec_directives
+  | invoke(gybis-arch-propagate_translate_to_specs(architecture, vocab_loaded, vocab_terms)) → spec_directives
   | transition(TRANSLATING → WRITING_SPECS)
   | invoke(gybis-arch-propagate_write_specs(spec_directives)) → specs_written
   | transition(WRITING_SPECS → VERIFYING)

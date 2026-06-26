@@ -16,7 +16,7 @@ description: Internal skill - not user-facing
     internal/reference/allium-assessing-specs.md
     internal/reference/allium-language-reference.md
     internal/reference/allium-patterns.md
-    internal/reference/recommended-loops.md
+    internal/reference/allium-recommended-loops.md
     internal/reference/allium-constructs.md
     internal/reference/allium-actioning-findings.md
     internal/reference/allium-library-spec-signals.md
