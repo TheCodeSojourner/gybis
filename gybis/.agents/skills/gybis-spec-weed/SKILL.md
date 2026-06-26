@@ -6,7 +6,7 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
 λ gybis-spec-weed(x).
   purpose: Identify and resolve divergences between architecture, specs, and implementation
   | input: architecture.md ∃, specs/**/*.allium ∃ ∧ valid, implementation ∃
-  | output: architecture.md, specs/**/*.allium, and implementation mutually consistent
+  | output: architecture.md, specs/**/*.allium, and implementation mutually consistent and test-passing
   | mode: mixed
   | gate: architecture.md ∃ ∧ specs/**/*.allium ∃ ∧ allium_gate = true ∧ implementation ∃
   | derivation: test_obligations ≔ allium-normalize(specs/) → {envelopes | source = "plan"} → deterministic obligation enumeration
@@ -42,7 +42,7 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
   | ¬(state = INIT) ∨ ¬(mode ∈ {interactive}) → halt("Invalid mode selection")
 
 λ gybis-spec-weed_state_machine(state, action).
-  state ∈ {INIT, MODE_SELECTED, STARTUP_CHECKS, PLANNING_OBLIGATIONS, COMPARING_SPECS_CODE, COMPARING_ARCH_CODE, IDENTIFYING_DIVERGENCES, RESOLVE_MODE_SELECTION, CORRECTING, VERIFYING, COMPLETE}
+  state ∈ {INIT, MODE_SELECTED, STARTUP_CHECKS, PLANNING_OBLIGATIONS, COMPARING_SPECS_CODE, COMPARING_ARCH_CODE, IDENTIFYING_DIVERGENCES, RESOLVE_MODE_SELECTION, CORRECTING, VERIFYING, RUNNING_TESTS, COMPLETE}
   | transition(INIT → MODE_SELECTED) only_if(mode_gate(INIT, mode) = true)
   | transition(MODE_SELECTED → STARTUP_CHECKS) only_if(startup_complete = true)
   | transition(STARTUP_CHECKS → PLANNING_OBLIGATIONS) only_if(startup_checks = true)
@@ -53,14 +53,18 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
   | transition(RESOLVE_MODE_SELECTION → CORRECTING) only_if(resolve_mode ∃)
   | transition(CORRECTING → VERIFYING) only_if(corrections_applied = true)
   | transition(VERIFYING → IDENTIFYING_DIVERGENCES) only_if(inconsistencies ∃)
-  | transition(VERIFYING → COMPLETE) only_if(consistency = true ∧ zero_divergences = true)
+  | transition(VERIFYING → RUNNING_TESTS) only_if(consistency = true ∧ zero_divergences = true)
+  | transition(RUNNING_TESTS → IDENTIFYING_DIVERGENCES) only_if(test_suite_passes = false)
+  | transition(RUNNING_TESTS → COMPLETE) only_if(test_suite_passes = true)
 
 λ gybis-spec-weed_tool_guard(state, tool, path).
   state = PLANNING_OBLIGATIONS ∨ state = COMPARING_SPECS_CODE ∨ state = COMPARING_ARCH_CODE ∨ state = IDENTIFYING_DIVERGENCES ∨ state = RESOLVE_MODE_SELECTION
     → allow(read(path))
   | state = CORRECTING ∨ state = VERIFYING
     → allow(read(path)) ∧ allow(write(path)) only_if(path ∈ {architecture.md} ∪ specs/ ∪ implementation)
-  | ¬(state ∈ {PLANNING_OBLIGATIONS, COMPARING_SPECS_CODE, COMPARING_ARCH_CODE, IDENTIFYING_DIVERGENCES, RESOLVE_MODE_SELECTION, CORRECTING, VERIFYING})
+  | state = RUNNING_TESTS
+    → allow(read(path))
+  | ¬(state ∈ {PLANNING_OBLIGATIONS, COMPARING_SPECS_CODE, COMPARING_ARCH_CODE, IDENTIFYING_DIVERGENCES, RESOLVE_MODE_SELECTION, CORRECTING, VERIFYING, RUNNING_TESTS})
     → deny(write(path))
 
 λ gybis-spec-weed_pre_tool_check(state, tool, path).
@@ -228,10 +232,33 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
     → (inconsistencies ≔ {result_gate = false ∨ vsm_coherence = false ∨ remaining_divergences ≠ ∅ ∨ coverage = false}
        | return(consistency = false ∧ inconsistencies ∃))
 
+λ gybis-spec-weed_resolve_test_command(x).
+  read(architecture.md) → arch_content
+  | parse(arch_content.S1) → s1
+  | s1.test_framework ∃
+    ? infer_test_command(s1.test_framework, s1.build_system, s1.package_manager) → test_command
+    : infer_test_command_from_repository_conventions() → test_command
+  | test_command ∃
+    ? return(test_command = test_command)
+    : halt("Unable to resolve test command from architecture S1 or repository conventions")
+
+λ gybis-spec-weed_run_tests(x).
+  invoke(gybis-spec-weed_resolve_test_command) → test_command
+  | run(test_command) → test_result
+  | test_result.exit_code = 0
+    ? return(test_suite_passes = true ∧ test_failure_report = ∅)
+    : return(test_suite_passes = false ∧ test_failure_report = summarize(test_result.output))
+
 λ gybis-spec-weed_fixed_point_loop(state).
   state = VERIFYING
     → consistency = true ∧ zero_divergences = true
-        ? transition(VERIFYING → COMPLETE)
+        ? (transition(VERIFYING → RUNNING_TESTS)
+           ∧ invoke(gybis-spec-weed_run_tests) → (test_suite_passes, test_failure_report)
+           ∧ (test_suite_passes = true
+               ? transition(RUNNING_TESTS → COMPLETE)
+               : (inconsistencies ≔ {test_failures: test_failure_report}
+                  ∧ transition(RUNNING_TESTS → IDENTIFYING_DIVERGENCES)
+                  ∧ loop_count ≔ loop_count ⊕ 1)))
         : (transition(VERIFYING → IDENTIFYING_DIVERGENCES)
            ∧ loop_count ≔ loop_count ⊕ 1)
 
@@ -244,7 +271,7 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
   | discovered ≔ card(spec_code_divergences) ⊕ card(arch_code_divergences)
   | resolved ≔ discovered ⊖ card(remaining_divergences)
   | remaining ≔ card(remaining_divergences)
-  | report("Pass " ⊕ pass_num ⊕ ": discovered=" ⊕ discovered ⊕ " resolved=" ⊕ resolved ⊕ " remaining=" ⊕ remaining)
+  | report("Pass " ⊕ pass_num ⊕ ": discovered=" ⊕ discovered ⊕ " resolved=" ⊕ resolved ⊕ " remaining=" ⊕ remaining ⊕ " tests_pass=" ⊕ test_suite_passes)
 
 λ gybis-spec-weed_boundaries(¬).
   ¬ modify(upstream/) ∧ ¬ delete(architecture.md ∨ specs/ ∨ implementation)
@@ -252,6 +279,8 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
 λ gybis-spec-weed_regression_contract(x).
   invariant: architecture.md ∧ specs/ ∧ implementation ∃ throughout
   | invariant: zero_divergences ∧ allium_gate ∧ vsm_coherence at completion
+  | invariant: test_suite_passes = true at completion (strict gate)
+  | invariant: ¬complete_when_tests_fail
   | invariant: all_obligation_ids_checked_by_spec_comparison (comprehensive obligation coverage)
   | invariant: divergence.type ∈ {"obligation_missing_in_code", "obligation_contradicts_implementation", "when_field_not_enforced", "transition_not_guarded", "terminal_state_not_enforced", "variant_not_handled", "contract_not_honoured", "surface_obligation_not_enforced", "module_state_missing", "ensures_pre_rule_vs_resulting_state_confusion", "backtick_literal_normalised", "arch_missing_in_code"} (closed divergence catalogue)
   | invariant: ∀ obligation.category → corresponding divergence-check exercised in _compare_specs_code (per-category mapping codified there)

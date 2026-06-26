@@ -6,14 +6,14 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
 λ gybis-spec-propagate(x).
   purpose: Propagate architecture and specifications to implementation and test suite
   | input: architecture.md ∃, specs/**/*.allium ∃ ∧ valid
-  | output: Implementation code and test suite generated and consistent
+  | output: Implementation code and test suite generated, consistent, and passing
   | mode: ai
   | gate: architecture.md ∃ ∧ specs/**/*.allium ∃ ∧ allium_gate = true
 
 λ gybis-spec-propagate_loop_role(x).
   role: take_action(spec_to_tests)
   | meaning: project behavior from spec into executable test contract
-  | suggested_next: implement_against_generated_tests → run_tests → invoke(/gybis-spec-weed)
+  | suggested_next: review_generated_artifacts → invoke(/gybis-spec-weed)
 
 λ gybis-spec-propagate_startup(x).
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
@@ -39,7 +39,7 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
   | ¬(state = INIT) ∨ ¬(mode ∈ {auto}) → halt("Invalid mode selection")
 
 λ gybis-spec-propagate_state_machine(state, action).
-  state ∈ {INIT, MODE_SELECTED, STARTUP_CHECKS, READING_ARCH, READING_SPECS, PLANNING_OBLIGATIONS, SYNTHESIZING_CODE, VERIFYING, COMPLETE}
+  state ∈ {INIT, MODE_SELECTED, STARTUP_CHECKS, READING_ARCH, READING_SPECS, PLANNING_OBLIGATIONS, SYNTHESIZING_CODE, VERIFYING, RUNNING_TESTS, COMPLETE}
   | transition(INIT → MODE_SELECTED) only_if(mode_gate(INIT, mode) = true)
   | transition(MODE_SELECTED → STARTUP_CHECKS) only_if(startup_complete = true)
   | transition(STARTUP_CHECKS → READING_ARCH) only_if(startup_checks = true)
@@ -47,14 +47,19 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
   | transition(READING_SPECS → PLANNING_OBLIGATIONS) only_if(specifications ∃)
   | transition(PLANNING_OBLIGATIONS → SYNTHESIZING_CODE) only_if(obligations ∃)
   | transition(SYNTHESIZING_CODE → VERIFYING) only_if(code_generated = true)
-  | transition(VERIFYING → COMPLETE) only_if(verification = true)
+  | transition(VERIFYING → RUNNING_TESTS) only_if(verification = true)
+  | transition(VERIFYING → SYNTHESIZING_CODE) only_if(verification = false)
+  | transition(RUNNING_TESTS → COMPLETE) only_if(test_suite_passes = true)
+  | transition(RUNNING_TESTS → SYNTHESIZING_CODE) only_if(test_suite_passes = false)
 
 λ gybis-spec-propagate_tool_guard(state, tool, path).
   state = READING_ARCH ∨ state = READING_SPECS ∨ state = PLANNING_OBLIGATIONS
     → allow(read(path))
   | state = SYNTHESIZING_CODE ∨ state = VERIFYING
     → allow(read(path)) ∧ allow(write(path)) only_if(path ⊆ {src/, lib/, tests/})
-  | ¬(state ∈ {READING_ARCH, READING_SPECS, PLANNING_OBLIGATIONS, SYNTHESIZING_CODE, VERIFYING})
+  | state = RUNNING_TESTS
+    → allow(read(path))
+  | ¬(state ∈ {READING_ARCH, READING_SPECS, PLANNING_OBLIGATIONS, SYNTHESIZING_CODE, VERIFYING, RUNNING_TESTS})
     → deny(write(path))
 
 λ gybis-spec-propagate_pre_tool_check(state, tool, path).
@@ -301,6 +306,21 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
   | ¬(conformance_check ∧ architecture_check ∧ paradigm_check ∧ value_check ∧ data_check ∧ anti_pattern_check ∧ obligations_coverage_check)
     → return(verification = false)
 
+λ gybis-spec-propagate_resolve_test_command(architecture_context).
+  architecture_context.test_framework ∃
+    ? infer_test_command(architecture_context.test_framework, architecture_context.build_system, architecture_context.package_manager) → test_command
+    : infer_test_command_from_repository_conventions() → test_command
+  | test_command ∃
+    ? return(test_command = test_command)
+    : halt("Unable to resolve test command from architecture S1 or repository conventions")
+
+λ gybis-spec-propagate_run_tests(architecture_context).
+  invoke(gybis-spec-propagate_resolve_test_command(architecture_context)) → test_command
+  | run(test_command) → test_result
+  | test_result.exit_code = 0
+    ? return(test_suite_passes = true ∧ test_failure_report = ∅)
+    : return(test_suite_passes = false ∧ test_failure_report = summarize(test_result.output))
+
 λ gybis-spec-propagate_core_op(x).
   transition(READING_ARCH → READING_SPECS)
   | invoke(gybis-spec-propagate_read_architecture) → architecture_context
@@ -314,8 +334,14 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
   | invoke(gybis-spec-propagate_verify_implementation(architecture_context, specifications, obligations)) → verification
   | include(orientation_output: architecture_context.orientation_guidance)
   | verification = true
-    ? transition(VERIFYING → COMPLETE)
-    : (re_synthesize_implementation ∧ transition(SYNTHESIZING_CODE → VERIFYING))
+    ? (transition(VERIFYING → RUNNING_TESTS)
+       | invoke(gybis-spec-propagate_run_tests(architecture_context)) → (test_suite_passes, test_failure_report)
+       | test_suite_passes = true
+         ? transition(RUNNING_TESTS → COMPLETE)
+         : (report("Tests failed during propagation: " ⊕ test_failure_report)
+            ∧ re_synthesize_implementation
+            ∧ transition(RUNNING_TESTS → SYNTHESIZING_CODE)))
+    : (re_synthesize_implementation ∧ transition(VERIFYING → SYNTHESIZING_CODE))
 
 λ gybis-spec-propagate_boundaries(¬).
   ¬ modify(architecture.md ∨ specs/**/*.allium ∨ upstream/)
@@ -336,3 +362,5 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
   invariant: architecture.md ∧ specs/**/*.allium ∃ ∧ ¬modify throughout
   | invariant: implementation ∅ at INIT ∧ ∃ ∧ consistent_with(specs, arch) at completion
   | invariant: ∀ obligation ∈ obligations, obligation.id ∈ test_suite.traceable_ids at completion
+  | invariant: test_suite_passes = true at completion (strict gate)
+  | invariant: ¬complete_when_tests_fail
