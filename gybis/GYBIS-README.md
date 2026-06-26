@@ -56,6 +56,119 @@ Run `/gybis-help` to see available commands organized by architecture, memory, s
 
 ---
 
+## Use Cases
+
+### Find the Right Command
+
+Use this when you know what kind of work you need to do, but not which gybis command to run first.
+
+1. Run `/gybis-help` to see commands grouped by vocabulary, architecture, specification, and memory.
+2. Choose the command family that matches the layer you need to work in before making changes further downstream.
+
+Outcome: you start from the right command family instead of guessing from the full command list.
+
+### Start a New Repository
+
+Use this when you are building a new system and want durable constraints established before implementation.
+
+1. Run `/gybis-vocab-elicit` to establish shared domain vocabulary with domain experts.
+2. Run `/gybis-arch-elicit` to define architecture constraints from that vocabulary.
+3. Run `/gybis-arch-propagate` to derive initial behavioral specifications.
+4. Run `/gybis-spec-propagate` to derive initial code and test scaffolding.
+
+Outcome: the project starts from vocabulary, architecture, and specifications rather than implementation-first drift.
+
+### Adopt gybis in an Existing Repository
+
+Use this when code and tests already exist and you need to recover durable project truth from the current system.
+
+1. Run `/gybis-spec-distill` to extract behavioral specifications from existing code and tests.
+2. Run `/gybis-arch-distill` to derive architecture from those specifications and the current implementation.
+3. Run `/gybis-vocab-distill` to extract vocabulary from architecture, specifications, and implementation.
+
+Outcome: an existing codebase is brought under explicit vocabulary, architecture, and specification governance.
+
+### Evolve Vocabulary Safely
+
+Use this when domain terms, definitions, or canonical names need to change after the project is already in motion.
+
+1. Run `/gybis-vocab-tend` to refine an existing `vocabulary.md`; use it when terms must be added, renamed, merged, split, or clarified.
+2. Run `/gybis-vocab-check` to validate vocabulary syntax and semantic consistency.
+3. Run `/gybis-arch-weed` to resolve divergence between architecture and specifications caused by vocabulary changes.
+4. Run `/gybis-spec-weed` to resolve divergence between specifications and code/tests after the vocabulary update propagates downstream.
+
+Outcome: the canonical domain language evolves without leaving architecture, specifications, or implementation misaligned.
+
+### Add or Refine Behavior in an Aligned System
+
+Use this when the project is already under gybis governance and you are extending or refining expected behavior.
+
+1. Run `/gybis-arch-tend` when existing architecture constraints need refinement before behavior changes.
+2. Run `/gybis-spec-tend` to refine existing specifications for the affected concern or domain.
+3. Run `/gybis-spec-propagate {concern|domain|all}` to push the updated specifications into code and test scaffolding.
+4. Run `/gybis-spec-check {concern|domain|all}` to validate the resulting specification set before moving further.
+
+Outcome: behavior evolves through architecture and specifications instead of being driven by ad hoc implementation changes.
+
+### Resolve Drift Before Merge or Release
+
+Use this when architecture, specifications, code, or tests appear to have diverged and you need convergence before shipping.
+
+1. Run `/gybis-spec-check {concern|domain|all}` to surface specification issues early.
+2. Run `/gybis-arch-weed` to resolve divergence between architecture and specifications.
+3. Run `/gybis-spec-weed` to resolve divergence between specifications and code/tests.
+4. Re-run `/gybis-spec-check {concern|domain|all}` until the targeted scope is valid and aligned.
+
+Outcome: release confidence comes from aligned durable constraints, not only from the current implementation state.
+
+### Explain System Intent to Different Audiences
+
+Use this when onboarding developers, briefing stakeholders, or turning project truth into audience-specific explanations.
+
+1. Run `/gybis-vocab-describe`, `/gybis-arch-describe`, and `/gybis-spec-describe {concern|domain|all}` for non-technical or business-facing explanations.
+2. Run `/gybis-vocab-explain`, `/gybis-arch-explain`, and `/gybis-spec-explain {concern|domain|all}` for developer-facing explanations.
+
+Outcome: the same vocabulary, architecture, and specifications can be communicated clearly to both technical and non-technical readers.
+
+### Start a Working Session
+
+Use this at the beginning of a real work session when you want the full gybis startup flow.
+
+1. Run `/gybis-init` to orient, recall, and prepare the AI context for the current repository state.
+2. Use the initialized context as the baseline for the rest of the session rather than rebuilding context ad hoc.
+
+Outcome: the session begins from restored project memory instead of whatever happens to be in live chat context.
+
+### Re-Orient Mid-Session
+
+Use this when the session is already active but you have switched branches, changed domains, returned after a pause, or suspect context drift.
+
+1. Run `/gybis-memory-orient` to restore previous AI context without restarting the full session lifecycle.
+2. Run `/gybis-memory-recall {topic}` to pull back a specific topic, decision trail, or recent pattern when you need targeted detail.
+
+Outcome: you recover the right project context surgically, without ending the session and starting over.
+
+### Checkpoint Under Context Pressure
+
+Use this when the session is getting dense and you want to preserve high-value information before chat compaction or context drift makes it harder to recover.
+
+1. Run `/gybis-memory-store {insight}` to persist a concrete decision, pattern, or lesson; if you do not know what to store yet, run `/gybis-memory-store` without an argument and let it prompt you for one.
+2. Run `/gybis-memory-synthesize` when several related memories should be consolidated into a higher-level understanding instead of remaining as isolated notes.
+3. If you are continuing immediately, run `/gybis-memory-orient` to rehydrate from durable memory; if you are ending the session, finish with `/gybis-fini`.
+
+Outcome: key decisions are preserved deliberately instead of being left to automatic chat summarization.
+
+### Close a Session Cleanly
+
+Use this when you are actually ending the current work session and want to preserve continuity for the next one.
+
+1. Run `/gybis-fini` to encode session state before termination.
+2. Start the next session with `/gybis-init` so the recorded state is brought back into working context.
+
+Outcome: each session leaves behind durable memory instead of losing project knowledge at the chat boundary.
+
+---
+
 ## Architecture Principles
 
 - **Organize by durability** — Structure things by how long they will likely last.
