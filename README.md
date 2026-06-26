@@ -31,7 +31,7 @@ The goal of **gybis** is to make it easy for developers to set up, utilize, and 
 - **AI base context**: [Nucleus](https://github.com/michaelwhitford/nucleus) mathematical notation engages
   the AI model's structured reasoning rather than its conversational defaults. The inherent precision means significantly fewer hallucinations, and the inherent density means significantly fewer tokens to convey the same context.
 
-- **Ubiquitous language**: Vocabulary commands establish and maintain canonical domain terminology in `vocabulary.md`, reducing ambiguity and keeping architecture/specification artifacts aligned to shared terms.
+- **Ubiquitous language**: In the context of Domain-Driven Design (DDD), a ubiquitous language is a shared, precise vocabulary that both technical and non-technical people use consistently when talking about a system. In gybis, vocabulary commands establish and maintain a project's ubiquitous language in `vocabulary.md`, thus reducing ambiguity and keeping architecture/specification artifacts aligned to shared terms.
  
 - **Architecture model**: A derivative of the [Nucleus VSM](https://github.com/michaelwhitford/nucleus/blob/main/VSM.md) allows an AI to generate and maintain a 5-layer architectural specification, stored in a `architecture.md` file, that AI keeps up to date as projects evolve.
  
@@ -173,7 +173,7 @@ In practice, upstream inputs are handled in three modes:
 
 ### Maintainer Notes
 
-#### Nucleus Lambda Compiler
+#### Nucleus Lambda Compilerubiquitous language
 
 gybis relies heavily on the lambda notation and operator semantics defined upstream in nucleus `LAMBDA-COMPILER.md`.
 That upstream file is a semantic source of truth for how lambda-heavy gybis artifacts should be read and authored, even though it is not copied into this repository.
