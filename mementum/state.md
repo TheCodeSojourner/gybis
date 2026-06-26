@@ -1,3 +1,4 @@
+✅ session-19 | 2026-06-26 strict test-pass convergence added to gybis-spec-propagate and gybis-spec-weed
 ✅ session-18 | 2026-06-26 gybis-fini closeout captured for vocabulary-first GYBIS-README alignment and citation cleanup
 ✅ session-17 | 2026-06-25 GYBIS-README scope clarified: only `/gybis-spec-propagate` and `/gybis-spec-weed` apply architecture preferences
 ✅ session-16 | 2026-06-25 describe/explain skills gained explicit response-vs-markdown output modes
@@ -19,16 +20,16 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-06-26T13:00:02-06:00
-- **Sessions**: 18 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout, session-11 bundle .agents migration, session-12 allium sync + loop protocol refinement, session-13 internal skill check updates, session-14 spec orientation scope correction, session-15 init workflow, session-16 describe/explain output modes, session-17 architecture-alignment scope doc update, session-18 README/GYBIS closeout)
-- **Status**: Session-18 terminated — gybis-fini complete
+- **Last updated**: 2026-06-26T13:22:37-06:00
+- **Sessions**: 19 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout, session-11 bundle .agents migration, session-12 allium sync + loop protocol refinement, session-13 internal skill check updates, session-14 spec orientation scope correction, session-15 init workflow, session-16 describe/explain output modes, session-17 architecture-alignment scope doc update, session-18 README/GYBIS closeout, session-19 strict test-pass convergence)
+- **Status**: Session-19 terminated — gybis-fini complete
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
 - **Core stack**: Nucleus (math notation base context) + Allium (behavioral DSL) + Mementum (persistent memory)
 - **Architecture**: VSM derivative (5-layer architectural spec)
 - **GitHub**: TheCodeSojourner/gybis
-- **Latest work**: Session-18 closed out documentation alignment work for README.md and gybis/GYBIS-README.md with vocabulary-first framing and citation consistency updates.
+- **Latest work**: Session-19 added strict test-pass convergence to `gybis-spec-propagate` and `gybis-spec-weed`, including explicit `RUNNING_TESTS` loop states and completion gates.
 
 ## Recent Activity
 - Initial commit: README with project definition, glossary, overview
@@ -82,6 +83,10 @@
   - Added five explicit output modes, repo-root `.md` path validation, overwrite confirmation, and conventional filenames
   - Synced README command tables to mention prose or markdown output
   - Stored reusable memory: `mementum/memories/describe-explain-output-modes.md`
+- Session-19 (2026-06-26): strict test-pass convergence for code-mutating spec skills
+  - Updated `gybis-spec-propagate` and `gybis-spec-weed` to require `test_suite_passes = true` before `COMPLETE`
+  - Added explicit `RUNNING_TESTS` states, test command resolution, and failure-driven loop-back transitions
+  - Stored synthesis memory: `mementum/memories/spec-strict-test-convergence.md`
 
 ## Feed-Forward Signals
 - README.md now synchronized with actual gybis/.agents/skills/ directory
@@ -95,22 +100,23 @@
 - Monitor for: gybis skills integration into non-Cline tools
 - Monitor for: orientation/language implication logic drifting into non-propagate/non-weed gybis-spec skills
 - Monitor for: output-mode wording drifting across the four describe/explain skills
+- Monitor for: test-command resolution heuristics drifting from architecture S1 fields and repository conventions
 
 ## Session Closeout
-- **last_session_id**: session-18
-- **current_timestamp**: 2026-06-26T13:00:02-06:00
-- **task**: Align gybis/GYBIS-README.md with updated README.md by enforcing vocabulary-first framing and upstream citation consistency while preserving complementary doc scope.
+- **last_session_id**: session-19
+- **current_timestamp**: 2026-06-26T13:22:37-06:00
+- **task**: Add strict test-pass fixed-point convergence to gybis-spec-propagate and gybis-spec-weed, then document the interaction semantics.
 - **questions**:
-  - Should gybis/GYBIS-README.md mirror root README maintainer sections (Versioning and Upstream Derivation), or stay usage-focused?
-  - Should the gybis/GYBIS-README.md Commands table be reordered to vocabulary-first domain grouping for stricter parity with root README?
+  - Should completion for code-mutating spec skills require passing tests instead of only structural/spec consistency?
+  - Should this behavior be strict-only (no non-strict mode)?
 - **decisions**:
-  - Kept gybis/GYBIS-README.md as an operational usage guide and did not copy root maintainer-only sections.
-  - Replaced architecture-first introductory language with vocabulary-first language to match current workflow semantics.
-  - Replaced self-referential gybis upstream citation with grill-with-docs citation for non-circular upstream documentation.
-  - Stored synthesis memory in `mementum/memories/readme-complementary-scope.md`.
+  - Implemented strict test-pass completion gates in both `gybis-spec-propagate` and `gybis-spec-weed`.
+  - Added `RUNNING_TESTS` phases plus test command resolution from architecture S1 with repository-convention fallback.
+  - Enforced non-completion on test failure via explicit invariants (`¬complete_when_tests_fail`).
+  - Stored synthesis memory in `mementum/memories/spec-strict-test-convergence.md`.
 - **next**:
-  1. Review README.md and gybis/GYBIS-README.md diff together and confirm final command ordering preference.
-  2. Commit documentation changes with a message focused on vocabulary-first alignment and citation cleanup.
-- **recover**: Review README.md and gybis/GYBIS-README.md diff together and confirm final command ordering preference.
+  1. Review whether README/GYBIS-README command descriptions should explicitly mention strict in-skill test execution.
+  2. Validate strict-loop behavior in a representative target repository with a real test runner.
+- **recover**: Review whether README/GYBIS-README command descriptions should explicitly mention strict in-skill test execution.
 
 ⏹→state.md
