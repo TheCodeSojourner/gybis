@@ -22,7 +22,7 @@ The goal of **gybis** is to make it easy for developers to set up, utilize, and 
 
 ## What is SDD and why gybis?
 
-**Spec-Driven Development** is a practice where architectural and behavioral specifications of `what` a system `is` and `what` it `does` drive the implementation of `how` it does it (e.g., code and tests). A specification of the system's `architecture` provides the context for the specification of its `behavior`, and the specification of its `behavior` provides the context for its `implementation` (e.g., code and tests). This creates a virtuous cycle where `architecture`, `behavior` and `implementation` inform and constrain one another as the system evolves. In SDD, specifications are the source of truth for the system's intended behavior, and implementation is done by AI, with full developer visibility. Specs are written before or alongside implementation, kept in source control, and used directly to guide/generate implementation, and detect architectural/behavioral/implementation drift.
+**Spec-Driven Development** is a practice where shared domain vocabulary, architectural and behavioral specifications of `what` a system `is` and `what` it `does` drive the implementation of `how` it does it (e.g., code and tests). A system vocabulary provides the context for its `architecture`, a specification of the system's `architecture` provides the context for the specification of its `behavior`, and the specification of its `behavior` provides the context for its `implementation` (e.g., code and tests). This creates a virtuous cycle where `vocabulary`, `architecture`, `behavior` and `implementation` inform and constrain one another as the system evolves. In SDD, specifications are the source of truth for the system's intended behavior, and implementation is done by AI, with full developer visibility. Specs are written before or alongside implementation, kept in source control, and used directly to guide/generate implementation, and detect architectural/behavioral/implementation drift.
 
 **gybis** adds Developer-Command-Driven AI-Assistance to SDD by adding AI/Developer conversation to the entire workflow. All phases of the software development workflow are verified, harmonized and accelerated by AI assistance, while at the same time, making all phases of the workflow transparent and accessible to the developer. The AI is a collaborator that can be consulted at any time, but the developer is always in control of the process and the final decisions.
 
@@ -30,14 +30,30 @@ The goal of **gybis** is to make it easy for developers to set up, utilize, and 
 
 - **AI base context**: [Nucleus](https://github.com/michaelwhitford/nucleus) mathematical notation engages
   the AI model's structured reasoning rather than its conversational defaults. The inherent precision means significantly fewer hallucinations, and the inherent density means significantly fewer tokens to convey the same context.
+
+- **Ubiquitous language**: Vocabulary commands establish and maintain canonical domain terminology in `vocabulary.md`, reducing ambiguity and keeping architecture/specification artifacts aligned to shared terms.
+ 
 - **Architecture model**: A derivative of the [Nucleus VSM](https://github.com/michaelwhitford/nucleus/blob/main/VSM.md) allows an AI to generate and maintain a 5-layer architectural specification, stored in a `architecture.md` file, that AI keeps up to date as projects evolve.
+ 
 - **Behavioral Domain Specific Language (DSL)**: The [Allium](https://github.com/juxt/allium) DSL is a behavioral specification language the AI can read and write precisely, not
   pseudocode, not free-form prose, but a structured DSL with rules, triggers, surfaces, and transition graphs that AI can reason about directly and minimize hallucinations. Behavioral specifications are saved in one or more files per domain (e.g., orders, payments).
+
 - **AI Session Persistent memory**: [Mementum](https://github.com/michaelwhitford/mementum) is used to manage decisions, patterns, and insights that are stored in files and recalled during AI sessions, so previous context is available between sessions.
 
 ## Available User Commands
 
 The following commands are available after integrating gybis into a target repository. Use them with any compatible AI tool configured to consume the bundled gybis `.agents/skills/` directory:
+
+### Vocabulary Commands (`/gv-*`)
+
+| Command                                  | Description                               |
+| ---------------------------------------- | ----------------------------------------- |
+| `/gybis-vocab-check` (`/gv-check`)       | Validate vocabulary.md syntax & semantics |
+| `/gybis-vocab-describe` (`/gv-describe`) | Describe vocabulary in business language  |
+| `/gybis-vocab-distill` (`/gv-distill`)   | Extract vocabulary from arch/specs/code   |
+| `/gybis-vocab-elicit` (`/gv-elicit`)     | Elicit vocabulary from domain experts     |
+| `/gybis-vocab-explain` (`/gv-explain`)   | Explain vocabulary for developers         |
+| `/gybis-vocab-tend` (`/gv-tend`)         | Update vocabulary with impact analysis    |
 
 ### Architecture Commands (`/ga-*`)
 
@@ -51,17 +67,6 @@ The following commands are available after integrating gybis into a target repos
 | `/gybis-arch-tend` (`/ga-tend`)           | Update arch with human                      |
 | `/gybis-arch-weed` (`/ga-weed`)           | Upsert arch/specs from diffs with human     |
 
-### Memory Commands (`/gm-*`)
-
-| Command                                                 | Description                        |
-| ------------------------------------------------------- | ---------------------------------- |
-| `/gybis-fini`                                           | Encode → Terminate                 |
-| `/gybis-init`                                           | Orient → Recall → Ready            |
-| `/gybis-memory-orient` (`/gm-orient`)                   | Restore prev AI context            |
-| `/gybis-memory-recall {topic}` (`/gm-recall {topic}`)   | Recall topic, or summarize latest  |
-| `/gybis-memory-store {insight}` (`/gm-store {insight}`) | Store insight, or prompt for one   |
-| `/gybis-memory-synthesize` (`/gm-synthesize`)           | Synthesize knowledge from memories |
-
 ### Spec Commands (`/gs-*`)
 
 | Command                                                          | Description                                   |
@@ -73,6 +78,17 @@ The following commands are available after integrating gybis into a target repos
 | `/gybis-spec-propagate` (`/gs-propagate {concern\|domain\|all}`) | Create initial code/tests                     |
 | `/gybis-spec-tend` (`/gs-tend`)                                  | Update specs with human                       |
 | `/gybis-spec-weed` (`/gs-weed`)                                  | Upsert specs/code-tests from diffs with human |
+
+### Memory Commands (`/gm-*`)
+
+| Command                                                 | Description                        |
+| ------------------------------------------------------- | ---------------------------------- |
+| `/gybis-fini`                                           | Encode → Terminate                 |
+| `/gybis-init`                                           | Orient → Recall → Ready            |
+| `/gybis-memory-orient` (`/gm-orient`)                   | Restore prev AI context            |
+| `/gybis-memory-recall {topic}` (`/gm-recall {topic}`)   | Recall topic, or summarize latest  |
+| `/gybis-memory-store {insight}` (`/gm-store {insight}`) | Store insight, or prompt for one   |
+| `/gybis-memory-synthesize` (`/gm-synthesize`)           | Synthesize knowledge from memories |
 
 ### Help
 
@@ -122,10 +138,11 @@ See the `gybis/GYBIS-README.md` for usage instructions, best practices, and work
 
 ## Upstream Repositories
 
-* [**allium**](https://github.com/juxt/allium) [Commit 493a2de] - Behavioral specification
-* [**allium-tools**](https://github.com/juxt/allium-tools) [Commit d368771] - Behavioral specification CLI tools
-* [**mementum**](https://github.com/michaelwhitford/mementum) [Commit ac2eadb] - AI Session Persistent memory
-* [**nucleus**](https://github.com/michaelwhitford/nucleus) [Commit 93c171a] - AI base context, and VSM architectural specifications
+* [**allium**](https://github.com/juxt/allium) - Behavioral specification
+* [**allium-tools**](https://github.com/juxt/allium-tools) - Behavioral specification CLI tools
+* [**grill-with-docs**](https://github.com/mattpocock/skills/tree/main/skills/engineering/grill-with-docs) - Vocabulary tools
+* [**mementum**](https://github.com/michaelwhitford/mementum) - AI Session Persistent memory
+* [**nucleus**](https://github.com/michaelwhitford/nucleus) - AI base context, and VSM architectural specifications
 
 ## For gybis Developers: Upstream Derivation
 
@@ -146,12 +163,13 @@ In practice, upstream inputs are handled in three modes:
 
 ### Per-Upstream Transformations
 
-| Upstream         | Pinned commit | Source consumed                                               | Transformation into gybis                                                                                                                                          |
-| ---------------- | ------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **allium**       | `493a2de`     | Allium language semantics and behavioral-spec structure       | Curated into gybis lang/ref docs, and encoded into spec skills.                                                                                                    |
-| **allium-tools** | `7fa6247`     | CLI validate/analyze capabilities                             | Executed in gybis spec skill workflows. User dependency only. Not integrated in `gybis/` in any way.                                                               |
-| **mementum**     | `ac2eadb`     | Mementum protocol semantics                                   | Used to derive gybis memory skills.                                                                                                                                |
-| **nucleus**      | `93c171a`     | Nucleus notation + VSM model + `LAMBDA-COMPILER.md` semantics | Used to derive gybis skills. gybis uses the lambda compiler defined by the nucleus `LAMBDA-COMPILER.md` even though the file is not included in gybis in any form. |
+| Upstream            | Pinned commit | Source consumed                                               | Transformation into gybis                                                                                                                                          |
+| ------------------- | ------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **allium**          | `493a2de`     | Allium language semantics and behavioral-spec structure       | Curated into gybis lang/ref docs, and encoded into spec skills.                                                                                                    |
+| **allium-tools**    | `7fa6247`     | CLI validate/analyze capabilities                             | Executed in gybis spec skill workflows. User dependency only. Not integrated in `gybis/` in any way.                                                               |
+| **grill-with-docs** | `5d78bd0`     | The grill-with-docs skill, and its dependencies               | Used to derive gybis vocabulary skills.                                                                                                                            |
+| **mementum**        | `ac2eadb`     | Mementum protocol semantics                                   | Used to derive gybis memory skills.                                                                                                                                |
+| **nucleus**         | `93c171a`     | Nucleus notation + VSM model + `LAMBDA-COMPILER.md` semantics | Used to derive gybis skills. gybis uses the lambda compiler defined by the nucleus `LAMBDA-COMPILER.md` even though the file is not included in gybis in any form. |
 
 ### Maintainer Notes
 
@@ -220,6 +238,18 @@ by JUXT.
 
 Original project:
 https://github.com/juxt/allium-tools
+
+Portions derived from the upstream project remain subject to the
+terms of its license.
+
+## grill-with-docs
+
+This project incorporates ideas, code, and/or structure from
+[grill-with-docs](https://github.com/mattpocock/skills/tree/main/skills/engineering/grill-with-docs)
+by Matt Pocock.
+
+Original project:
+https://github.com/mattpocock/skills/tree/main/skills/engineering/grill-with-docs
 
 Portions derived from the upstream project remain subject to the
 terms of its license.
