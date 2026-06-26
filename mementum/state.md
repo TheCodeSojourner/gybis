@@ -1,3 +1,5 @@
+✅ session-18 | 2026-06-26 gybis-fini closeout captured for vocabulary-first GYBIS-README alignment and citation cleanup
+✅ session-17 | 2026-06-25 GYBIS-README scope clarified: only `/gybis-spec-propagate` and `/gybis-spec-weed` apply architecture preferences
 ✅ session-16 | 2026-06-25 describe/explain skills gained explicit response-vs-markdown output modes
 ✅ session-15 | 2026-06-25 gybis-init: orient manifest prepared from state, memories, knowledge, and open questions
 ✅ session-14 | 2026-06-25 spec orientation scope corrected: keep orientation handling only in gybis-spec-propagate and gybis-spec-weed
@@ -17,16 +19,16 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-06-25T12:58:45-06:00
-- **Sessions**: 16 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout, session-11 bundle .agents migration, session-12 allium sync + loop protocol refinement, session-13 internal skill check updates, session-14 spec orientation scope correction, session-15 init workflow, session-16 describe/explain output modes)
-- **Status**: Session-16 terminated — gybis-fini complete
+- **Last updated**: 2026-06-26T13:00:02-06:00
+- **Sessions**: 18 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout, session-11 bundle .agents migration, session-12 allium sync + loop protocol refinement, session-13 internal skill check updates, session-14 spec orientation scope correction, session-15 init workflow, session-16 describe/explain output modes, session-17 architecture-alignment scope doc update, session-18 README/GYBIS closeout)
+- **Status**: Session-18 terminated — gybis-fini complete
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
 - **Core stack**: Nucleus (math notation base context) + Allium (behavioral DSL) + Mementum (persistent memory)
 - **Architecture**: VSM derivative (5-layer architectural spec)
 - **GitHub**: TheCodeSojourner/gybis
-- **Latest work**: Session-16 added explicit human-selected response/markdown output modes to the four describe/explain skills, with repo-root markdown guards and synced command-table wording.
+- **Latest work**: Session-18 closed out documentation alignment work for README.md and gybis/GYBIS-README.md with vocabulary-first framing and citation consistency updates.
 
 ## Recent Activity
 - Initial commit: README with project definition, glossary, overview
@@ -95,27 +97,20 @@
 - Monitor for: output-mode wording drifting across the four describe/explain skills
 
 ## Session Closeout
-- **last_session_id**: session-17
-- **current_timestamp**: 2026-06-25T14:15:00-06:00
-- **task**: Added "Architecture alignment" bullet to GYBIS-README.md Specification Philosophy section; clarified that only `/gybis-spec-propagate` and `/gybis-spec-weed` apply architectural preferences; other spec skills are architecture-agnostic
-- **questions**: —
-- **decisions**: Confirmed lighter-touch wording ("are" vs "remain"); integrated session-14 decision into documentation
-- **next**: [Commit GYBIS-README.md change, Monitor: New skills/command drift/output-mode consistency, Consider describe/explain output-mode README updates (deferred)]
-- **recover**: Commit GYBIS-README.md change with message "📋 architecture alignment: document spec skills scope"
-- **task**:
-  - Add explicit human-selected response/markdown output modes to the four describe/explain skills and synchronize the command tables.
+- **last_session_id**: session-18
+- **current_timestamp**: 2026-06-26T13:00:02-06:00
+- **task**: Align gybis/GYBIS-README.md with updated README.md by enforcing vocabulary-first framing and upstream citation consistency while preserving complementary doc scope.
 - **questions**:
-  - Should a future skill-consistency check assert the same five output mode labels across all four describe/explain skills?
-  - Should a live manual exercise be added later to validate prompt wording and overwrite behavior in actual agent runs?
+  - Should gybis/GYBIS-README.md mirror root README maintainer sections (Versioning and Upstream Derivation), or stay usage-focused?
+  - Should the gybis/GYBIS-README.md Commands table be reordered to vocabulary-first domain grouping for stricter parity with root README?
 - **decisions**:
-  - Standardized five modes: `response_only`, `prompted_file_only`, `default_file_only`, `response_and_prompted_file`, and `response_and_default_file`.
-  - Restricted prompted output targets to repo-root `.md` filenames and rejected subpaths.
-  - Chose conventional filenames `arch-describe.md`, `arch-explain.md`, `spec-describe.md`, and `spec-explain.md`.
-  - Required explicit overwrite approval before replacing an existing markdown output file.
-  - Added memory `mementum/memories/describe-explain-output-modes.md` as feed-forward guidance.
-  - Deferred git commit to the normal user-controlled workflow.
+  - Kept gybis/GYBIS-README.md as an operational usage guide and did not copy root maintainer-only sections.
+  - Replaced architecture-first introductory language with vocabulary-first language to match current workflow semantics.
+  - Replaced self-referential gybis upstream citation with grill-with-docs citation for non-circular upstream documentation.
+  - Stored synthesis memory in `mementum/memories/readme-complementary-scope.md`.
 - **next**:
-  1. Manually exercise one architecture and one specification describe/explain command to validate prompt wording and overwrite flow.
-  2. Consider adding a non-blocking skill-consistency check to keep the four output-mode contracts synchronized.
+  1. Review README.md and gybis/GYBIS-README.md diff together and confirm final command ordering preference.
+  2. Commit documentation changes with a message focused on vocabulary-first alignment and citation cleanup.
+- **recover**: Review README.md and gybis/GYBIS-README.md diff together and confirm final command ordering preference.
 
 ⏹→state.md
