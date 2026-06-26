@@ -14,19 +14,19 @@
 
 ## Development with the Gybis Stack
 
-This repository is structured for **development with the Gybis stack**, following a disciplined architecture-first methodology where durability, hierarchy, and behavioral truth guide every decision.
+This repository is structured for **development with the Gybis stack**, following a disciplined vocabulary-first methodology where durability, hierarchy, and behavioral truth guide every decision.
 
 When gybis is installed into a target repository, its command implementations are shipped in the bundled `.agents/skills/` directory.
 
-gybis is a **developer-command-driven, AI-assisted Spec-Driven Development (SDD) stack**. It is designed to help you define architecture and behavioral specifications first, then implement and validate code against those specifications with full human oversight.
+gybis is a **developer-command-driven, AI-assisted Spec-Driven Development (SDD) stack**. It is designed to help you establish shared domain vocabulary first, then define architecture and behavioral specifications, and finally implement and validate code against those specifications with full human oversight.
 
 ## What gybis Is and Why It Exists
 
-In gybis, specifications are durable and implementation is replaceable.
+In gybis, vocabulary and specifications are durable and implementation is replaceable.
 
-- **Spec-Driven Development (SDD):** Architecture and behavioral specifications define what the system is and does, and implementation follows those constraints.
+- **Spec-Driven Development (SDD):** Shared domain vocabulary, architecture, and behavioral specifications define what the system is and does, and implementation follows those constraints.
 - **Human-controlled AI assistance:** AI supports analysis, authoring, and validation, but humans stay in control of decisions and approvals.
-- **Durable truth model:** Architecture and behavioral specifications are the source of truth; code and tests must align to them.
+- **Durable truth model:** Vocabulary, architecture, and behavioral specifications are the source of truth; code and tests must align to them.
 
 ## Installing the Allium CLI
 
@@ -36,9 +36,23 @@ See the [allium-tools repository](https://github.com/juxt/allium-tools) for inst
 
 ## Quick Start
 
-- **New repository:** Start with `/gybis-arch-elicit` to establish architecture constraints.
-- **Existing repository:** Start with `/gybis-spec-distill` to extract behavioral specifications from current implementation, then use `/gybis-arch-distill` to derive architecture from those specifications.
-- **Need guidance:** Run `/gybis-help` to see available commands.
+### New Repository: Vocabulary-First Workflow
+
+1. **Establish vocabulary:** Run `/gybis-vocab-elicit` to elicit domain vocabulary from domain experts.
+2. **Establish architecture:** Run `/gybis-arch-elicit` to establish architecture constraints from the agreed vocabulary.
+3. **Derive specifications:** Run `/gybis-arch-propagate` to create specifications from architecture.
+4. **Derive code and tests:** Run `/gybis-spec-propagate` to generate initial code and test stubs.
+
+### Existing Repository: Distill-First Workflow
+
+1. **Extract specifications:** Run `/gybis-spec-distill` to extract behavioral specifications from current implementation.
+2. **Derive architecture:** Run `/gybis-arch-distill` to derive architecture from extracted specifications, and implementation.
+3. **Extract vocabulary:** Run `/gybis-vocab-distill` to extract  vocabulary from architecture, specifications, and implementation.
+4. **Synchronize and refine:** Use `/gybis-vocab-tend`, `/gybis-arch-weed`, and `/gybis-spec-weed` to resolve divergence and keep layers aligned.
+
+### Need Guidance?
+
+Run `/gybis-help` to see available commands organized by architecture, memory, specification, and vocabulary domains.
 
 ---
 
@@ -46,29 +60,37 @@ See the [allium-tools repository](https://github.com/juxt/allium-tools) for inst
 
 - **Organize by durability** — Structure things by how long they will likely last.
 - **Hierarchy of abstractions:** why > what > how.
-- **Layered system:** S5 > S4 > S3 > S2 > S1 > specs > tests > code — stricter, more durable layers constrain looser, more transient ones.
-  S5..S1 are architectural layers; together they constrain specifications, which then constrain tests, which then constrain code.
+- **Layered system:** vocabulary > S5 > S4 > S3 > S2 > S1 > specs > tests > code — stricter, more durable layers constrain looser, more transient ones.
+  Vocabulary and S5..S1 are durable constraint layers. Together they constrain specifications, which then constrain tests, which then constrain code.
 - **No flat structures.** Everything has its place in the hierarchy.
-- **Top-down only.** Higher layers constrain lower layers. Architecture (S5 ... S1) > Specs > Tests > Code.
+- **Top-down only.** Higher layers constrain lower layers. Vocabulary > Architecture (S5 ... S1) > Specs > Tests > Code.
 - **No reverse dependencies.** Lower layers never constrain higher layers.
 - **Drift surfaces automatically.** When code, tests, or behavior diverge from architecture/specification constraints, drift is detected, surfaced, and halted.
+
+### Vocabulary Layer
+
+Vocabulary is the durable, human-agreed foundation that constrains downstream architecture and specifications.
+
+- **Ubiquitous language:** `vocabulary.md` captures canonical terms, definitions, and relationships.
+- **Constraint hierarchy:** Vocabulary constrains architecture, architecture constrains specifications, specifications constrain tests, and tests constrain code.
+- **Durability:** Vocabulary is often more durable than architecture and should be established first for new systems or distilled first for existing systems.
 
 ---
 
 ## Architecture Philosophy
 
-Architecture describes system-level constraints that drive behavior specifications that drive tests, that drive code.
+Vocabulary and architecture describe system-level constraints that drive behavior specifications that drive tests, that drive code.
 
 - **Constrain top-down.** Architecture governs specification, tests, and code, not the reverse.
 - **Governance flow:** Architecture, specification, tests and implementation must remain aligned.
 
 ### New Repository
 
-For a new repository, start with `/gybis-arch-elicit` to establish durable architectural constraints with the developer, then derive behavior specifications from the architecture with `/gybis-arch-propagate`, and finally derive code and tests from the behavior specifications with `/gybis-spec-propagate`.
+For a new repository, run `/gybis-vocab-elicit` to establish domain vocabulary with the developer first, then run `/gybis-arch-elicit` to establish durable architectural constraints, derive behavior specifications with `/gybis-arch-propagate`, and finally derive code and tests with `/gybis-spec-propagate`.
 
 ### Existing Repository
 
-For an existing repository, start with `/gybis-spec-distill` to create a set of behavior specifications from tests and code, then establish durable architectural constraints with `/gybis-arch-distill`.
+For an existing repository, run `/gybis-spec-distill` to create behavior specifications from tests and code, then establish durable architectural constraints with `/gybis-arch-distill`, and then run `/gybis-vocab-distill` to extract vocabulary.
 
 ---
 
@@ -98,7 +120,7 @@ Specifications describe code **behavior**, not implementation.
 
 ## Memory System
 
-Memory tracks the state of four domains: **architecture, specification, tests, and code**.
+Memory tracks the state of five domains: **vocabulary, architecture, specification, tests, and code**.
 
 - **Session persistence:** Session `n+1` is proportional to the sum of all prior encodings from sessions `1..n`.
 - **No knowledge loss** across sessions. Decisions captured in one session are available to future sessions through memory recall commands.
@@ -140,10 +162,11 @@ This section defines transparency, for all non-memory operations.
 ## Layer Order (Enforced)
 
 ```
-architecture > specification > tests > code
+vocabulary > architecture > specification > tests > code
 ```
 
 - **No bypassing the hierarchy.**
+- **No architecture before vocabulary.**
 - **No specification before architecture.**
 - **No testing before specification.**
 - **No implementation before testing.**
@@ -164,6 +187,7 @@ architecture > specification > tests > code
 | `/gybis-arch-tend` (`/ga-tend`)                                  | Update arch with human                        |
 | `/gybis-arch-weed` (`/ga-weed`)                                  | Upsert arch/specs from diffs with human       |
 | `/gybis-fini`                                                    | CRUD memory before terminate                  |
+| `/gybis-help`                                                    | Show available commands                       |
 | `/gybis-init`                                                    | Initialize gybis AI context                   |
 | `/gybis-memory-orient` (`/gm-orient`)                            | Restore prev AI context                       |
 | `/gybis-memory-recall {topic}` (`/gm-recall {topic}`)            | Recall topic/summarize-latest                 |
@@ -176,6 +200,12 @@ architecture > specification > tests > code
 | `/gybis-spec-propagate` (`/gs-propagate {concern\|domain\|all}`) | Create initial code/tests                     |
 | `/gybis-spec-tend` (`/gs-tend`)                                  | Update specs with human                       |
 | `/gybis-spec-weed` (`/gs-weed`)                                  | Upsert specs/code-tests from diffs with human |
+| `/gybis-vocab-check` (`/gv-check`)                               | Validate vocabulary.md syntax & semantics     |
+| `/gybis-vocab-describe` (`/gv-describe`)                         | Describe vocabulary in business language      |
+| `/gybis-vocab-distill` (`/gv-distill`)                           | Extract vocabulary from arch/specs/code       |
+| `/gybis-vocab-elicit` (`/gv-elicit`)                             | Elicit vocabulary from domain experts         |
+| `/gybis-vocab-explain` (`/gv-explain`)                           | Explain vocabulary for developers             |
+| `/gybis-vocab-tend` (`/gv-tend`)                                 | Update vocabulary with impact analysis        |
 
 ## Upstream Citations
 
@@ -203,14 +233,14 @@ https://github.com/juxt/allium-tools
 Portions derived from the upstream project remain subject to the
 terms of its license.
 
-## gybis
+## grill-with-docs
 
 This project incorporates ideas, code, and/or structure from
-[gybis](https://github.com/TheCodeSojourner/gybis)
-by Paul Whittington.
+[grill-with-docs](https://github.com/mattpocock/skills/tree/main/skills/engineering/grill-with-docs)
+by Matt Pocock.
 
 Original project:
-https://github.com/TheCodeSojourner/gybis
+https://github.com/mattpocock/skills/tree/main/skills/engineering/grill-with-docs
 
 Portions derived from the upstream project remain subject to the
 terms of its license.
