@@ -26,6 +26,14 @@ The goal of **gybis** is to make it easy for developers to set up, utilize, and 
 
 **gybis** adds Developer-Command-Driven AI-Assistance to SDD by adding AI/Developer conversation to the entire workflow. All phases of the software development workflow are verified, harmonized and accelerated by AI assistance, while at the same time, making all phases of the workflow transparent and accessible to the developer. The AI is a collaborator that can be consulted at any time, but the developer is always in control of the process and the final decisions.
 
+## Operator Responsibility Model
+
+gybis is command-driven guidance, not always-on process enforcement.
+
+- Human operators are responsible for stage readiness (`vocabulary.md` -> `architecture.md` -> `specs/**/*.allium` -> code/tests).
+- Skills execute the requested transformation and enforce only execution-critical gates.
+- Check and weed commands are available as deliberate convergence tools when operators choose to run them.
+
 **gybis** provides the scaffolding to make AI-assisted SDD practical:
 
 - **AI base context**: [Nucleus](https://github.com/michaelwhitford/nucleus) mathematical notation engages

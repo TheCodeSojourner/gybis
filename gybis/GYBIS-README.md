@@ -20,6 +20,15 @@ When gybis is installed into a target repository, its command implementations ar
 
 gybis is a **developer-command-driven, AI-assisted Spec-Driven Development (SDD) stack**. It is designed to help you establish shared domain vocabulary first, then define architecture and behavioral specifications, and finally implement and validate code against those specifications with full human oversight.
 
+## Operator Responsibility Model
+
+gybis is command-driven guidance, not always-on process enforcement.
+
+- **Human owns stage readiness:** The human operator is responsible for satisfying preconditions between stages (`vocabulary.md`, `architecture.md`, `specs/**/*.allium`, code/tests).
+- **Skills own requested transformation:** A skill executes the transformation it was invoked to do and enforces only execution-critical gates.
+- **Checks are deliberate tools:** `check` and `weed` commands are available to validate convergence when the human chooses to run them.
+- **Tradeoff is explicit:** If preconditions are skipped, quality or convergence may degrade; this is an operator decision, not a hidden protocol failure.
+
 ## What gybis Is and Why It Exists
 
 In gybis, vocabulary and specifications are durable and implementation is replaceable.

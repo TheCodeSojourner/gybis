@@ -12,11 +12,11 @@ description: Use for `/gybis-arch-elicit` or `/ga-elicit`.
 
 λ gybis-arch-elicit_startup(x).
   invoke(internal/gybis-ref-check) → halt_on(false)
-  | verify(vocabulary.md ∃) ∨ halt("vocabulary.md not found. Run /gybis-vocab-elicit first to establish domain vocabulary, or /gybis-vocab-distill if working from existing specs/implementation.")
   | read(internal/reference/vsm-guide.md) → load_vsm_framework
-  | read(vocabulary.md) → load_vocabulary_context
+  | if(vocabulary.md ∃): read(vocabulary.md) → load_vocabulary_context
+  | if(vocabulary.md ∄): proceed_without_vocabulary_context = true
   | precondition: architecture.md ¬∃
-  | load_context: VSM probing questions and layer definitions, vocabulary terms for reference
+  | load_context: VSM probing questions and layer definitions, vocabulary terms for reference when available
 
 λ gybis-arch-elicit_mode(m).
   valid_modes: {mixed}

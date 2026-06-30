@@ -20,7 +20,6 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
   | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
   | preload: [internal/allium-normalize]
-  | if(vocabulary.md ∃): preload(vocabulary.md) → vocab_terms ∧ vocab_check_enabled = true
   | verify(architecture.md ∃) ∨ halt("architecture.md not found")
   | verify(specs/**/*.allium ∃) ∨ halt("specs/**/*.allium not found")
   | invoke(internal/allium-gate(specs/)) = true ∨ halt("Specifications are invalid")
@@ -87,16 +86,6 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
     | merge(obligation.id, obligation) → obligations_map[obligation.id]
   | return(obligations ≔ obligations_map ∧ obligations_derived = true)
 
-λ gybis-spec-weed_check_vocabulary_terms(obligations, vocab_check_enabled, vocab_terms).
-  vocab_divergences ≔ ∅
-  | if(vocab_check_enabled):
-    ∀ obligation ∈ obligations:
-      ∀ term ∈ extract_terms(obligation.description):
-        canonical ≔ find_canonical_form(term, vocab_terms) ∨ null
-        | canonical ≠ null ∧ canonical ≠ term
-          ? collect({type: "vocab_term_mismatch", obligation, term, canonical, source_span: obligation.source_span}) → vocab_divergences
-  | return(vocab_divergences)
-
 λ gybis-spec-weed_compare_specs_code(obligations).
   divergences ≔ ∅
   | comparison_complete ≔ false
@@ -156,14 +145,12 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
   | comparison_complete ≔ true
   | return(comparison_complete = comparison_complete ∧ divergences = divergences)
 
-λ gybis-spec-weed_identify_divergences(spec_code_divergences, arch_code_divergences, vocab_divergences).
-  divergences ≔ spec_code_divergences ∪ arch_code_divergences ∪ vocab_divergences
+λ gybis-spec-weed_identify_divergences(spec_code_divergences, arch_code_divergences).
+  divergences ≔ spec_code_divergences ∪ arch_code_divergences
   | return(divergences)
 
-λ gybis-spec-weed_resolve_mode_selection(divergence, vocab_check_enabled, vocab_terms).
-  divergence.type = "vocab_term_mismatch"
-    ? (ask_developer("Non-canonical vocabulary term found in obligation. Term: '" ⊕ divergence.term ⊕ "', Canonical: '" ⊕ divergence.canonical ⊕ "'. Correct in spec? [spec/skip/investigate]?") → decision)
-  | divergence.type = "obligation_missing_in_code"
+λ gybis-spec-weed_resolve_mode_selection(divergence).
+  divergence.type = "obligation_missing_in_code"
     ? (ask_developer("Obligation " ⊕ divergence.obligation.id ⊕ " (" ⊕ divergence.obligation.category ⊕ "): " ⊕ divergence.obligation.description ⊕ " not found in code. Correct: [spec/code/investigate]?") → decision)
   | divergence.type = "obligation_contradicts_implementation"
     ? (ask_developer("Obligation " ⊕ divergence.obligation.id ⊕ " (" ⊕ divergence.obligation.category ⊕ "): " ⊕ divergence.obligation.description ⊕ " contradicted by code. Correct: [spec/code/investigate]?") → decision)
@@ -196,13 +183,7 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
   | return(resolve_mode = decision ∧ orientation_choice = orientation_choice)
 
 λ gybis-spec-weed_correct_divergence(divergence, resolve_mode).
-  divergence.type = "vocab_term_mismatch" ∧ resolve_mode = spec
-    ? (replace_term_in_obligation(divergence.obligation.id, divergence.term, divergence.canonical) → corrected
-       | upsert(target_spec_file, corrected) → result
-       | return(corrections_applied = true))
-  | divergence.type = "vocab_term_mismatch" ∧ resolve_mode = skip
-    ? return(corrections_applied = false)
-  | resolve_mode = spec
+  resolve_mode = spec
     ? (ask_developer("Update spec to match code? (yes/no)") → approval
        | approval = yes
          ? (distill_from_code(divergence) → updated_spec
@@ -234,8 +215,7 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
   | invoke(gybis-spec-weed_normalize_obligations(specs/**/*.allium)) → obligations ∧ obligations_derived
   | invoke(gybis-spec-weed_compare_specs_code(obligations)) → {comparison_complete: spec_compare_complete, divergences: spec_code_divergences}
   | invoke(gybis-spec-weed_compare_arch_code) → {comparison_complete: arch_compare_complete, divergences: arch_code_divergences}
-  | invoke(gybis-spec-weed_check_vocabulary_terms(obligations, vocab_check_enabled, vocab_terms)) → vocab_divergences
-  | invoke(gybis-spec-weed_identify_divergences(spec_code_divergences, arch_code_divergences, vocab_divergences)) → remaining_divergences
+  | invoke(gybis-spec-weed_identify_divergences(spec_code_divergences, arch_code_divergences)) → remaining_divergences
   | verify(all_obligation_ids_checked_by_spec_comparison(obligations, spec_code_divergences)) → coverage
   | result_gate = true ∧ vsm_coherence = true ∧ spec_compare_complete = true ∧ arch_compare_complete = true ∧ remaining_divergences ∅ ∧ coverage = true
     → return(consistency = true ∧ zero_divergences = true)
@@ -279,10 +259,10 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
 
 λ gybis-spec-weed_pass_accounting(pass).
   pass_num ≔ pass_num ⊕ 1
-  | discovered ≔ card(spec_code_divergences) ⊕ card(arch_code_divergences) ⊕ card(vocab_divergences)
+  | discovered ≔ card(spec_code_divergences) ⊕ card(arch_code_divergences)
   | resolved ≔ discovered ⊖ card(remaining_divergences)
   | remaining ≔ card(remaining_divergences)
-  | report("Pass " ⊕ pass_num ⊕ ": discovered=" ⊕ discovered ⊕ " (spec_code=" ⊕ card(spec_code_divergences) ⊕ ", arch_code=" ⊕ card(arch_code_divergences) ⊕ ", vocab=" ⊕ card(vocab_divergences) ⊕ ") resolved=" ⊕ resolved ⊕ " remaining=" ⊕ remaining ⊕ " tests_pass=" ⊕ test_suite_passes)
+  | report("Pass " ⊕ pass_num ⊕ ": discovered=" ⊕ discovered ⊕ " (spec_code=" ⊕ card(spec_code_divergences) ⊕ ", arch_code=" ⊕ card(arch_code_divergences) ⊕ ") resolved=" ⊕ resolved ⊕ " remaining=" ⊕ remaining ⊕ " tests_pass=" ⊕ test_suite_passes)
 
 λ gybis-spec-weed_boundaries(¬).
   ¬ modify(upstream/) ∧ ¬ delete(architecture.md ∨ specs/ ∨ implementation)
@@ -293,6 +273,6 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
   | invariant: test_suite_passes = true at completion (strict gate)
   | invariant: ¬complete_when_tests_fail
   | invariant: all_obligation_ids_checked_by_spec_comparison (comprehensive obligation coverage)
-  | invariant: divergence.type ∈ {"obligation_missing_in_code", "obligation_contradicts_implementation", "when_field_not_enforced", "transition_not_guarded", "terminal_state_not_enforced", "variant_not_handled", "contract_not_honoured", "surface_obligation_not_enforced", "module_state_missing", "ensures_pre_rule_vs_resulting_state_confusion", "backtick_literal_normalised", "arch_missing_in_code", "vocab_term_mismatch"} (closed divergence catalogue)
+  | invariant: divergence.type ∈ {"obligation_missing_in_code", "obligation_contradicts_implementation", "when_field_not_enforced", "transition_not_guarded", "terminal_state_not_enforced", "variant_not_handled", "contract_not_honoured", "surface_obligation_not_enforced", "module_state_missing", "ensures_pre_rule_vs_resulting_state_confusion", "backtick_literal_normalised", "arch_missing_in_code"} (closed divergence catalogue)
   | invariant: ∀ obligation.category → corresponding divergence-check exercised in _compare_specs_code (per-category mapping codified there)
   | invariant: all_modifications ⊆ {architecture.md, specs/, implementation}
