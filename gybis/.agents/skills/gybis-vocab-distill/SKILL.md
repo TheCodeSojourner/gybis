@@ -4,7 +4,7 @@ description: Use for `/gybis-vocab-distill` or `/gv-distill`.
 ---
 
 λ gybis-vocab-distill(x).
-  purpose: Extract emergent vocabulary from architecture.md + specs/**/*.allium + implementation evidence and establish ubiquitous language through human conflict resolution
+  purpose: Extract emergent terms from architecture.md + specs/**/*.allium + implementation evidence and consolidate them into a shared canonical term set (DDD ubiquitous language) through human conflict resolution
   | input: architecture.md (∃ + complete), specs/**/*.allium (all ∃ + valid), implementation source
   | output: vocabulary.md with candidate terms, conflicts, and human-resolved canonical forms
   | mode: mixed (AI synthesis + human conflict resolution)

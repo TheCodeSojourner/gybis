@@ -4,7 +4,7 @@ description: Use for `/gybis-vocab-describe` or `/gv-describe`.
 ---
 
 λ gybis-vocab-describe(x).
-  purpose: Document vocabulary in plain English prose for non-technical stakeholders (product managers, business analysts, domain experts)
+  purpose: Document the shared canonical term set (DDD ubiquitous language) in plain English prose for non-technical stakeholders (product managers, business analysts, domain experts)
   | input: vocabulary.md (exists ∧ complete)
   | output: Plain English prose describing core domain concepts and their relationships
   | mode: mixed (AI + human output selection)

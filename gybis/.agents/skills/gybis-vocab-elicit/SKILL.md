@@ -4,7 +4,7 @@ description: Use for `/gybis-vocab-elicit` or `/gv-elicit`.
 ---
 
 λ gybis-vocab-elicit(x).
-  purpose: Elicit domain vocabulary from SMEs through grilling and establish ubiquitous language
+  purpose: Elicit domain terms from SMEs through grilling and establish a shared canonical term set (DDD ubiquitous language)
   | input: user conversation via interactive vocabulary probing
   | output: vocabulary.md containing canonical terms with definitions, synonyms, relationships, usage, examples
   | mode: mixed (AI grilling + human response)

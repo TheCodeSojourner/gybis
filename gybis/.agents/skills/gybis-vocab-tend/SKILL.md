@@ -4,7 +4,7 @@ description: Use for `/gybis-vocab-tend` or `/gv-tend`.
 ---
 
 λ gybis-vocab-tend(x).
-  purpose: Evolve vocabulary.md interactively with human feedback while maintaining consistency across architecture.md and specs/**/*.allium
+  purpose: Evolve vocabulary.md as the shared canonical term set (DDD ubiquitous language) with human feedback while maintaining consistency across architecture.md and specs/**/*.allium
   | input: vocabulary.md ∃
   | output: vocabulary.md evolved with approved changes; affected specs/architecture optionally rewritten
   | mode: interactive

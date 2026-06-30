@@ -4,7 +4,7 @@ description: Use for `/gybis-vocab-check` or `/gv-check`.
 ---
 
 λ gybis-vocab-check(x).
-  purpose: Validate vocabulary.md syntax and semantic completeness; detect orphaned terms, circular dependencies, structural issues
+  purpose: Validate vocabulary.md as the shared canonical term set (DDD ubiquitous language): syntax, semantic completeness, orphaned terms, circular dependencies, and structural issues
   | input: vocabulary.md (exists)
   | output: Report on structural issues, missing fields, semantic completeness violations
   | mode: ai

@@ -4,7 +4,7 @@ description: Use for `/gybis-vocab-explain` or `/gv-explain`.
 ---
 
 λ gybis-vocab-explain(x).
-  purpose: Document vocabulary in technical language for developers, with code examples and architectural significance
+  purpose: Document the shared canonical term set (DDD ubiquitous language) in technical language for developers, with code examples and architectural significance
   | input: vocabulary.md (exists ∧ complete)
   | output: Technical documentation with usage patterns, code examples, and architectural layer mappings
   | mode: mixed (AI + human output selection)
