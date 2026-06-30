@@ -34,6 +34,31 @@ gybis is command-driven guidance, not always-on process enforcement.
 - Skills execute the requested transformation and enforce only execution-critical gates.
 - Check and weed commands are available as deliberate convergence tools when operators choose to run them.
 
+## Check, Tend, and Weed Philosophy
+
+These three operations form the core gybis convergence loop:
+
+- `check` diagnoses the current state of one layer and reports what is wrong.
+- `tend` refines one layer with explicit human intent and keeps the change localized.
+- `weed` reconciles drift between adjacent layers and the implementation so the system converges again.
+
+They work top-down: vocabulary constrains architecture, architecture constrains specs, and specs constrain tests and code. `check` finds drift, `tend` makes the intended layer-local change, and `weed` resolves disagreement when two artifacts no longer agree.
+
+| Operation | Purpose                                         | Human role                                               | Typical outcome                   |
+| --------- | ----------------------------------------------- | -------------------------------------------------------- | --------------------------------- |
+| `check`   | Diagnose a layer and surface integrity issues   | Choose when to run it and review the report              | Severity-tagged findings          |
+| `tend`    | Evolve one layer with developer-approved intent | State the desired change and approve edits               | Updated artifact in the same lane |
+| `weed`    | Reconcile divergence across adjacent layers     | Decide which side should move and approve the correction | Mutually consistent artifacts     |
+
+## Workflow Cheat Sheet
+
+Use `check` when you want a diagnostic snapshot, `tend` when you already know the intended refinement, and `weed` when the real task is convergence across layers rather than a single artifact edit.
+
+1. Run `check` first to expose drift or broken assumptions.
+2. Run `tend` next when the needed change belongs to one layer and the intent is clear.
+3. Run `weed` when architecture, specs, or implementation disagree and need a human decision about which artifact should change.
+4. Re-run `check` after `weed` to confirm the target layer is back in a valid state.
+
 **gybis** provides the scaffolding to make AI-assisted SDD practical:
 
 - **AI base context**: [Nucleus](https://github.com/michaelwhitford/nucleus) mathematical notation engages

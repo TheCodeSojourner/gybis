@@ -27,16 +27,16 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-06-30T13:56:31-06:00
-- **Sessions**: 26 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout, session-11 bundle .agents migration, session-12 allium sync + loop protocol refinement, session-13 internal skill check updates, session-14 spec orientation scope correction, session-15 init workflow, session-16 describe/explain output modes, session-17 architecture-alignment scope doc update, session-18 README/GYBIS closeout, session-19 strict test-pass convergence, session-20 use-cases command-surface implementation, session-21 spec-weed vocabulary divergence integration, session-22 init workflow, session-23 vocab-weed skill addition, session-24 operator-responsibility model + spec-vocab decoupling, session-25 init workflow, session-26 arch-check implementation)
-- **Status**: Session-26 terminated — gybis-fini complete
+- **Last updated**: 2026-06-30T14:50:00-06:00
+- **Sessions**: 28 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout, session-11 bundle .agents migration, session-12 allium sync + loop protocol refinement, session-13 internal skill check updates, session-14 spec orientation scope correction, session-15 init workflow, session-16 describe/explain output modes, session-17 architecture-alignment scope doc update, session-18 README/GYBIS closeout, session-19 strict test-pass convergence, session-20 use-cases command-surface implementation, session-21 spec-weed vocabulary divergence integration, session-22 init workflow, session-23 vocab-weed skill addition, session-24 operator-responsibility model + spec-vocab decoupling, session-25 init workflow, session-26 arch-check implementation, session-27 gybis-init orientation, session-28 gybis-fini closeout)
+- **Status**: Session-28 terminated — gybis-fini complete
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
 - **Core stack**: Nucleus (math notation base context) + Allium (behavioral DSL) + Mementum (persistent memory)
 - **Architecture**: VSM derivative (5-layer architectural spec)
 - **GitHub**: TheCodeSojourner/gybis
-- **Latest work**: Session-26 closed via gybis-fini with synthesized memory and updated closeout payload.
+- **Latest work**: Session-28 closeout completed after the README philosophy and workflow cheat sheet updates.
 
 ## Recent Activity
 - Initial commit: README with project definition, glossary, overview
@@ -124,6 +124,14 @@
   - Updated command surfaces in `gybis-help`, `README.md`, and `gybis/GYBIS-README.md`
   - Kept check/resolve boundary consistent: diagnostics in check, resolution in tend/weed skills
   - Stored synthesis memory: `mementum/memories/arch-check-integrity-boundary.md`
+- Session-27 (2026-06-30): gybis-init orientation run
+  - Read `mementum/state.md` as the session bootloader and followed the recent architecture-check context
+  - Ran targeted searches for the current arch-check report question and shared schema question
+  - Prepared the orient manifest required by the gybis-init session startup gate
+- Session-28 (2026-06-30): gybis-fini closeout run
+  - Updated both README files with check/tend/weed philosophy sections and compact workflow cheat sheets
+  - Kept the root README conceptual and the GYBIS-README operational so the docs remain complementary
+  - Refreshed the complementary-scope memory with the new documentation split
 
 ## Feed-Forward Signals
 - README.md now synchronized with actual gybis/.agents/skills/ directory
@@ -143,22 +151,21 @@
 - Monitor for: test-command resolution heuristics drifting from architecture S1 fields and repository conventions
 - Monitor for: Use Cases section drifting from the canonical command table as new commands or aliases are added
 - Monitor for: vocabulary-related divergence logic reappearing in spec skills instead of `gybis-vocab-*` skills
+- Monitor for: arch-check report-mode and shared schema decisions if the check family is expanded later
+- Monitor for: check/tend/weed philosophy staying aligned across README and GYBIS-README without mirroring entire sections
 
 ## Session Closeout
-- **last_session_id**: session-26
-- **current_timestamp**: 2026-06-30T13:56:31-06:00
-- **task**: Implement gybis-arch-check as a read-only architecture integrity validator and synchronize command surfaces.
+- **last_session_id**: session-28
+- **current_timestamp**: 2026-06-30T14:50:00-06:00
+- **task**: Close out the README documentation update for check/tend/weed philosophy and workflow cheat sheets.
 - **questions**:
-  - Should gybis-arch-check emit a markdown-formatted report option that mirrors describe/explain output-mode conventions?
-  - Should all check skills standardize a shared severity taxonomy and report schema contract?
+  - none
 - **decisions**:
-  - Added `gybis-arch-check` with AI-mode, read-only validation scope for architecture structure/coherence/constraints.
-  - Kept check/resolve role boundaries explicit: check diagnoses, tend/weed resolve.
-  - Wired `/gybis-arch-check` (`/ga-check`) into `gybis-help`, `README.md`, and `gybis/GYBIS-README.md`.
-  - Synthesized and stored memory in `mementum/memories/arch-check-integrity-boundary.md`.
+  - Added check/tend/weed philosophy sections to both [README.md](/home/pauwhi/Work/gybis/README.md) and [gybis/GYBIS-README.md](/home/pauwhi/Work/gybis/gybis/GYBIS-README.md).
+  - Kept the root README conceptual and the GYBIS-README operational to preserve complementary scope.
+  - Refreshed `mementum/memories/readme-complementary-scope.md` to capture the new documentation split.
 - **next**:
-  1. Decide whether gybis-arch-check should support markdown report output mode.
-  2. Define a shared report schema contract across `gybis-*-check` skills.
-- **recover**: Decide whether gybis-arch-check should support markdown report output mode.
+  1. Review the updated README sections in a future docs pass if additional command-family guidance is added.
+- **recover**: check/tend/weed philosophy sections now live in both README files.
 
 ⏹→state.md

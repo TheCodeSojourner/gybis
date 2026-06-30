@@ -20,23 +20,6 @@ When gybis is installed into a target repository, its command implementations ar
 
 gybis is a **developer-command-driven, AI-assisted Spec-Driven Development (SDD) stack**. It is designed to help you establish shared domain vocabulary first, then define architecture and behavioral specifications, and finally implement and validate code against those specifications with full human oversight.
 
-## Operator Responsibility Model
-
-gybis is command-driven guidance, not always-on process enforcement.
-
-- **Human owns stage readiness:** The human operator is responsible for satisfying preconditions between stages (`vocabulary.md`, `architecture.md`, `specs/**/*.allium`, code/tests).
-- **Skills own requested transformation:** A skill executes the transformation it was invoked to do and enforces only execution-critical gates.
-- **Checks are deliberate tools:** `check` and `weed` commands are available to validate convergence when the human chooses to run them.
-- **Tradeoff is explicit:** If preconditions are skipped, quality or convergence may degrade; this is an operator decision, not a hidden protocol failure.
-
-## What gybis Is and Why It Exists
-
-In gybis, vocabulary and specifications are durable and implementation is replaceable.
-
-- **Spec-Driven Development (SDD):** Shared domain vocabulary, architecture, and behavioral specifications define what the system is and does, and implementation follows those constraints.
-- **Human-controlled AI assistance:** AI supports analysis, authoring, and validation, but humans stay in control of decisions and approvals.
-- **Durable truth model:** Vocabulary, architecture, and behavioral specifications are the source of truth; code and tests must align to them.
-
 ## Installing the Allium CLI
 
 The `allium` CLI is required for spec validation and analysis commands (`/gybis-spec-check`, `/gybis-spec-distill`, etc.). It must be installed on your system separately.
@@ -57,13 +40,54 @@ See the [allium-tools repository](https://github.com/juxt/allium-tools) for inst
 1. **Extract specifications:** Run `/gybis-spec-distill` to extract behavioral specifications from current implementation.
 2. **Derive architecture:** Run `/gybis-arch-distill` to derive architecture from extracted specifications, and implementation.
 3. **Extract vocabulary:** Run `/gybis-vocab-distill` to extract  vocabulary from architecture, specifications, and implementation.
-4. **Synchronize and refine:** Use `/gybis-vocab-tend`, `/gybis-vocab-weed`, `/gybis-arch-weed`, and `/gybis-spec-weed` to resolve divergence and keep layers aligned.
 
 ### Need Guidance?
 
 Run `/gybis-help` to see available commands organized by architecture, memory, specification, and vocabulary domains.
 
 ---
+
+## What gybis Is and Why It Exists
+
+In gybis, vocabulary and specifications are durable and implementation is replaceable.
+
+- **Spec-Driven Development (SDD):** Shared domain vocabulary, architecture, and behavioral specifications define what the system is and does, and implementation follows those constraints.
+- **Human-controlled AI assistance:** AI supports analysis, authoring, and validation, but humans stay in control of decisions and approvals.
+- **Durable truth model:** Vocabulary, architecture, and behavioral specifications are the source of truth; code and tests must align to them.
+
+## Operator Responsibility Model
+
+gybis is command-driven guidance, not always-on process enforcement.
+
+- **Human owns stage readiness:** The human operator is responsible for satisfying preconditions between stages (`vocabulary.md`, `architecture.md`, `specs/**/*.allium`, code/tests).
+- **Skills own requested transformation:** A skill executes the transformation it was invoked to do and enforces only execution-critical gates.
+- **Checks are deliberate tools:** `check` and `weed` commands are available to validate convergence when the human chooses to run them.
+- **Tradeoff is explicit:** If preconditions are skipped, quality or convergence may degrade; this is an operator decision, not a hidden protocol failure.
+
+## Check, Tend, and Weed Philosophy
+
+The gybis workflow is built around three deliberate actions that the human chooses at the right time:
+
+- `check` tells you whether a layer is valid and what kind of drift or inconsistency is present.
+- `tend` lets you refine a single layer with human-approved intent before the drift spreads downstream.
+- `weed` resolves mismatch across neighboring layers or implementation when two artifacts no longer describe the same truth.
+
+The pattern is intentionally hierarchical: check first, tend when the intended change belongs to one lane, and weed when the task is convergence across lanes. The human decides the scope and approves any write.
+
+| Operation | When to use it                                    | Human role                                                     | Typical outcome                  |
+| --------- | ------------------------------------------------- | -------------------------------------------------------------- | -------------------------------- |
+| `check`   | You want a diagnostic pass before making changes  | Review the report and decide whether the layer needs attention | Findings or a clean pass         |
+| `tend`    | You know the intended refinement for one artifact | Explain the change, review impact, and approve edits           | A layer updated in place         |
+| `weed`    | The real problem is divergence between artifacts  | Choose which side should move, then approve the correction     | Layers realigned and re-verified |
+
+## Workflow Cheat Sheet
+
+Think of the sequence as a loop rather than a one-off command.
+
+1. Start with `check` when you are unsure whether the layer is sound.
+2. Use `tend` when the change is local to one layer and the intent is already agreed.
+3. Use `weed` when the discrepancy spans architecture, specs, or implementation and requires a human decision.
+4. Finish with `check` again if you want a final validation pass after convergence.
 
 ## Use Cases
 
