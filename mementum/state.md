@@ -1,3 +1,4 @@
+✅ session-21 | 2026-06-30 gybis-spec-weed wired for end-to-end vocabulary divergence convergence and contract consistency
 ✅ session-20 | 2026-06-30 Use Cases section added to GYBIS-README with full command-surface scenario coverage
 ✅ session-19 | 2026-06-26 strict test-pass convergence added to gybis-spec-propagate and gybis-spec-weed
 ✅ session-18 | 2026-06-26 gybis-fini closeout captured for vocabulary-first GYBIS-README alignment and citation cleanup
@@ -21,16 +22,16 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-06-30T11:37:33-06:00
-- **Sessions**: 20 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout, session-11 bundle .agents migration, session-12 allium sync + loop protocol refinement, session-13 internal skill check updates, session-14 spec orientation scope correction, session-15 init workflow, session-16 describe/explain output modes, session-17 architecture-alignment scope doc update, session-18 README/GYBIS closeout, session-19 strict test-pass convergence, session-20 use-cases command-surface implementation)
-- **Status**: Session-20 terminated — gybis-fini complete
+- **Last updated**: 2026-06-30T12:22:51-06:00
+- **Sessions**: 21 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout, session-11 bundle .agents migration, session-12 allium sync + loop protocol refinement, session-13 internal skill check updates, session-14 spec orientation scope correction, session-15 init workflow, session-16 describe/explain output modes, session-17 architecture-alignment scope doc update, session-18 README/GYBIS closeout, session-19 strict test-pass convergence, session-20 use-cases command-surface implementation, session-21 spec-weed vocabulary divergence integration)
+- **Status**: Session-21 terminated — gybis-fini complete
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
 - **Core stack**: Nucleus (math notation base context) + Allium (behavioral DSL) + Mementum (persistent memory)
 - **Architecture**: VSM derivative (5-layer architectural spec)
 - **GitHub**: TheCodeSojourner/gybis
-- **Latest work**: Session-20 added a full `Use Cases` section to `gybis/GYBIS-README.md` with scenario coverage across all user-facing gybis commands.
+- **Latest work**: Session-21 hardened `gybis-spec-weed` so vocabulary divergence detection is integrated end-to-end in verification, resolver decisions, accounting, and invariants.
 
 ## Recent Activity
 - Initial commit: README with project definition, glossary, overview
@@ -93,6 +94,12 @@
   - Structured scenario-based workflows covering all user-facing commands in the command table
   - Clarified mid-session memory operations (`/gybis-memory-orient`, `/gybis-memory-store`, `/gybis-memory-synthesize`) versus full session lifecycle commands (`/gybis-init`, `/gybis-fini`)
   - Stored synthesis memory: `mementum/memories/use-cases-command-coverage.md`
+- Session-21 (2026-06-30): gybis-spec-weed vocabulary divergence convergence hardening
+  - Clarified vocab purpose across all six `gybis-vocab-*` skills as shared canonical term set (DDD ubiquitous language)
+  - Updated `gybis-spec-weed` to integrate `check_vocabulary_terms` into verify-time divergence aggregation
+  - Normalized divergence shape for vocabulary mismatches with explicit `type: "vocab_term_mismatch"`
+  - Reconciled resolver decision model (`spec|skip|investigate`) with correction branches and invariant catalogue
+  - Stored synthesis memory: `mementum/memories/spec-weed-vocab-divergence-wiring.md`
 
 ## Feed-Forward Signals
 - README.md now synchronized with actual gybis/.agents/skills/ directory
@@ -108,22 +115,24 @@
 - Monitor for: output-mode wording drifting across the four describe/explain skills
 - Monitor for: test-command resolution heuristics drifting from architecture S1 fields and repository conventions
 - Monitor for: Use Cases section drifting from the canonical command table as new commands or aliases are added
+- Monitor for: divergence types and resolver decisions drifting out of sync with verify aggregation and regression contract in `gybis-spec-weed`
 
 ## Session Closeout
-- **last_session_id**: session-20
-- **current_timestamp**: 2026-06-30T11:37:33-06:00
-- **task**: Implement a full Use Cases section in gybis/GYBIS-README.md with complete user-command scenario coverage and memory workflow clarifications.
+- **last_session_id**: session-21
+- **current_timestamp**: 2026-06-30T12:22:51-06:00
+- **task**: Harden gybis-spec-weed by fully integrating vocabulary divergence detection and fixing resolver-contract mismatches.
 - **questions**:
-  - What is the minimal scenario set that still covers the full user-facing command surface without bloating the README?
-  - How should `/gybis-init` and `/gybis-memory-orient` be distinguished operationally in documentation?
+  - Should vocabulary divergence handling remain in `gybis-spec-weed`, or be centralized in a dedicated `gybis-vocab-weed` skill?
+  - Should divergence-object schema requirements be standardized as an internal reference shared by all weed skills?
 - **decisions**:
-  - Added a dedicated `## Use Cases` section in `gybis/GYBIS-README.md` after Quick Start to provide scenario-first command guidance.
-  - Covered the full command table through direct workflows and explicit paired command usage (`describe/explain`).
-  - Clarified memory command semantics for startup, re-orient, store-prompt behavior, and synthesis/checkpointing.
-  - Stored synthesis memory in `mementum/memories/use-cases-command-coverage.md`.
+  - Kept both `gybis-vocab-describe` and `gybis-vocab-explain` because they are distinct audience views over the same canonical vocabulary.
+  - Updated all six `gybis-vocab-*` skills to explicitly frame vocabulary as shared canonical terms (DDD ubiquitous language).
+  - Repaired `gybis-spec-weed` vocabulary convergence by wiring detection into verification and remaining-divergence aggregation.
+  - Aligned resolver prompts, allowed decisions, correction branches, pass accounting, and closed divergence catalogue for `vocab_term_mismatch`.
+  - Stored synthesis memory in `mementum/memories/spec-weed-vocab-divergence-wiring.md`.
 - **next**:
-  1. Keep `README.md` and `gybis/GYBIS-README.md` command phrasing aligned as command semantics evolve.
-  2. Re-check Use Cases coverage whenever command additions, removals, or alias changes are introduced.
-- **recover**: Keep `README.md` and `gybis/GYBIS-README.md` command phrasing aligned as command semantics evolve.
+  1. Evaluate whether `gybis-vocab-weed` should own cross-artifact vocabulary drift resolution to reduce overlap in `gybis-spec-weed`.
+  2. Add an internal contract note for divergence-object schema consistency across weed skills.
+- **recover**: Evaluate whether `gybis-vocab-weed` should own cross-artifact vocabulary drift resolution to reduce overlap in `gybis-spec-weed`.
 
 ⏹→state.md
