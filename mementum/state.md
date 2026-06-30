@@ -1,4 +1,4 @@
-🌀 session-26 | 2026-06-30 gybis-arch-check implemented and wired into help/README command surfaces
+✅ session-26 | 2026-06-30 gybis-arch-check implemented and wired into help/README command surfaces
 🌀 session-25 | 2026-06-30 gybis-init: orient manifest prepared from state, memories, and open questions
 ✅ session-24 | 2026-06-30 operator-responsibility model documented; spec skills decoupled from direct vocabulary policing
 ✅ session-23 | 2026-06-30 gybis-vocab-weed added and wired into help/README command surfaces
@@ -27,16 +27,16 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-06-30T13:54:00-06:00
+- **Last updated**: 2026-06-30T13:56:31-06:00
 - **Sessions**: 26 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout, session-11 bundle .agents migration, session-12 allium sync + loop protocol refinement, session-13 internal skill check updates, session-14 spec orientation scope correction, session-15 init workflow, session-16 describe/explain output modes, session-17 architecture-alignment scope doc update, session-18 README/GYBIS closeout, session-19 strict test-pass convergence, session-20 use-cases command-surface implementation, session-21 spec-weed vocabulary divergence integration, session-22 init workflow, session-23 vocab-weed skill addition, session-24 operator-responsibility model + spec-vocab decoupling, session-25 init workflow, session-26 arch-check implementation)
-- **Status**: Session-26 active — gybis-arch-check implementation complete
+- **Status**: Session-26 terminated — gybis-fini complete
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
 - **Core stack**: Nucleus (math notation base context) + Allium (behavioral DSL) + Mementum (persistent memory)
 - **Architecture**: VSM derivative (5-layer architectural spec)
 - **GitHub**: TheCodeSojourner/gybis
-- **Latest work**: Session-26 implemented `gybis-arch-check` as a read-only architecture integrity report skill and synchronized command surfaces.
+- **Latest work**: Session-26 closed via gybis-fini with synthesized memory and updated closeout payload.
 
 ## Recent Activity
 - Initial commit: README with project definition, glossary, overview
@@ -123,6 +123,7 @@
   - Added `gybis/.agents/skills/gybis-arch-check/SKILL.md` as a read-only architecture integrity validator
   - Updated command surfaces in `gybis-help`, `README.md`, and `gybis/GYBIS-README.md`
   - Kept check/resolve boundary consistent: diagnostics in check, resolution in tend/weed skills
+  - Stored synthesis memory: `mementum/memories/arch-check-integrity-boundary.md`
 
 ## Feed-Forward Signals
 - README.md now synchronized with actual gybis/.agents/skills/ directory
@@ -144,21 +145,20 @@
 - Monitor for: vocabulary-related divergence logic reappearing in spec skills instead of `gybis-vocab-*` skills
 
 ## Session Closeout
-- **last_session_id**: session-24
-- **current_timestamp**: 2026-06-30T13:24:23-06:00
-- **task**: Codify human-owned stage readiness and decouple direct vocabulary policing from spec skills.
+- **last_session_id**: session-26
+- **current_timestamp**: 2026-06-30T13:56:31-06:00
+- **task**: Implement gybis-arch-check as a read-only architecture integrity validator and synchronize command surfaces.
 - **questions**:
-  - Should spec skills emit an optional non-blocking hint to run `/gybis-vocab-weed` when wording ambiguity is observed?
-  - Should an internal divergence-object contract note be standardized across `*weed` skills now that vocab ownership is separated?
+  - Should gybis-arch-check emit a markdown-formatted report option that mirrors describe/explain output-mode conventions?
+  - Should all check skills standardize a shared severity taxonomy and report schema contract?
 - **decisions**:
-  - Adopted the operator-responsibility model: humans own stage readiness; skills enforce only execution-critical gates.
-  - Added explicit Operator Responsibility Model sections to `README.md` and `gybis/GYBIS-README.md`.
-  - Relaxed `gybis-arch-elicit` so missing `vocabulary.md` no longer hard-halts architecture elicitation.
-  - Removed direct vocabulary drift checking/resolution flow from `gybis-spec-check` and `gybis-spec-weed` to keep spec skills focused on behavior/spec-code-arch convergence.
-  - Stored synthesis memory in `mementum/memories/human-owned-stage-readiness.md`.
+  - Added `gybis-arch-check` with AI-mode, read-only validation scope for architecture structure/coherence/constraints.
+  - Kept check/resolve role boundaries explicit: check diagnoses, tend/weed resolve.
+  - Wired `/gybis-arch-check` (`/ga-check`) into `gybis-help`, `README.md`, and `gybis/GYBIS-README.md`.
+  - Synthesized and stored memory in `mementum/memories/arch-check-integrity-boundary.md`.
 - **next**:
-  1. Decide whether spec skills should emit optional non-blocking handoff hints to `/gybis-vocab-weed` when wording ambiguity is detected.
-  2. Add an internal contract note for divergence-object schema consistency across all `*weed` skills.
-- **recover**: Decide whether spec skills should emit optional non-blocking handoff hints to `/gybis-vocab-weed` when wording ambiguity is detected.
+  1. Decide whether gybis-arch-check should support markdown report output mode.
+  2. Define a shared report schema contract across `gybis-*-check` skills.
+- **recover**: Decide whether gybis-arch-check should support markdown report output mode.
 
 ⏹→state.md
