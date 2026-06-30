@@ -1,3 +1,4 @@
+🌀 session-25 | 2026-06-30 gybis-init: orient manifest prepared from state, memories, and open questions
 ✅ session-24 | 2026-06-30 operator-responsibility model documented; spec skills decoupled from direct vocabulary policing
 ✅ session-23 | 2026-06-30 gybis-vocab-weed added and wired into help/README command surfaces
 ✅ session-22 | 2026-06-30 gybis-init: orient manifest prepared from state, memories, and open questions
@@ -25,16 +26,16 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-06-30T13:22:35-06:00
-- **Sessions**: 24 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout, session-11 bundle .agents migration, session-12 allium sync + loop protocol refinement, session-13 internal skill check updates, session-14 spec orientation scope correction, session-15 init workflow, session-16 describe/explain output modes, session-17 architecture-alignment scope doc update, session-18 README/GYBIS closeout, session-19 strict test-pass convergence, session-20 use-cases command-surface implementation, session-21 spec-weed vocabulary divergence integration, session-22 init workflow, session-23 vocab-weed skill addition, session-24 operator-responsibility model + spec-vocab decoupling)
-- **Status**: Session-24 terminated — gybis-fini complete
+- **Last updated**: 2026-06-30T13:30:34-06:00
+- **Sessions**: 25 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout, session-11 bundle .agents migration, session-12 allium sync + loop protocol refinement, session-13 internal skill check updates, session-14 spec orientation scope correction, session-15 init workflow, session-16 describe/explain output modes, session-17 architecture-alignment scope doc update, session-18 README/GYBIS closeout, session-19 strict test-pass convergence, session-20 use-cases command-surface implementation, session-21 spec-weed vocabulary divergence integration, session-22 init workflow, session-23 vocab-weed skill addition, session-24 operator-responsibility model + spec-vocab decoupling, session-25 init workflow)
+- **Status**: Session-25 active — gybis-init orientation complete
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
 - **Core stack**: Nucleus (math notation base context) + Allium (behavioral DSL) + Mementum (persistent memory)
 - **Architecture**: VSM derivative (5-layer architectural spec)
 - **GitHub**: TheCodeSojourner/gybis
-- **Latest work**: Session-24 closed with operator-responsibility model codified, spec-vocab boundaries enforced, and closeout memory synthesized.
+- **Latest work**: Session-25 initialized via gybis-init; orient manifest prepared from state, memories, and open questions.
 
 ## Recent Activity
 - Initial commit: README with project definition, glossary, overview
@@ -112,6 +113,11 @@
   - Relaxed `gybis-arch-elicit` startup so missing `vocabulary.md` no longer hard-halts architecture elicitation
   - Removed direct vocabulary drift detection/resolution from `gybis-spec-check` and `gybis-spec-weed` so spec skills focus on behavioral/spec-code-arch convergence
   - Stored synthesis memory: `mementum/memories/human-owned-stage-readiness.md`
+- Session-25 (2026-06-30): gybis-init orientation run
+  - Read `mementum/state.md` as bootloader and followed related memory artifacts
+  - Validated open question context against current `gybis-spec-weed` and `gybis-spec-check` skill definitions
+  - Ran targeted searches for vocab-weed handoff hints and divergence-object contract references
+  - Prepared orient manifest required by `session_startup_gate`
 
 ## Feed-Forward Signals
 - README.md now synchronized with actual gybis/.agents/skills/ directory
