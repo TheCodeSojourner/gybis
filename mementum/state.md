@@ -27,14 +27,14 @@
 ## Working Memory
 - **Last updated**: 2026-06-30T13:22:35-06:00
 - **Sessions**: 24 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout, session-11 bundle .agents migration, session-12 allium sync + loop protocol refinement, session-13 internal skill check updates, session-14 spec orientation scope correction, session-15 init workflow, session-16 describe/explain output modes, session-17 architecture-alignment scope doc update, session-18 README/GYBIS closeout, session-19 strict test-pass convergence, session-20 use-cases command-surface implementation, session-21 spec-weed vocabulary divergence integration, session-22 init workflow, session-23 vocab-weed skill addition, session-24 operator-responsibility model + spec-vocab decoupling)
-- **Status**: Session-24 active — human-owned preconditions policy and skill-boundary relaxations applied
+- **Status**: Session-24 terminated — gybis-fini complete
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
 - **Core stack**: Nucleus (math notation base context) + Allium (behavioral DSL) + Mementum (persistent memory)
 - **Architecture**: VSM derivative (5-layer architectural spec)
 - **GitHub**: TheCodeSojourner/gybis
-- **Latest work**: Session-24 documented operator-responsibility policy and relaxed non-critical stage policing in arch/spec skills.
+- **Latest work**: Session-24 closed with operator-responsibility model codified, spec-vocab boundaries enforced, and closeout memory synthesized.
 
 ## Recent Activity
 - Initial commit: README with project definition, glossary, overview
@@ -111,6 +111,7 @@
   - Added an explicit Operator Responsibility Model section to `README.md` and `gybis/GYBIS-README.md`
   - Relaxed `gybis-arch-elicit` startup so missing `vocabulary.md` no longer hard-halts architecture elicitation
   - Removed direct vocabulary drift detection/resolution from `gybis-spec-check` and `gybis-spec-weed` so spec skills focus on behavioral/spec-code-arch convergence
+  - Stored synthesis memory: `mementum/memories/human-owned-stage-readiness.md`
 
 ## Feed-Forward Signals
 - README.md now synchronized with actual gybis/.agents/skills/ directory
@@ -131,21 +132,21 @@
 - Monitor for: vocabulary-related divergence logic reappearing in spec skills instead of `gybis-vocab-*` skills
 
 ## Session Closeout
-- **last_session_id**: session-21
-- **current_timestamp**: 2026-06-30T12:22:51-06:00
-- **task**: Harden gybis-spec-weed by fully integrating vocabulary divergence detection and fixing resolver-contract mismatches.
+- **last_session_id**: session-24
+- **current_timestamp**: 2026-06-30T13:24:23-06:00
+- **task**: Codify human-owned stage readiness and decouple direct vocabulary policing from spec skills.
 - **questions**:
-  - Should vocabulary divergence handling remain in `gybis-spec-weed`, or be centralized in a dedicated `gybis-vocab-weed` skill?
-  - Should divergence-object schema requirements be standardized as an internal reference shared by all weed skills?
+  - Should spec skills emit an optional non-blocking hint to run `/gybis-vocab-weed` when wording ambiguity is observed?
+  - Should an internal divergence-object contract note be standardized across `*weed` skills now that vocab ownership is separated?
 - **decisions**:
-  - Kept both `gybis-vocab-describe` and `gybis-vocab-explain` because they are distinct audience views over the same canonical vocabulary.
-  - Updated all six `gybis-vocab-*` skills to explicitly frame vocabulary as shared canonical terms (DDD ubiquitous language).
-  - Repaired `gybis-spec-weed` vocabulary convergence by wiring detection into verification and remaining-divergence aggregation.
-  - Aligned resolver prompts, allowed decisions, correction branches, pass accounting, and closed divergence catalogue for `vocab_term_mismatch`.
-  - Stored synthesis memory in `mementum/memories/spec-weed-vocab-divergence-wiring.md`.
+  - Adopted the operator-responsibility model: humans own stage readiness; skills enforce only execution-critical gates.
+  - Added explicit Operator Responsibility Model sections to `README.md` and `gybis/GYBIS-README.md`.
+  - Relaxed `gybis-arch-elicit` so missing `vocabulary.md` no longer hard-halts architecture elicitation.
+  - Removed direct vocabulary drift checking/resolution flow from `gybis-spec-check` and `gybis-spec-weed` to keep spec skills focused on behavior/spec-code-arch convergence.
+  - Stored synthesis memory in `mementum/memories/human-owned-stage-readiness.md`.
 - **next**:
-  1. Evaluate whether `gybis-vocab-weed` should own cross-artifact vocabulary drift resolution to reduce overlap in `gybis-spec-weed`.
-  2. Add an internal contract note for divergence-object schema consistency across weed skills.
-- **recover**: Evaluate whether `gybis-vocab-weed` should own cross-artifact vocabulary drift resolution to reduce overlap in `gybis-spec-weed`.
+  1. Decide whether spec skills should emit optional non-blocking handoff hints to `/gybis-vocab-weed` when wording ambiguity is detected.
+  2. Add an internal contract note for divergence-object schema consistency across all `*weed` skills.
+- **recover**: Decide whether spec skills should emit optional non-blocking handoff hints to `/gybis-vocab-weed` when wording ambiguity is detected.
 
 ⏹→state.md
