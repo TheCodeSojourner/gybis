@@ -1,3 +1,4 @@
+✅ session-23 | 2026-06-30 gybis-vocab-weed added and wired into help/README command surfaces
 ✅ session-22 | 2026-06-30 gybis-init: orient manifest prepared from state, memories, and open questions
 ✅ session-21 | 2026-06-30 gybis-spec-weed wired for end-to-end vocabulary divergence convergence and contract consistency
 ✅ session-20 | 2026-06-30 Use Cases section added to GYBIS-README with full command-surface scenario coverage
@@ -23,16 +24,16 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-06-30T12:54:40-06:00
-- **Sessions**: 22 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout, session-11 bundle .agents migration, session-12 allium sync + loop protocol refinement, session-13 internal skill check updates, session-14 spec orientation scope correction, session-15 init workflow, session-16 describe/explain output modes, session-17 architecture-alignment scope doc update, session-18 README/GYBIS closeout, session-19 strict test-pass convergence, session-20 use-cases command-surface implementation, session-21 spec-weed vocabulary divergence integration, session-22 init workflow)
-- **Status**: Session-22 active — gybis-init orient complete
+- **Last updated**: 2026-06-30T13:07:28-06:00
+- **Sessions**: 23 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout, session-11 bundle .agents migration, session-12 allium sync + loop protocol refinement, session-13 internal skill check updates, session-14 spec orientation scope correction, session-15 init workflow, session-16 describe/explain output modes, session-17 architecture-alignment scope doc update, session-18 README/GYBIS closeout, session-19 strict test-pass convergence, session-20 use-cases command-surface implementation, session-21 spec-weed vocabulary divergence integration, session-22 init workflow, session-23 vocab-weed skill addition)
+- **Status**: Session-23 active — vocab-weed scaffold and docs wiring complete
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
 - **Core stack**: Nucleus (math notation base context) + Allium (behavioral DSL) + Mementum (persistent memory)
 - **Architecture**: VSM derivative (5-layer architectural spec)
 - **GitHub**: TheCodeSojourner/gybis
-- **Latest work**: Session-22 executed gybis-init orientation from state bootloader, memory follow-up, and open-question acknowledgement.
+- **Latest work**: Session-23 added `gybis-vocab-weed` and updated help/README command surfaces and usage guidance.
 
 ## Recent Activity
 - Initial commit: README with project definition, glossary, overview
@@ -101,12 +102,16 @@
   - Normalized divergence shape for vocabulary mismatches with explicit `type: "vocab_term_mismatch"`
   - Reconciled resolver decision model (`spec|skip|investigate`) with correction branches and invariant catalogue
   - Stored synthesis memory: `mementum/memories/spec-weed-vocab-divergence-wiring.md`
+- Session-23 (2026-06-30): gybis-vocab-weed command scaffolded and documented
+  - Added `gybis/.agents/skills/gybis-vocab-weed/SKILL.md` as a dedicated vocabulary convergence loop
+  - Updated command surfaces in `gybis-help`, `README.md`, and `gybis/GYBIS-README.md`
+  - Updated vocabulary evolution workflow guidance to call `/gybis-vocab-weed` before downstream weed passes
 
 ## Feed-Forward Signals
 - README.md now synchronized with actual gybis/.agents/skills/ directory
 - Hidden bundle layouts require `cp -ra <bundle>/. .`; `*` globs skip `.agents/`
-- All 26 commands properly documented and organized
-- User Commands table: 7 arch + 6 memory/session + 7 spec + 1 help = 21 commands
+- Command tables synchronized with current command surface, including `/gybis-vocab-weed`
+- Vocabulary command family now includes a dedicated weed convergence command
 - Developer Commands table: 6 memory + 1 help (plus /gybis-init, /gybis-fini, /gybis-help shared with users)
 - **Tool-agnostic positioning established**: gybis skills work with any AI tool supporting `skills/` directories; the distributed bundle now ships them under `.agents/skills/`
 - Monitor for: New skills added to gybis/.agents/skills/ directory

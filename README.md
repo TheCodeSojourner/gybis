@@ -46,14 +46,15 @@ The following commands are available after integrating gybis into a target repos
 
 ### Vocabulary Commands (`/gv-*`)
 
-| Command                                  | Description                               |
-| ---------------------------------------- | ----------------------------------------- |
-| `/gybis-vocab-check` (`/gv-check`)       | Validate vocabulary.md syntax & semantics |
-| `/gybis-vocab-describe` (`/gv-describe`) | Describe vocabulary in business language  |
-| `/gybis-vocab-distill` (`/gv-distill`)   | Extract vocabulary from arch/specs/code   |
-| `/gybis-vocab-elicit` (`/gv-elicit`)     | Elicit vocabulary from domain experts     |
-| `/gybis-vocab-explain` (`/gv-explain`)   | Explain vocabulary for developers         |
-| `/gybis-vocab-tend` (`/gv-tend`)         | Update vocabulary with impact analysis    |
+| Command                                  | Description                                       |
+| ---------------------------------------- | ------------------------------------------------- |
+| `/gybis-vocab-check` (`/gv-check`)       | Validate vocabulary.md syntax & semantics         |
+| `/gybis-vocab-describe` (`/gv-describe`) | Describe vocabulary in business language          |
+| `/gybis-vocab-distill` (`/gv-distill`)   | Extract vocabulary from arch/specs/code           |
+| `/gybis-vocab-elicit` (`/gv-elicit`)     | Elicit vocabulary from domain experts             |
+| `/gybis-vocab-explain` (`/gv-explain`)   | Explain vocabulary for developers                 |
+| `/gybis-vocab-tend` (`/gv-tend`)         | Update vocabulary with impact analysis            |
+| `/gybis-vocab-weed` (`/gv-weed`)         | Upsert vocabulary/artifacts from diffs with human |
 
 ### Architecture Commands (`/ga-*`)
 

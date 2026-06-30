@@ -39,4 +39,5 @@ CRITICAL CONSTRAINTS:
 | `/gybis-vocab-elicit` (`/gv-elicit`) | Elicit vocabulary from domain experts |
 | `/gybis-vocab-explain` (`/gv-explain`) | Explain vocabulary for developers |
 | `/gybis-vocab-tend` (`/gv-tend`) | Update vocabulary with impact analysis |
+| `/gybis-vocab-weed` (`/gv-weed`) | Upsert vocabulary/artifacts from diffs with human |
 
