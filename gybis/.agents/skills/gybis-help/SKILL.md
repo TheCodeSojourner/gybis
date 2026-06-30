@@ -13,6 +13,7 @@ CRITICAL CONSTRAINTS:
 
 | Skill Name | Description |
 |---|---|
+| `/gybis-arch-check` (`/ga-check`) | Validate architecture.md integrity & coherence |
 | `/gybis-arch-describe` (`/ga-describe`) | Describe arch in non-tech prose |
 | `/gybis-arch-distill` (`/ga-distill`) | Create initial arch from specs |
 | `/gybis-arch-elicit` (`/ga-elicit`) | Create initial arch with human |
