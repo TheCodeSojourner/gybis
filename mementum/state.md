@@ -1,3 +1,4 @@
+✅ session-20 | 2026-06-30 Use Cases section added to GYBIS-README with full command-surface scenario coverage
 ✅ session-19 | 2026-06-26 strict test-pass convergence added to gybis-spec-propagate and gybis-spec-weed
 ✅ session-18 | 2026-06-26 gybis-fini closeout captured for vocabulary-first GYBIS-README alignment and citation cleanup
 ✅ session-17 | 2026-06-25 GYBIS-README scope clarified: only `/gybis-spec-propagate` and `/gybis-spec-weed` apply architecture preferences
@@ -20,16 +21,16 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-06-26T13:22:37-06:00
-- **Sessions**: 19 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout, session-11 bundle .agents migration, session-12 allium sync + loop protocol refinement, session-13 internal skill check updates, session-14 spec orientation scope correction, session-15 init workflow, session-16 describe/explain output modes, session-17 architecture-alignment scope doc update, session-18 README/GYBIS closeout, session-19 strict test-pass convergence)
-- **Status**: Session-19 terminated — gybis-fini complete
+- **Last updated**: 2026-06-30T11:37:33-06:00
+- **Sessions**: 20 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout, session-11 bundle .agents migration, session-12 allium sync + loop protocol refinement, session-13 internal skill check updates, session-14 spec orientation scope correction, session-15 init workflow, session-16 describe/explain output modes, session-17 architecture-alignment scope doc update, session-18 README/GYBIS closeout, session-19 strict test-pass convergence, session-20 use-cases command-surface implementation)
+- **Status**: Session-20 terminated — gybis-fini complete
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
 - **Core stack**: Nucleus (math notation base context) + Allium (behavioral DSL) + Mementum (persistent memory)
 - **Architecture**: VSM derivative (5-layer architectural spec)
 - **GitHub**: TheCodeSojourner/gybis
-- **Latest work**: Session-19 added strict test-pass convergence to `gybis-spec-propagate` and `gybis-spec-weed`, including explicit `RUNNING_TESTS` loop states and completion gates.
+- **Latest work**: Session-20 added a full `Use Cases` section to `gybis/GYBIS-README.md` with scenario coverage across all user-facing gybis commands.
 
 ## Recent Activity
 - Initial commit: README with project definition, glossary, overview
@@ -87,6 +88,11 @@
   - Updated `gybis-spec-propagate` and `gybis-spec-weed` to require `test_suite_passes = true` before `COMPLETE`
   - Added explicit `RUNNING_TESTS` states, test command resolution, and failure-driven loop-back transitions
   - Stored synthesis memory: `mementum/memories/spec-strict-test-convergence.md`
+- Session-20 (2026-06-30): Use Cases section implementation for operational command guidance
+  - Added `## Use Cases` to `gybis/GYBIS-README.md` between Quick Start and Architecture Principles
+  - Structured scenario-based workflows covering all user-facing commands in the command table
+  - Clarified mid-session memory operations (`/gybis-memory-orient`, `/gybis-memory-store`, `/gybis-memory-synthesize`) versus full session lifecycle commands (`/gybis-init`, `/gybis-fini`)
+  - Stored synthesis memory: `mementum/memories/use-cases-command-coverage.md`
 
 ## Feed-Forward Signals
 - README.md now synchronized with actual gybis/.agents/skills/ directory
@@ -101,22 +107,23 @@
 - Monitor for: orientation/language implication logic drifting into non-propagate/non-weed gybis-spec skills
 - Monitor for: output-mode wording drifting across the four describe/explain skills
 - Monitor for: test-command resolution heuristics drifting from architecture S1 fields and repository conventions
+- Monitor for: Use Cases section drifting from the canonical command table as new commands or aliases are added
 
 ## Session Closeout
-- **last_session_id**: session-19
-- **current_timestamp**: 2026-06-26T13:22:37-06:00
-- **task**: Add strict test-pass fixed-point convergence to gybis-spec-propagate and gybis-spec-weed, then document the interaction semantics.
+- **last_session_id**: session-20
+- **current_timestamp**: 2026-06-30T11:37:33-06:00
+- **task**: Implement a full Use Cases section in gybis/GYBIS-README.md with complete user-command scenario coverage and memory workflow clarifications.
 - **questions**:
-  - Should completion for code-mutating spec skills require passing tests instead of only structural/spec consistency?
-  - Should this behavior be strict-only (no non-strict mode)?
+  - What is the minimal scenario set that still covers the full user-facing command surface without bloating the README?
+  - How should `/gybis-init` and `/gybis-memory-orient` be distinguished operationally in documentation?
 - **decisions**:
-  - Implemented strict test-pass completion gates in both `gybis-spec-propagate` and `gybis-spec-weed`.
-  - Added `RUNNING_TESTS` phases plus test command resolution from architecture S1 with repository-convention fallback.
-  - Enforced non-completion on test failure via explicit invariants (`¬complete_when_tests_fail`).
-  - Stored synthesis memory in `mementum/memories/spec-strict-test-convergence.md`.
+  - Added a dedicated `## Use Cases` section in `gybis/GYBIS-README.md` after Quick Start to provide scenario-first command guidance.
+  - Covered the full command table through direct workflows and explicit paired command usage (`describe/explain`).
+  - Clarified memory command semantics for startup, re-orient, store-prompt behavior, and synthesis/checkpointing.
+  - Stored synthesis memory in `mementum/memories/use-cases-command-coverage.md`.
 - **next**:
-  1. Review whether README/GYBIS-README command descriptions should explicitly mention strict in-skill test execution.
-  2. Validate strict-loop behavior in a representative target repository with a real test runner.
-- **recover**: Review whether README/GYBIS-README command descriptions should explicitly mention strict in-skill test execution.
+  1. Keep `README.md` and `gybis/GYBIS-README.md` command phrasing aligned as command semantics evolve.
+  2. Re-check Use Cases coverage whenever command additions, removals, or alias changes are introduced.
+- **recover**: Keep `README.md` and `gybis/GYBIS-README.md` command phrasing aligned as command semantics evolve.
 
 ⏹→state.md
