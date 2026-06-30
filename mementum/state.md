@@ -1,3 +1,4 @@
+✅ session-22 | 2026-06-30 gybis-init: orient manifest prepared from state, memories, and open questions
 ✅ session-21 | 2026-06-30 gybis-spec-weed wired for end-to-end vocabulary divergence convergence and contract consistency
 ✅ session-20 | 2026-06-30 Use Cases section added to GYBIS-README with full command-surface scenario coverage
 ✅ session-19 | 2026-06-26 strict test-pass convergence added to gybis-spec-propagate and gybis-spec-weed
@@ -22,16 +23,16 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-06-30T12:22:51-06:00
-- **Sessions**: 21 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout, session-11 bundle .agents migration, session-12 allium sync + loop protocol refinement, session-13 internal skill check updates, session-14 spec orientation scope correction, session-15 init workflow, session-16 describe/explain output modes, session-17 architecture-alignment scope doc update, session-18 README/GYBIS closeout, session-19 strict test-pass convergence, session-20 use-cases command-surface implementation, session-21 spec-weed vocabulary divergence integration)
-- **Status**: Session-21 terminated — gybis-fini complete
+- **Last updated**: 2026-06-30T12:54:40-06:00
+- **Sessions**: 22 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout, session-11 bundle .agents migration, session-12 allium sync + loop protocol refinement, session-13 internal skill check updates, session-14 spec orientation scope correction, session-15 init workflow, session-16 describe/explain output modes, session-17 architecture-alignment scope doc update, session-18 README/GYBIS closeout, session-19 strict test-pass convergence, session-20 use-cases command-surface implementation, session-21 spec-weed vocabulary divergence integration, session-22 init workflow)
+- **Status**: Session-22 active — gybis-init orient complete
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
 - **Core stack**: Nucleus (math notation base context) + Allium (behavioral DSL) + Mementum (persistent memory)
 - **Architecture**: VSM derivative (5-layer architectural spec)
 - **GitHub**: TheCodeSojourner/gybis
-- **Latest work**: Session-21 hardened `gybis-spec-weed` so vocabulary divergence detection is integrated end-to-end in verification, resolver decisions, accounting, and invariants.
+- **Latest work**: Session-22 executed gybis-init orientation from state bootloader, memory follow-up, and open-question acknowledgement.
 
 ## Recent Activity
 - Initial commit: README with project definition, glossary, overview
