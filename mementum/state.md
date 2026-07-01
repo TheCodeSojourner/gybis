@@ -1,3 +1,4 @@
+✅ session-29 | 2026-07-01 refine command family documented in README surfaces and philosophy heading aligned to include refine
 ✅ session-26 | 2026-06-30 gybis-arch-check implemented and wired into help/README command surfaces
 🌀 session-25 | 2026-06-30 gybis-init: orient manifest prepared from state, memories, and open questions
 ✅ session-24 | 2026-06-30 operator-responsibility model documented; spec skills decoupled from direct vocabulary policing
@@ -27,16 +28,16 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-06-30T14:50:00-06:00
-- **Sessions**: 28 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout, session-11 bundle .agents migration, session-12 allium sync + loop protocol refinement, session-13 internal skill check updates, session-14 spec orientation scope correction, session-15 init workflow, session-16 describe/explain output modes, session-17 architecture-alignment scope doc update, session-18 README/GYBIS closeout, session-19 strict test-pass convergence, session-20 use-cases command-surface implementation, session-21 spec-weed vocabulary divergence integration, session-22 init workflow, session-23 vocab-weed skill addition, session-24 operator-responsibility model + spec-vocab decoupling, session-25 init workflow, session-26 arch-check implementation, session-27 gybis-init orientation, session-28 gybis-fini closeout)
-- **Status**: Session-28 terminated — gybis-fini complete
+- **Last updated**: 2026-07-01T15:55:37-06:00
+- **Sessions**: 29 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout, session-11 bundle .agents migration, session-12 allium sync + loop protocol refinement, session-13 internal skill check updates, session-14 spec orientation scope correction, session-15 init workflow, session-16 describe/explain output modes, session-17 architecture-alignment scope doc update, session-18 README/GYBIS closeout, session-19 strict test-pass convergence, session-20 use-cases command-surface implementation, session-21 spec-weed vocabulary divergence integration, session-22 init workflow, session-23 vocab-weed skill addition, session-24 operator-responsibility model + spec-vocab decoupling, session-25 init workflow, session-26 arch-check implementation, session-27 gybis-init orientation, session-28 gybis-fini closeout, session-29 refine docs alignment + gybis-fini closeout)
+- **Status**: Session-29 terminated — gybis-fini complete
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
 - **Core stack**: Nucleus (math notation base context) + Allium (behavioral DSL) + Mementum (persistent memory)
 - **Architecture**: VSM derivative (5-layer architectural spec)
 - **GitHub**: TheCodeSojourner/gybis
-- **Latest work**: Session-28 closeout completed after the README philosophy and workflow cheat sheet updates.
+- **Latest work**: Session-29 documented `gybis-*-refine` coverage across README surfaces, aligned workflow text, and updated the philosophy heading to include refine.
 
 ## Recent Activity
 - Initial commit: README with project definition, glossary, overview
@@ -132,6 +133,11 @@
   - Updated both README files with check/tend/weed philosophy sections and compact workflow cheat sheets
   - Kept the root README conceptual and the GYBIS-README operational so the docs remain complementary
   - Refreshed the complementary-scope memory with the new documentation split
+- Session-29 (2026-07-01): refine command-family docs + heading alignment
+  - Added `gybis-vocab-refine`, `gybis-arch-refine`, and `gybis-spec-refine` to command surfaces in both README files
+  - Updated workflow/philosophy guidance to use `check -> refine -> tend -> weed`
+  - Renamed philosophy heading in both docs to `Check, Refine, Tend, and Weed`
+  - Stored memory: `mementum/memories/check-refine-heading-alignment.md`
 
 ## Feed-Forward Signals
 - README.md now synchronized with actual gybis/.agents/skills/ directory
@@ -153,19 +159,22 @@
 - Monitor for: vocabulary-related divergence logic reappearing in spec skills instead of `gybis-vocab-*` skills
 - Monitor for: arch-check report-mode and shared schema decisions if the check family is expanded later
 - Monitor for: check/tend/weed philosophy staying aligned across README and GYBIS-README without mirroring entire sections
+- Monitor for: operation-family heading and loop naming drifting when new `check/refine/tend/weed` commands are added
 
 ## Session Closeout
-- **last_session_id**: session-28
-- **current_timestamp**: 2026-06-30T14:50:00-06:00
-- **task**: Close out the README documentation update for check/tend/weed philosophy and workflow cheat sheets.
+- **last_session_id**: session-29
+- **current_timestamp**: 2026-07-01T15:55:37-06:00
+- **task**: Document newly added `gybis-*-refine` skills across README surfaces, align workflow language, and close out with heading consistency.
 - **questions**:
   - none
 - **decisions**:
-  - Added check/tend/weed philosophy sections to both [README.md](/home/pauwhi/Work/gybis/README.md) and [gybis/GYBIS-README.md](/home/pauwhi/Work/gybis/gybis/GYBIS-README.md).
-  - Kept the root README conceptual and the GYBIS-README operational to preserve complementary scope.
-  - Refreshed `mementum/memories/readme-complementary-scope.md` to capture the new documentation split.
+  - Added refine command rows (`/gybis-vocab-refine`, `/gybis-arch-refine`, `/gybis-spec-refine`) to [README.md](/home/pauwhi/Work/gybis/README.md) and [gybis/GYBIS-README.md](/home/pauwhi/Work/gybis/gybis/GYBIS-README.md).
+  - Updated workflow/philosophy wording in both docs to include `refine` in the default loop (`check -> refine -> tend -> weed`).
+  - Renamed the section heading in both docs from `Check, Tend, and Weed Philosophy` to `Check, Refine, Tend, and Weed Philosophy`.
+  - Stored memory `mementum/memories/check-refine-heading-alignment.md` to prevent future heading/command drift.
 - **next**:
-  1. Review the updated README sections in a future docs pass if additional command-family guidance is added.
-- **recover**: check/tend/weed philosophy sections now live in both README files.
+  1. Validate command-surface wording in `gybis-help` if refine descriptions are expanded further.
+  2. Re-check Use Cases for sequence clarity if additional operation families are introduced.
+- **recover**: refine command family and heading/loop language are now aligned across both README files.
 
 ⏹→state.md
