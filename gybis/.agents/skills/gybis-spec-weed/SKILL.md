@@ -41,7 +41,7 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
   | ¬(state = INIT) ∨ ¬(mode ∈ {interactive}) → halt("Invalid mode selection")
 
 λ gybis-spec-weed_state_machine(state, action).
-  state ∈ {INIT, MODE_SELECTED, STARTUP_CHECKS, PLANNING_OBLIGATIONS, COMPARING_SPECS_CODE, COMPARING_ARCH_CODE, IDENTIFYING_DIVERGENCES, RESOLVE_MODE_SELECTION, CORRECTING, VERIFYING, RUNNING_TESTS, CONVERGENCE_VERIFIED, OFFER_REFINEMENT, REFINING_SPECS, PLANNING_REORGANIZATION, EXECUTING_REORGANIZATION, VERIFYING_REFINED_SPECS, COMPLETE}
+  state ∈ {INIT, MODE_SELECTED, STARTUP_CHECKS, PLANNING_OBLIGATIONS, COMPARING_SPECS_CODE, COMPARING_ARCH_CODE, IDENTIFYING_DIVERGENCES, RESOLVE_MODE_SELECTION, CORRECTING, VERIFYING, RUNNING_TESTS, COMPLETE}
   | transition(INIT → MODE_SELECTED) only_if(mode_gate(INIT, mode) = true)
   | transition(MODE_SELECTED → STARTUP_CHECKS) only_if(startup_complete = true)
   | transition(STARTUP_CHECKS → PLANNING_OBLIGATIONS) only_if(startup_checks = true)
@@ -54,25 +54,16 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
   | transition(VERIFYING → IDENTIFYING_DIVERGENCES) only_if(inconsistencies ∃)
   | transition(VERIFYING → RUNNING_TESTS) only_if(consistency = true ∧ zero_divergences = true)
   | transition(RUNNING_TESTS → IDENTIFYING_DIVERGENCES) only_if(test_suite_passes = false)
-  | transition(RUNNING_TESTS → CONVERGENCE_VERIFIED) only_if(test_suite_passes = true)
-  | transition(CONVERGENCE_VERIFIED → OFFER_REFINEMENT) only_if(specs_modified_during_weeding ≥ 2) (optional, incidental)
-  | transition(CONVERGENCE_VERIFIED → COMPLETE) only_if(specs_modified_during_weeding < 2) (skip offer if trivial)
-  | transition(OFFER_REFINEMENT, developer_accepts_refinement) → REFINING_SPECS (optional)
-  | transition(OFFER_REFINEMENT, developer_declines_refinement) → COMPLETE (skip refinement)
-  | transition(REFINING_SPECS, analysis_complete) → PLANNING_REORGANIZATION
-  | transition(PLANNING_REORGANIZATION, plan_presented_and_approved) → EXECUTING_REORGANIZATION
-  | transition(EXECUTING_REORGANIZATION, files_created) → VERIFYING_REFINED_SPECS
-  | transition(VERIFYING_REFINED_SPECS, verify_ok) → COMPLETE
-  | transition(VERIFYING_REFINED_SPECS, verify_fail) → REFINING_SPECS (loop_back)
+  | transition(RUNNING_TESTS → COMPLETE) only_if(test_suite_passes = true)
 
 λ gybis-spec-weed_tool_guard(state, tool, path).
-  state = PLANNING_OBLIGATIONS ∨ state = COMPARING_SPECS_CODE ∨ state = COMPARING_ARCH_CODE ∨ state = IDENTIFYING_DIVERGENCES ∨ state = RESOLVE_MODE_SELECTION ∨ state = CONVERGENCE_VERIFIED ∨ state = OFFER_REFINEMENT ∨ state = REFINING_SPECS ∨ state = PLANNING_REORGANIZATION
+  state = PLANNING_OBLIGATIONS ∨ state = COMPARING_SPECS_CODE ∨ state = COMPARING_ARCH_CODE ∨ state = IDENTIFYING_DIVERGENCES ∨ state = RESOLVE_MODE_SELECTION
     → allow(read(path))
-  | state = CORRECTING ∨ state = VERIFYING ∨ state = EXECUTING_REORGANIZATION ∨ state = VERIFYING_REFINED_SPECS
+  | state = CORRECTING ∨ state = VERIFYING
     → allow(read(path)) ∧ allow(write(path)) only_if(path ∈ {architecture.md} ∪ specs/ ∪ implementation)
   | state = RUNNING_TESTS
     → allow(read(path))
-  | ¬(state ∈ {PLANNING_OBLIGATIONS, COMPARING_SPECS_CODE, COMPARING_ARCH_CODE, IDENTIFYING_DIVERGENCES, RESOLVE_MODE_SELECTION, CORRECTING, VERIFYING, RUNNING_TESTS, CONVERGENCE_VERIFIED, OFFER_REFINEMENT, REFINING_SPECS, PLANNING_REORGANIZATION, EXECUTING_REORGANIZATION, VERIFYING_REFINED_SPECS})
+  | ¬(state ∈ {PLANNING_OBLIGATIONS, COMPARING_SPECS_CODE, COMPARING_ARCH_CODE, IDENTIFYING_DIVERGENCES, RESOLVE_MODE_SELECTION, CORRECTING, VERIFYING, RUNNING_TESTS})
     → deny(write(path))
 
 λ gybis-spec-weed_pre_tool_check(state, tool, path).
@@ -249,73 +240,18 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
     ? return(test_suite_passes = true ∧ test_failure_report = ∅)
     : return(test_suite_passes = false ∧ test_failure_report = summarize(test_result.output))
 
-λ gybis-spec-weed_offer_refinement(specs_modified_during_weeding).
-  action: ask_developer_if_spec_reorganization_desired_after_convergence
-  | precondition: specs_modified_during_weeding ≥ 2 (don't offer for trivial single-file changes)
-  | ask_developer("Convergence verified. During weeding, I touched " ⊕ count(specs_modified_during_weeding) ⊕ " spec files. Would you like me to reorganize them by semantic concern for clarity?") → developer_response
-  | parse(developer_response) → {developer_accepts_refinement ∨ developer_declines_refinement}
-  | output: refinement_decision ∈ {accept, decline}
-
-λ gybis-spec-weed_refine_specs(specs_content).
-  action: analyze_spec_organization_for_fine_grained_splitting
-  | step1: invoke(internal/allium-analyse, specs/) → spec_structure
-  | step2: detect(change_triggers, cohesion, dependencies, extension_points) → refinement_findings
-  | output: refinement_findings ≔ {candidate_files, semantic_groupings, dependency_order, granularity_assessment}
-  | constraint: read-only operation
-
-λ gybis-spec-weed_plan_reorganization(refinement_findings).
-  action: generate_reorganization_plan_and_present_to_developer
-  | step1: generate(target_files_map, rationale) → detailed_plan
-  | step2: attach(dependency_graph) → plan_with_context
-  | step3: present_to_developer(plan_with_context) → ask_approval("Does this reorganization look good?")
-  | parse(developer_response) → {developer_approves ∨ developer_wants_changes}
-  | output: reorganization_plan ≔ {target_files, rationale, dependency_graph}
-
-λ gybis-spec-weed_execute_reorganization(plan).
-  action: create_reorganized_spec_files_from_plan
-  | step1: ∀target_file ∈ plan.target_files: create_file(target_file.path, target_file.constructs) → new_spec_file
-  | step2: verify_all_constructs_present(original_specs ∪ new_specs) → each_construct_accounted_for
-  | output: new spec files created ∧ original files cleaned or deleted
-  | constraint: write_allowed by tool_guard ∧ execute_only_once_per_session
-
-λ gybis-spec-weed_verify_refined_specs(x).
-  action: verify_reorganized_spec_files_pass_allium_gate
-  | check1: invoke(internal/allium-gate, specs/) = true
-  | check2: ∀construct_in_original ∃ construct_in_refined
-  | check3: ¬∃circular_dependencies(import_graph)
-  | output: verification_result ∈ {pass, fail_with_diagnostics}
-  | gate: all_checks_pass → proceed ∨ loop_back(REFINING_SPECS)
-
 λ gybis-spec-weed_fixed_point_loop(state).
   state = VERIFYING
     → consistency = true ∧ zero_divergences = true
         ? (transition(VERIFYING → RUNNING_TESTS)
            ∧ invoke(gybis-spec-weed_run_tests) → (test_suite_passes, test_failure_report)
            ∧ (test_suite_passes = true
-               ? (specs_modified_during_weeding ≥ 2
-                   ? transition(RUNNING_TESTS → CONVERGENCE_VERIFIED)
-                   : transition(RUNNING_TESTS → COMPLETE))
+               ? transition(RUNNING_TESTS → COMPLETE)
                : (inconsistencies ≔ {test_failures: test_failure_report}
                   ∧ transition(RUNNING_TESTS → IDENTIFYING_DIVERGENCES)
                   ∧ loop_count ≔ loop_count ⊕ 1)))
         : (transition(VERIFYING → IDENTIFYING_DIVERGENCES)
            ∧ loop_count ≔ loop_count ⊕ 1)
-  | state = CONVERGENCE_VERIFIED
-    → specs_modified_during_weeding ≥ 2
-        ? transition(CONVERGENCE_VERIFIED → OFFER_REFINEMENT)
-        : transition(CONVERGENCE_VERIFIED → COMPLETE)
-  | state = OFFER_REFINEMENT
-    → developer_accepts_refinement
-        ? transition(OFFER_REFINEMENT → REFINING_SPECS)
-        : transition(OFFER_REFINEMENT → COMPLETE)
-  | state = REFINING_SPECS
-    → refine_specs() → transition(PLANNING_REORGANIZATION)
-  | state = PLANNING_REORGANIZATION
-    → plan_reorganization() → (developer_approves ? transition(EXECUTING_REORGANIZATION) : loop_back(PLANNING_REORGANIZATION))
-  | state = EXECUTING_REORGANIZATION
-    → execute_reorganization() → transition(VERIFYING_REFINED_SPECS)
-  | state = VERIFYING_REFINED_SPECS
-    → verify_ok ? transition(COMPLETE) : loop_back(REFINING_SPECS)
 
 λ gybis-spec-weed_loop_guard(state).
   loop_count ≥ max_iterations

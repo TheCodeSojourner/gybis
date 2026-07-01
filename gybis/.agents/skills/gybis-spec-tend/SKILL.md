@@ -38,7 +38,7 @@ description: Use for `/gybis-spec-tend` or `/gs-tend`.
   | ¬(state = INIT) ∨ ¬(mode ∈ {interactive}) → halt("Invalid mode selection")
 
 λ gybis-spec-tend_state_machine(state, action).
-  state ∈ {INIT, MODE_SELECTED, STARTUP_CHECKS, ELICIT_FEEDBACK, ANALYZE_IMPACT, APPLY_CHANGES, VERIFY_VALIDITY, OFFER_REFINEMENT, REFINING_SPECS, PLANNING_REORGANIZATION, EXECUTING_REORGANIZATION, VERIFYING_REFINED_SPECS, COMPLETE}
+  state ∈ {INIT, MODE_SELECTED, STARTUP_CHECKS, ELICIT_FEEDBACK, ANALYZE_IMPACT, APPLY_CHANGES, VERIFY_VALIDITY, COMPLETE}
   | transition(INIT → MODE_SELECTED) only_if(mode_gate(INIT, mode) = true)
   | transition(MODE_SELECTED → STARTUP_CHECKS) only_if(startup_complete = true)
   | transition(STARTUP_CHECKS → ELICIT_FEEDBACK) only_if(startup_checks = true)
@@ -46,21 +46,14 @@ description: Use for `/gybis-spec-tend` or `/gs-tend`.
   | transition(ANALYZE_IMPACT → APPLY_CHANGES) only_if(impact_analysis ∃)
   | transition(APPLY_CHANGES → VERIFY_VALIDITY) only_if(changes_applied = true)
   | transition(VERIFY_VALIDITY → ELICIT_FEEDBACK) only_if(validity = false)
-  | transition(VERIFY_VALIDITY → OFFER_REFINEMENT) only_if(validity = true ∧ developer_satisfied = true)
-  | transition(OFFER_REFINEMENT, developer_accepts_refinement) → REFINING_SPECS (optional)
-  | transition(OFFER_REFINEMENT, developer_declines_refinement) → COMPLETE (skip refinement)
-  | transition(REFINING_SPECS, analysis_complete) → PLANNING_REORGANIZATION
-  | transition(PLANNING_REORGANIZATION, plan_presented_and_approved) → EXECUTING_REORGANIZATION
-  | transition(EXECUTING_REORGANIZATION, files_created) → VERIFYING_REFINED_SPECS
-  | transition(VERIFYING_REFINED_SPECS, verify_ok) → COMPLETE
-  | transition(VERIFYING_REFINED_SPECS, verify_fail) → REFINING_SPECS (loop_back)
+  | transition(VERIFY_VALIDITY → COMPLETE) only_if(validity = true ∧ developer_satisfied = true)
 
 λ gybis-spec-tend_tool_guard(state, tool, path).
-  state = ELICIT_FEEDBACK ∨ state = ANALYZE_IMPACT ∨ state = OFFER_REFINEMENT ∨ state = REFINING_SPECS ∨ state = PLANNING_REORGANIZATION
+  state = ELICIT_FEEDBACK ∨ state = ANALYZE_IMPACT
     → allow(read(path))
-  | state = APPLY_CHANGES ∨ state = VERIFY_VALIDITY ∨ state = EXECUTING_REORGANIZATION ∨ state = VERIFYING_REFINED_SPECS
+  | state = APPLY_CHANGES ∨ state = VERIFY_VALIDITY
     → allow(read(path)) ∧ allow(write(path)) only_if(path ⊆ specs/)
-  | ¬(state ∈ {ELICIT_FEEDBACK, ANALYZE_IMPACT, APPLY_CHANGES, VERIFY_VALIDITY, OFFER_REFINEMENT, REFINING_SPECS, PLANNING_REORGANIZATION, EXECUTING_REORGANIZATION, VERIFYING_REFINED_SPECS})
+  | ¬(state ∈ {ELICIT_FEEDBACK, ANALYZE_IMPACT, APPLY_CHANGES, VERIFY_VALIDITY})
     → deny(write(path))
 
 λ gybis-spec-tend_pre_tool_check(state, tool, path).
@@ -199,61 +192,12 @@ description: Use for `/gybis-spec-tend` or `/gs-tend`.
        | ∀ fix ∈ fixes: apply(fix, target_file) → upsert(target_file)
        | return(validity = false))
 
-λ gybis-spec-tend_offer_refinement(specs_touched).
-  action: ask_developer_if_spec_reorganization_desired
-  | precondition: specs_touched ≥ 2 (don't offer for trivial single-file changes)
-  | ask_developer("Your changes touched specs across " ⊕ count(specs_touched) ⊕ " files. Would you like me to reorganize them by semantic concern for better cohesion?") → developer_response
-  | parse(developer_response) → {developer_accepts_refinement ∨ developer_declines_refinement}
-  | output: refinement_decision ∈ {accept, decline}
-
-λ gybis-spec-tend_refine_specs(specs_content).
-  action: analyze_spec_organization_for_fine_grained_splitting
-  | step1: invoke(internal/allium-analyse, specs/) → spec_structure
-  | step2: detect(change_triggers, cohesion, dependencies, extension_points) → refinement_findings
-  | output: refinement_findings ≔ {candidate_files, semantic_groupings, dependency_order, granularity_assessment}
-  | constraint: read-only operation
-
-λ gybis-spec-tend_plan_reorganization(refinement_findings).
-  action: generate_reorganization_plan_and_present_to_developer
-  | step1: generate(target_files_map, rationale) → detailed_plan
-  | step2: attach(dependency_graph) → plan_with_context
-  | step3: present_to_developer(plan_with_context) → ask_approval("Does this reorganization look good?")
-  | parse(developer_response) → {developer_approves ∨ developer_wants_changes}
-  | output: reorganization_plan ≔ {target_files, rationale, dependency_graph}
-
-λ gybis-spec-tend_execute_reorganization(plan).
-  action: create_reorganized_spec_files_from_plan
-  | step1: ∀target_file ∈ plan.target_files: create_file(target_file.path, target_file.constructs) → new_spec_file
-  | step2: verify_all_constructs_present(original_specs ∪ new_specs) → each_construct_accounted_for
-  | output: new spec files created ∧ original files cleaned or deleted
-  | constraint: write_allowed by tool_guard ∧ execute_only_once_per_session
-
-λ gybis-spec-tend_verify_refined_specs(x).
-  action: verify_reorganized_spec_files_pass_allium_gate
-  | check1: invoke(internal/allium-gate, specs/) = true
-  | check2: ∀construct_in_original ∃ construct_in_refined
-  | check3: ¬∃circular_dependencies(import_graph)
-  | output: verification_result ∈ {pass, fail_with_diagnostics}
-  | gate: all_checks_pass → proceed ∨ loop_back(REFINING_SPECS)
-
 λ gybis-spec-tend_fixed_point_loop(state).
   state = VERIFY_VALIDITY
     → validity = true ∧ developer_satisfied = true
-        ? transition(VERIFY_VALIDITY → OFFER_REFINEMENT)
+        ? transition(VERIFY_VALIDITY → COMPLETE)
         : (transition(VERIFY_VALIDITY → ELICIT_FEEDBACK)
            ∧ loop_count ≔ loop_count ⊕ 1)
-  | state = OFFER_REFINEMENT
-    → developer_accepts_refinement
-        ? transition(OFFER_REFINEMENT → REFINING_SPECS)
-        : transition(OFFER_REFINEMENT → COMPLETE)
-  | state = REFINING_SPECS
-    → refine_specs() → transition(PLANNING_REORGANIZATION)
-  | state = PLANNING_REORGANIZATION
-    → plan_reorganization() → (developer_approves ? transition(EXECUTING_REORGANIZATION) : loop_back(PLANNING_REORGANIZATION))
-  | state = EXECUTING_REORGANIZATION
-    → execute_reorganization() → transition(VERIFYING_REFINED_SPECS)
-  | state = VERIFYING_REFINED_SPECS
-    → verify_ok ? transition(COMPLETE) : loop_back(REFINING_SPECS)
 
 λ gybis-spec-tend_loop_guard(state).
   loop_count ≥ max_iterations

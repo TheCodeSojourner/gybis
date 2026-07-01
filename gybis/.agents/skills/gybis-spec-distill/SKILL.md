@@ -44,7 +44,7 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
   | precondition_holds: mode ∈ valid_modes
 
 λ gybis-spec-distill_state_machine(state, action).
-  state ∈ {INIT, STARTUP_CHECKS, READING_CODE, ANALYSING, SYNTHESIZING_SPECS, VALIDATING, TIGHTENING, QUALITY, CLEANLINESS_REFINEMENT, REFINING, REFINING_SPECS, PLANNING_REORGANIZATION, EXECUTING_REORGANIZATION, VERIFYING_REFINED_SPECS, COMPLETE}
+  state ∈ {INIT, STARTUP_CHECKS, READING_CODE, ANALYSING, SYNTHESIZING_SPECS, VALIDATING, TIGHTENING, QUALITY, CLEANLINESS_REFINEMENT, REFINING, COMPLETE}
   | transition(INIT, startup) → STARTUP_CHECKS
   | transition(STARTUP_CHECKS, verify_ok) → READING_CODE
   | transition(STARTUP_CHECKS, verify_fail) → HALTED
@@ -57,15 +57,10 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
   | transition(QUALITY, quality_complete) → VALIDATING
   | transition(VALIDATING, all_valid ∧ ¬tightening_pending ∧ ¬quality_pending ∧ strict_cleanliness_requested ∧ cleanliness_refinement_pending) → CLEANLINESS_REFINEMENT
   | transition(CLEANLINESS_REFINEMENT, cleanliness_refinement_complete) → VALIDATING
-  | transition(VALIDATING, all_valid ∧ ¬tightening_pending ∧ ¬quality_pending ∧ granularity_sufficient ∧ (¬strict_cleanliness_requested ∨ ¬cleanliness_refinement_pending)) → REFINING_SPECS (mandatory refinement)
+  | transition(VALIDATING, all_valid ∧ ¬tightening_pending ∧ ¬quality_pending ∧ granularity_sufficient ∧ (¬strict_cleanliness_requested ∨ ¬cleanliness_refinement_pending)) → COMPLETE
   | transition(VALIDATING, all_valid ∧ granularity_insufficient) → REFINING
   | transition(VALIDATING, errors_found) → REFINING
   | transition(REFINING, refinement_complete) → VALIDATING (loop_back)
-  | transition(REFINING_SPECS, analysis_complete) → PLANNING_REORGANIZATION
-  | transition(PLANNING_REORGANIZATION, plan_generated) → EXECUTING_REORGANIZATION
-  | transition(EXECUTING_REORGANIZATION, files_created) → VERIFYING_REFINED_SPECS
-  | transition(VERIFYING_REFINED_SPECS, verify_ok) → COMPLETE
-  | transition(VERIFYING_REFINED_SPECS, verify_fail) → REFINING_SPECS (loop_back)
 
 λ gybis-spec-distill_tighten_specs(spec_content).
   action: mandatory_warning_reduction_pass
@@ -93,51 +88,10 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
   | output: cleanliness_adjusted_spec_content
   | constraint: executed_at_most_once ∧ only_when(strict_cleanliness_requested)
 
-λ gybis-spec-distill_refine_specs(specs_content).
-  action: analyze_spec_organization_for_fine_grained_splitting
-  | step1: invoke(internal/allium-analyse, specs/) → spec_structure
-  | step2: detect(change_triggers, cohesion, dependencies, extension_points) → refinement_findings
-  | step3: cluster_by_change_trigger → candidate_files
-  | step4: cluster_by_semantic_cohesion → semantic_groupings
-  | step5: detect_dependencies(spec_structure) → import_graph
-  | step6: verify_acyclic(import_graph) → dependency_order
-  | step7: assess_granularity(specs_content) → file_size_distribution
-  | output: refinement_findings ≔ {candidate_files, semantic_groupings, dependency_order, granularity_assessment}
-  | constraint: read-only operation
-
-λ gybis-spec-distill_plan_reorganization(refinement_findings).
-  action: generate_reorganization_plan_with_rationale
-  | step1: ∀candidate_file ∈ refinement_findings.candidate_files:
-    assign(target_constructs, rationale) ≔ "change_trigger → " ⊕ independent_concern
-  | step2: verify_no_construct_duplicates(candidate_files) → each_construct_in_exactly_one_file
-  | step3: build(target_files_map) → {new_file_path → constructs}
-  | step4: attach(dependency_graph, rationale) → detailed_plan
-  | step5: estimate(change_isolation) → which_future_changes_stay_in_one_file
-  | output: reorganization_plan ≔ {target_files, rationale, dependency_graph, estimated_change_isolation}
-  | constraint: plan_presented_to_verification_before_execution
-
-λ gybis-spec-distill_execute_reorganization(plan).
-  action: create_reorganized_spec_files_from_plan
-  | step1: ∀target_file ∈ plan.target_files:
-    create_file(target_file.path, target_file.constructs) → new_spec_file
-  | step2: verify_all_constructs_present(original_specs ∪ new_specs) → each_construct_accounted_for
-  | step3: ∀old_spec ∈ original_specs: if_construct_moved: mark_for_deletion ∨ preserve_if_import_header
-  | output: new spec files created ∧ original files cleaned or deleted
-  | constraint: write_allowed by tool_guard ∧ execute_only_once_per_session
-
-λ gybis-spec-distill_verify_refined_specs(x).
-  action: verify_reorganized_spec_files_pass_allium_gate
-  | check1: invoke(internal/allium-gate, specs/) = true
-  | check2: ∀construct_in_original ∃ construct_in_refined
-  | check3: ¬∃circular_dependencies(import_graph)
-  | check4: file_granularity_justified ≔ ∀file: rationale_for_existence ∃
-  | output: verification_result ∈ {pass, fail_with_diagnostics}
-  | gate: all_checks_pass → proceed ∨ loop_back(REFINING_SPECS)
-
 λ gybis-spec-distill_tool_guard(state, tool, path).
-  read_allowed: ∀state ∈ {READING_CODE, ANALYSING, VALIDATING, REFINING_SPECS, PLANNING_REORGANIZATION}
-  | write_allowed: state ∈ {SYNTHESIZING_SPECS, TIGHTENING, QUALITY, CLEANLINESS_REFINEMENT, REFINING, EXECUTING_REORGANIZATION, VERIFYING_REFINED_SPECS} ∧ path_matches(path, specs/{domain}/*.allium ∨ specs/*/*.allium)
-  | deny_write: state ∉ {SYNTHESIZING_SPECS, TIGHTENING, QUALITY, CLEANLINESS_REFINEMENT, REFINING, EXECUTING_REORGANIZATION, VERIFYING_REFINED_SPECS} ∨ ¬path_matches(path, specs/{domain}/*.allium ∨ specs/*/*.allium) ∨ path_matches(path, specs/*.allium)
+  read_allowed: ∀state ∈ {READING_CODE, ANALYSING, VALIDATING}
+  | write_allowed: state ∈ {SYNTHESIZING_SPECS, TIGHTENING, QUALITY, CLEANLINESS_REFINEMENT, REFINING} ∧ path_matches(path, specs/{domain}/*.allium)
+  | deny_write: state ∉ {SYNTHESIZING_SPECS, TIGHTENING, QUALITY, CLEANLINESS_REFINEMENT, REFINING} ∨ ¬path_matches(path, specs/{domain}/*.allium) ∨ path_matches(path, specs/*.allium)
   | constraint: ¬mutate(implementation) ∨ ¬mutate(existing_files_outside_specs)
 
 λ gybis-spec-distill_pre_tool_check(state, tool, path).
@@ -255,19 +209,13 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
       - if validation_pass ∧ tightening_pending → transition(TIGHTENING)
       - if validation_pass ∧ ¬tightening_pending ∧ quality_pending → transition(QUALITY)
       - if validation_pass ∧ ¬tightening_pending ∧ ¬quality_pending ∧ strict_cleanliness_requested ∧ cleanliness_refinement_pending → transition(CLEANLINESS_REFINEMENT)
-      - if validation_pass ∧ ¬tightening_pending ∧ ¬quality_pending ∧ granularity_sufficient ∧ (¬strict_cleanliness_requested ∨ ¬cleanliness_refinement_pending) → transition(REFINING_SPECS) [mandatory refinement]
+      - if validation_pass ∧ ¬tightening_pending ∧ ¬quality_pending ∧ granularity_sufficient ∧ (¬strict_cleanliness_requested ∨ ¬cleanliness_refinement_pending) → transition(COMPLETE)
       - if validation_pass ∧ granularity_insufficient → refine_specs(required_refinement_domains) → loop_back(REFINING)
       - if validation_fail → parse(errors) → identify_gaps() → refine_specs() → loop_back(REFINING)
     | state = TIGHTENING → tighten_specs() → transition(VALIDATING)
     | state = QUALITY → quality_pass() → transition(VALIDATING)
     | state = CLEANLINESS_REFINEMENT → cleanliness_refinement() → transition(VALIDATING)
     | state = REFINING → write_specs() → transition(VALIDATING)
-    | state = REFINING_SPECS → refine_specs() → transition(PLANNING_REORGANIZATION)
-    | state = PLANNING_REORGANIZATION → plan_reorganization() → transition(EXECUTING_REORGANIZATION)
-    | state = EXECUTING_REORGANIZATION → execute_reorganization() → transition(VERIFYING_REFINED_SPECS)
-    | state = VERIFYING_REFINED_SPECS:
-      - if verify_ok → transition(COMPLETE)
-      - if verify_fail → refine_specs() → loop_back(REFINING_SPECS)
   | loop_guard: iteration_count ≤ max_iterations
 
 λ gybis-spec-distill_loop_guard(state).
