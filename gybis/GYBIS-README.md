@@ -64,30 +64,33 @@ gybis is command-driven guidance, not always-on process enforcement.
 - **Checks are deliberate tools:** `check` and `weed` commands are available to validate convergence when the human chooses to run them.
 - **Tradeoff is explicit:** If preconditions are skipped, quality or convergence may degrade; this is an operator decision, not a hidden protocol failure.
 
-## Check, Tend, and Weed Philosophy
+## Check, Refine, Tend, and Weed Philosophy
 
-The gybis workflow is built around three deliberate actions that the human chooses at the right time:
+The gybis workflow is built around four deliberate actions that the human chooses at the right time:
 
 - `check` tells you whether a layer is valid and what kind of drift or inconsistency is present.
-- `tend` lets you refine a single layer with human-approved intent before the drift spreads downstream.
+- `refine` polishes a single layer's structure and readability while preserving intended meaning.
+- `tend` evolves a single layer with human-approved intent before the drift spreads downstream.
 - `weed` resolves mismatch across neighboring layers or implementation when two artifacts no longer describe the same truth.
 
-The pattern is intentionally hierarchical: check first, tend when the intended change belongs to one lane, and weed when the task is convergence across lanes. The human decides the scope and approves any write.
+The pattern is intentionally hierarchical: check first, refine when structure needs polish, tend when intended meaning needs to evolve, and weed when the task is convergence across lanes. The human decides the scope and approves any write.
 
-| Operation | When to use it                                    | Human role                                                     | Typical outcome                  |
-| --------- | ------------------------------------------------- | -------------------------------------------------------------- | -------------------------------- |
-| `check`   | You want a diagnostic pass before making changes  | Review the report and decide whether the layer needs attention | Findings or a clean pass         |
-| `tend`    | You know the intended refinement for one artifact | Explain the change, review impact, and approve edits           | A layer updated in place         |
-| `weed`    | The real problem is divergence between artifacts  | Choose which side should move, then approve the correction     | Layers realigned and re-verified |
+| Operation | When to use it                                            | Human role                                                     | Typical outcome                    |
+| --------- | --------------------------------------------------------- | -------------------------------------------------------------- | ---------------------------------- |
+| `check`   | You want a diagnostic pass before making changes          | Review the report and decide whether the layer needs attention | Findings or a clean pass           |
+| `refine`  | You want structure/clarity polish without changing intent | Approve local hygiene edits and verify meaning is preserved    | Clearer artifact with same meaning |
+| `tend`    | You know the intended refinement for one artifact         | Explain the change, review impact, and approve edits           | A layer updated in place           |
+| `weed`    | The real problem is divergence between artifacts          | Choose which side should move, then approve the correction     | Layers realigned and re-verified   |
 
 ## Workflow Cheat Sheet
 
 Think of the sequence as a loop rather than a one-off command.
 
 1. Start with `check` when you are unsure whether the layer is sound.
-2. Use `tend` when the change is local to one layer and the intent is already agreed.
-3. Use `weed` when the discrepancy spans architecture, specs, or implementation and requires a human decision.
-4. Finish with `check` again if you want a final validation pass after convergence.
+2. Use `refine` when the change is structural polish and intended meaning should remain stable.
+3. Use `tend` when the change is local to one layer and the intent is already agreed.
+4. Use `weed` when the discrepancy spans architecture, specs, or implementation and requires a human decision.
+5. Finish with `check` again if you want a final validation pass after convergence.
 
 ## Use Cases
 
@@ -125,11 +128,12 @@ Outcome: an existing codebase is brought under explicit vocabulary, architecture
 
 Use this when domain terms, definitions, or canonical names need to change after the project is already in motion.
 
-1. Run `/gybis-vocab-tend` to refine an existing `vocabulary.md`; use it when terms must be added, renamed, merged, split, or clarified.
-2. Run `/gybis-vocab-check` to validate vocabulary syntax and semantic consistency.
-3. Run `/gybis-vocab-weed` to resolve vocabulary drift between `vocabulary.md` and architecture/specifications/implementation.
-4. Run `/gybis-arch-weed` to resolve divergence between architecture and specifications caused by vocabulary changes.
-5. Run `/gybis-spec-weed` to resolve divergence between specifications and code/tests after the vocabulary update propagates downstream.
+1. Run `/gybis-vocab-check` to validate vocabulary syntax and semantic consistency before edits.
+2. Run `/gybis-vocab-refine` when the goal is structural clarity and maintainability without changing term meaning.
+3. Run `/gybis-vocab-tend` when terms must be added, renamed, merged, split, or clarified.
+4. Run `/gybis-vocab-weed` to resolve vocabulary drift between `vocabulary.md` and architecture/specifications/implementation.
+5. Run `/gybis-arch-weed` to resolve divergence between architecture and specifications caused by vocabulary changes.
+6. Run `/gybis-spec-weed` to resolve divergence between specifications and code/tests after the vocabulary update propagates downstream.
 
 Outcome: the canonical domain language evolves without leaving architecture, specifications, or implementation misaligned.
 
@@ -137,10 +141,12 @@ Outcome: the canonical domain language evolves without leaving architecture, spe
 
 Use this when the project is already under gybis governance and you are extending or refining expected behavior.
 
-1. Run `/gybis-arch-tend` when existing architecture constraints need refinement before behavior changes.
-2. Run `/gybis-spec-tend` to refine existing specifications for the affected concern or domain.
-3. Run `/gybis-spec-propagate {concern|domain|all}` to push the updated specifications into code and test scaffolding.
-4. Run `/gybis-spec-check {concern|domain|all}` to validate the resulting specification set before moving further.
+1. Run `/gybis-spec-check {concern|domain|all}` to validate the current specification baseline.
+2. Run `/gybis-arch-refine` and `/gybis-spec-refine` when the goal is structure/clarity polish without changing intended behavior.
+3. Run `/gybis-arch-tend` and `/gybis-spec-tend` when architecture or behavior intent must evolve.
+4. Run `/gybis-spec-propagate {concern|domain|all}` to push updated specifications into code and test scaffolding.
+5. Run `/gybis-spec-weed` if propagation exposes spec-code divergence requiring convergence.
+6. Re-run `/gybis-spec-check {concern|domain|all}` to validate the updated specification set.
 
 Outcome: behavior evolves through architecture and specifications instead of being driven by ad hoc implementation changes.
 
@@ -149,9 +155,10 @@ Outcome: behavior evolves through architecture and specifications instead of bei
 Use this when architecture, specifications, code, or tests appear to have diverged and you need convergence before shipping.
 
 1. Run `/gybis-spec-check {concern|domain|all}` to surface specification issues early.
-2. Run `/gybis-arch-weed` to resolve divergence between architecture and specifications.
-3. Run `/gybis-spec-weed` to resolve divergence between specifications and code/tests.
-4. Re-run `/gybis-spec-check {concern|domain|all}` until the targeted scope is valid and aligned.
+2. Run `/gybis-spec-refine` if findings are structural/readability issues without behavior change.
+3. Run `/gybis-arch-weed` to resolve divergence between architecture and specifications.
+4. Run `/gybis-spec-weed` to resolve divergence between specifications and code/tests.
+5. Re-run `/gybis-spec-check {concern|domain|all}` until the targeted scope is valid and aligned.
 
 Outcome: release confidence comes from aligned durable constraints, not only from the current implementation state.
 
@@ -248,7 +255,7 @@ Specifications describe code **behavior**, not implementation.
 - **/gybis-arch-weed** checks for divergence between architecture and specs, then surfaces explicit resolution options with human approval.
 - **/gybis-spec-distill** extracts behavioral specifications from existing code, then surfaces them for review and refinement.
 - **Do not implement before specifying.** Implementation details are replaceable; specifications are the system's source of truth.
-- **Workflow:** propagate or distill → check → tend → weed.
+- **Workflow:** propagate or distill → check → refine → tend → weed.
 - **Governance flows:** AI is governed by formalized behavior; behavior is governed by architecture.
 - **Architecture alignment:** Only `/gybis-spec-propagate` and `/gybis-spec-weed` 
   apply architectural preferences; other spec skills are architecture-agnostic.
@@ -332,6 +339,7 @@ vocabulary > architecture > specification > tests > code
 | `/gybis-arch-elicit` (`/ga-elicit`)                              | Create initial arch with human                    |
 | `/gybis-arch-explain` (`/ga-explain`)                            | Explain arch in dev prose or markdown             |
 | `/gybis-arch-propagate` (`/ga-propagate`)                        | Create initial specs from arch                    |
+| `/gybis-arch-refine` (`/ga-refine`)                              | Refine architecture structure & clarity           |
 | `/gybis-arch-tend` (`/ga-tend`)                                  | Update arch with human                            |
 | `/gybis-arch-weed` (`/ga-weed`)                                  | Upsert arch/specs from diffs with human           |
 | `/gybis-fini`                                                    | CRUD memory before terminate                      |
@@ -346,6 +354,7 @@ vocabulary > architecture > specification > tests > code
 | `/gybis-spec-distill` (`/gs-distill`)                            | Create initial specs from code/tests              |
 | `/gybis-spec-explain` (`/gs-explain {concern\|domain\|all}`)     | Explain in dev prose or markdown                  |
 | `/gybis-spec-propagate` (`/gs-propagate {concern\|domain\|all}`) | Create initial code/tests                         |
+| `/gybis-spec-refine` (`/gs-refine`)                              | Refine specs structure & clarity                  |
 | `/gybis-spec-tend` (`/gs-tend`)                                  | Update specs with human                           |
 | `/gybis-spec-weed` (`/gs-weed`)                                  | Upsert specs/code-tests from diffs with human     |
 | `/gybis-vocab-check` (`/gv-check`)                               | Validate vocabulary.md syntax & semantics         |
@@ -353,6 +362,7 @@ vocabulary > architecture > specification > tests > code
 | `/gybis-vocab-distill` (`/gv-distill`)                           | Extract vocabulary from arch/specs/code           |
 | `/gybis-vocab-elicit` (`/gv-elicit`)                             | Elicit vocabulary from domain experts             |
 | `/gybis-vocab-explain` (`/gv-explain`)                           | Explain vocabulary for developers                 |
+| `/gybis-vocab-refine` (`/gv-refine`)                             | Refine vocabulary structure & clarity             |
 | `/gybis-vocab-tend` (`/gv-tend`)                                 | Update vocabulary with impact analysis            |
 | `/gybis-vocab-weed` (`/gv-weed`)                                 | Upsert vocabulary/artifacts from diffs with human |
 

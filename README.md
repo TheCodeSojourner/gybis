@@ -34,30 +34,33 @@ gybis is command-driven guidance, not always-on process enforcement.
 - Skills execute the requested transformation and enforce only execution-critical gates.
 - Check and weed commands are available as deliberate convergence tools when operators choose to run them.
 
-## Check, Tend, and Weed Philosophy
+## Check, Refine, Tend, and Weed Philosophy
 
-These three operations form the core gybis convergence loop:
+These operations form the core gybis convergence loop:
 
 - `check` diagnoses the current state of one layer and reports what is wrong.
-- `tend` refines one layer with explicit human intent and keeps the change localized.
+- `refine` improves one layer's structure and clarity without changing intended meaning.
+- `tend` evolves one layer with explicit human intent and keeps the change localized.
 - `weed` reconciles drift between adjacent layers and the implementation so the system converges again.
 
-They work top-down: vocabulary constrains architecture, architecture constrains specs, and specs constrain tests and code. `check` finds drift, `tend` makes the intended layer-local change, and `weed` resolves disagreement when two artifacts no longer agree.
+They work top-down: vocabulary constrains architecture, architecture constrains specs, and specs constrain tests and code. `check` finds drift, `refine` polishes local structure, `tend` makes intended layer-local changes, and `weed` resolves disagreement when two artifacts no longer agree.
 
-| Operation | Purpose                                         | Human role                                               | Typical outcome                   |
-| --------- | ----------------------------------------------- | -------------------------------------------------------- | --------------------------------- |
-| `check`   | Diagnose a layer and surface integrity issues   | Choose when to run it and review the report              | Severity-tagged findings          |
-| `tend`    | Evolve one layer with developer-approved intent | State the desired change and approve edits               | Updated artifact in the same lane |
-| `weed`    | Reconcile divergence across adjacent layers     | Decide which side should move and approve the correction | Mutually consistent artifacts     |
+| Operation | Purpose                                         | Human role                                               | Typical outcome                    |
+| --------- | ----------------------------------------------- | -------------------------------------------------------- | ---------------------------------- |
+| `check`   | Diagnose a layer and surface integrity issues   | Choose when to run it and review the report              | Severity-tagged findings           |
+| `refine`  | Polish one layer's structure and readability    | Choose safe polish scope and approve edits               | Clearer artifact with same meaning |
+| `tend`    | Evolve one layer with developer-approved intent | State the desired change and approve edits               | Updated artifact in the same lane  |
+| `weed`    | Reconcile divergence across adjacent layers     | Decide which side should move and approve the correction | Mutually consistent artifacts      |
 
 ## Workflow Cheat Sheet
 
-Use `check` when you want a diagnostic snapshot, `tend` when you already know the intended refinement, and `weed` when the real task is convergence across layers rather than a single artifact edit.
+Use `check` when you want a diagnostic snapshot, `refine` when the task is structural polish, `tend` when you already know the intended layer change, and `weed` when the real task is convergence across layers rather than a single artifact edit.
 
 1. Run `check` first to expose drift or broken assumptions.
-2. Run `tend` next when the needed change belongs to one layer and the intent is clear.
-3. Run `weed` when architecture, specs, or implementation disagree and need a human decision about which artifact should change.
-4. Re-run `check` after `weed` to confirm the target layer is back in a valid state.
+2. Run `refine` next when the needed change is structure and clarity without changing intended meaning.
+3. Run `tend` when the needed change belongs to one layer and the intent is clear.
+4. Run `weed` when architecture, specs, or implementation disagree and need a human decision about which artifact should change.
+5. Re-run `check` after `weed` to confirm the target layer is back in a valid state.
 
 **gybis** provides the scaffolding to make AI-assisted SDD practical:
 
@@ -86,6 +89,7 @@ The following commands are available after integrating gybis into a target repos
 | `/gybis-vocab-distill` (`/gv-distill`)   | Extract vocabulary from arch/specs/code           |
 | `/gybis-vocab-elicit` (`/gv-elicit`)     | Elicit vocabulary from domain experts             |
 | `/gybis-vocab-explain` (`/gv-explain`)   | Explain vocabulary for developers                 |
+| `/gybis-vocab-refine` (`/gv-refine`)     | Refine vocabulary structure & clarity             |
 | `/gybis-vocab-tend` (`/gv-tend`)         | Update vocabulary with impact analysis            |
 | `/gybis-vocab-weed` (`/gv-weed`)         | Upsert vocabulary/artifacts from diffs with human |
 
@@ -99,6 +103,7 @@ The following commands are available after integrating gybis into a target repos
 | `/gybis-arch-elicit` (`/ga-elicit`)       | Create initial arch with human              |
 | `/gybis-arch-explain` (`/ga-explain`)     | Explain arch in dev prose or markdown       |
 | `/gybis-arch-propagate` (`/ga-propagate`) | Create initial specs from arch              |
+| `/gybis-arch-refine` (`/ga-refine`)       | Refine architecture structure & clarity     |
 | `/gybis-arch-tend` (`/ga-tend`)           | Update arch with human                      |
 | `/gybis-arch-weed` (`/ga-weed`)           | Upsert arch/specs from diffs with human     |
 
@@ -111,6 +116,7 @@ The following commands are available after integrating gybis into a target repos
 | `/gybis-spec-distill` (`/gs-distill`)                            | Create initial specs from code/tests          |
 | `/gybis-spec-explain` (`/gs-explain {concern\|domain\|all}`)     | Explain in dev prose or markdown              |
 | `/gybis-spec-propagate` (`/gs-propagate {concern\|domain\|all}`) | Create initial code/tests                     |
+| `/gybis-spec-refine` (`/gs-refine`)                              | Refine specs structure & clarity              |
 | `/gybis-spec-tend` (`/gs-tend`)                                  | Update specs with human                       |
 | `/gybis-spec-weed` (`/gs-weed`)                                  | Upsert specs/code-tests from diffs with human |
 
