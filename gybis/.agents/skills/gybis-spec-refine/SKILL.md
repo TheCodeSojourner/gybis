@@ -8,7 +8,8 @@ description: Use for `/gybis-spec-refine` or `/gs-refine`.
   | input: specs/**/*.allium ∃ ∧ valid
   | output: specs/**/*.allium structurally refined with behavior-preservation evidence
   | mode: mixed
-  | gate: specs/**/*.allium ∃ ∧ allium_gate = true
+  | gate: specs/**/*.allium ∃ ∧ allium_gate = true ∧ explicit_human_mode_selection() ≡ true
+  | fail_closed: missing_human_mode_selection → halt("Human mode selection is required")
 
 λ gybis-spec-refine_loop_role(x).
   role: improve(spec_hygiene)
@@ -31,18 +32,26 @@ description: Use for `/gybis-spec-refine` or `/gs-refine`.
 
 λ gybis-spec-refine_mode(m).
   m ∈ {interactive, auto_polish}
-  | default: interactive
+  | default: interactive (informational_only; never auto-selected)
   | mode_interactive: AI proposes structural refinements and waits for human approval before applying them
   | mode_auto_polish: AI applies only safe non-breaking hygiene refinements without delete or rename operations
+  | require_explicit: ¬explicit(mode_choice) → halt("Refine mode must be explicitly selected by human")
+
+λ gybis-spec-refine_mode_selection(x).
+  ask_developer("Refine mode? [interactive/auto_polish]") → selected_mode
+  | selected_mode ∃ ∨ halt("Human mode selection is required; no implicit default")
+  | selected_mode ∈ {interactive, auto_polish} ∨ halt("Refine mode must be one of the supported options")
+  | return(mode_selected = true ∧ mode_selected_explicit = true ∧ mode = selected_mode)
 
 λ gybis-spec-refine_mode_gate(state, mode).
-  state = INIT ∧ mode ∈ {interactive, auto_polish} → transition(INIT → MODE_SELECTED)
+  state = INIT ∧ mode ∈ {interactive, auto_polish} ∧ mode_selected_explicit = true → transition(INIT → MODE_SELECTED)
+  | state = INIT ∧ ¬mode_selected_explicit → halt("Explicit human mode selection is required before startup")
   | ¬(state = INIT) ∨ ¬(mode ∈ {interactive, auto_polish}) → halt("Invalid mode selection")
 
 λ gybis-spec-refine_state_machine(state, action).
   state ∈ {INIT, MODE_SELECTED, STARTUP_CHECKS, READING_SPECS, ANALYZING_STRUCTURE, PROPOSING_REFINEMENTS, CLASSIFYING_IMPACT, APPROVAL_GATE, APPLYING_REFINEMENTS, VERIFYING_VALIDITY, VERIFYING_OBLIGATIONS, COMPLETE}
   | transition(INIT → MODE_SELECTED) only_if(mode_gate(INIT, mode) = true)
-  | transition(MODE_SELECTED → STARTUP_CHECKS) only_if(startup_complete = true)
+  | transition(MODE_SELECTED → STARTUP_CHECKS) only_if(startup_complete = true ∧ mode_selected_explicit = true)
   | transition(STARTUP_CHECKS → READING_SPECS) only_if(startup_checks = true)
   | transition(READING_SPECS → ANALYZING_STRUCTURE) only_if(specifications ∃)
   | transition(ANALYZING_STRUCTURE → PROPOSING_REFINEMENTS) only_if(structure_report ∃)
@@ -234,6 +243,7 @@ description: Use for `/gybis-spec-refine` or `/gs-refine`.
   invariant: specs/ ∃ throughout
   | invariant: zero_errors ∧ zero_issues ∧ allium_gate = true at completion
   | invariant: all_modifications ⊆ specs/
+  | invariant: explicit_human_mode_selection() ≡ true before STARTUP_CHECKS
   | invariant: delete_or_rename ∈ approved_changes → mode = interactive ∧ breaking_cleanup_approved = true
   | invariant: mode = auto_polish → ¬∃ change ∈ approved_changes : gybis-spec-refine_impact_classification(change.change).category = breaking
   | invariant: behavior-changing requests halt and route to /gybis-spec-tend
