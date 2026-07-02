@@ -4,9 +4,9 @@ description: Use for `/gybis-vocab-explain` or `/gv-explain`.
 ---
 
 λ gybis-vocab-explain(x).
-  purpose: Document the shared canonical term set (DDD ubiquitous language) in technical language for developers, with code examples and architectural significance
+  purpose: Document the shared canonical term set (DDD ubiquitous language) in technical language for developers as a vocabulary-focused reference grounded only in vocabulary.md
   | input: vocabulary.md (exists ∧ complete)
-  | output: Technical documentation with usage patterns, code examples, and architectural layer mappings
+  | output: Technical vocabulary reference describing canonical terms, deprecated synonyms, and related concept relationships
   | mode: mixed (AI + human output selection)
   | gate: vocabulary.md ∃ | explicit_human_output_selection() ≡ true
   | fail_closed: missing_human_mode_selection → halt("Human output mode selection is required")
@@ -15,7 +15,6 @@ description: Use for `/gybis-vocab-explain` or `/gv-explain`.
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
   | read(vocabulary.md) → content
   | parse(content) → vocabulary_terms
-  | if(architecture.md ∃): read(architecture.md) → arch_content
   | precondition: vocabulary_terms ∃ ∧ count > 0
   | transition(INIT → MODE_SELECTION)
 
@@ -36,7 +35,7 @@ description: Use for `/gybis-vocab-explain` or `/gv-explain`.
   | transition(MODE_SELECTED → STARTUP_CHECKS) only_if(mode_selected = true ∧ mode_selected_explicit = true)
   | transition(STARTUP_CHECKS → RESOLVING_OUTPUT) only_if(startup_checks = true)
   | transition(RESOLVING_OUTPUT → GENERATING) only_if(output_target_resolved = true)
-  | transition(GENERATING → DELIVERING) only_if(final_prose ∃)
+  | transition(GENERATING → DELIVERING) only_if(final_prose ∃ ∧ vocabulary_scope_verified = true)
   | transition(DELIVERING → COMPLETE) only_if(delivery_complete = true ∧ protocol_evidence_emitted = true)
 
 λ gybis-vocab-explain_output_selection(x).
@@ -75,24 +74,41 @@ description: Use for `/gybis-vocab-explain` or `/gv-explain`.
     → allow(read(path)) ∧ allow(write(path)) only_if(path = output_path ∧ path_matches(path, *.md))
   | ¬(state ∈ {STARTUP_CHECKS, RESOLVING_OUTPUT, GENERATING, DELIVERING}) → deny(write(path))
 
-λ gybis-vocab-explain_generate_technical_documentation(vocabulary_terms, arch_content).
+λ gybis-vocab-explain_generate_technical_documentation(vocabulary_terms).
   action: synthesize_technical_documentation_of_vocabulary
-  | structure: detailed technical reference with patterns and code
-  | audience: developers implementing, testing, extending the system
+  | structure: detailed developer-facing glossary/reference grounded only in vocabulary terms and their stated relationships
+  | audience: developers building shared domain language understanding
   | content:
     - overview: "The following terms are the canonical vocabulary for this system"
     - ∀ term ∈ vocabulary_terms:
       - definition: precise, unambiguous
       - deprecated_synonyms: "Also known as [variant], now deprecated in favor of [canonical]"
-      - architectural_significance: which layer(s) use this term, how it flows through the system
-      - patterns: how this concept is typically implemented or used
-      - code_examples: concrete snippets showing usage
+      - relationship_explanation: how this term connects to the related concepts explicitly listed in vocabulary.md
       - related_concepts: [other terms it works with]
-    - patterns_index: common architectural patterns involving multiple vocabulary terms
-  | architectural_layer_integration: if(architecture.md ∃):
-    map_term_to_layers(term, arch_content) → {S5, S4, S3, S2, S1}
-    | include_layer_significance: how term manifests at each layer
-  | return(documentation ∃ ∧ complete ∧ includes_code_examples = true)
+    - term_relationships: concise synthesis of how the canonical terms fit together as a vocabulary system
+  | exclusions:
+    - no_architecture_layer_mappings
+    - no_spec_path_bindings
+    - no_code_examples
+    - no_implementation_or_test_bindings
+  | return(documentation ∃ ∧ complete ∧ vocabulary_only_grounding = true)
+
+λ gybis-vocab-explain_verify_output_scope(documentation).
+  required_signals:
+    - contains_term_definitions = true
+    - contains_related_concepts = true
+    - relationship_focused = true
+  | forbidden_signals:
+    - mentions(architecture.md)
+    - mentions(specs/**/*.allium)
+    - mentions(src/**)
+    - mentions(tests/**)
+    - mentions(S1 ∨ S2 ∨ S3 ∨ S4 ∨ S5)
+    - contains_code_fence
+    - contains_implementation_examples
+    - contains_test_examples
+  | all(required_signals) ∧ none(forbidden_signals) → return(vocabulary_scope_verified = true)
+  | otherwise → halt("Generated vocabulary explanation drifted beyond vocabulary.md-only scope")
 
 λ gybis-vocab-explain_output_dispatch(documentation, mode, output_path).
   require(mode_selected_explicit = true) ∨ halt("Output dispatch blocked: explicit human mode selection missing")
@@ -113,15 +129,19 @@ description: Use for `/gybis-vocab-explain` or `/gv-explain`.
     mode_selected_explicit: true,
     filename_prompted: selected_mode ∈ {prompted_file_only, response_and_prompted_file},
     output_path: output_path,
+    sources_read: [vocabulary.md],
+    vocabulary_scope_verified: true,
     startup_checks_passed: true
   }
   | emit(output_manifest) → protocol_evidence_emitted = true
 
 λ gybis-vocab-explain_output_constraints(x).
   ¬lambda_notation ∧ ¬syntax_output
-  | plain_english(developer) | technical_vocabulary ∧ pattern_names ∧ implementation_context
-  | ¬invent(¬exists(vocabulary.md ∨ architecture.md ∨ refs)) | only explain what exists
+  | plain_english(developer) | technical_vocabulary ∧ relationship_focused_explanation ∧ glossary_reference
+  | ¬invent(¬exists(vocabulary.md)) | only explain what vocabulary.md contains
   | flag(gap ∨ empty ∨ ambiguous) ∧ ¬speculate | highlight unknowns without guessing
+  | ¬reference(architecture.md ∨ specs/**/*.allium ∨ src/** ∨ tests/**) in generated_content
+  | ¬emit(S1 ∨ S2 ∨ S3 ∨ S4 ∨ S5 ∨ code_fences ∨ implementation_examples ∨ test_examples)
   | ¬modify(vocabulary.md ∨ architecture.md ∨ specs/**/*.allium ∨ internal/reference/**)
   | write_only(repo_root_markdown_filename = output_path) | ¬write(subpaths ∨ non_markdown)
   | explicit_human_output_selection_required: true | ¬implicit_default_progression
