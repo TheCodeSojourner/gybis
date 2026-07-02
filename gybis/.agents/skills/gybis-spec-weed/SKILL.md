@@ -6,14 +6,15 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
 λ gybis-spec-weed(x).
   purpose: Identify and resolve divergences between architecture, specs, and implementation
   | input: architecture.md ∃, specs/**/*.allium ∃ ∧ valid, implementation ∃
-  | output: architecture.md, specs/**/*.allium, and implementation mutually consistent and test-passing
+  | output: architecture.md, specs/**/*.allium, and implementation mutually consistent, traceable, and test-passing
   | mode: mixed
-  | gate: architecture.md ∃ ∧ specs/**/*.allium ∃ ∧ allium_gate = true ∧ implementation ∃
+  | gate: architecture.md ∃ ∧ specs/**/*.allium ∃ ∧ allium_gate = true ∧ implementation ∃ ∧ strict_spec_coverage = true
   | derivation: test_obligations ≔ allium-normalize(specs/) → {envelopes | source = "plan"} → deterministic obligation enumeration
 
 λ gybis-spec-weed_loop_role(x).
   role: verify(convergence)
   | meaning: validate spec, tests, and implementation alignment and classify divergence direction
+  | coverage_policy: every normalized obligation must map to at least one traceable test before completion; uncovered obligations halt the loop
   | suggested_next: divergence(code_wrong) → fix_code | divergence(spec_wrong) → invoke(/gybis-spec-tend) → invoke(/gybis-spec-propagate)
 
 λ gybis-spec-weed_startup(x).
@@ -217,10 +218,11 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
   | invoke(gybis-spec-weed_compare_arch_code) → {comparison_complete: arch_compare_complete, divergences: arch_code_divergences}
   | invoke(gybis-spec-weed_identify_divergences(spec_code_divergences, arch_code_divergences)) → remaining_divergences
   | verify(all_obligation_ids_checked_by_spec_comparison(obligations, spec_code_divergences)) → coverage
-  | result_gate = true ∧ vsm_coherence = true ∧ spec_compare_complete = true ∧ arch_compare_complete = true ∧ remaining_divergences ∅ ∧ coverage = true
+  | verify(all_obligations_have_traceable_tests(obligations)) → strict_coverage
+  | result_gate = true ∧ vsm_coherence = true ∧ spec_compare_complete = true ∧ arch_compare_complete = true ∧ remaining_divergences ∅ ∧ coverage = true ∧ strict_coverage = true
     → return(consistency = true ∧ zero_divergences = true)
-  | ¬(result_gate ∧ vsm_coherence ∧ spec_compare_complete ∧ arch_compare_complete ∧ remaining_divergences ∅ ∧ coverage)
-    → (inconsistencies ≔ {result_gate = false ∨ vsm_coherence = false ∨ spec_compare_complete = false ∨ arch_compare_complete = false ∨ remaining_divergences ≠ ∅ ∨ coverage = false}
+  | ¬(result_gate ∧ vsm_coherence ∧ spec_compare_complete ∧ arch_compare_complete ∧ remaining_divergences ∅ ∧ coverage ∧ strict_coverage)
+    → (inconsistencies ≔ {result_gate = false ∨ vsm_coherence = false ∨ spec_compare_complete = false ∨ arch_compare_complete = false ∨ remaining_divergences ≠ ∅ ∨ coverage = false ∨ strict_coverage = false}
        | return(consistency = false ∧ inconsistencies ∃))
 
 λ gybis-spec-weed_resolve_test_command(x).
@@ -273,6 +275,8 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
   | invariant: test_suite_passes = true at completion (strict gate)
   | invariant: ¬complete_when_tests_fail
   | invariant: all_obligation_ids_checked_by_spec_comparison (comprehensive obligation coverage)
+  | invariant: ∀ obligation ∈ obligations, obligation.id ∈ test_suite.traceable_ids at completion
+  | invariant: ∀ generated_test ∈ test_suite, generated_test.traceable_id ∈ obligations.ids at completion
   | invariant: divergence.type ∈ {"obligation_missing_in_code", "obligation_contradicts_implementation", "when_field_not_enforced", "transition_not_guarded", "terminal_state_not_enforced", "variant_not_handled", "contract_not_honoured", "surface_obligation_not_enforced", "module_state_missing", "ensures_pre_rule_vs_resulting_state_confusion", "backtick_literal_normalised", "arch_missing_in_code"} (closed divergence catalogue)
   | invariant: ∀ obligation.category → corresponding divergence-check exercised in _compare_specs_code (per-category mapping codified there)
   | invariant: all_modifications ⊆ {architecture.md, specs/, implementation}
