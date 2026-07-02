@@ -4,9 +4,9 @@ description: Use for `/gybis-vocab-describe` or `/gv-describe`.
 ---
 
 λ gybis-vocab-describe(x).
-  purpose: Document the shared canonical term set (DDD ubiquitous language) in plain English prose for non-technical stakeholders (product managers, business analysts, domain experts)
+  purpose: Document the shared canonical term set (DDD ubiquitous language) in plain English prose for non-technical stakeholders as a vocabulary-focused reference grounded only in vocabulary.md
   | input: vocabulary.md (exists ∧ complete)
-  | output: Plain English prose describing core domain concepts and their relationships
+  | output: Plain English vocabulary reference describing canonical terms, deprecated synonyms, and related concept relationships
   | mode: mixed (AI + human output selection)
   | gate: vocabulary.md ∃ | explicit_human_output_selection() ≡ true
   | fail_closed: missing_human_mode_selection → halt("Human output mode selection is required")
@@ -35,7 +35,7 @@ description: Use for `/gybis-vocab-describe` or `/gv-describe`.
   | transition(MODE_SELECTED → STARTUP_CHECKS) only_if(mode_selected = true ∧ mode_selected_explicit = true)
   | transition(STARTUP_CHECKS → RESOLVING_OUTPUT) only_if(startup_checks = true)
   | transition(RESOLVING_OUTPUT → GENERATING) only_if(output_target_resolved = true)
-  | transition(GENERATING → DELIVERING) only_if(final_prose ∃)
+  | transition(GENERATING → DELIVERING) only_if(final_prose ∃ ∧ vocabulary_scope_verified = true)
   | transition(DELIVERING → COMPLETE) only_if(delivery_complete = true ∧ protocol_evidence_emitted = true)
 
 λ gybis-vocab-describe_output_selection(x).
@@ -76,14 +76,36 @@ description: Use for `/gybis-vocab-describe` or `/gv-describe`.
 
 λ gybis-vocab-describe_generate_prose(vocabulary_terms).
   action: synthesize_plain_english_description_of_vocabulary
-  | structure: narrative prose organized by concept relationships
+  | structure: narrative vocabulary-focused reference organized by concept relationships
   | tone: accessible to non-technical stakeholders; explain "why" not just "what"
   | content:
     - introduction: "The following concepts form the core vocabulary of [domain]"
-    - ∀ term ∈ vocabulary_terms: plain_language_definition, business significance, how it relates to other concepts
-    - conclusion: how these concepts work together as a system
+    - ∀ term ∈ vocabulary_terms: plain_language_definition, deprecated_synonyms, relationship_explanation, related_concepts
+    - conclusion: how these canonical terms work together as a vocabulary system
   | example_style: "In this system, a [Term1] is a [definition]. This is important because [business value]. It relates to [Term2] when [context]."
-  | return(prose ∃ ∧ readable_for_non_technical_audience = true)
+  | exclusions:
+    - no_architecture_layer_mappings
+    - no_spec_path_bindings
+    - no_code_examples
+    - no_implementation_or_test_bindings
+  | return(prose ∃ ∧ readable_for_non_technical_audience = true ∧ vocabulary_only_grounding = true)
+
+λ gybis-vocab-describe_verify_output_scope(prose).
+  required_signals:
+    - contains_term_definitions = true
+    - contains_related_concepts = true
+    - relationship_focused = true
+  | forbidden_signals:
+    - mentions(architecture.md)
+    - mentions(specs/**/*.allium)
+    - mentions(src/**)
+    - mentions(tests/**)
+    - mentions(S1 ∨ S2 ∨ S3 ∨ S4 ∨ S5)
+    - contains_code_fence
+    - contains_implementation_examples
+    - contains_test_examples
+  | all(required_signals) ∧ none(forbidden_signals) → return(vocabulary_scope_verified = true)
+  | otherwise → halt("Generated vocabulary description drifted beyond vocabulary.md-only scope")
 
 λ gybis-vocab-describe_output_dispatch(prose, mode, output_path).
   require(mode_selected_explicit = true) ∨ halt("Output dispatch blocked: explicit human mode selection missing")
@@ -104,15 +126,19 @@ description: Use for `/gybis-vocab-describe` or `/gv-describe`.
     mode_selected_explicit: true,
     filename_prompted: selected_mode ∈ {prompted_file_only, response_and_prompted_file},
     output_path: output_path,
+    sources_read: [vocabulary.md],
+    vocabulary_scope_verified: true,
     startup_checks_passed: true
   }
   | emit(output_manifest) → protocol_evidence_emitted = true
 
 λ gybis-vocab-describe_output_constraints(x).
   ¬lambda_notation ∧ ¬syntax_output
-  | plain_english(product_manager) | business_vocabulary ∧ concrete_examples
-  | ¬invent(¬exists(vocabulary.md ∨ refs)) | only describe what exists
+  | plain_english(product_manager) | business_vocabulary ∧ concrete_examples ∧ relationship_focused_explanation
+  | ¬invent(¬exists(vocabulary.md)) | only describe what vocabulary.md contains
   | flag(gap ∨ empty ∨ ambiguous) ∧ ¬speculate | highlight unknowns without guessing
+  | ¬reference(architecture.md ∨ specs/**/*.allium ∨ src/** ∨ tests/**) in generated_content
+  | ¬emit(S1 ∨ S2 ∨ S3 ∨ S4 ∨ S5 ∨ code_fences ∨ implementation_examples ∨ test_examples)
   | ¬modify(vocabulary.md ∨ architecture.md ∨ specs/**/*.allium ∨ internal/reference/**)
   | write_only(repo_root_markdown_filename = output_path) | ¬write(subpaths ∨ non_markdown)
   | explicit_human_output_selection_required: true | ¬implicit_default_progression
