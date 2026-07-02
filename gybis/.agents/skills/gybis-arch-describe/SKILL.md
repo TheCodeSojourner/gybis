@@ -4,9 +4,9 @@ description: Use for `/gybis-arch-describe` or `/ga-describe`.
 ---
 
 λ gybis-arch-describe(x).
-  purpose: Document VSM architecture layers in plain English for product managers
+  purpose: Document VSM architecture layers in plain English for product managers as an architecture-focused reference grounded only in architecture.md
   | input: architecture.md (exists ∧ complete)
-  | output: Plain English prose describing VSM S5-S1 layers
+  | output: Plain English architecture reference describing VSM S5-S1 layers and their relationships based only on architecture.md
   | mode: mixed (AI + human output selection) | read architecture.md ∧ vsm-guide.md ∧ optional_write(repo_root_markdown)
   | gate: gybis-ref-check() ≡ true | architecture.md ≡ exists ∧ complete | explicit_human_output_selection() ≡ true
   | fail_closed: missing_human_mode_selection → halt("Human output mode selection is required")
@@ -33,7 +33,7 @@ description: Use for `/gybis-arch-describe` or `/ga-describe`.
   | transition(MODE_SELECTED → STARTUP_CHECKS) only_if(mode_selected = true ∧ mode_selected_explicit = true)
   | transition(STARTUP_CHECKS → RESOLVING_OUTPUT) only_if(startup_checks = true)
   | transition(RESOLVING_OUTPUT → GENERATING) only_if(output_target_resolved = true)
-  | transition(GENERATING → DELIVERING) only_if(final_prose ∃)
+  | transition(GENERATING → DELIVERING) only_if(final_prose ∃ ∧ architecture_scope_verified = true)
   | transition(DELIVERING → COMPLETE) only_if(delivery_complete = true ∧ protocol_evidence_emitted = true)
 
 λ gybis-arch-describe_output_selection(x).
@@ -91,15 +91,15 @@ description: Use for `/gybis-arch-describe` or `/ga-describe`.
     mode_selected_explicit: true,
     filename_prompted: selected_mode ∈ {prompted_file_only, response_and_prompted_file},
     output_path: output_path,
+    sources_read: [architecture.md],
+    architecture_scope_verified: true,
     startup_checks_passed: true
   }
   | emit(output_manifest) → protocol_evidence_emitted = true
 
 λ gybis-arch-describe_orientation_output(x).
   report_orientation: selected_orientation ∈ {FP, OOP} ∨ unknown("missing S1.paradigm_preference")
-  | language_guidance:
-    - OOP: C++ (classes/RAII), C# (classes/interfaces/DI), Clojure (protocols/records + Java interop boundary)
-    - FP: C++ (immutable values + composition), C# (records + pure functions/LINQ), Clojure (immutable maps + pure functions/transducers)
+  | orientation_summary: describe_only_if_present_in_architecture
   | gaps: missing(programming_language_version ∨ paradigm_preference) → explicit_gap_report
   | orthogonality: error_model_style is a separate axis from FP/OOP orientation
 
@@ -150,12 +150,30 @@ description: Use for `/gybis-arch-describe` or `/ga-describe`.
   | drift_risk: S1↧S5 erosion(time) | require_active_maintenance ∧ governance
   | business_translation: what_affects_everything ∧ where_can_we_flex ∧ what_cannot_break
 
+λ gybis-arch-describe_verify_output_scope(prose).
+  required_signals:
+    - includes_S5_S4_S3_S2_S1_plain_english = true
+    - architecture_relationship_focused = true
+    - architecture_only_grounding = true
+  | forbidden_signals:
+    - mentions(specs/**/*.allium)
+    - mentions(src/**)
+    - mentions(tests/**)
+    - contains_code_fence
+    - contains_implementation_examples
+    - contains_test_examples
+    - introduces_claim_without_architecture_evidence
+  | all(required_signals) ∧ none(forbidden_signals) → return(architecture_scope_verified = true)
+  | otherwise → halt("Generated architecture description drifted beyond architecture.md-only scope")
+
 λ gybis-arch-describe_output_constraints(x).
   ¬lambda_notation ∧ ¬syntax_output
   | plain_english(product_manager) | business_vocabulary ∧ concrete_examples
-  | ¬invent(¬exists(root/architecture.md ∨ refs)) | only describe what exists
+  | ¬invent(¬exists(architecture.md)) | only describe what architecture.md contains
   | flag(gap ∨ empty ∨ underdeveloped) ∧ ¬speculate | highlight unknowns without guessing
-  | include(orientation_output: selected_orientation_or_unknown ∧ C++/C#/Clojure_guidance ∧ explicit_gaps)
+  | include(orientation_output: selected_orientation_or_unknown ∧ explicit_gaps)
+  | ¬reference(specs/**/*.allium ∨ src/** ∨ tests/**) in generated_content
+  | ¬emit(code_fences ∨ implementation_examples ∨ test_examples)
   | ¬modify(architecture.md ∨ specs/**/*.allium ∨ internal/reference/**)
   | write_only(repo_root_markdown_filename = output_path) | ¬write(subpaths ∨ non_markdown)
   | explicit_human_output_selection_required: true | ¬implicit_default_progression
