@@ -4,9 +4,9 @@ description: Use for `/gybis-spec-explain` or `/gs-explain`.
 ---
 
 λ gybis-spec-explain(input_type, input_args).
-  purpose: Document allium specifications in technical language for developers
+  purpose: Document allium specifications in technical language for developers as a specification-focused reference grounded only in specs/**/*.allium
   | input: specs/**/*.allium (exists ∧ valid ∧ passes allium-gate)
-  | output: Technical prose describing specifications with implementation context
+  | output: Technical specification reference describing behaviors, rules, guarantees, and construct usage based only on specs/**/*.allium
   | mode: mixed (AI + human output selection) | read specs ∧ allium-ref ∧ optional_write(repo_root_markdown)
   | gate: gybis-ref-check() ≡ true | allium-gate() ≡ true | explicit_human_output_selection() ≡ true
   | fail_closed: missing_human_mode_selection → halt("Human output mode selection is required")
@@ -36,7 +36,7 @@ description: Use for `/gybis-spec-explain` or `/gs-explain`.
   | transition(MODE_SELECTED → STARTUP_CHECKS) only_if(mode_selected = true ∧ mode_selected_explicit = true)
   | transition(STARTUP_CHECKS → RESOLVING_OUTPUT) only_if(startup_checks = true)
   | transition(RESOLVING_OUTPUT → GENERATING) only_if(output_target_resolved = true)
-  | transition(GENERATING → DELIVERING) only_if(final_prose ∃)
+  | transition(GENERATING → DELIVERING) only_if(final_prose ∃ ∧ spec_scope_verified = true)
   | transition(DELIVERING → COMPLETE) only_if(delivery_complete = true ∧ protocol_evidence_emitted = true)
 
 λ gybis-spec-explain_output_selection(x).
@@ -94,6 +94,8 @@ description: Use for `/gybis-spec-explain` or `/gs-explain`.
     mode_selected_explicit: true,
     filename_prompted: selected_mode ∈ {prompted_file_only, response_and_prompted_file},
     output_path: output_path,
+    sources_read: [specs/**/*.allium],
+    spec_scope_verified: true,
     startup_checks_passed: true
   }
   | emit(output_manifest) → protocol_evidence_emitted = true
@@ -142,11 +144,29 @@ description: Use for `/gybis-spec-explain` or `/gs-explain`.
   resolve(input) → generate_prose → format_output → quality_check
   | quality_check(∀ guarantee_holds) → complete ¬until_pass
 
+λ gybis-spec-explain_verify_output_scope(prose).
+  required_signals:
+    - behavior_rules_guarantees_present = true
+    - construct_specific_framing_present = true
+    - specification_only_grounding = true
+  | forbidden_signals:
+    - mentions(architecture.md)
+    - mentions(src/**)
+    - mentions(tests/**)
+    - contains_code_fence
+    - contains_implementation_examples
+    - contains_test_examples
+    - introduces_claim_without_spec_evidence
+  | all(required_signals) ∧ none(forbidden_signals) → return(spec_scope_verified = true)
+  | otherwise → halt("Generated specification explanation drifted beyond specs/**/*.allium-only scope")
+
 λ gybis-spec-explain_output_constraints(x).
   ¬lambda_notation ∧ ¬syntax_output
-  | plain_english(developer) | technical_vocabulary ∧ pattern_names ∧ implementation_context
-  | ¬invent(¬exists(specs/**/*.allium ∨ refs)) | only explain what exists
+  | plain_english(developer) | technical_vocabulary ∧ pattern_names ∧ construct_framing
+  | ¬invent(¬exists(specs/**/*.allium)) | only explain what specs/**/*.allium contains
   | flag(gap ∨ empty ∨ ambiguous) ∧ ¬speculate | highlight unknowns without guessing
+  | ¬reference(architecture.md ∨ src/** ∨ tests/**) in generated_content
+  | ¬emit(code_fences ∨ implementation_examples ∨ test_examples)
   | ¬modify(specs/**/*.allium ∨ architecture.md ∨ internal/reference/**)
   | write_only(repo_root_markdown_filename = output_path) | ¬write(subpaths ∨ non_markdown)
   | explicit_human_output_selection_required: true | ¬implicit_default_progression
