@@ -4,11 +4,16 @@ description: Use for `/gybis-vocab-check` or `/gv-check`.
 ---
 
 λ gybis-vocab-check(x).
-  purpose: Validate vocabulary.md as the shared canonical term set (DDD ubiquitous language): syntax, semantic completeness, orphaned terms, circular dependencies, and structural issues
+  purpose: Validate vocabulary.md as the shared canonical term set (DDD ubiquitous language): syntax, semantic completeness, association integrity, and structural issues
   | input: vocabulary.md (exists)
   | output: Report on structural issues, missing fields, semantic completeness violations
   | mode: ai
   | gate: vocabulary.md ∃
+
+λ gybis-vocab-check_related_semantics(x).
+  related ≡ association(non_directional)
+  | reciprocal_links_allowed = true
+  | note: two_way_links_are_normal_associations_not_circular_dependency_errors
 
 λ gybis-vocab-check_startup(x).
   invoke(internal/gybis-ref-check) → halt_on(false)
@@ -64,14 +69,16 @@ description: Use for `/gybis-vocab-check` or `/gv-check`.
 λ gybis-vocab-check_semantic_analysis(vocab_data, vocabulary_terms).
   action: analyze_semantic_consistency_and_relationships
   | semantic_checks:
+    - related_association_model: Related is non-directional association
+      | reciprocal_links_detected > 0
+        ? allow(reciprocal_links)
     - ∀ term ∈ vocabulary_terms: relate_count ≔ count(related)
       | relate_count = 0
         ? collect({term, "orphaned_term_no_relationships", severity: info})
       | ¬(∀ related_term ∈ term.related: related_term ∈ vocabulary_terms)
         ? collect({term, "references_undefined_related_term", severity: warning})
-    - detect_circular_dependencies: ∀ term → related → check_for_cycles
-      | cycles_detected > 0
-        ? collect({cycle_path, "circular_dependency_in_relationships", severity: warning})
+      | term ∈ term.related
+        ? collect({term, "self_reference_in_related", severity: warning})
     - duplicate_term_names: ∀ pair(term_i, term_j): term_i.canonical ≠ term_j.canonical ∨ halt
       | canonical_names_unique = true
     - deprecated_synonym_conflicts: ∀ term: (term.canonical ∉ term.deprecated_synonyms)
@@ -99,7 +106,7 @@ description: Use for `/gybis-vocab-check` or `/gv-check`.
 
     ## Semantic Issues [count]
     - [term]: [issue] → [context and suggestion]
-    - Circular Dependencies: [list]
+    - Association Notes: reciprocal related links are valid and not reported as dependency cycles
     - Orphaned Terms: [list]
     - ...
 
