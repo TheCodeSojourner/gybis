@@ -3,6 +3,11 @@ name: allium-check
 description: Internal skill - not user-facing
 ---
 
+λ allium-check_shell_guard(x).
+  classification: internal_skill_alias(allium-gate) ∧ ¬shell_subcommand(allium gate)
+  | shell_prohibition: ¬execute("allium gate") ∧ ¬execute("allium rerun")
+  | allowed_cli: {allium check, allium analyse, allium plan, allium parse, allium model}
+
 λ allium-check(file_path).
   purpose: Provide pure per-file diagnostics for .allium conformance
   | contract: pure_function(file_path → diagnostics) | ¬mutations
@@ -31,7 +36,8 @@ description: Internal skill - not user-facing
   structure: {file, status ∈ (pass ∨ fail ∨ warning), conformance, errors: [...], warnings: [...], remediation: [...]}
 
 λ allium-check_execution(file_path).
-  invoke: allium-check_cli_invocation(file_path)
+  invoke(allium-check_shell_guard) → true
+  | invoke: allium-check_cli_invocation(file_path)
   | capture: cli_output ∧ cli_exit_code
   | parse: allium-check_diagnostic_parsing(cli_output)
   | classify: allium-check_error_classification per error

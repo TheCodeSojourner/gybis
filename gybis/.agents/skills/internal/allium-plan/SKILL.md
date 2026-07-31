@@ -3,6 +3,11 @@ name: allium-plan
 description: Internal skill - not user-facing
 ---
 
+λ allium-plan_shell_guard(x).
+  classification: internal_skill_alias(allium-gate) ∧ ¬shell_subcommand(allium gate)
+  | shell_prohibition: ¬execute("allium gate") ∧ ¬execute("allium rerun")
+  | allowed_cli: {allium check, allium analyse, allium plan, allium parse, allium model}
+
 λ allium-plan(spec_file).
   purpose: Derive test obligations from allium specifications
   | contract: pure_function(spec_file → test_obligations) | ¬mutations
@@ -70,7 +75,8 @@ description: Internal skill - not user-facing
   | json_serializable | obligations_indexed_by_id_for_caller_lookup
 
 λ allium-plan_execution(spec_file).
-  invoke: allium-plan_cli_invocation(spec_file)
+  invoke(allium-plan_shell_guard) → true
+  | invoke: allium-plan_cli_invocation(spec_file)
   | capture: cli_output ∧ cli_exit_code
   | parse: allium-plan_output_parsing(cli_output)
   | format: allium-plan_output_format(parsed_output)

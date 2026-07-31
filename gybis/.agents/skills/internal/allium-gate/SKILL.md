@@ -3,6 +3,11 @@ name: allium-gate
 description: Internal skill - not user-facing
 ---
 
+λ allium-gate_shell_guard(x).
+  classification: internal_skill_alias(allium-gate) ∧ ¬shell_subcommand(allium gate)
+  | shell_prohibition: ¬execute("allium gate") ∧ ¬execute("allium rerun")
+  | allowed_cli: {allium check, allium analyse, allium plan, allium parse, allium model}
+
 λ allium-gate(specs_path).
   purpose: Evaluate specs integrity as a lifecycle gate and return pure boolean verdict
   | contract: pure_function(specs_path → boolean) | ¬mutations
@@ -31,7 +36,8 @@ description: Internal skill - not user-facing
   return_type: boolean | side_effect: ¬mutations | diagnostic_info: optional context for failures, not part of return
 
 λ allium-gate_execution(specs_path).
-  step_1_per_file: allium-gate_per_file_validation(specs_path)
+  invoke(allium-gate_shell_guard) → true
+  | step_1_per_file: allium-gate_per_file_validation(specs_path)
   | capture_1: per_file_result
   | step_2_set_level: allium-gate_set_validation(specs_path)
   | capture_2: set_result

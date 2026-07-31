@@ -3,6 +3,11 @@ name: allium-analyse
 description: Internal skill - not user-facing
 ---
 
+λ allium-analyse_shell_guard(x).
+  classification: internal_skill_alias(allium-gate) ∧ ¬shell_subcommand(allium gate)
+  | shell_prohibition: ¬execute("allium gate") ∧ ¬execute("allium rerun")
+  | allowed_cli: {allium check, allium analyse, allium plan, allium parse, allium model}
+
 λ allium-analyse(specs_path).
   purpose: Provide pure set-level diagnostics for the specs/ directory
   | contract: pure_function(specs_path → findings) | ¬mutations
@@ -31,7 +36,8 @@ description: Internal skill - not user-facing
   | json_serializable | human_readable
 
 λ allium-analyse_execution(specs_path).
-  invoke: allium-analyse_cli_invocation(specs_path)
+  invoke(allium-analyse_shell_guard) → true
+  | invoke: allium-analyse_cli_invocation(specs_path)
   | capture: cli_output ∧ cli_exit_code
   | parse: allium-analyse_findings_parsing(cli_output)
   | classify: allium-analyse_finding_classification per finding

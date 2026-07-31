@@ -10,7 +10,13 @@ description: Use for `/gybis-spec-check` or `/gs-check`.
   | mode: ai
   | gate: specs/**/*.allium ∃ ∧ ¬∅
 
+λ gybis-spec-check_shell_guard(x).
+  classification: internal_skill_alias(allium-gate) ∧ ¬shell_subcommand(allium gate)
+  | shell_prohibition: ¬execute("allium gate") ∧ ¬execute("allium rerun")
+  | allowed_cli: {allium check, allium analyse, allium plan, allium parse, allium model}
+
 λ gybis-spec-check_startup(x).
+  invoke(gybis-spec-check_shell_guard) → true
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
   | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
   | preload: [internal/allium-analyse, internal/allium-check, internal/allium-normalize, internal/allium-gate]
