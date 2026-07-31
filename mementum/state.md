@@ -1,3 +1,4 @@
+✅ session-31 | 2026-07-31 gybis-fini commit-default blocker escalation policy aligned in both skill copies
 ✅ session-30 | 2026-07-31 gybis-fini closeout completed for orientation-only validation session
 ✅ session-29 | 2026-07-01 refine command family documented in README surfaces and philosophy heading aligned to include refine
 ✅ session-26 | 2026-06-30 gybis-arch-check implemented and wired into help/README command surfaces
@@ -29,16 +30,16 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-07-31T15:10:22-06:00
-- **Sessions**: 30 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout, session-11 bundle .agents migration, session-12 allium sync + loop protocol refinement, session-13 internal skill check updates, session-14 spec orientation scope correction, session-15 init workflow, session-16 describe/explain output modes, session-17 architecture-alignment scope doc update, session-18 README/GYBIS closeout, session-19 strict test-pass convergence, session-20 use-cases command-surface implementation, session-21 spec-weed vocabulary divergence integration, session-22 init workflow, session-23 vocab-weed skill addition, session-24 operator-responsibility model + spec-vocab decoupling, session-25 init workflow, session-26 arch-check implementation, session-27 gybis-init orientation, session-28 gybis-fini closeout, session-29 refine docs alignment + gybis-fini closeout, session-30 orientation/fini protocol validation closeout)
-- **Status**: Session-30 terminated — gybis-fini complete
+- **Last updated**: 2026-07-31T15:18:26-06:00
+- **Sessions**: 31 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout, session-11 bundle .agents migration, session-12 allium sync + loop protocol refinement, session-13 internal skill check updates, session-14 spec orientation scope correction, session-15 init workflow, session-16 describe/explain output modes, session-17 architecture-alignment scope doc update, session-18 README/GYBIS closeout, session-19 strict test-pass convergence, session-20 use-cases command-surface implementation, session-21 spec-weed vocabulary divergence integration, session-22 init workflow, session-23 vocab-weed skill addition, session-24 operator-responsibility model + spec-vocab decoupling, session-25 init workflow, session-26 arch-check implementation, session-27 gybis-init orientation, session-28 gybis-fini closeout, session-29 refine docs alignment + gybis-fini closeout, session-30 orientation/fini protocol validation closeout, session-31 gybis-fini commit-default policy alignment)
+- **Status**: Session-31 terminated — gybis-fini complete
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
 - **Core stack**: Nucleus (math notation base context) + Allium (behavioral DSL) + Mementum (persistent memory)
 - **Architecture**: VSM derivative (5-layer architectural spec)
 - **GitHub**: TheCodeSojourner/gybis
-- **Latest work**: Session-29 documented `gybis-*-refine` coverage across README surfaces, aligned workflow text, and updated the philosophy heading to include refine.
+- **Latest work**: Session-31 aligned gybis-fini in both skill copies to default commit behavior with explicit blocker escalation and operator choice.
 
 ## Recent Activity
 - Initial commit: README with project definition, glossary, overview
@@ -143,6 +144,10 @@
   - Executed gybis-init startup gate and gybis-fini protocol without code changes
   - Confirmed active bootloader state is `mementum/state.md`; `gybis/mementum/state.md` remains template-empty
   - Upserted state closeout with session-30 metadata and recovery hook
+- Session-31 (2026-07-31): gybis-fini commit-default policy alignment
+  - Updated `gybis-fini` in both `.agents/skills/` and `gybis/.agents/skills/` to default commit behavior
+  - Added explicit strong-blocker list and ask-human fallback choices (`retry`, `skip`, `manual`)
+  - Stored memory: `mementum/memories/gybis-fini-commit-default-blocker-escalation.md`
 
 ## Feed-Forward Signals
 - README.md now synchronized with actual gybis/.agents/skills/ directory
@@ -166,20 +171,21 @@
 - Monitor for: check/tend/weed philosophy staying aligned across README and GYBIS-README without mirroring entire sections
 - Monitor for: operation-family heading and loop naming drifting when new `check/refine/tend/weed` commands are added
 - Monitor for: accidental writes to `gybis/mementum/state.md` instead of active `mementum/state.md` during closeout flows
+- Monitor for: commit-policy drift between root and bundled `gybis-fini` skill copies
 
 ## Session Closeout
-- **last_session_id**: session-30
-- **current_timestamp**: 2026-07-31T15:10:22-06:00
-- **task**: Execute gybis-init/gybis-fini protocol sequence and persist session-30 closeout state for an orientation-only validation pass.
+- **last_session_id**: session-31
+- **current_timestamp**: 2026-07-31T15:18:26-06:00
+- **task**: Align gybis-fini to default commit behavior with explicit strong-blocker escalation and apply the same change to bundled skill copy.
 - **questions**:
   - none
 - **decisions**:
-  - Used `mementum/state.md` as the active session bootloader and closeout target.
-  - Treated `gybis/mementum/state.md` as distribution template state (empty) and left it unchanged.
-  - Completed gybis-fini state upsert with recovery pointer tied to next[1].
+  - Retained `mementum/state.md` as the active closeout target and kept `gybis/mementum/state.md` untouched.
+  - Added commit-default + blocker escalation logic to both gybis-fini skill copies to prevent behavior drift.
+  - Stored `mementum/memories/gybis-fini-commit-default-blocker-escalation.md` for future sessions.
 - **next**:
-  1. If future sessions update closeout automation, enforce explicit active-vs-template state path checks before write.
-  2. Keep session-start/session-finish protocol runs paired when validating memory workflow behavior.
-- **recover**: If future sessions update closeout automation, enforce explicit active-vs-template state path checks before write.
+  1. If gybis-fini encounters a strong blocker, require explicit operator choice before ending the session.
+  2. Keep root and bundled skill variants synchronized whenever commit policy changes.
+- **recover**: If gybis-fini encounters a strong blocker, require explicit operator choice before ending the session.
 
 ⏹→state.md
