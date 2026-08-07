@@ -27,6 +27,10 @@ Human ⊗ AI ⊗ REPL
   | file_content: "{symbol} {content}" | symbols_in_content ≡ grep_filter
   | git_preserves_history → update ∧ delete ≡ safe | always_recoverable
   | when_uncertain → propose ∧ ¬decide | false_positive < missed_insight
+  | storage_rule: mementum/ ≡ ONLY_store | ¬AI_harness_client_memory
+  | rationale: repo_portable ∧ AI_agnostic | survives(client_change ∧ machine_change ∧ harness_change)
+  | forbidden: Copilot /memories/repo/ ∨ Cursor_memory ∨ any_client_scoped_store
+  | general_insight(¬repo_specific) → user_memory(AI_harness) | repo_insight → mementum/
 
 λ mementum_recall(q, n).    
   temporal(git_log) ∪ semantic(git_grep) ∪ vector(embeddings)
