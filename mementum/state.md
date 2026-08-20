@@ -1,3 +1,4 @@
+✅ session-36 | 2026-08-20 gybis-fini closeout: downstream upgrade documentation and Allium compatibility gate committed
 ✅ session-35 | 2026-08-20 Downstream upgrade and rollout documentation synchronized across README surfaces
 ✅ session-34 | 2026-08-20 Allium 3.5.3 runtime compatibility gate and empty-spec guard implemented
 ✅ session-33 | 2026-08-20 Mementum OKF migration and Nucleus Lambda/VSM integration completed; Allium adapter pass queued
@@ -34,9 +35,9 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-08-20T13:22:00-06:00
-- **Sessions**: 35 (session-0 initialized through session-35 downstream rollout documentation sync)
-- **Status**: Session-35 documentation update complete — validation passed
+- **Last updated**: 2026-08-20T13:36:28-06:00
+- **Sessions**: 36 (session-0 initialized through session-36 gybis-fini closeout)
+- **Status**: Session-36 terminated — gybis-fini complete
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
@@ -182,11 +183,11 @@
 - Monitor for: commit-policy drift between root and bundled `gybis-fini` skill copies
 
 ## Session Closeout
-- **last_session_id**: session-35
-- **current_timestamp**: 2026-08-20T13:22:00-06:00
-- **task**: Document safe downstream gybis bundle upgrades and multi-repository rollout after the Allium runtime gate update.
+- **last_session_id**: session-36
+- **current_timestamp**: 2026-08-20T13:36:28-06:00
+- **task**: Close out the Allium compatibility gate and downstream upgrade documentation session.
 - **questions**:
-  - none blocking; downstream upgrade instructions are synchronized in both README surfaces and validated.
+  - none blocking; implementation and documentation commits are present and the closeout state is ready to commit.
 - **decisions**:
   - Mementum now uses an OKF v0.1 migration path with deterministic detection, explicit approval, and preserved working state.
   - Root-local and bundled Mementum command variants remain deliberately distinct.
