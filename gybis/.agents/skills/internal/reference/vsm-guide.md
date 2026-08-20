@@ -93,7 +93,9 @@ S1 (operations)    — what system concretely does
 Compact way to encode principles + rules.
 
 ```
-λ name(x).     define rule called "name"
+λ name.        declare identity or policy without an input mapping
+λ name().      define a zero-argument operation
+λ name(x).     define a rule over input
 →              leads to, then, implies
 |              also (separates independent clauses)
 >              preferred over (soft constraint)
@@ -109,6 +111,11 @@ Compact way to encode principles + rules.
 ∘              compose (f ∘ g applies f after g)
 ⊗              tensor product (all constraints simultaneously)
 ```
+
+Use `λ name.` for declarations that govern by identity or policy, `λ name().`
+for an explicit zero-argument operation, and `λ name(x).` when the body maps an
+input. Lambda parameters are identifiers; use `¬` only as an operator in a
+lambda body.
 
 Multi-line lambdas indent continuations, use `|` for independent clauses:
 ```
