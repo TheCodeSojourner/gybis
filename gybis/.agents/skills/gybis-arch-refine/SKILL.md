@@ -146,7 +146,7 @@ description: Use for `/gybis-arch-refine` or `/ga-refine`.
   | return(impact_report ≔ {classified_proposals, breaking_candidates, unknown_candidates})
 
 λ gybis-arch-refine_route_misfit_request(change).
-  change ∈ {introduce_new_architectural_policy, retire_existing_architectural_policy, change_vsm_layer_contract, add_new_operational_constraint, remove_existing_operational_constraint}
+  change ∈ {introduce_new_S5_policy_with_rationale, retire_existing_S5_policy, add_new_S3_enforcement_mechanism, remove_existing_S3_enforcement_mechanism, change_vsm_layer_contract}
     → halt("Requested change is architectural evolution; route to /gybis-arch-tend")
   | change ∈ {arch_spec_divergence, spec_contradicts_arch, implementation_contradicts_arch}
     → halt("Requested change is a convergence problem; route to /gybis-arch-weed")
