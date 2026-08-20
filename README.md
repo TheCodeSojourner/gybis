@@ -181,13 +181,25 @@ This copies the complete gybis bundle, including the hidden `.agents/skills/` di
 
 Do not rerun the full installation copy against an existing target repository: its live `mementum/` directory is project-owned durable memory and must be preserved.
 
-Update only the command bundle:
+From the target repository, update only the command bundle:
 
 ```bash
 cp -ra <pathToGybisDirectory>/gybis/.agents/skills/. .agents/skills/
 ```
 
+This replaces the distributed command implementations, including internal Allium adapters and the runtime compatibility gate. It does not replace project specifications, source code, tests, or the target repository's `mementum/` store. Review the resulting diff before continuing.
+
+Before running specification commands, verify the target machine has a supported Allium CLI:
+
+```bash
+allium --version # current bundle requirement: 3.5.3 or newer
+```
+
 Then run `/gybis-memory-migrate` (`/gm-migrate`). The command inspects the target repository's existing `mementum/` store, reports `NO_MIGRATION_REQUIRED` when it is already conformant, previews recognized legacy conversions, and requires explicit approval before writing. It halts without changes for malformed or ambiguous data.
+
+Finally, run `/gybis-spec-check {concern|domain|all}` when the target contains `.allium` specifications. The runtime gate reports `NO_SPECS` for an empty specification directory; this is an absence-of-work result, not an Allium compatibility failure. Repositories that have not created specifications yet can complete the bundle update and create them later.
+
+For several downstream repositories, repeat this command-bundle update separately in each repository. Keep the same source bundle version for the batch, and commit each downstream repository's skill update independently so its migration and validation history remain visible.
 
 See the `gybis/GYBIS-README.md` for usage instructions, best practices, and workflow suggestions.
 

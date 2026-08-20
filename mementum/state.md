@@ -1,3 +1,4 @@
+✅ session-35 | 2026-08-20 Downstream upgrade and rollout documentation synchronized across README surfaces
 ✅ session-34 | 2026-08-20 Allium 3.5.3 runtime compatibility gate and empty-spec guard implemented
 ✅ session-33 | 2026-08-20 Mementum OKF migration and Nucleus Lambda/VSM integration completed; Allium adapter pass queued
 ✅ session-32 | 2026-08-20 gybis-fini orientation validation: no drift, all systems stable
@@ -33,9 +34,9 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-08-20T13:18:38-06:00
-- **Sessions**: 34 (session-0 initialized through session-34 Allium compatibility gate implementation)
-- **Status**: Session-34 implementation complete — validation passed
+- **Last updated**: 2026-08-20T13:22:00-06:00
+- **Sessions**: 35 (session-0 initialized through session-35 downstream rollout documentation sync)
+- **Status**: Session-35 documentation update complete — validation passed
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
@@ -155,6 +156,7 @@
 ## Feed-Forward Signals
 - Allium adapters now perform a shared executable version preflight through `internal/allium-runtime-check`
 - Runtime compatibility distinguishes unsupported executables from `NO_SPECS` empty-target results
+- Downstream upgrade instructions now cover command-bundle-only copying, Allium `3.5.3+`, Mementum migration, `NO_SPECS`, and independent fleet rollout
 - `allium-gate` requires at least one `.allium` file before per-file or set-level validation
 - README.md now synchronized with actual gybis/.agents/skills/ directory
 - Hidden bundle layouts require `cp -ra <bundle>/. .`; `*` globs skip `.agents/`
@@ -180,11 +182,11 @@
 - Monitor for: commit-policy drift between root and bundled `gybis-fini` skill copies
 
 ## Session Closeout
-- **last_session_id**: session-34
-- **current_timestamp**: 2026-08-20T13:18:38-06:00
-- **task**: Add an Allium runtime compatibility preflight and explicit empty-specification guard after the 3.5.3 adapter update.
+- **last_session_id**: session-35
+- **current_timestamp**: 2026-08-20T13:22:00-06:00
+- **task**: Document safe downstream gybis bundle upgrades and multi-repository rollout after the Allium runtime gate update.
 - **questions**:
-  - none blocking; runtime gate is declarative and validated against the installed Allium 3.5.3 executable.
+  - none blocking; downstream upgrade instructions are synchronized in both README surfaces and validated.
 - **decisions**:
   - Mementum now uses an OKF v0.1 migration path with deterministic detection, explicit approval, and preserved working state.
   - Root-local and bundled Mementum command variants remain deliberately distinct.
@@ -193,6 +195,7 @@
   - Direct Allium pins remain current; the installed 3.5.3 CLI exposed bundled adapter JSON-contract drift.
   - Runtime version checking is nonrecursive; target payload probing is available as an explicit gate operation rather than from inside the adapters.
   - Empty specification directories return `NO_SPECS` instead of passing the gate vacuously.
+  - Existing downstream repositories must copy only `.agents/skills/`, preserve live project artifacts, verify Allium `3.5.3+`, run `/gybis-memory-migrate`, and validate specs only when `.allium` files exist.
 - **next**:
   1. Run a real valid `.allium` fixture through the new target payload probe and adapter normalization path.
   2. Keep upstream pins unchanged unless upstream heads advance.

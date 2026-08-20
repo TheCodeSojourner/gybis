@@ -126,11 +126,23 @@ Outcome: an existing codebase is brought under explicit vocabulary, architecture
 
 ### Upgrade Mementum Safely
 
-Use this after updating an existing gybis installation to the OKF-enabled Mementum workflow.
+Use this when updating an existing gybis installation to a newer command bundle.
 
-1. Update only `.agents/skills/` from the newer gybis bundle; do not overwrite the target repository's live `mementum/` directory.
-2. Run `/gybis-memory-migrate` to inspect the current memory store and receive either `NO_MIGRATION_REQUIRED`, a deterministic migration preview, or an explicit ambiguity report.
-3. Review the preview and approve it only when the listed file changes preserve the intended project history.
+1. From the target repository, update only `.agents/skills/` from the newer gybis bundle:
+
+  ```bash
+  cp -ra <pathToGybisDirectory>/gybis/.agents/skills/. .agents/skills/
+  ```
+
+  Do not overwrite the target repository's live `mementum/` directory, specifications, source code, or tests.
+2. Review the skill-file diff, including `internal/allium-runtime-check` and the internal skill manifest.
+3. Verify the external prerequisite with `allium --version`; the current bundle requires Allium `3.5.3` or newer for its JSON adapter contract.
+4. Run `/gybis-memory-migrate` to inspect the current memory store and receive either `NO_MIGRATION_REQUIRED`, a deterministic migration preview, or an explicit ambiguity report.
+5. Review the migration preview and approve it only when the listed file changes preserve the intended project history.
+6. If `.allium` specifications exist, run `/gybis-spec-check {concern|domain|all}`. If none exist, `NO_SPECS` is expected and the bundle update can still be completed; create specifications before invoking spec validation or propagation commands.
+7. Commit the bundle update and any approved memory migration in the target repository as a separately reviewable change.
+
+For a fleet of downstream repositories, perform these steps independently in each repository. Use one known gybis bundle version for the batch, record any repository-specific migration result, and do not copy the full `gybis/` bundle over an existing target.
 
 Outcome: a target repository adopts OKF-compatible Mementum storage without losing or silently rewriting its durable memory.
 
