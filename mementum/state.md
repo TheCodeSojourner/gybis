@@ -1,3 +1,4 @@
+✅ session-33 | 2026-08-20 Mementum OKF migration and Nucleus Lambda/VSM integration completed; Allium adapter pass queued
 ✅ session-32 | 2026-08-20 gybis-fini orientation validation: no drift, all systems stable
 ✅ session-31 | 2026-07-31 gybis-fini commit-default blocker escalation policy aligned in both skill copies
 ✅ session-30 | 2026-07-31 gybis-fini closeout completed for orientation-only validation session
@@ -31,16 +32,16 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-07-31T15:18:26-06:00
-- **Sessions**: 31 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout, session-11 bundle .agents migration, session-12 allium sync + loop protocol refinement, session-13 internal skill check updates, session-14 spec orientation scope correction, session-15 init workflow, session-16 describe/explain output modes, session-17 architecture-alignment scope doc update, session-18 README/GYBIS closeout, session-19 strict test-pass convergence, session-20 use-cases command-surface implementation, session-21 spec-weed vocabulary divergence integration, session-22 init workflow, session-23 vocab-weed skill addition, session-24 operator-responsibility model + spec-vocab decoupling, session-25 init workflow, session-26 arch-check implementation, session-27 gybis-init orientation, session-28 gybis-fini closeout, session-29 refine docs alignment + gybis-fini closeout, session-30 orientation/fini protocol validation closeout, session-31 gybis-fini commit-default policy alignment)
-- **Status**: Session-31 terminated — gybis-fini complete
+- **Last updated**: 2026-08-20T13:01:57-06:00
+- **Sessions**: 33 (session-0 initialized through session-33 Mementum and Nucleus integration closeout)
+- **Status**: Session-33 terminated — gybis-fini complete
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
 - **Core stack**: Nucleus (math notation base context) + Allium (behavioral DSL) + Mementum (persistent memory)
 - **Architecture**: VSM derivative (5-layer architectural spec)
 - **GitHub**: TheCodeSojourner/gybis
-- **Latest work**: Session-31 aligned gybis-fini in both skill copies to default commit behavior with explicit blocker escalation and operator choice.
+- **Latest work**: Session-33 completed Mementum OKF migration capability and Nucleus Lambda/VSM integration; queued Allium 3.5.3 adapter compatibility work.
 
 ## Recent Activity
 - Initial commit: README with project definition, glossary, overview
@@ -175,20 +176,21 @@
 - Monitor for: commit-policy drift between root and bundled `gybis-fini` skill copies
 
 ## Session Closeout
-- **last_session_id**: session-32
-- **current_timestamp**: 2026-08-20T00:00:00-06:00
-- **task**: gybis-fini orientation validation — verify protocol execution, check for drift since session-31 closeout, confirm stable state.
+- **last_session_id**: session-33
+- **current_timestamp**: 2026-08-20T13:01:57-06:00
+- **task**: Integrate Mementum OKF migration capability and Nucleus Lambda/VSM updates; assess installed Allium 3.5.3 compatibility.
 - **questions**:
-  - none
+  - none blocking; execute the focused Allium 3.5.3 adapter compatibility pass next session.
 - **decisions**:
-  - Confirmed: No code drift in root README.md or gybis/GYBIS-README.md since session-31.
-  - Confirmed: All feed-forward signals remain valid and no blocking issues detected.
-  - Confirmed: gybis project maintains stable operator responsibility model and command-surface alignment.
-  - No code changes needed for session-32; session executed as pure orientation/validation pass.
+  - Mementum now uses an OKF v0.1 migration path with deterministic detection, explicit approval, and preserved working state.
+  - Root-local and bundled Mementum command variants remain deliberately distinct.
+  - Nucleus is pinned at `64880ed`; Lambda declarations use valid parameter forms and bundled VSM guidance assigns policy/rationale to S5 and enforcement to S3.
+  - No automatic VSM architecture migration skill was added; arch-check diagnoses, arch-tend applies human-approved corrections, and arch-weed handles downstream convergence.
+  - Direct Allium pins remain current; the installed 3.5.3 CLI exposed bundled adapter JSON-contract drift.
 - **next**:
-  1. Continue standard monitoring for drift in command surfaces, output modes, and test resolution heuristics.
-  2. Keep root and bundled skill variants synchronized whenever commit policy or fini behavior changes.
-  3. Watch for accidental writes to `gybis/mementum/state.md` instead of active `mementum/state.md` during closeouts.
-- **recover**: If session-33 finds drift, check feed-forward signals first and cross-reference with memory files for context.
+  1. Start with the focused Allium 3.5.3 adapter compatibility pass for `internal/allium-check`, `internal/allium-analyse`, `internal/allium-plan`, and `internal/allium-normalize`.
+  2. Use `mementum/memories/allium-353-adapter-compatibility.md` as the CLI-contract evidence and keep upstream pins unchanged unless upstream heads advance.
+  3. Continue standard monitoring for command-surface, output-mode, and architecture policy/enforcement drift.
+- **recover**: Read `mementum/memories/allium-353-adapter-compatibility.md`, then run the recorded CLI fixture smoke test before editing adapters.
 
 ⏹→state.md
