@@ -154,13 +154,15 @@ allium --version  # current bundle requirement: 3.5.3 or newer
 
 #### Inspect and Migrate Mementum
 
-Run the migration command from this repository:
+Start a session with `/gybis-init` using the new installation. This loads the Nucleus and Mementum operating context and completes the session startup gate.
+
+From that initialized session, run `/gybis-memory-migrate`:
 
 ```text
 /gybis-memory-migrate
 ```
 
-The command inspects `mementum/`, classifies the store, and shows an exact preview before it writes anything. Handle the result as follows:
+Migration and initialization are separate operations. Migration inspects `mementum/`, classifies the store, and shows an exact preview before it writes anything. Handle the result as follows:
 
 | Result                    | Meaning                                                                  | Next step                                                                         |
 | ------------------------- | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
@@ -169,7 +171,7 @@ The command inspects `mementum/`, classifies the store, and shows an exact previ
 | `INITIALIZATION_REQUIRED` | No Mementum store exists to migrate.                                     | Initialize Mementum separately; do not treat initialization as migration.         |
 | `AMBIGUOUS`               | A file is malformed, unknown, conflicting, or otherwise unsafe to infer. | Resolve the reported ambiguity manually, then rerun the command.                  |
 
-If you approve a migration, it must preserve memory and knowledge bodies verbatim, leave conformant files unchanged, and leave `mementum/state.md` unchanged. Continue only after the command reports `MIGRATION_VALIDATED`.
+If you approve a migration, it must preserve memory and knowledge bodies verbatim, leave conformant files unchanged, and leave `mementum/state.md` unchanged. Continue only after the command reports `MIGRATION_VALIDATED`. If it reports `INITIALIZATION_REQUIRED`, initialize Mementum separately; do not treat initialization as migration. It halts without changes for malformed or ambiguous data.
 
 #### Validate Specifications
 
