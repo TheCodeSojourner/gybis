@@ -210,7 +210,7 @@ In practice, upstream inputs are handled in three modes:
 | **allium**          | `527cd52`     | Allium language semantics and behavioral-spec structure       | Curated into gybis lang/ref docs, and encoded into spec skills.                                                                                                    |
 | **allium-tools**    | `08d3139`     | CLI validate/analyze capabilities                             | Executed in gybis spec skill workflows. User dependency only. Not integrated in `gybis/` in any way.                                                               |
 | **grill-with-docs** | `0ab1b63`     | The grill-with-docs skill, and its dependencies               | Used to derive gybis vocabulary skills.                                                                                                                            |
-| **mementum**        | `ac2eadb`     | Mementum protocol semantics                                   | Used to derive gybis memory skills.                                                                                                                                |
+| **mementum**        | `4968400`     | Mementum protocol semantics                                   | Used to derive gybis memory skills.                                                                                                                                |
 | **nucleus**         | `93c171a`     | Nucleus notation + VSM model + `LAMBDA-COMPILER.md` semantics | Used to derive gybis skills. gybis uses the lambda compiler defined by the nucleus `LAMBDA-COMPILER.md` even though the file is not included in gybis in any form. |
 
 ### Maintainer Notes
