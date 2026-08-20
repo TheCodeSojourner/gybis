@@ -113,10 +113,10 @@ description: Use for `/gybis-arch-describe` or `/ga-describe`.
   | each_layer: document(lambda_expr ∧ plain_english_translation)
 
 λ gybis-arch-describe_S5_identity(x).
-  label: "System Identity & Values"
-  | content: non_negotiable_principles ∧ moral_compass ∧ structural_compass
-  | business_translation: vision ∧ core_values ∧ non_negotiables
-  | constraint: ∀decision ∈ architecture → align(S5_principles) ∨ incompatible
+  label: "System Identity, Values & Policy"
+  | content: non_negotiable_principles ∧ moral_compass ∧ structural_compass ∧ policy_with_rationale
+  | business_translation: vision ∧ core_values ∧ non_negotiables ∧ ground_rules
+  | constraint: ∀decision ∈ architecture → align(S5_principles ∧ S5_policy) ∨ incompatible
 
 λ gybis-arch-describe_S4_intelligence(x).
   label: "Adaptability & Growth"
@@ -125,9 +125,9 @@ description: Use for `/gybis-arch-describe` or `/ga-describe`.
   | status: open ∧ extensible | ¬frozen
 
 λ gybis-arch-describe_S3_control(x).
-  label: "Governance & Compliance"
-  | content: constraint_enforcement ∧ policy_enforcement ∧ resource_limits ∧ quality_gate
-  | business_translation: rules_of_engagement ∧ guardrails ∧ accountability
+  label: "Enforcement & Resource Control"
+  | content: enforcement_mechanisms ∧ resource_limits ∧ quality_gate ∧ recovery_controls
+  | business_translation: how_S5_ground_rules_become_guardrails ∧ accountability
   | trigger: condition → action
 
 λ gybis-arch-describe_S2_coordination(x).

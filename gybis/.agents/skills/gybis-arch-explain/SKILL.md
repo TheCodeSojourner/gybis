@@ -113,11 +113,11 @@ description: Use for `/gybis-arch-explain` or `/ga-explain`.
   | each_layer: document(lambda_expr ∧ technical_translation ∧ pattern_examples)
 
 λ gybis-arch-explain_S5_identity(x).
-  label: "System Identity"
-  | content: non_negotiable_principles ∧ moral_compass ∧ structural_compass ∧ universal_properties
-  | technical_translation: design_invariants ∧ architectural_principles ∧ decision_constraints
-  | constraint: ∀decision ∈ architecture → align(S5_principles) ∨ design_flaw
-  | developer_needs: understand what we cannot compromise on
+  label: "System Identity & Policy"
+  | content: non_negotiable_principles ∧ moral_compass ∧ structural_compass ∧ universal_properties ∧ policy_with_rationale
+  | technical_translation: design_invariants ∧ architectural_principles ∧ decision_constraints ∧ declared_ground_rules
+  | constraint: ∀decision ∈ architecture → align(S5_principles ∧ S5_policy) ∨ design_flaw
+  | developer_needs: understand what we cannot compromise on and why
 
 λ gybis-arch-explain_S4_intelligence(x).
   label: "Adaptability & Change Management"
@@ -128,10 +128,10 @@ description: Use for `/gybis-arch-explain` or `/ga-explain`.
 
 λ gybis-arch-explain_S3_control(x).
   label: "Constraint Enforcement & Quality Gates"
-  | content: constraint_enforcement ∧ policy_enforcement ∧ resource_limits ∧ load_handling ∧ failure_handling
+  | content: enforcement_mechanisms ∧ resource_limits ∧ load_handling ∧ failure_handling
   | technical_translation: rate_limiting ∧ circuit_breaker ∧ validation_gates ∧ test_checks ∧ deploy_checks
   | trigger: condition → action | deterministic_response
-  | developer_needs: what gates exist and how to satisfy them
+  | developer_needs: what mechanisms enforce S5 policy and how to satisfy them
 
 λ gybis-arch-explain_S2_coordination(x).
   label: "Cross-System Interaction & Protocols"

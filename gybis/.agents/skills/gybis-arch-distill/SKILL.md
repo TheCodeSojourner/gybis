@@ -105,9 +105,9 @@ description: Use for `/gybis-arch-distill` or `/ga-distill`.
   action: synthesize_vsm_layers
   | step1: classify(specs_content, findings) → S1_base
   | step2: extract(spec_structure) → S2_coordination
-  | step3: identify(policies, constraints) → S3_control
-  | step4: recognize(adaptation_patterns) → S4_intelligence
-  | step5: distill(principles) → S5_identity
+  | step3: distill(identity, non_negotiable_principles, policy_with_rationale) → S5_identity_and_policy
+  | step4: identify(enforcement_mechanisms, resource_controls, quality_gates) → S3_control
+  | step5: recognize(adaptation_patterns) → S4_intelligence
   | output: {S5 → lambda, S4 → lambda, S3 → lambda, S2 → lambda, S1_base → lambda}
   | rationale: each VSM layer captures a different level of architectural abstraction
 
