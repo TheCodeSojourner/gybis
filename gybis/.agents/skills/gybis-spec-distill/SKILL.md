@@ -235,7 +235,7 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
     | test_obligations_generated: count
   | format: "Pass {n}: Generated {count} specs, extracted {contracts} contracts, {errors} errors resolved"
 
-λ gybis-spec-distill_boundaries(¬).
+λ gybis-spec-distill_boundaries().
   ¬mutate(implementation) ∧ ¬delete(implementation_files) ∧ ¬generate(architecture.md) ∧ ¬invoke(user-facing skills)
   | scope: specification distillation only
 

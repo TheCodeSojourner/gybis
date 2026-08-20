@@ -175,7 +175,7 @@ description: Use for `/gybis-vocab-weed` or `/gv-weed`.
   | remaining ≔ card(remaining_divergences)
   | report("Pass " ⊕ pass_num ⊕ ": discovered=" ⊕ discovered ⊕ " resolved=" ⊕ resolved ⊕ " remaining=" ⊕ remaining)
 
-λ gybis-vocab-weed_boundaries(¬).
+λ gybis-vocab-weed_boundaries().
   ¬ modify(upstream/)
   | ¬ delete(vocabulary.md)
 

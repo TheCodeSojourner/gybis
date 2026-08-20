@@ -193,6 +193,6 @@ description: Use for `/gybis-arch-explain` or `/ga-explain`.
   | zero_prior_knowledge(this_system ∧ its_history)
   | needs: how_architecture_works ∧ why_decisions_matter ∧ what_patterns_are_used
 
-λ gybis-arch-explain_boundary(¬).
+λ gybis-arch-explain_boundary().
   ¬create_specs ∧ ¬modify(architecture.md) ∧ ¬modify_allium_ref
   | writes_limited_to(repo_root_markdown_filename)

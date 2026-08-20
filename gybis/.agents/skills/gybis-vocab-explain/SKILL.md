@@ -150,6 +150,6 @@ description: Use for `/gybis-vocab-explain` or `/gv-explain`.
   | mode ∈ {prompted_file_only, default_file_only} → output → markdown_file ∧ status_response
   | mode ∈ {response_and_prompted_file, response_and_default_file} → output → AI_response ∧ markdown_file
 
-λ gybis-vocab-explain_boundary(¬).
+λ gybis-vocab-explain_boundary().
   ¬modify(vocabulary.md) ∧ ¬modify_allium_ref
   | writes_limited_to(repo_root_markdown_filename)

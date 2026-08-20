@@ -225,7 +225,7 @@ description: Use for `/gybis-arch-refine` or `/ga-refine`.
   | breaking ≔ card(impact_report.breaking_candidates)
   | report("Pass " ⊕ pass_num ⊕ ": proposed=" ⊕ proposed ⊕ " approved=" ⊕ approved ⊕ " breaking=" ⊕ breaking)
 
-λ gybis-arch-refine_boundaries(¬).
+λ gybis-arch-refine_boundaries().
   ¬ modify(vocabulary.md)
   | ¬ modify(specs/)
   | ¬ modify(implementation)

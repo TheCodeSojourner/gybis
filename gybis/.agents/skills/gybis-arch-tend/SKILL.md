@@ -107,7 +107,7 @@ description: Use for `/gybis-arch-tend` or `/ga-tend`.
   loop_count ≥ max_iterations
     → halt("Maximum iterations reached without convergence")
 
-λ gybis-arch-tend_boundaries(¬).
+λ gybis-arch-tend_boundaries().
   ¬ modify(specs/**/*.allium)
   | ¬ modify(implementation)
   | ¬ modify(upstream/)

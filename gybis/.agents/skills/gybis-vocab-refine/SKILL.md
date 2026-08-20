@@ -221,7 +221,7 @@ description: Use for `/gybis-vocab-refine` or `/gv-refine`.
   | breaking ≔ card(impact_report.breaking_candidates)
   | report("Pass " ⊕ pass_num ⊕ ": proposed=" ⊕ proposed ⊕ " approved=" ⊕ approved ⊕ " breaking=" ⊕ breaking)
 
-λ gybis-vocab-refine_boundaries(¬).
+λ gybis-vocab-refine_boundaries().
   ¬ modify(architecture.md)
   | ¬ modify(specs/)
   | ¬ modify(implementation)

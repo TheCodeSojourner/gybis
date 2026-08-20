@@ -188,6 +188,6 @@ description: Use for `/gybis-arch-describe` or `/ga-describe`.
   | zero_prior_knowledge(technical_architecture ∧ vsm)
   | needs: what_system_is ∧ why_it_matters ∧ what_drives_decisions
 
-λ gybis-arch-describe_boundary(¬).
+λ gybis-arch-describe_boundary().
   ¬create_specs ∧ ¬modify(architecture.md) ∧ ¬modify_allium_ref
   | writes_limited_to(repo_root_markdown_filename)

@@ -176,7 +176,7 @@ description: Use for `/gybis-spec-check` or `/gs-check`.
   | remaining ≔ card(issues_remaining)
   | report("Pass " ⊕ pass_num ⊕ ": discovered=" ⊕ discovered ⊕ " resolved=" ⊕ resolved ⊕ " remaining=" ⊕ remaining)
 
-λ gybis-spec-check_boundaries(¬).
+λ gybis-spec-check_boundaries().
   ¬ modify(architecture.md ∨ implementation ∨ upstream/) ∧ ¬ delete(specs/)
 
 λ gybis-spec-check_regression_contract(x).

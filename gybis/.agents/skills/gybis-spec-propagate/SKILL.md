@@ -349,7 +349,7 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
             ∧ transition(RUNNING_TESTS → SYNTHESIZING_CODE)))
     : (re_synthesize_implementation ∧ transition(VERIFYING → SYNTHESIZING_CODE))
 
-λ gybis-spec-propagate_boundaries(¬).
+λ gybis-spec-propagate_boundaries().
   ¬ modify(architecture.md ∨ specs/**/*.allium ∨ upstream/)
 
 λ gybis-spec-propagate_limitations(x).

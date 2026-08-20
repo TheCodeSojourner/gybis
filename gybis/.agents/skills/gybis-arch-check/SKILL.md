@@ -112,7 +112,7 @@ description: Use for `/gybis-arch-check` or `/ga-check`.
   print(report) → stdout
   | return(report_delivered = true)
 
-λ gybis-arch-check_boundaries(¬).
+λ gybis-arch-check_boundaries().
   ¬ modify(architecture.md ∨ specs/**/*.allium ∨ implementation ∨ upstream/)
   | ¬ delete(architecture.md)
 

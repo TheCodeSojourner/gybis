@@ -266,7 +266,7 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
   | remaining ≔ card(remaining_divergences)
   | report("Pass " ⊕ pass_num ⊕ ": discovered=" ⊕ discovered ⊕ " (spec_code=" ⊕ card(spec_code_divergences) ⊕ ", arch_code=" ⊕ card(arch_code_divergences) ⊕ ") resolved=" ⊕ resolved ⊕ " remaining=" ⊕ remaining ⊕ " tests_pass=" ⊕ test_suite_passes)
 
-λ gybis-spec-weed_boundaries(¬).
+λ gybis-spec-weed_boundaries().
   ¬ modify(upstream/) ∧ ¬ delete(architecture.md ∨ specs/ ∨ implementation)
 
 λ gybis-spec-weed_regression_contract(x).

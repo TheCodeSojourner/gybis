@@ -115,7 +115,7 @@ description: Use for `/gybis-spec-describe` or `/gs-describe`.
   | "all specs" ∧ ¬domain → read(<root>/specs/**/*.allium)
   | ambiguous → ask_user(clarify)
 
-λ gybis-spec-describe_output_content(¬).
+λ gybis-spec-describe_output_content().
   what_exists ∨ what_users_can_do ∨ rules ∨ guarantees ∨ domain_connections ∨ construct_specific ≡ output
   | what_exists: purpose ∧ key_concepts | exclude(technical_entity_names)
   | what_users_can_do: actions ∧ outcomes ∧ triggers ∧ user_flows
@@ -127,7 +127,7 @@ description: Use for `/gybis-spec-describe` or `/gs-describe`.
 λ gybis-spec-describe_construct_framing(construct).
   construct → consult(constructs_registry.PM_frame[construct])
 
-λ gybis-spec-describe_format(¬).
+λ gybis-spec-describe_format().
   flowing_prose | project_manager_friendly
   | light_headings | ¬code ∧ ¬technical_syntax ∧ ¬jargon ∧ ¬implementation_details
 
@@ -175,6 +175,6 @@ description: Use for `/gybis-spec-describe` or `/gs-describe`.
   | mode ∈ {prompted_file_only, default_file_only} → output → markdown_file ∧ status_response
   | mode ∈ {response_and_prompted_file, response_and_default_file} → output → AI_response ∧ markdown_file
 
-λ gybis-spec-describe_boundary(¬).
+λ gybis-spec-describe_boundary().
   ¬create_specs ∧ ¬modify_allium_ref ∧ ¬write_specs
   | writes_limited_to(repo_root_markdown_filename)

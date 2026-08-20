@@ -207,7 +207,7 @@ description: Use for `/gybis-arch-distill` or `/ga-distill`.
     | orientation_gaps: count
   | format: "Pass {n}: Synthesized {count} VSM layers, identified {patterns} patterns, populated {s1_count} S1 fields ({confidence} confidence), resolved {issues} issues"
 
-λ gybis-arch-distill_boundaries(¬).
+λ gybis-arch-distill_boundaries().
   constraint: ¬generate(specs/**/*.allium)
   | constraint: ¬mutate(specs/**/*.allium)
   | constraint: ¬mutate(implementation_root/**)

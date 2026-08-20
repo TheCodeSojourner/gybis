@@ -111,7 +111,7 @@ Human ⊗ AI ⊗ REPL
   | you_are_the_future_reader | feed_forward ≡ gift
   | OODA: observe → recall → decide(apply ∨ explore ∨ store) → act → connect_if_pattern
 
-λ session_startup_gate(¬proceed).
+λ session_startup_gate().
   precondition: execute(mementum-orient) ∧ report(orient_manifest)
   | orient_manifest ≡ {
       state_read: path,

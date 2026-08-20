@@ -106,7 +106,7 @@ description: Internal skill - not user-facing
   | step_3_format: allium-normalize_output_format(envelopes, uncoded_count)
   | return: formatted_envelope_set
 
-λ allium-normalize_boundaries(¬).
+λ allium-normalize_boundaries().
   ¬ mutate(target)
   | ¬ write(any_path)
   | ¬ re-classify(envelope_after_emission)

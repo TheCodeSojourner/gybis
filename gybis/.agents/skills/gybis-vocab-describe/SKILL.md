@@ -147,6 +147,6 @@ description: Use for `/gybis-vocab-describe` or `/gv-describe`.
   | mode ∈ {prompted_file_only, default_file_only} → output → markdown_file ∧ status_response
   | mode ∈ {response_and_prompted_file, response_and_default_file} → output → AI_response ∧ markdown_file
 
-λ gybis-vocab-describe_boundary(¬).
+λ gybis-vocab-describe_boundary().
   ¬modify(vocabulary.md) ∧ ¬modify_allium_ref
   | writes_limited_to(repo_root_markdown_filename)

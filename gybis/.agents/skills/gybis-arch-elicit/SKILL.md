@@ -161,7 +161,7 @@ description: Use for `/gybis-arch-elicit` or `/ga-elicit`.
   | check12: all_layers_address_user_intent = true
   | gate: all_checks_pass → proceed ∨ halt("architecture invalid or incomplete")
 
-λ gybis-arch-elicit_boundaries(¬).
+λ gybis-arch-elicit_boundaries().
   constraint: ¬generate(specs/**/*.allium)
   | constraint: ¬mutate(existing_files)
   | constraint: ¬delete(any_files)

@@ -232,7 +232,7 @@ description: Use for `/gybis-spec-refine` or `/gs-refine`.
   | breaking ≔ card(impact_report.breaking_candidates)
   | report("Pass " ⊕ pass_num ⊕ ": proposed=" ⊕ proposed ⊕ " approved=" ⊕ approved ⊕ " breaking=" ⊕ breaking)
 
-λ gybis-spec-refine_boundaries(¬).
+λ gybis-spec-refine_boundaries().
   ¬ modify(architecture.md)
   | ¬ modify(implementation)
   | ¬ modify(upstream/)
