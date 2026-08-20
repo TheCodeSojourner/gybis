@@ -17,6 +17,11 @@ description: Internal skill - not user-facing
   | gate_type: pre_condition ∨ post_condition
   | precondition: specs_path ∧ exists(specs_path) ∧ is_directory(specs_path)
 
+λ allium-gate_spec_inventory(specs_path).
+  spec_files ≔ recursive_files(specs_path, extension = .allium)
+  | card(spec_files) > 0 → spec_files
+  | card(spec_files) = 0 → false + "NO_SPECS: no .allium files found under {specs_path}"
+
 λ allium-gate_per_file_validation(specs_path).
   operation: ∀ .allium_file ∈ specs_path, invoke allium-check(file)
   | collect: [check_result_1, ..., check_result_n]
@@ -36,10 +41,12 @@ description: Internal skill - not user-facing
   return_type: boolean | side_effect: ¬mutations | diagnostic_info: optional context for failures, not part of return
 
 λ allium-gate_execution(specs_path).
+  invoke(allium-runtime-check_version()) → true ∨ return(false, diagnostic)
   invoke(allium-gate_shell_guard) → true
-  | step_1_per_file: allium-gate_per_file_validation(specs_path)
+  | step_1_inventory: allium-gate_spec_inventory(specs_path) → spec_files ∨ return(false, diagnostic)
+  | step_2_per_file: allium-gate_per_file_validation(specs_path)
   | capture_1: per_file_result
-  | step_2_set_level: allium-gate_set_validation(specs_path)
+  | step_3_set_level: allium-gate_set_validation(specs_path)
   | capture_2: set_result
-  | step_3_verdict: allium-gate_verdict_logic(per_file_result, set_result)
+  | step_4_verdict: allium-gate_verdict_logic(per_file_result, set_result)
   | return: verdict_boolean

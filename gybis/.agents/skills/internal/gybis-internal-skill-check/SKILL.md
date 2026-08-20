@@ -18,6 +18,7 @@ description: Internal skill - not user-facing
     internal/allium-gate/SKILL.md
     internal/allium-normalize/SKILL.md
     internal/allium-plan/SKILL.md
+    internal/allium-runtime-check/SKILL.md
   }
   | all_paths ⊂ repository_root ∧ readable(file)
 

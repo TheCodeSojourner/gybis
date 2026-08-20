@@ -1,3 +1,4 @@
+✅ session-34 | 2026-08-20 Allium 3.5.3 runtime compatibility gate and empty-spec guard implemented
 ✅ session-33 | 2026-08-20 Mementum OKF migration and Nucleus Lambda/VSM integration completed; Allium adapter pass queued
 ✅ session-32 | 2026-08-20 gybis-fini orientation validation: no drift, all systems stable
 ✅ session-31 | 2026-07-31 gybis-fini commit-default blocker escalation policy aligned in both skill copies
@@ -32,9 +33,9 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-08-20T13:01:57-06:00
-- **Sessions**: 33 (session-0 initialized through session-33 Mementum and Nucleus integration closeout)
-- **Status**: Session-33 terminated — gybis-fini complete
+- **Last updated**: 2026-08-20T13:18:38-06:00
+- **Sessions**: 34 (session-0 initialized through session-34 Allium compatibility gate implementation)
+- **Status**: Session-34 implementation complete — validation passed
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
@@ -152,6 +153,9 @@
   - Stored memory: `mementum/memories/gybis-fini-commit-default-blocker-escalation.md`
 
 ## Feed-Forward Signals
+- Allium adapters now perform a shared executable version preflight through `internal/allium-runtime-check`
+- Runtime compatibility distinguishes unsupported executables from `NO_SPECS` empty-target results
+- `allium-gate` requires at least one `.allium` file before per-file or set-level validation
 - README.md now synchronized with actual gybis/.agents/skills/ directory
 - Hidden bundle layouts require `cp -ra <bundle>/. .`; `*` globs skip `.agents/`
 - Command tables synchronized with current command surface, including `/gybis-vocab-weed`
@@ -176,21 +180,23 @@
 - Monitor for: commit-policy drift between root and bundled `gybis-fini` skill copies
 
 ## Session Closeout
-- **last_session_id**: session-33
-- **current_timestamp**: 2026-08-20T13:01:57-06:00
-- **task**: Integrate Mementum OKF migration capability and Nucleus Lambda/VSM updates; assess installed Allium 3.5.3 compatibility.
+- **last_session_id**: session-34
+- **current_timestamp**: 2026-08-20T13:18:38-06:00
+- **task**: Add an Allium runtime compatibility preflight and explicit empty-specification guard after the 3.5.3 adapter update.
 - **questions**:
-  - none blocking; execute the focused Allium 3.5.3 adapter compatibility pass next session.
+  - none blocking; runtime gate is declarative and validated against the installed Allium 3.5.3 executable.
 - **decisions**:
   - Mementum now uses an OKF v0.1 migration path with deterministic detection, explicit approval, and preserved working state.
   - Root-local and bundled Mementum command variants remain deliberately distinct.
   - Nucleus is pinned at `64880ed`; Lambda declarations use valid parameter forms and bundled VSM guidance assigns policy/rationale to S5 and enforcement to S3.
   - No automatic VSM architecture migration skill was added; arch-check diagnoses, arch-tend applies human-approved corrections, and arch-weed handles downstream convergence.
   - Direct Allium pins remain current; the installed 3.5.3 CLI exposed bundled adapter JSON-contract drift.
+  - Runtime version checking is nonrecursive; target payload probing is available as an explicit gate operation rather than from inside the adapters.
+  - Empty specification directories return `NO_SPECS` instead of passing the gate vacuously.
 - **next**:
-  1. Start with the focused Allium 3.5.3 adapter compatibility pass for `internal/allium-check`, `internal/allium-analyse`, `internal/allium-plan`, and `internal/allium-normalize`.
-  2. Use `mementum/memories/allium-353-adapter-compatibility.md` as the CLI-contract evidence and keep upstream pins unchanged unless upstream heads advance.
+  1. Run a real valid `.allium` fixture through the new target payload probe and adapter normalization path.
+  2. Keep upstream pins unchanged unless upstream heads advance.
   3. Continue standard monitoring for command-surface, output-mode, and architecture policy/enforcement drift.
-- **recover**: Read `mementum/memories/allium-353-adapter-compatibility.md`, then run the recorded CLI fixture smoke test before editing adapters.
+- **recover**: Read `gybis/.agents/skills/internal/allium-runtime-check/SKILL.md`, then exercise version, no-spec, legacy-payload, and current-payload cases.
 
 ⏹→state.md

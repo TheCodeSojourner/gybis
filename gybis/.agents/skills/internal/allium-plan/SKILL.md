@@ -20,7 +20,7 @@ description: Internal skill - not user-facing
   cli_command: "allium plan {spec_file}"
   | execution: deterministic(spec_file) → fixed_output
   | stderr_handling: capture_and_return
-  | stdout_handling: parse_json_output
+  | stdout_handling: parse_json_envelope
 
 λ allium-plan_obligation_categories(x).
   categories: {
@@ -65,16 +65,20 @@ description: Internal skill - not user-facing
 
 λ allium-plan_output_parsing(cli_output).
   parse: cli_output → JSON
+  | extract: diagnostics ≔ [diagnostic_1, ..., diagnostic_n]
   | extract: version ≔ version_number
   | extract: obligations ≔ [obligation_1, ..., obligation_n]
-  | validate: version ∈ {3}
+  | validate: version ∈ {1, 2, 3, null}
   | validate: ∀ obligation ∈ obligations, obligation_structure_valid
+  | diagnostics: structured_failure_only_when(error_severity ∧ exit_code ≠ 0)
+  | exit_code ∈ {0, 1} does_not_override_valid_json
 
 λ allium-plan_output_format(parsed_output).
-  structure: {version, obligations: [...]}
+  structure: {version, diagnostics: [...], obligations: [...]}
   | json_serializable | obligations_indexed_by_id_for_caller_lookup
 
 λ allium-plan_execution(spec_file).
+  invoke(allium-runtime-check_version()) → true ∨ halt("Allium runtime compatibility check failed")
   invoke(allium-plan_shell_guard) → true
   | invoke: allium-plan_cli_invocation(spec_file)
   | capture: cli_output ∧ cli_exit_code
