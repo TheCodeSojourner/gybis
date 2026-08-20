@@ -181,13 +181,23 @@ This copies the complete gybis bundle, including the hidden `.agents/skills/` di
 
 Do not rerun the full installation copy against an existing target repository: its live `mementum/` directory is project-owned durable memory and must be preserved.
 
+Finish or deliberately pause any current work in the target repository before upgrading. If a gybis session is active, run `/gybis-fini` using the existing installation to save its session state before replacing `.agents/skills/`.
+
 From the target repository, update only the command bundle:
 
 ```bash
 cp -ra <pathToGybisDirectory>/gybis/.agents/skills/. .agents/skills/
 ```
 
-This replaces the distributed command implementations, including internal Allium adapters and the runtime compatibility gate. It does not replace project specifications, source code, tests, or the target repository's `mementum/` store. Review the resulting diff before continuing.
+This replaces the distributed command implementations, including internal Allium adapters and the runtime compatibility gate. It does not replace project specifications, source code, tests, or the target repository's `mementum/` store. Review the resulting diff before continuing; it should contain only the intended `.agents/skills/` changes at this point.
+
+The distributed documentation can be updated separately after reviewing any local edits to `GYBIS-README.md`:
+
+```bash
+cp -a <pathToGybisDirectory>/gybis/GYBIS-README.md GYBIS-README.md
+```
+
+This replaces only the installed gybis README. Do not run the command if the target repository has intentionally customized that file without first preserving or reconciling those changes.
 
 Before running specification commands, verify the target machine has a supported Allium CLI:
 
@@ -195,7 +205,7 @@ Before running specification commands, verify the target machine has a supported
 allium --version # current bundle requirement: 3.5.3 or newer
 ```
 
-Then run `/gybis-memory-migrate` (`/gm-migrate`). The command inspects the target repository's existing `mementum/` store, reports `NO_MIGRATION_REQUIRED` when it is already conformant, previews recognized legacy conversions, and requires explicit approval before writing. It halts without changes for malformed or ambiguous data.
+Then run `/gybis-memory-migrate` (`/gm-migrate`). The command inspects the target repository's existing `mementum/` store, reports `NO_MIGRATION_REQUIRED` when it is already conformant, previews recognized legacy conversions, and requires explicit approval before writing. It reports `MIGRATION_VALIDATED` only after verifying the resulting store and preserving `mementum/state.md`. It halts without changes for malformed or ambiguous data.
 
 Finally, run `/gybis-spec-check {concern|domain|all}` when the target contains `.allium` specifications. The runtime gate reports `NO_SPECS` for an empty specification directory; this is an absence-of-work result, not an Allium compatibility failure. Repositories that have not created specifications yet can complete the bundle update and create them later.
 
