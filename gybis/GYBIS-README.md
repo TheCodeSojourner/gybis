@@ -124,6 +124,16 @@ Use this when code and tests already exist and you need to recover durable proje
 
 Outcome: an existing codebase is brought under explicit vocabulary, architecture, and specification governance.
 
+### Upgrade Mementum Safely
+
+Use this after updating an existing gybis installation to the OKF-enabled Mementum workflow.
+
+1. Update only `.agents/skills/` from the newer gybis bundle; do not overwrite the target repository's live `mementum/` directory.
+2. Run `/gybis-memory-migrate` to inspect the current memory store and receive either `NO_MIGRATION_REQUIRED`, a deterministic migration preview, or an explicit ambiguity report.
+3. Review the preview and approve it only when the listed file changes preserve the intended project history.
+
+Outcome: a target repository adopts OKF-compatible Mementum storage without losing or silently rewriting its durable memory.
+
 ### Evolve Vocabulary Safely
 
 Use this when domain terms, definitions, or canonical names need to change after the project is already in motion.
@@ -345,6 +355,7 @@ vocabulary > architecture > specification > tests > code
 | `/gybis-fini`                                                    | CRUD memory before terminate                      |
 | `/gybis-help`                                                    | Show available commands                           |
 | `/gybis-init`                                                    | Initialize gybis AI context                       |
+| `/gybis-memory-migrate` (`/gm-migrate`)                          | Migrate Mementum store to current format          |
 | `/gybis-memory-orient` (`/gm-orient`)                            | Restore prev AI context                           |
 | `/gybis-memory-recall {topic}` (`/gm-recall {topic}`)            | Recall topic/summarize-latest                     |
 | `/gybis-memory-store {insight}` (`/gm-store {insight}`)          | Store insight, or prompt for one                  |

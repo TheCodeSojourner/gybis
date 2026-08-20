@@ -23,6 +23,7 @@ CRITICAL CONSTRAINTS:
 | `/gybis-arch-weed` (`/ga-weed`) | Upsert arch/specs from diffs with human |
 | `/gybis-fini` | CRUD memory before terminate |
 | `/gybis-init` | Initialize gybis AI context |
+| `/gybis-memory-migrate` (`/gm-migrate`) | Migrate Mementum store to current format |
 | `/gybis-memory-orient` (`/gm-orient`) | Restore prev AI context |
 | `/gybis-memory-recall {topic}` (`/gm-recall {topic}`) | Recall topic/summarize-latest |
 | `/gybis-memory-store {insight}` (`/gm-store {insight}`) | Store insight |
