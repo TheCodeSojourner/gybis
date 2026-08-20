@@ -1,4 +1,10 @@
-💡 keep root repo local skill subset instead of mirroring bundled distribution
+---
+type: Insight
+symbol: 💡
+title: local-root-skill-subset
+---
+
+keep root repo local skill subset instead of mirroring bundled distribution
 
 ## Context
 The root repo intentionally keeps a narrower local `.agents/skills` set rather than mirroring the broader distributable bundle in `gybis/.agents/skills`.

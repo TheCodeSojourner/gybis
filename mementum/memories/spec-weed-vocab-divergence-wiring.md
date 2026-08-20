@@ -1,4 +1,10 @@
-💡 spec-weed vocabulary divergence handling must be end-to-end, not partial scaffolding
+---
+type: Insight
+symbol: 💡
+title: spec-weed-vocab-divergence-wiring
+---
+
+spec-weed vocabulary divergence handling must be end-to-end, not partial scaffolding
 
 If a skill declares a divergence type and resolver branch, detection must be integrated into verification and convergence accounting.
 

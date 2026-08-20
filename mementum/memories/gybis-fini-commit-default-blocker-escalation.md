@@ -1,4 +1,10 @@
-💡 Make gybis-fini commit by default and escalate blockers explicitly
+---
+type: Insight
+symbol: 💡
+title: gybis-fini-commit-default-blocker-escalation
+---
+
+Make gybis-fini commit by default and escalate blockers explicitly
 
 When gybis-fini includes a commit step, set commit as the default action and only skip for strong blockers (explicit no-commit instruction, unresolved merge/index conflict, git failure needing human action, or policy/safety conflict).
 

@@ -1,4 +1,10 @@
-💡 Human-owned stage readiness works best when skill ownership boundaries are explicit
+---
+type: Insight
+symbol: 💡
+title: human-owned-stage-readiness
+---
+
+Human-owned stage readiness works best when skill ownership boundaries are explicit
 
 If gybis is command-driven guidance (not always-on enforcement), then readiness for each layer (`vocabulary -> architecture -> specs -> code/tests`) should be owned by the human operator, while each skill owns only its transformation scope.
 

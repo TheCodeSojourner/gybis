@@ -1,4 +1,10 @@
-💡 spec-propagate and spec-weed should converge on passing tests, not only structural consistency
+---
+type: Insight
+symbol: 💡
+title: spec-strict-test-convergence
+---
+
+spec-propagate and spec-weed should converge on passing tests, not only structural consistency
 
 When skills mutate implementation/tests, structural/spec checks are necessary but insufficient for completion.
 

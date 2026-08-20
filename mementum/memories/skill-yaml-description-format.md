@@ -1,1 +1,7 @@
-💡 Skill YAML descriptions should only contain the slash command and its alias (e.g., 'Use for `/gybis-mementum-orient` or `/gm-orient`.') because the trigger mechanism matches against the description field - keeping it command-focused ensures precise, unambiguous skill activation without unintended matches.
+---
+type: Insight
+symbol: 💡
+title: skill-yaml-description-format
+---
+
+Skill YAML descriptions should only contain the slash command and its alias (e.g., 'Use for `/gybis-mementum-orient` or `/gm-orient`.') because the trigger mechanism matches against the description field - keeping it command-focused ensures precise, unambiguous skill activation without unintended matches.
