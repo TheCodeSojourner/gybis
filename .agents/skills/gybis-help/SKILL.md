@@ -15,7 +15,7 @@ CRITICAL CONSTRAINTS:
 |---|---|
 | `/gybis-fini` | CRUD memory before terminate |
 | `/gybis-init` | Initialize AI context |
-| `/gybis-mementum-migrate` (`/gm-migrate`) | Migrate legacy Mementum store to OKF |
+| `/gybis-mementum-migrate` (`/gm-migrate`) | Migrate Mementum store to current format |
 | `/gybis-mementum-orient` (`/gm-orient`) | Restore prev AI context |
 | `/gybis-mementum-recall {topic}` (`/gm-recall {topic}`) | Recall topic/summarize-latest |
 | `/gybis-mementum-store {insight}` (`/gm-store {insight}`) | Store insight |

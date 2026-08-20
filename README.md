@@ -122,14 +122,15 @@ The following commands are available after integrating gybis into a target repos
 
 ### Memory Commands (`/gm-*`)
 
-| Command                                                 | Description                        |
-| ------------------------------------------------------- | ---------------------------------- |
-| `/gybis-fini`                                           | Encode → Terminate                 |
-| `/gybis-init`                                           | Orient → Recall → Ready            |
-| `/gybis-memory-orient` (`/gm-orient`)                   | Restore prev AI context            |
-| `/gybis-memory-recall {topic}` (`/gm-recall {topic}`)   | Recall topic, or summarize latest  |
-| `/gybis-memory-store {insight}` (`/gm-store {insight}`) | Store insight, or prompt for one   |
-| `/gybis-memory-synthesize` (`/gm-synthesize`)           | Synthesize knowledge from memories |
+| Command                                                 | Description                              |
+| ------------------------------------------------------- | ---------------------------------------- |
+| `/gybis-fini`                                           | Encode → Terminate                       |
+| `/gybis-init`                                           | Orient → Recall → Ready                  |
+| `/gybis-memory-migrate` (`/gm-migrate`)                 | Migrate Mementum store to current format |
+| `/gybis-memory-orient` (`/gm-orient`)                   | Restore prev AI context                  |
+| `/gybis-memory-recall {topic}` (`/gm-recall {topic}`)   | Recall topic, or summarize latest        |
+| `/gybis-memory-store {insight}` (`/gm-store {insight}`) | Store insight, or prompt for one         |
+| `/gybis-memory-synthesize` (`/gm-synthesize`)           | Synthesize knowledge from memories       |
 
 ### Help
 
@@ -143,15 +144,15 @@ The following commands are available while developing gybis in this repository. 
 
 ### Memory Commands (`/gm-*`)
 
-| Command                                                   | Description                          |
-| --------------------------------------------------------- | ------------------------------------ |
-| `/gybis-fini`                                             | Encode → Terminate                   |
-| `/gybis-init`                                             | Orient → Recall → Ready              |
-| `/gybis-mementum-migrate` (`/gm-migrate`)                 | Migrate legacy Mementum store to OKF |
-| `/gybis-mementum-orient` (`/gm-orient`)                   | Restore prev AI context              |
-| `/gybis-mementum-recall {topic}` (`/gm-recall {topic}`)   | Recall topic, or summarize latest    |
-| `/gybis-mementum-store {insight}` (`/gm-store {insight}`) | Store insight, or prompt for one     |
-| `/gybis-mementum-synthesize` (`/gm-synthesize`)           | Synthesize knowledge from memories   |
+| Command                                                   | Description                              |
+| --------------------------------------------------------- | ---------------------------------------- |
+| `/gybis-fini`                                             | Encode → Terminate                       |
+| `/gybis-init`                                             | Orient → Recall → Ready                  |
+| `/gybis-mementum-migrate` (`/gm-migrate`)                 | Migrate Mementum store to current format |
+| `/gybis-mementum-orient` (`/gm-orient`)                   | Restore prev AI context                  |
+| `/gybis-mementum-recall {topic}` (`/gm-recall {topic}`)   | Recall topic, or summarize latest        |
+| `/gybis-mementum-store {insight}` (`/gm-store {insight}`) | Store insight, or prompt for one         |
+| `/gybis-mementum-synthesize` (`/gm-synthesize`)           | Synthesize knowledge from memories       |
 
 ### Help
 
@@ -175,6 +176,18 @@ cp -ra <pathToGybisDirectory>/gybis/. . # e.g., `cp -ra ~/Downloads/gybis/gybis/
 ```
 
 This copies the complete gybis bundle, including the hidden `.agents/skills/` directory that provides the command implementations.
+
+### Upgrading an Existing Installation
+
+Do not rerun the full installation copy against an existing target repository: its live `mementum/` directory is project-owned durable memory and must be preserved.
+
+Update only the command bundle:
+
+```bash
+cp -ra <pathToGybisDirectory>/gybis/.agents/skills/. .agents/skills/
+```
+
+Then run `/gybis-memory-migrate` (`/gm-migrate`). The command inspects the target repository's existing `mementum/` store, reports `NO_MIGRATION_REQUIRED` when it is already conformant, previews recognized legacy conversions, and requires explicit approval before writing. It halts without changes for malformed or ambiguous data.
 
 See the `gybis/GYBIS-README.md` for usage instructions, best practices, and workflow suggestions.
 
