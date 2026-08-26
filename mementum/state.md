@@ -35,9 +35,9 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-08-20T13:36:28-06:00
-- **Sessions**: 36 (session-0 initialized through session-36 gybis-fini closeout)
-- **Status**: Session-36 terminated — gybis-fini complete
+- **Last updated**: 2026-08-26T00:00:00-06:00
+- **Sessions**: 37 (session-0 initialized through session-37 gybis-fini closeout)
+- **Status**: Session-37 terminated — gybis-fini complete
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
@@ -202,5 +202,40 @@
   2. Keep upstream pins unchanged unless upstream heads advance.
   3. Continue standard monitoring for command-surface, output-mode, and architecture policy/enforcement drift.
 - **recover**: Read `gybis/.agents/skills/internal/allium-runtime-check/SKILL.md`, then exercise version, no-spec, legacy-payload, and current-payload cases.
+
+## Session Orientation
+- **current_timestamp**: 2026-08-26T00:00:00-06:00
+- **phase**: gybis-init orient complete
+- **state_read**: `mementum/state.md`
+- **memories_read**:
+  - `mementum/memories/gybis-tool-agnostic.md`
+  - `mementum/memories/gybis-hidden-bundle-copy.md`
+  - `mementum/memories/use-cases-command-coverage.md`
+  - `mementum/memories/spec-strict-test-convergence.md`
+- **knowledge_read**:
+  - `mementum/knowledge/session-2026-05-15.md`
+- **searches_run**:
+  - "gybis-init"
+  - "mementum orient"
+  - "README"
+- **open_questions_acknowledged**:
+  - No blocking questions. Current repo state reflects the previous successful gybis closeout and the active documentation bundle remains aligned.
+- **readiness**: Ready to proceed from the current repo state without re-initializing the project memory structure.
+
+## Session Closeout
+- **last_session_id**: session-37
+- **current_timestamp**: 2026-08-26T00:00:00-06:00
+- **task**: Complete the current gybis-init orient pass and persist the project working memory for the next session.
+- **questions**:
+  - none blocking; the active repo state is coherent and no migration or recovery action is required before continuing.
+- **decisions**:
+  - The active bootloader remains `mementum/state.md` as the durable working memory for this repo.
+  - Repo-local memory remains the correct scope; no client-scoped memory or external store was introduced.
+  - No further code or spec changes were required during this orientation-only pass.
+- **next**:
+  1. Continue from the current repository state with the next task.
+  2. Re-run `gybis-init` only if a new session needs a fresh orientation reset.
+  3. Preserve working memory by keeping `mementum/state.md` and related `mementum/` files in sync with the active context.
+- **recover**: Re-read `mementum/state.md`, then follow the most recent memory and knowledge entries to reconstruct the current session context.
 
 ⏹→state.md
