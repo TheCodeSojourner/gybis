@@ -11,6 +11,6 @@ If gybis is command-driven guidance (not always-on enforcement), then readiness 
 Practical boundary that stayed coherent in this session:
 - `gybis-vocab-*` owns vocabulary convergence and drift resolution.
 - `gybis-spec-*` owns behavior/spec/code/arch consistency, not vocabulary policing.
-- `gybis-arch-elicit` may use vocabulary context when present, but should not hard-halt when missing.
+- `gybis-arch-elicit` was removed (session-42); greenfield architecture.md is human-authored with AI assistance and validated by `/gybis-arch-check`, which does not hard-halt on other artifacts.
 
 This keeps prompts lean, avoids cross-skill concern leakage, and preserves operator control while still providing explicit convergence tools (`check`/`weed`) when the human chooses to run them.

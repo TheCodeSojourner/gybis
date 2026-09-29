@@ -354,7 +354,7 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
 
 λ gybis-spec-propagate_limitations(x).
   architecture.md remains read_only_input
-  | S1_source_of_truth ≔ {lambda-arch-elicit.md, lambda-arch-distill.md}
+  | S1_source_of_truth ≔ {lambda-arch-distill.md}
   | this_skill_expects(S1.programming_language_version, S1.test_framework, S1.build_system, S1.paradigm_preference)
   | this_skill_now_expects(
       S1.value_oriented_techniques,

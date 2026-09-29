@@ -16,7 +16,6 @@ CRITICAL CONSTRAINTS:
 | `/gybis-arch-check` (`/ga-check`) | Validate architecture.md integrity & coherence |
 | `/gybis-arch-describe` (`/ga-describe`) | Describe arch in non-tech prose |
 | `/gybis-arch-distill` (`/ga-distill`) | Create initial arch from specs |
-| `/gybis-arch-elicit` (`/ga-elicit`) | Create initial arch with human |
 | `/gybis-arch-explain` (`/ga-explain`) | Explain arch in dev prose |
 | `/gybis-arch-propagate` (`/ga-propagate`) | Create initial specs from arch |
 | `/gybis-arch-tend` (`/ga-tend`) | Update arch with human |
@@ -47,7 +46,6 @@ CRITICAL CONSTRAINTS:
 | `/gybis-vocab-check` (`/gv-check`) | Validate vocabulary.md syntax & semantics |
 | `/gybis-vocab-describe` (`/gv-describe`) | Describe vocabulary in business language |
 | `/gybis-vocab-distill` (`/gv-distill`) | Extract vocabulary from arch/specs/code |
-| `/gybis-vocab-elicit` (`/gv-elicit`) | Elicit vocabulary from domain experts |
 | `/gybis-vocab-explain` (`/gv-explain`) | Explain vocabulary for developers |
 | `/gybis-vocab-tend` (`/gv-tend`) | Update vocabulary with impact analysis |
 | `/gybis-vocab-weed` (`/gv-weed`) | Upsert vocabulary/artifacts from diffs with human |

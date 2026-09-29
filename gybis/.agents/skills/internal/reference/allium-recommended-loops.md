@@ -9,8 +9,9 @@
   entry ∈ {spec_ready, code_first, no_spec}
   | spec_ready → /gybis-spec-tend
   | code_first → /gybis-spec-distill
-  | no_spec → /gybis-arch-elicit → /gybis-arch-propagate → /gybis-spec-tend
-  | constraint: ¬exists(/gybis-spec-elicit)
+  | no_spec → /gybis-req-elicit → /gybis-arch-check → /gybis-arch-propagate → /gybis-spec-tend
+  | constraint: ¬exists(/gybis-spec-elicit) ∧ ¬exists(/gybis-arch-elicit) ∧ ¬exists(/gybis-vocab-elicit)
+  | greenfield_vocab_arch: human-authored vocabulary.md ∧ architecture.md validated by /gybis-vocab-check ∧ /gybis-arch-check
 
 λ loop_phases(x).
   gather_context → take_action → verify → repeat

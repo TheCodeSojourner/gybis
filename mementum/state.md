@@ -1,4 +1,4 @@
-✅ session-42 | 2026-09-29 gybis-init orient complete on branch add-requirements-layer at session-41 head (5531635)
+✅ session-42 | 2026-09-29 gybis-vocab-elicit and gybis-arch-elicit removed; greenfield vocab/arch artifacts now human-authored; doc surfaces synchronized (commit c20b767 then removal commit)
 ✅ session-40 | 2026-09-29 gybis-init orient complete on branch add-requirements-layer at session-39 head (85b9a97)
 ✅ session-38 | 2026-09-29 Requirements layer added: /gybis-req-* nine-skill family scaffolded and command surfaces synchronized
 ✅ session-36 | 2026-08-20 gybis-fini closeout: downstream upgrade documentation and Allium compatibility gate committed
@@ -40,7 +40,7 @@
 ## Working Memory
 - **Last updated**: 2026-09-29T16:30:00-06:00
 - **Sessions**: 42 (session-0 initialized through session-42 gybis-init orient)
-- **Status**: Session-42 oriented — branch add-requirements-layer at session-41 head (5531635); pending human decisions carried from session-41
+- **Status**: Session-42 — vocab-elicit/arch-elicit removed; surfaces synchronized; branch add-requirements-layer
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
@@ -341,3 +341,29 @@
   3. Resolve FN-002G/H collision via tend (declare known-collision or alias).
   4. Refine gr-elicit transcription heuristics after first real use (session-38 carryover).
 - **recover**: Read mementum/state.md session-41 entry and gybis/GYBIS-DEV-WORKFLOW.md §2/§6 for the polish edits; rationale rules in mementum/memories/rationale-field-convention.md.
+
+## Session-42 (2026-09-29): vocab-elicit and arch-elicit removed
+- Human decision after cowoker suggestion review: remove both `gybis-vocab-elicit` and `gybis-arch-elicit` (greenfield interview skills that bypassed the requirements layer).
+- Rationale: requirements layer now sits atop the durability order (req > vocab > arch > spec > tests > code); elicit skills created vocabulary.md/architecture.md without requirements grounding — layer-ordering inversion. Precedent: /gybis-spec-elicit was removed the same way.
+- Deleted: gybis/.agents/skills/gybis-vocab-elicit/, gybis/.agents/skills/gybis-arch-elicit/.
+- Updated: gybis-arch-describe and gybis-arch-explain halt pointers (now /gybis-arch-distill only); gybis-spec-propagate S1_source_of_truth (lambda-arch-distill.md only); internal/reference/allium-recommended-loops.md no_spec entry path (req-elicit → checks → arch-propagate → spec-tend) and forbidden-skill constraints.
+- Greenfield replacement: vocabulary.md and architecture.md are human-authored with AI assistance from requirements, validated by /gybis-vocab-check and /gybis-arch-check (tend gates require artifacts to exist, so no creation skill remains for these layers — consistent with human-owned stage readiness).
+- Doc surfaces synchronized: GYBIS-README (Quick Start, Start a New Repository, New Repository philosophy, command table rows), README.md (command table rows), gybis-help (table rows).
+- Memory stored: mementum/memories/elicit-skills-removed.md; knowledge page requirements-layer.md forward path updated; human-owned-stage-readiness.md memory refreshed.
+
+## Session Closeout
+- **last_session_id**: session-42
+- **current_timestamp**: 2026-09-29T17:10:00-06:00
+- **task**: Remove gybis-vocab-elicit and gybis-arch-elicit and synchronize all dependent skills, references, and doc surfaces.
+- **questions**:
+  - Carried: 4 AI_inferred rationale approvals pending; FN-002G/H collision resolution; compound_by_design markers; branch-example fixtures commit decision; gr-elicit heuristics after first real use.
+  - New: none this session.
+- **decisions**:
+  - Elicit skills removed rather than subordinated; greenfield vocabulary.md/architecture.md become human-authored artifacts validated by check skills.
+  - Requirements-first greenfield chain: /gybis-req-elicit → human-authored vocab/arch → checks → /gybis-arch-propagate → /gybis-spec-propagate.
+- **next**:
+  1. Review/commit the untracked branch-example/ and branch-example-original/ fixture directories.
+  2. Approve or remove the 4 AI_inferred rationale lines via /gybis-req-tend.
+  3. Resolve FN-002G/H collision via tend (declare known-collision or alias).
+  4. Refine gr-elicit transcription heuristics after first real use.
+- **recover**: Read mementum/memories/elicit-skills-removed.md and mementum/knowledge/requirements-layer.md; verify no /ga-elicit or /gv-elicit references remain (grep elicit, exclude req-elicit).

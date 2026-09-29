@@ -105,7 +105,7 @@ description: Use for `/gybis-arch-describe` or `/ga-describe`.
 
 λ gybis-arch-describe_prerequisites(x).
   gate(architecture.md) → exists ∧ complete
-  | ¬exists → halt("No architecture.md found. Use /gybis-arch-elicit or /gybis-arch-distill first.")
+  | ¬exists → halt("No architecture.md found. Use /gybis-arch-distill first.")
   | ¬complete → flag("architecture.md appears incomplete. Gaps will be noted in output.")
 
 λ gybis-arch-describe_five_layer(x).
