@@ -95,7 +95,7 @@ The following commands are available after integrating gybis into a target repos
 
 ### Requirements Commands (`/gr-*`)
 
-Requirements are the top layer of the stack: dependency-ordered module files containing `REQ-<DOMAIN>-NNN` clauses in nucleus lambda notation, rendered for humans on demand via describe/explain.
+Requirements are the top layer of the stack: dependency-ordered module files containing `REQ-<DOMAIN>-NNN` clauses in nucleus lambda notation, rendered for humans on demand via describe/explain. Each clause may carry an optional `rationale:` line recording why the requirement exists — guidance and context only, never a rule anyone must satisfy. It is elicited from stakeholders during `/gybis-req-elicit`, validated by `/gybis-req-check` (it is never a binding obligation and never counted as test coverage), and rendered as "because: ..." by describe/explain when present.
 
 | Command                                  | Description                                                           |
 | ---------------------------------------- | --------------------------------------------------------------------- |

@@ -398,6 +398,8 @@ vocabulary > architecture > specification > tests > code
 
 ## Commands
 
+REQ-clause convention: requirements clauses (`/gybis-req-*` family) may carry an optional `rationale:` line recording why the requirement exists — guidance and context only, never a rule anyone must satisfy. It is captured by elicit, validated by check (never a binding obligation, never counted as coverage), and rendered as "because: ..." by describe/explain when present.
+
 | Skill Name                                                       | Description                                                           |
 | ---------------------------------------------------------------- | --------------------------------------------------------------------- |
 | `/gybis-arch-check` (`/ga-check`)                                | Validate architecture integrity & coherence                           |
