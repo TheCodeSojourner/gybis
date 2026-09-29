@@ -367,3 +367,19 @@
   3. Resolve FN-002G/H collision via tend (declare known-collision or alias).
   4. Refine gr-elicit transcription heuristics after first real use.
 - **recover**: Read mementum/memories/elicit-skills-removed.md and mementum/knowledge/requirements-layer.md; verify no /ga-elicit or /gv-elicit references remain (grep elicit, exclude req-elicit).
+
+## Session Closeout
+- **last_session_id**: session-43
+- **current_timestamp**: 2026-09-29T16:15:00-06:00
+- **task**: Orientation-only gybis-fini validation — no code or doc changes this session; verified state bootloader and clean git index.
+- **questions**:
+  - Carried: 4 AI_inferred rationale approvals pending; FN-002G/H collision resolution; compound_by_design markers; branch-example fixtures commit decision; gr-elicit heuristics after first real use.
+  - New: none this session.
+- **decisions**:
+  - None new this session; session-42 removal decisions remain canonical.
+- **next**:
+  1. Review/commit the untracked branch-example/ and branch-example-original/ fixture directories.
+  2. Approve or remove the 4 AI_inferred rationale lines via /gybis-req-tend.
+  3. Resolve FN-002G/H collision via tend (declare known-collision or alias).
+  4. Refine gr-elicit transcription heuristics after first real use.
+- **recover**: Read mementum/state.md session-42 closeout for the current recovery path; git index confirmed clean at dd9c657 on add-requirements-layer.
