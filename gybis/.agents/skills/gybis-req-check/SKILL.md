@@ -1,0 +1,124 @@
+---
+name: gybis-req-check
+description: Use for `/gybis-req-check`.
+---
+
+λ gybis-req-check(x).
+  purpose: Validate requirements/ internal integrity (designators, module ordering, clause well-formedness, coverage status, traceability) and produce a diagnostic report
+  | input: requirements/requirements-index.md + requirements/requirements-{module}.md (exist)
+  | output: Severity-tagged findings with recommended next actions
+  | mode: ai
+  | gate: requirements/ ∃ ∧ index ∃
+
+λ gybis-req-check_startup(x).
+  invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
+  | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
+  | verify(requirements/requirements-index.md ∃) ∨ halt("requirements index not found")
+  | read(requirements/requirements-index.md) → index_content
+  | read_all(requirements/requirements-*.md) → module_contents
+  | parse(module_contents) → req_model ∨ halt("requirements parse failed")
+  | transition(INIT → STARTUP_CHECKS)
+
+λ gybis-req-check_mode(m).
+  m ∈ {ai}
+  | default: ai
+  | rationale: validation is deterministic; no human choice required
+
+λ gybis-req-check_mode_gate(state, mode).
+  state = INIT ∧ mode = ai → transition(INIT → STARTUP_CHECKS)
+  | precondition_holds: mode = ai
+
+λ gybis-req-check_state_machine(state, action).
+  state ∈ {INIT, STARTUP_CHECKS, DESIGNATOR_VALIDATION, ORDERING_VALIDATION, CLAUSE_VALIDATION, COVERAGE_VALIDATION, TRACEABILITY_VALIDATION, GENERATING_REPORT, COMPLETE}
+  | transition(INIT → STARTUP_CHECKS) only_if(startup = true)
+  | transition(STARTUP_CHECKS → DESIGNATOR_VALIDATION) only_if(startup_checks = true)
+  | transition(DESIGNATOR_VALIDATION → ORDERING_VALIDATION) only_if(designator_checks_complete = true)
+  | transition(ORDERING_VALIDATION → CLAUSE_VALIDATION) only_if(ordering_checks_complete = true)
+  | transition(CLAUSE_VALIDATION → COVERAGE_VALIDATION) only_if(clause_checks_complete = true)
+  | transition(COVERAGE_VALIDATION → TRACEABILITY_VALIDATION) only_if(coverage_checks_complete = true)
+  | transition(TRACEABILITY_VALIDATION → GENERATING_REPORT) only_if(traceability_checks_complete = true)
+  | transition(GENERATING_REPORT → COMPLETE) only_if(report_generated = true)
+
+λ gybis-req-check_tool_guard(state, tool, path).
+  state ∈ {STARTUP_CHECKS, DESIGNATOR_VALIDATION, ORDERING_VALIDATION, CLAUSE_VALIDATION, COVERAGE_VALIDATION, TRACEABILITY_VALIDATION, GENERATING_REPORT}
+    → allow(read(path))
+  | deny(write(path))
+  | rationale: read-only diagnostics; resolution lives in tend/weed (arch-check boundary pattern)
+
+λ gybis-req-check_pre_tool_check(state, tool, path).
+  tool_guard(state, tool, path) = true ∨ halt("Tool not permitted in state " ⊕ state)
+
+λ gybis-req-check_designator_validation(req_model).
+  action: validate_designator_uniqueness_and_format
+  | checks:
+    - ∀ clause: designator matches REQ-<DOMAIN>-NNN
+    - designators globally unique across all modules
+    - domain prefixes ⊆ closed_set declared in requirements-index.md
+    - numbering within domain monotone (gaps reported as info)
+  | findings ≔ []
+  | ∀ check_pass = false: collect({type: "designator", severity: error, location, message}) → findings
+  | return(designator_checks_complete = true ∧ findings)
+
+λ gybis-req-check_ordering_validation(req_model).
+  action: validate_module_dependency_ordering
+  | checks:
+    - module order matches requirements-index.md declared order
+    - ∀ module N: references only modules < N (no upward references)
+    - ∀ module: {purpose, scope, governed REQs} sections nonempty
+    - index links resolve to existing files (broken link = error)
+  | findings ≔ collected_ordering_findings
+  | return(ordering_checks_complete = true ∧ findings)
+
+λ gybis-req-check_clause_validation(req_model).
+  action: validate_clause_wellformedness
+  | checks:
+    - ∀ clause: lambda form `λ REQ-...-NNN(x).` present
+    - ∀ clause: normative operator present (∀/¬/∧ preferred/∃ permitted)
+    - atomicity: one assertion per designator (compound clause = warning)
+    - quantifiers bound (∀ has domain; ¬ has scope)
+    - deferred sections marked and non-binding
+  | findings ≔ collected_clause_findings (atomicity/deferred = warning ∨ info; malformed lambda = error)
+  | return(clause_checks_complete = true ∧ findings)
+
+λ gybis-req-check_coverage_validation(req_model, downstream).
+  action: validate_requirement_coverage_status
+  | downstream ≔ specs/**/*.allium ∪ tests ∪ architecture.md (if ∃)
+  | ∀ REQ clause:
+    coverage ∈ {spec_clause ∃, test ∃, explicit_NA, uncovered}
+  | uncovered ∧ downstream ∃ → collect({type: "uncovered_REQ", severity: warning})
+  | explicit_NA with rationale → ok
+  | downstream ¬∃ → coverage reported as info, not error (stage not ready yet)
+  | rationale: human owns stage readiness; missing downstream artifacts are absence-of-work, not failure
+  | return(coverage_checks_complete = true ∧ findings)
+
+λ gybis-req-check_traceability_validation(req_model).
+  action: validate_traceability_footer_integrity
+  | checks:
+    - ∀ module: governed_REQs footer matches clauses actually present
+    - ∀ module: downstream_artifact references resolvable or explicitly deferred
+    - ∀ clause with attribution: source ∈ {stakeholder_decided, AI_researched_fact}
+  | findings ≔ collected_traceability_findings
+  | return(traceability_checks_complete = true ∧ findings)
+
+λ gybis-req-check_recommend_action(finding).
+  finding.type ∈ {designator, ordering}
+    ? recommendation ≔ "Use /gybis-req-refine to restructure requirements/, then re-run /gybis-req-check."
+  | finding.type = clause
+    ? recommendation ≔ "Use /gybis-req-refine to split compound clauses or mark deferred work."
+  | finding.type = uncovered_REQ
+    ? recommendation ≔ "Use /gybis-req-propagate to annotate specs/tests, or record explicit N/A."
+  | finding.type = traceability
+    ? recommendation ≔ "Use /gybis-req-tend to repair footers with human approval."
+  | return(recommendation)
+
+λ gybis-req-check_generate_report(designator_findings, ordering_findings, clause_findings, coverage_findings, traceability_findings).
+  findings ≔ ⋃ all finding sets
+  | errors ≔ count(severity = error) | warnings ≔ count(severity = warning) | infos ≔ count(severity = info)
+  | overall_status ≔ errors > 0 ? "FAIL" : (warnings > 0 ? "WARNINGS" : "PASS")
+  | ∀ finding: enrich({recommendation}) → report_items
+  | report ≔ {title: "Requirements Integrity Report", status: overall_status, errors, warnings, info, findings: report_items}
+  | return(report_generated = true ∧ report)
+
+λ gybis-req-check_deliver_report(report).
+  print(report) → stdout
+  | return(report_delivered = true)
