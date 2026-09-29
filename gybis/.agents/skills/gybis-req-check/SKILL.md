@@ -15,6 +15,7 @@ description: Use for `/gybis-req-check`.
   | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
   | verify(requirements/requirements-index.md ∃) ∨ halt("requirements index not found")
   | read(requirements/requirements-index.md) → index_content
+  | index_conventions: verify index declares domain_prefixes (closed set) ∧ normative_mapping; missing conventions declarations = warning (consumers would have to re-derive them)
   | read_all(requirements/requirements-*.md) → module_contents
   | parse(module_contents) → req_model ∨ halt("requirements parse failed")
   | transition(INIT → STARTUP_CHECKS)
@@ -52,7 +53,7 @@ description: Use for `/gybis-req-check`.
   action: validate_designator_uniqueness_and_format
   | checks:
     - ∀ clause: designator matches REQ-<DOMAIN>-NNN
-    - designators globally unique across all modules
+    - designators globally unique across all modules — exception: a collision declared in requirements-index.md as a known-collision (designator + governing modules listed) = warning pending /gybis-req-tend resolution; undeclared collision = error
     - domain prefixes ⊆ closed_set declared in requirements-index.md
     - numbering within domain monotone (gaps reported as info)
   | findings ≔ []
@@ -63,7 +64,8 @@ description: Use for `/gybis-req-check`.
   action: validate_module_dependency_ordering
   | checks:
     - module order matches requirements-index.md declared order
-    - ∀ module N: references only modules < N (no upward references)
+    - ∀ module N: behavioral dependencies reference only modules < N (no upward behavioral references)
+    - definitional_forward_reference: a reference to a later module's REQ defining a term or boundary contract = info (valid); ¬∃ error for definitional references — behavioral dependency on a later module = error
     - ∀ module: {purpose, scope, governed REQs} sections nonempty
     - index links resolve to existing files (broken link = error)
   | findings ≔ collected_ordering_findings
@@ -73,10 +75,12 @@ description: Use for `/gybis-req-check`.
   action: validate_clause_wellformedness
   | checks:
     - ∀ clause: lambda form `λ REQ-...-NNN(x).` present
-    - ∀ clause: normative operator present (∀/¬/∧ preferred/∃ permitted)
-    - atomicity: one assertion per designator (compound clause = warning)
+    - ∀ clause: normative operator present (∀/¬/∧ preferred/∃ permitted) — rationale: lines excluded from this check
+    - atomicity: one assertion per designator (compound clause = warning) — granularity-aware: compound clause whose footer declares `compound_by_design: true` and whose conjuncts all serve one operator's contract = info; compound clause mixing unrelated assertions = warning regardless of granularity
     - quantifiers bound (∀ has domain; ¬ has scope)
-    - deferred sections marked and non-binding
+    - deferred sections marked and non-binding — marker: section heading containing "(Deferred" or deferred blockquote opener
+    - compound_by_design: marker must appear in the clause footer ∧ be declared by human approval via /gybis-req-tend (¬silent lint suppression)
+    - rationale: lines are non-normative and optional — ¬error(absence); a rationale: line containing normative operators (∀/¬/∃) as obligations = error (rationale must record intent, not impose constraints)
   | findings ≔ collected_clause_findings (atomicity/deferred = warning ∨ info; malformed lambda = error)
   | return(clause_checks_complete = true ∧ findings)
 
@@ -95,8 +99,10 @@ description: Use for `/gybis-req-check`.
   action: validate_traceability_footer_integrity
   | checks:
     - ∀ module: governed_REQs footer matches clauses actually present
+    - footer_derivation: governed_REQs footers MUST be derivable from clauses present — a footer that requires hand-maintenance to be correct = warning (regenerate from clauses)
     - ∀ module: downstream_artifact references resolvable or explicitly deferred
     - ∀ clause with attribution: source ∈ {stakeholder_decided, AI_researched_fact}
+    - ∀ clause with rationale: {rationale_source: origin_artifact | AI_inferred} declared when rationale present ∧ AI_inferred rationale in stakeholder_decided clause = warning (requires human approval via /gybis-req-tend)
   | findings ≔ collected_traceability_findings
   | return(traceability_checks_complete = true ∧ findings)
 

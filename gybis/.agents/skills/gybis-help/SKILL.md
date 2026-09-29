@@ -52,3 +52,4 @@ CRITICAL CONSTRAINTS:
 | `/gybis-vocab-tend` (`/gv-tend`) | Update vocabulary with impact analysis |
 | `/gybis-vocab-weed` (`/gv-weed`) | Upsert vocabulary/artifacts from diffs with human |
 
+REQ-clause convention: REQ clauses (`/gybis-req-*` family) may carry an optional `rationale:` line (why the requirement exists) — guidance and context only, never a rule anyone must satisfy. It is captured by elicit, validated by check (never a binding obligation, never counted as coverage), and rendered as "because: ..." by describe/explain when present.

@@ -54,6 +54,7 @@ description: Use for `/gybis-req-describe`.
   action: render_stakeholder_prose
   | ∀ REQ in scope: lambda clause → business prose (no notation symbols, no jargon)
   | structure: by module, in dependency order, with requirement rationale
+  | rationale_rendering: when a clause carries a rationale: line, render it as "because: ..." following the requirement statement; when absent, omit silently (¬fabricate rationale from clause text)
   | attribution surfaced in prose: "decided by stakeholders" vs "derived from analysis"
   | deferred sections labeled "planned future requirements (not currently binding)"
   | output: prose_rendered

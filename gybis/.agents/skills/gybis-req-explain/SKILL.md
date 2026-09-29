@@ -57,6 +57,7 @@ description: Use for `/gybis-req-explain`.
     - explain implementation implications (what code/tests must satisfy it)
     - explain negotiation status: contractual (stakeholder_decided) vs negotiable (AI_researched_fact)
     - cite downstream targets: annotated spec clauses ∧ tests (when propagated)
+    - when a rationale: line exists, quote it verbatim and use it to ground implementation implications; when absent, derive implications from the clause body only ∧ note "no recorded rationale"
   | structure: by module, dependency order
   | output: explanation_rendered
 
