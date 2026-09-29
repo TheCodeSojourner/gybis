@@ -1,4 +1,10 @@
-💡 hidden bundle installs need `cp -ra <bundle>/. .`
+---
+type: Insight
+symbol: 💡
+title: gybis-hidden-bundle-copy
+---
+
+hidden bundle installs need `cp -ra <bundle>/. .`
 
 ## Context
 When gybis ships command implementations under the hidden `.agents/skills/` directory, shell globs like `gybis/*` skip that content during installation.

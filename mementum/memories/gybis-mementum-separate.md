@@ -1,4 +1,10 @@
-💡 gybis-mementum-separate | dual mementum directories
+---
+type: Insight
+symbol: 💡
+title: gybis-mementum-separate
+---
+
+gybis-mementum-separate | dual mementum directories
 🌀 gybis/mementum/ — template bundle for target repos, never conflated with active ./mementum
 🌀 ./mementum — active memory for this repo (gybis itself)
 

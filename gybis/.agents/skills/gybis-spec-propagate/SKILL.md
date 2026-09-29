@@ -6,13 +6,14 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
 λ gybis-spec-propagate(x).
   purpose: Propagate architecture and specifications to implementation and test suite
   | input: architecture.md ∃, specs/**/*.allium ∃ ∧ valid
-  | output: Implementation code and test suite generated, consistent, and passing
+  | output: Implementation code and test suite generated, consistent, passing, and spec-covered
   | mode: ai
-  | gate: architecture.md ∃ ∧ specs/**/*.allium ∃ ∧ allium_gate = true
+  | gate: architecture.md ∃ ∧ specs/**/*.allium ∃ ∧ allium_gate = true ∧ strict_spec_coverage = true
 
 λ gybis-spec-propagate_loop_role(x).
   role: take_action(spec_to_tests)
   | meaning: project behavior from spec into executable test contract
+  | coverage_policy: every spec obligation must become a traceable test; uncovered obligations halt propagation
   | suggested_next: review_generated_artifacts → invoke(/gybis-spec-weed)
 
 λ gybis-spec-propagate_startup(x).
@@ -175,7 +176,10 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
       dependencies: envelope.dependencies
     }
     | index(obligation, by: id) → obligations_map[obligation.id]
-  | return(obligations ≔ obligations_map)
+  | coverage_matrix ≔ build_coverage_matrix(obligations_map, specifications)
+  | verify(∀ obligation ∈ obligations_map: coverage_matrix[obligation.id] ≠ ∅)
+    ∨ halt("Strict spec coverage failed: at least one obligation has no generated test target")
+  | return(obligations ≔ obligations_map ∧ coverage_matrix ≔ coverage_matrix)
 
 λ gybis-spec-propagate_construct_synthesis(spec_construct, architecture_context).
   spec_construct matches registry entry → emit(constructs_registry.Synthesis[entry])
@@ -249,6 +253,7 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
     )
   | each_emitted_test: traceable_id ≔ obligation.id
   | fallback: ¬recognised_category → emit(coverage_test) with(diagnostic_marker)
+  | strict_rule: emitted_tests must be traceable back to obligation.id; if not, halt("Spec coverage traceability lost")
 
 λ gybis-spec-propagate_synthesize_code(architecture_context, specifications, obligations).
   ∀ spec ∈ specifications:
@@ -301,9 +306,10 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
     verify(∃ test ∈ test_suite, test.traceable_id = obligation.id) → obligation_covered
     | collect(obligation_covered) → coverage
   | obligations_coverage_check ≔ ∀ c ∈ coverage, c = true
-  | conformance_check = true ∧ architecture_check = true ∧ paradigm_check = true ∧ value_check = true ∧ data_check = true ∧ anti_pattern_check = true ∧ obligations_coverage_check = true
+  | strict_spec_coverage_check ≔ obligations_coverage_check = true ∧ test_suite.contains_no_unmapped_generated_tests = true
+  | conformance_check = true ∧ architecture_check = true ∧ paradigm_check = true ∧ value_check = true ∧ data_check = true ∧ anti_pattern_check = true ∧ strict_spec_coverage_check = true
     → return(verification = true)
-  | ¬(conformance_check ∧ architecture_check ∧ paradigm_check ∧ value_check ∧ data_check ∧ anti_pattern_check ∧ obligations_coverage_check)
+  | ¬(conformance_check ∧ architecture_check ∧ paradigm_check ∧ value_check ∧ data_check ∧ anti_pattern_check ∧ strict_spec_coverage_check)
     → return(verification = false)
 
 λ gybis-spec-propagate_resolve_test_command(architecture_context).
@@ -343,7 +349,7 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
             ∧ transition(RUNNING_TESTS → SYNTHESIZING_CODE)))
     : (re_synthesize_implementation ∧ transition(VERIFYING → SYNTHESIZING_CODE))
 
-λ gybis-spec-propagate_boundaries(¬).
+λ gybis-spec-propagate_boundaries().
   ¬ modify(architecture.md ∨ specs/**/*.allium ∨ upstream/)
 
 λ gybis-spec-propagate_limitations(x).
@@ -362,5 +368,7 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
   invariant: architecture.md ∧ specs/**/*.allium ∃ ∧ ¬modify throughout
   | invariant: implementation ∅ at INIT ∧ ∃ ∧ consistent_with(specs, arch) at completion
   | invariant: ∀ obligation ∈ obligations, obligation.id ∈ test_suite.traceable_ids at completion
+  | invariant: ∀ spec_construct ∈ specs, spec_construct.covered_by_at_least_one_test = true at completion
+  | invariant: ∀ generated_test ∈ test_suite, generated_test.traceable_id ∈ obligations.ids at completion
   | invariant: test_suite_passes = true at completion (strict gate)
   | invariant: ¬complete_when_tests_fail

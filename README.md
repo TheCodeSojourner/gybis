@@ -34,30 +34,33 @@ gybis is command-driven guidance, not always-on process enforcement.
 - Skills execute the requested transformation and enforce only execution-critical gates.
 - Check and weed commands are available as deliberate convergence tools when operators choose to run them.
 
-## Check, Tend, and Weed Philosophy
+## Check, Refine, Tend, and Weed Philosophy
 
-These three operations form the core gybis convergence loop:
+These operations form the core gybis convergence loop:
 
 - `check` diagnoses the current state of one layer and reports what is wrong.
-- `tend` refines one layer with explicit human intent and keeps the change localized.
+- `refine` improves one layer's structure and clarity without changing intended meaning.
+- `tend` evolves one layer with explicit human intent and keeps the change localized.
 - `weed` reconciles drift between adjacent layers and the implementation so the system converges again.
 
-They work top-down: vocabulary constrains architecture, architecture constrains specs, and specs constrain tests and code. `check` finds drift, `tend` makes the intended layer-local change, and `weed` resolves disagreement when two artifacts no longer agree.
+They work top-down: vocabulary constrains architecture, architecture constrains specs, and specs constrain tests and code. `check` finds drift, `refine` polishes local structure, `tend` makes intended layer-local changes, and `weed` resolves disagreement when two artifacts no longer agree.
 
-| Operation | Purpose                                         | Human role                                               | Typical outcome                   |
-| --------- | ----------------------------------------------- | -------------------------------------------------------- | --------------------------------- |
-| `check`   | Diagnose a layer and surface integrity issues   | Choose when to run it and review the report              | Severity-tagged findings          |
-| `tend`    | Evolve one layer with developer-approved intent | State the desired change and approve edits               | Updated artifact in the same lane |
-| `weed`    | Reconcile divergence across adjacent layers     | Decide which side should move and approve the correction | Mutually consistent artifacts     |
+| Operation | Purpose                                         | Human role                                               | Typical outcome                    |
+| --------- | ----------------------------------------------- | -------------------------------------------------------- | ---------------------------------- |
+| `check`   | Diagnose a layer and surface integrity issues   | Choose when to run it and review the report              | Severity-tagged findings           |
+| `refine`  | Polish one layer's structure and readability    | Choose safe polish scope and approve edits               | Clearer artifact with same meaning |
+| `tend`    | Evolve one layer with developer-approved intent | State the desired change and approve edits               | Updated artifact in the same lane  |
+| `weed`    | Reconcile divergence across adjacent layers     | Decide which side should move and approve the correction | Mutually consistent artifacts      |
 
 ## Workflow Cheat Sheet
 
-Use `check` when you want a diagnostic snapshot, `tend` when you already know the intended refinement, and `weed` when the real task is convergence across layers rather than a single artifact edit.
+Use `check` when you want a diagnostic snapshot, `refine` when the task is structural polish, `tend` when you already know the intended layer change, and `weed` when the real task is convergence across layers rather than a single artifact edit.
 
 1. Run `check` first to expose drift or broken assumptions.
-2. Run `tend` next when the needed change belongs to one layer and the intent is clear.
-3. Run `weed` when architecture, specs, or implementation disagree and need a human decision about which artifact should change.
-4. Re-run `check` after `weed` to confirm the target layer is back in a valid state.
+2. Run `refine` next when the needed change is structure and clarity without changing intended meaning.
+3. Run `tend` when the needed change belongs to one layer and the intent is clear.
+4. Run `weed` when architecture, specs, or implementation disagree and need a human decision about which artifact should change.
+5. Re-run `check` after `weed` to confirm the target layer is back in a valid state.
 
 **gybis** provides the scaffolding to make AI-assisted SDD practical:
 
@@ -86,6 +89,7 @@ The following commands are available after integrating gybis into a target repos
 | `/gybis-vocab-distill` (`/gv-distill`)   | Extract vocabulary from arch/specs/code           |
 | `/gybis-vocab-elicit` (`/gv-elicit`)     | Elicit vocabulary from domain experts             |
 | `/gybis-vocab-explain` (`/gv-explain`)   | Explain vocabulary for developers                 |
+| `/gybis-vocab-refine` (`/gv-refine`)     | Refine vocabulary structure & clarity             |
 | `/gybis-vocab-tend` (`/gv-tend`)         | Update vocabulary with impact analysis            |
 | `/gybis-vocab-weed` (`/gv-weed`)         | Upsert vocabulary/artifacts from diffs with human |
 
@@ -99,6 +103,7 @@ The following commands are available after integrating gybis into a target repos
 | `/gybis-arch-elicit` (`/ga-elicit`)       | Create initial arch with human              |
 | `/gybis-arch-explain` (`/ga-explain`)     | Explain arch in dev prose or markdown       |
 | `/gybis-arch-propagate` (`/ga-propagate`) | Create initial specs from arch              |
+| `/gybis-arch-refine` (`/ga-refine`)       | Refine architecture structure & clarity     |
 | `/gybis-arch-tend` (`/ga-tend`)           | Update arch with human                      |
 | `/gybis-arch-weed` (`/ga-weed`)           | Upsert arch/specs from diffs with human     |
 
@@ -111,19 +116,21 @@ The following commands are available after integrating gybis into a target repos
 | `/gybis-spec-distill` (`/gs-distill`)                            | Create initial specs from code/tests          |
 | `/gybis-spec-explain` (`/gs-explain {concern\|domain\|all}`)     | Explain in dev prose or markdown              |
 | `/gybis-spec-propagate` (`/gs-propagate {concern\|domain\|all}`) | Create initial code/tests                     |
+| `/gybis-spec-refine` (`/gs-refine`)                              | Refine specs structure & clarity              |
 | `/gybis-spec-tend` (`/gs-tend`)                                  | Update specs with human                       |
 | `/gybis-spec-weed` (`/gs-weed`)                                  | Upsert specs/code-tests from diffs with human |
 
 ### Memory Commands (`/gm-*`)
 
-| Command                                                 | Description                        |
-| ------------------------------------------------------- | ---------------------------------- |
-| `/gybis-fini`                                           | Encode → Terminate                 |
-| `/gybis-init`                                           | Orient → Recall → Ready            |
-| `/gybis-memory-orient` (`/gm-orient`)                   | Restore prev AI context            |
-| `/gybis-memory-recall {topic}` (`/gm-recall {topic}`)   | Recall topic, or summarize latest  |
-| `/gybis-memory-store {insight}` (`/gm-store {insight}`) | Store insight, or prompt for one   |
-| `/gybis-memory-synthesize` (`/gm-synthesize`)           | Synthesize knowledge from memories |
+| Command                                                 | Description                              |
+| ------------------------------------------------------- | ---------------------------------------- |
+| `/gybis-fini`                                           | Encode → Terminate                       |
+| `/gybis-init`                                           | Orient → Recall → Ready                  |
+| `/gybis-memory-migrate` (`/gm-migrate`)                 | Migrate Mementum store to current format |
+| `/gybis-memory-orient` (`/gm-orient`)                   | Restore prev AI context                  |
+| `/gybis-memory-recall {topic}` (`/gm-recall {topic}`)   | Recall topic, or summarize latest        |
+| `/gybis-memory-store {insight}` (`/gm-store {insight}`) | Store insight, or prompt for one         |
+| `/gybis-memory-synthesize` (`/gm-synthesize`)           | Synthesize knowledge from memories       |
 
 ### Help
 
@@ -137,14 +144,15 @@ The following commands are available while developing gybis in this repository. 
 
 ### Memory Commands (`/gm-*`)
 
-| Command                                                   | Description                        |
-| --------------------------------------------------------- | ---------------------------------- |
-| `/gybis-fini`                                             | Encode → Terminate                 |
-| `/gybis-init`                                             | Orient → Recall → Ready            |
-| `/gybis-mementum-orient` (`/gm-orient`)                   | Restore prev AI context            |
-| `/gybis-mementum-recall {topic}` (`/gm-recall {topic}`)   | Recall topic, or summarize latest  |
-| `/gybis-mementum-store {insight}` (`/gm-store {insight}`) | Store insight, or prompt for one   |
-| `/gybis-mementum-synthesize` (`/gm-synthesize`)           | Synthesize knowledge from memories |
+| Command                                                   | Description                              |
+| --------------------------------------------------------- | ---------------------------------------- |
+| `/gybis-fini`                                             | Encode → Terminate                       |
+| `/gybis-init`                                             | Orient → Recall → Ready                  |
+| `/gybis-mementum-migrate` (`/gm-migrate`)                 | Migrate Mementum store to current format |
+| `/gybis-mementum-orient` (`/gm-orient`)                   | Restore prev AI context                  |
+| `/gybis-mementum-recall {topic}` (`/gm-recall {topic}`)   | Recall topic, or summarize latest        |
+| `/gybis-mementum-store {insight}` (`/gm-store {insight}`) | Store insight, or prompt for one         |
+| `/gybis-mementum-synthesize` (`/gm-synthesize`)           | Synthesize knowledge from memories       |
 
 ### Help
 
@@ -168,6 +176,42 @@ cp -ra <pathToGybisDirectory>/gybis/. . # e.g., `cp -ra ~/Downloads/gybis/gybis/
 ```
 
 This copies the complete gybis bundle, including the hidden `.agents/skills/` directory that provides the command implementations.
+
+### Upgrading an Existing Installation
+
+Do not rerun the full installation copy against an existing target repository: its live `mementum/` directory is project-owned durable memory and must be preserved.
+
+Finish or deliberately pause any current work in the target repository before upgrading. If a gybis session is active, run `/gybis-fini` using the existing installation to save its session state before replacing `.agents/skills/`.
+
+From the target repository, update only the command bundle:
+
+```bash
+cp -ra <pathToGybisDirectory>/gybis/.agents/skills/. .agents/skills/
+```
+
+This replaces the distributed command implementations, including internal Allium adapters and the runtime compatibility gate. It does not replace project specifications, source code, tests, or the target repository's `mementum/` store. Review the resulting diff before continuing; it should contain only the intended `.agents/skills/` changes at this point.
+
+The distributed documentation can be updated separately after reviewing any local edits to `GYBIS-README.md`:
+
+```bash
+cp -a <pathToGybisDirectory>/gybis/GYBIS-README.md GYBIS-README.md
+```
+
+This replaces only the installed gybis README. Do not run the command if the target repository has intentionally customized that file without first preserving or reconciling those changes.
+
+Before running specification commands, verify the target machine has a supported Allium CLI:
+
+```bash
+allium --version # current bundle requirement: 3.5.3 or newer
+```
+
+Then start a session with `/gybis-init` using the new installation. This loads the Nucleus and Mementum operating context and completes the session startup gate.
+
+From that initialized session, run `/gybis-memory-migrate` (`/gm-migrate`). Migration and initialization remain separate operations: migration inspects the target repository's existing `mementum/` store, reports `NO_MIGRATION_REQUIRED` when it is already conformant, previews recognized legacy conversions, and requires explicit approval before writing. It reports `MIGRATION_VALIDATED` only after verifying the resulting store and preserving `mementum/state.md`. If it reports `INITIALIZATION_REQUIRED`, initialize Mementum separately; do not treat initialization as migration. It halts without changes for malformed or ambiguous data.
+
+Finally, run `/gybis-spec-check {concern|domain|all}` when the target contains `.allium` specifications. The runtime gate reports `NO_SPECS` for an empty specification directory; this is an absence-of-work result, not an Allium compatibility failure. Repositories that have not created specifications yet can complete the bundle update and create them later.
+
+For several downstream repositories, repeat this command-bundle update separately in each repository. Keep the same source bundle version for the batch, and commit each downstream repository's skill update independently so its migration and validation history remain visible.
 
 See the `gybis/GYBIS-README.md` for usage instructions, best practices, and workflow suggestions.
 
@@ -200,11 +244,11 @@ In practice, upstream inputs are handled in three modes:
 
 | Upstream            | Pinned commit | Source consumed                                               | Transformation into gybis                                                                                                                                          |
 | ------------------- | ------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **allium**          | `493a2de`     | Allium language semantics and behavioral-spec structure       | Curated into gybis lang/ref docs, and encoded into spec skills.                                                                                                    |
-| **allium-tools**    | `7fa6247`     | CLI validate/analyze capabilities                             | Executed in gybis spec skill workflows. User dependency only. Not integrated in `gybis/` in any way.                                                               |
-| **grill-with-docs** | `5d78bd0`     | The grill-with-docs skill, and its dependencies               | Used to derive gybis vocabulary skills.                                                                                                                            |
-| **mementum**        | `ac2eadb`     | Mementum protocol semantics                                   | Used to derive gybis memory skills.                                                                                                                                |
-| **nucleus**         | `93c171a`     | Nucleus notation + VSM model + `LAMBDA-COMPILER.md` semantics | Used to derive gybis skills. gybis uses the lambda compiler defined by the nucleus `LAMBDA-COMPILER.md` even though the file is not included in gybis in any form. |
+| **allium**          | `527cd52`     | Allium language semantics and behavioral-spec structure       | Curated into gybis lang/ref docs, and encoded into spec skills.                                                                                                    |
+| **allium-tools**    | `08d3139`     | CLI validate/analyze capabilities                             | Executed in gybis spec skill workflows. User dependency only. Not integrated in `gybis/` in any way.                                                               |
+| **grill-with-docs** | `0ab1b63`     | The grill-with-docs skill, and its dependencies               | Used to derive gybis vocabulary skills.                                                                                                                            |
+| **mementum**        | `4968400`     | Mementum protocol semantics                                   | Used to derive gybis memory skills.                                                                                                                                |
+| **nucleus**         | `64880ed`     | Nucleus notation + VSM model + `LAMBDA-COMPILER.md` semantics | Used to derive gybis skills. gybis uses the lambda compiler defined by the nucleus `LAMBDA-COMPILER.md` even though the file is not included in gybis in any form. |
 
 ### Maintainer Notes
 

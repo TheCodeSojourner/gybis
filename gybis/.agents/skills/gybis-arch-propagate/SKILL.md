@@ -106,7 +106,7 @@ description: Use for `/gybis-arch-propagate` or `/ga-propagate`.
     ? transition(VERIFYING → COMPLETE)
     : (re_synthesize_failed_specs ∧ transition(WRITING_SPECS → VERIFYING))
 
-λ gybis-arch-propagate_boundaries(¬).
+λ gybis-arch-propagate_boundaries().
   ¬ modify(architecture.md)
   | ¬ modify(implementation)
   | ¬ modify(upstream/)

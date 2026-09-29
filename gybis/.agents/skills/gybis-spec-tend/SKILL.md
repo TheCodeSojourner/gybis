@@ -209,7 +209,7 @@ description: Use for `/gybis-spec-tend` or `/gs-tend`.
   | changes_applied ≔ changes_proposed
   | report("Pass " ⊕ pass_num ⊕ ": proposed=" ⊕ changes_proposed ⊕ " applied=" ⊕ changes_applied)
 
-λ gybis-spec-tend_boundaries(¬).
+λ gybis-spec-tend_boundaries().
   ¬ modify(architecture.md)
   | ¬ modify(implementation)
   | ¬ modify(upstream/)

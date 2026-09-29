@@ -52,18 +52,19 @@ description: Use for `/gybis-arch-elicit` or `/ga-elicit`.
   enforce(tool_guard(state, tool, path)) → permit(tool) ∨ halt("tool not permitted in this state")
 
 λ gybis-arch-elicit_elicit_s5(x).
-   action: elicit_identity_layer
-   | purpose: S5 answers "what IS your system" - principles that survive everything
-   | prompt_strategy: structured interviewing with VSM S5 context, eliciting unchanging principles
+   action: elicit_identity_and_policy_layer
+   | purpose: S5 answers "what IS your system" and declares the ground rules that protect it
+   | prompt_strategy: structured interviewing with VSM S5 context, eliciting unchanging principles, policy, and rationale
    | vocabulary_constraint: reference vocabulary.md terms when discussing principles; use canonical terminology
   | sample_questions:
     - "What are the unchanging principles that define your system? (Using our vocabulary: [core_terms])"
     - "What would make your system no longer be itself?"
     - "What values are inviolable?"
+    - "What ground rules protect those values, and why?"
   | capture: user_response → S5_lambda_draft
   | flag_non_vocabulary_terms: if(user_response contains term ∉ vocabulary.md):
     suggest_canonical_alternative ∨ ask_if_new_term_should_be_added
-  | output: S5_principles_collected ∧ vocabulary_aligned
+  | output: S5_principles_and_policy_collected ∧ vocabulary_aligned
 
 λ gybis-arch-elicit_elicit_s4(x).
    action: elicit_intelligence_layer
@@ -78,14 +79,14 @@ description: Use for `/gybis-arch-elicit` or `/ga-elicit`.
 
 λ gybis-arch-elicit_elicit_s3(x).
    action: elicit_control_layer
-   | purpose: S3 answers "how does your system manage resources" - policies and limits
-   | prompt_strategy: structured interviewing building on S4, focusing on policies and constraints
+   | purpose: S3 answers "how does your system enforce S5 policy and manage resources"
+   | prompt_strategy: structured interviewing building on S4, focusing on enforcement mechanisms and constraints
   | sample_questions:
-    - "What policies govern resource allocation?"
-    - "What are your non-negotiable constraints?"
-    - "How do you enforce limits?"
+    - "Which mechanism enforces each relevant S5 policy?"
+    - "How do you enforce limits, quality gates, and recovery behavior?"
+    - "What resources need concrete control?"
   | capture: user_response → S3_lambda_draft
-  | output: S3_policies_collected
+  | output: S3_enforcement_mechanisms_collected
 
 λ gybis-arch-elicit_elicit_s2(x).
    action: elicit_coordination_layer
@@ -161,7 +162,7 @@ description: Use for `/gybis-arch-elicit` or `/ga-elicit`.
   | check12: all_layers_address_user_intent = true
   | gate: all_checks_pass → proceed ∨ halt("architecture invalid or incomplete")
 
-λ gybis-arch-elicit_boundaries(¬).
+λ gybis-arch-elicit_boundaries().
   constraint: ¬generate(specs/**/*.allium)
   | constraint: ¬mutate(existing_files)
   | constraint: ¬delete(any_files)

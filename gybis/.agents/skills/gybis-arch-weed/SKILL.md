@@ -152,7 +152,7 @@ description: Use for `/gybis-arch-weed` or `/ga-weed`.
   | remaining ≔ card(remaining_divergences)
   | report("Pass " ⊕ pass_num ⊕ ": discovered=" ⊕ discovered ⊕ " resolved=" ⊕ resolved ⊕ " remaining=" ⊕ remaining)
 
-λ gybis-arch-weed_boundaries(¬).
+λ gybis-arch-weed_boundaries().
   ¬ modify(implementation)
   | ¬ modify(upstream/)
   | ¬ delete(architecture.md)

@@ -1,3 +1,11 @@
+✅ session-36 | 2026-08-20 gybis-fini closeout: downstream upgrade documentation and Allium compatibility gate committed
+✅ session-35 | 2026-08-20 Downstream upgrade and rollout documentation synchronized across README surfaces
+✅ session-34 | 2026-08-20 Allium 3.5.3 runtime compatibility gate and empty-spec guard implemented
+✅ session-33 | 2026-08-20 Mementum OKF migration and Nucleus Lambda/VSM integration completed; Allium adapter pass queued
+✅ session-32 | 2026-08-20 gybis-fini orientation validation: no drift, all systems stable
+✅ session-31 | 2026-07-31 gybis-fini commit-default blocker escalation policy aligned in both skill copies
+✅ session-30 | 2026-07-31 gybis-fini closeout completed for orientation-only validation session
+✅ session-29 | 2026-07-01 refine command family documented in README surfaces and philosophy heading aligned to include refine
 ✅ session-26 | 2026-06-30 gybis-arch-check implemented and wired into help/README command surfaces
 🌀 session-25 | 2026-06-30 gybis-init: orient manifest prepared from state, memories, and open questions
 ✅ session-24 | 2026-06-30 operator-responsibility model documented; spec skills decoupled from direct vocabulary policing
@@ -27,16 +35,16 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-06-30T14:50:00-06:00
-- **Sessions**: 28 (session-0 initialized, session-1 oriented, session-2 gybis committed, session-3 terminate workflow, session-4 README updated, session-5 README commands synchronized, session-6 tool-agnostic clarity, session-7 init workflow, session-8 init workflow, session-9 README .agents migration, session-10 fini closeout, session-11 bundle .agents migration, session-12 allium sync + loop protocol refinement, session-13 internal skill check updates, session-14 spec orientation scope correction, session-15 init workflow, session-16 describe/explain output modes, session-17 architecture-alignment scope doc update, session-18 README/GYBIS closeout, session-19 strict test-pass convergence, session-20 use-cases command-surface implementation, session-21 spec-weed vocabulary divergence integration, session-22 init workflow, session-23 vocab-weed skill addition, session-24 operator-responsibility model + spec-vocab decoupling, session-25 init workflow, session-26 arch-check implementation, session-27 gybis-init orientation, session-28 gybis-fini closeout)
-- **Status**: Session-28 terminated — gybis-fini complete
+- **Last updated**: 2026-08-26T00:00:00-06:00
+- **Sessions**: 37 (session-0 initialized through session-37 gybis-fini closeout)
+- **Status**: Session-37 terminated — gybis-fini complete
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
 - **Core stack**: Nucleus (math notation base context) + Allium (behavioral DSL) + Mementum (persistent memory)
 - **Architecture**: VSM derivative (5-layer architectural spec)
 - **GitHub**: TheCodeSojourner/gybis
-- **Latest work**: Session-28 closeout completed after the README philosophy and workflow cheat sheet updates.
+- **Latest work**: Session-33 completed Mementum OKF migration capability and Nucleus Lambda/VSM integration; queued Allium 3.5.3 adapter compatibility work.
 
 ## Recent Activity
 - Initial commit: README with project definition, glossary, overview
@@ -132,8 +140,25 @@
   - Updated both README files with check/tend/weed philosophy sections and compact workflow cheat sheets
   - Kept the root README conceptual and the GYBIS-README operational so the docs remain complementary
   - Refreshed the complementary-scope memory with the new documentation split
+- Session-29 (2026-07-01): refine command-family docs + heading alignment
+  - Added `gybis-vocab-refine`, `gybis-arch-refine`, and `gybis-spec-refine` to command surfaces in both README files
+  - Updated workflow/philosophy guidance to use `check -> refine -> tend -> weed`
+  - Renamed philosophy heading in both docs to `Check, Refine, Tend, and Weed`
+  - Stored memory: `mementum/memories/check-refine-heading-alignment.md`
+- Session-30 (2026-07-31): gybis-fini closeout for orientation-only session
+  - Executed gybis-init startup gate and gybis-fini protocol without code changes
+  - Confirmed active bootloader state is `mementum/state.md`; `gybis/mementum/state.md` remains template-empty
+  - Upserted state closeout with session-30 metadata and recovery hook
+- Session-31 (2026-07-31): gybis-fini commit-default policy alignment
+  - Updated `gybis-fini` in both `.agents/skills/` and `gybis/.agents/skills/` to default commit behavior
+  - Added explicit strong-blocker list and ask-human fallback choices (`retry`, `skip`, `manual`)
+  - Stored memory: `mementum/memories/gybis-fini-commit-default-blocker-escalation.md`
 
 ## Feed-Forward Signals
+- Allium adapters now perform a shared executable version preflight through `internal/allium-runtime-check`
+- Runtime compatibility distinguishes unsupported executables from `NO_SPECS` empty-target results
+- Downstream upgrade instructions now cover command-bundle-only copying, Allium `3.5.3+`, Mementum migration, `NO_SPECS`, and independent fleet rollout
+- `allium-gate` requires at least one `.allium` file before per-file or set-level validation
 - README.md now synchronized with actual gybis/.agents/skills/ directory
 - Hidden bundle layouts require `cp -ra <bundle>/. .`; `*` globs skip `.agents/`
 - Command tables synchronized with current command surface, including `/gybis-vocab-weed`
@@ -153,19 +178,64 @@
 - Monitor for: vocabulary-related divergence logic reappearing in spec skills instead of `gybis-vocab-*` skills
 - Monitor for: arch-check report-mode and shared schema decisions if the check family is expanded later
 - Monitor for: check/tend/weed philosophy staying aligned across README and GYBIS-README without mirroring entire sections
+- Monitor for: operation-family heading and loop naming drifting when new `check/refine/tend/weed` commands are added
+- Monitor for: accidental writes to `gybis/mementum/state.md` instead of active `mementum/state.md` during closeout flows
+- Monitor for: commit-policy drift between root and bundled `gybis-fini` skill copies
 
 ## Session Closeout
-- **last_session_id**: session-28
-- **current_timestamp**: 2026-06-30T14:50:00-06:00
-- **task**: Close out the README documentation update for check/tend/weed philosophy and workflow cheat sheets.
+- **last_session_id**: session-36
+- **current_timestamp**: 2026-08-20T13:36:28-06:00
+- **task**: Close out the Allium compatibility gate and downstream upgrade documentation session.
 - **questions**:
-  - none
+  - none blocking; implementation and documentation commits are present and the closeout state is ready to commit.
 - **decisions**:
-  - Added check/tend/weed philosophy sections to both [README.md](/home/pauwhi/Work/gybis/README.md) and [gybis/GYBIS-README.md](/home/pauwhi/Work/gybis/gybis/GYBIS-README.md).
-  - Kept the root README conceptual and the GYBIS-README operational to preserve complementary scope.
-  - Refreshed `mementum/memories/readme-complementary-scope.md` to capture the new documentation split.
+  - Mementum now uses an OKF v0.1 migration path with deterministic detection, explicit approval, and preserved working state.
+  - Root-local and bundled Mementum command variants remain deliberately distinct.
+  - Nucleus is pinned at `64880ed`; Lambda declarations use valid parameter forms and bundled VSM guidance assigns policy/rationale to S5 and enforcement to S3.
+  - No automatic VSM architecture migration skill was added; arch-check diagnoses, arch-tend applies human-approved corrections, and arch-weed handles downstream convergence.
+  - Direct Allium pins remain current; the installed 3.5.3 CLI exposed bundled adapter JSON-contract drift.
+  - Runtime version checking is nonrecursive; target payload probing is available as an explicit gate operation rather than from inside the adapters.
+  - Empty specification directories return `NO_SPECS` instead of passing the gate vacuously.
+  - Existing downstream repositories must copy only `.agents/skills/`, preserve live project artifacts, verify Allium `3.5.3+`, run `/gybis-memory-migrate`, and validate specs only when `.allium` files exist.
 - **next**:
-  1. Review the updated README sections in a future docs pass if additional command-family guidance is added.
-- **recover**: check/tend/weed philosophy sections now live in both README files.
+  1. Run a real valid `.allium` fixture through the new target payload probe and adapter normalization path.
+  2. Keep upstream pins unchanged unless upstream heads advance.
+  3. Continue standard monitoring for command-surface, output-mode, and architecture policy/enforcement drift.
+- **recover**: Read `gybis/.agents/skills/internal/allium-runtime-check/SKILL.md`, then exercise version, no-spec, legacy-payload, and current-payload cases.
+
+## Session Orientation
+- **current_timestamp**: 2026-08-26T00:00:00-06:00
+- **phase**: gybis-init orient complete
+- **state_read**: `mementum/state.md`
+- **memories_read**:
+  - `mementum/memories/gybis-tool-agnostic.md`
+  - `mementum/memories/gybis-hidden-bundle-copy.md`
+  - `mementum/memories/use-cases-command-coverage.md`
+  - `mementum/memories/spec-strict-test-convergence.md`
+- **knowledge_read**:
+  - `mementum/knowledge/session-2026-05-15.md`
+- **searches_run**:
+  - "gybis-init"
+  - "mementum orient"
+  - "README"
+- **open_questions_acknowledged**:
+  - No blocking questions. Current repo state reflects the previous successful gybis closeout and the active documentation bundle remains aligned.
+- **readiness**: Ready to proceed from the current repo state without re-initializing the project memory structure.
+
+## Session Closeout
+- **last_session_id**: session-37
+- **current_timestamp**: 2026-08-26T00:00:00-06:00
+- **task**: Complete the current gybis-init orient pass and persist the project working memory for the next session.
+- **questions**:
+  - none blocking; the active repo state is coherent and no migration or recovery action is required before continuing.
+- **decisions**:
+  - The active bootloader remains `mementum/state.md` as the durable working memory for this repo.
+  - Repo-local memory remains the correct scope; no client-scoped memory or external store was introduced.
+  - No further code or spec changes were required during this orientation-only pass.
+- **next**:
+  1. Continue from the current repository state with the next task.
+  2. Re-run `gybis-init` only if a new session needs a fresh orientation reset.
+  3. Preserve working memory by keeping `mementum/state.md` and related `mementum/` files in sync with the active context.
+- **recover**: Re-read `mementum/state.md`, then follow the most recent memory and knowledge entries to reconstruct the current session context.
 
 ⏹→state.md

@@ -12,21 +12,32 @@ Human ⊗ AI ⊗ REPL
   | create ∧ create-knowledge ∧ update ∧ delete ∧ search ∧ read ∧ synthesize ≡ operations
   | memories(mementum/memories/) ∧ knowledge(mementum/knowledge/)
   | mementum/state.md ≡ working_memory | read_first_every_session
+  | scope ≡ mementum/ | guest(host) | ¬colonize ∧ ¬claim(host_identity)
+  | bundle(mementum/) ≡ OKF_conformant(v0.1) | declare: okf_version:"0.1" ∈ mementum/index.md
   | symbols: 💡 insight | 🔄 shift | 🎯 decision | 🌀 meta | ❌ mistake | ✅ win | 🔁 pattern | extend_per_domain
+  | symbols ≡ event_types(what_happened) | ¬memory_markers(what_touched)
+  | apply(memory_commits ∧ code_commits) | union ¬exclusion
+  | extend_per_domain: activities(¬∃memory_analog) → new_symbols(closed_set)
 
 λ mementum_store(x).        
   gate-1: helps(future_AI_session) | ¬personal ¬off_topic
   gate-2: effort > 1_attempt ∨ likely_recur | both_gates → propose
   | create ∧ create-knowledge ∧ update ∧ delete ≡ full_lifecycle
-  | memories: mementum/memories/{slug}.md | <200 words | one_insight_per_file
-  | knowledge: (create-knowledge "topic" "---\ntitle: T\nstatus: open\n---\nContent")
-  | knowledge_path: mementum/knowledge/{topic}.md | frontmatter_required | updated_in_place
+  | memories ∧ knowledge ≡ OKF_concepts | frontmatter{type:required} | extensions_ok
+  | memories: mementum/memories/{slug}.md | frontmatter{type←symbol, symbol, title} | body<200 words | one_insight_per_file
+  | knowledge: (create-knowledge "topic" "---\ntype: Reference\ntitle: T\nstatus: open\n---\nContent")
+  | knowledge_path: mementum/knowledge/{topic}.md | OKF_concept | type_required | updated_in_place
   | memory_commit: "{symbol} {slug}" | knowledge_commit: "💡 {description}"
   | update: "{content}" > file → commit "🔄 update: {slug}"
   | delete: git rm → commit "❌ delete: {slug}"
-  | file_content: "{symbol} {content}" | symbols_in_content ≡ grep_filter
+  | memory_file: frontmatter(type,symbol,title) ⊕ body | symbol_in_frontmatter ≡ grep_filter
   | git_preserves_history → update ∧ delete ≡ safe | always_recoverable
+  | write(situation ∧ solution) | link(related ∈ frontmatter) → recall_traversable | ¬enumerate(triggers)
   | when_uncertain → propose ∧ ¬decide | false_positive < missed_insight
+  | storage_rule: mementum/ ≡ ONLY_store | ¬AI_harness_client_memory
+  | rationale: repo_portable ∧ AI_agnostic | survives(client_change ∧ machine_change ∧ harness_change)
+  | forbidden: Copilot /memories/repo/ ∨ Cursor_memory ∨ any_client_scoped_store
+  | general_insight(¬repo_specific) → user_memory(AI_harness) | repo_insight → mementum/
 
 λ mementum_recall(q, n).    
   temporal(git_log) ∪ semantic(git_grep) ∪ vector(embeddings)
@@ -38,6 +49,10 @@ Human ⊗ AI ⊗ REPL
   | history: git log --follow -n {depth} -- {path}
   | superseded: git log -p -S "{query}" -- mementum/
   | symbols_as_filters: git grep "💡" | git log --grep "🎯"
+  | relational > exact | empty ∨ thin(result) → widen ∧ ↑depth(fib)
+  | traverse: hit → follow(related_edges ∈ frontmatter) → neighborhood | related > exact for cross_domain
+  | miss(silent) ← stop(exact) ∧ needed(adjacent) | fix ≡ search(related) ¬predict(index@write)
+  | bash+git: grep "related:" → read(links) | vector(if_present) for unknown_unknowns
   | recall_before_explore | prior_synthesis > re_derivation
 
 λ mementum_metabolize(x).
@@ -50,7 +65,7 @@ Human ⊗ AI ⊗ REPL
   detect: ≥3 memories(topic) ∨ stale(memory) ∨ crystallized(understanding)
   | stale_memory ≡ strongest_signal
   | gather: recall(topic) → collect(memories) ∧ collect(context)
-  | draft: knowledge_page(title, status, related, content)
+  | draft: knowledge_page(type, title?, status?, content)
   | create: (create-knowledge "slug" "frontmatter+content")
   | update: stale(memories) → refresh(current_understanding)
   | verify: (list) → visible(memories ∧ knowledge)
@@ -77,8 +92,12 @@ Human ⊗ AI ⊗ REPL
   | every_session_leaves_project_smarter ∨ waste(session)
 
 λ mementum_knowledge(x).
-  frontmatter: {title, status, category, tags, related, depends-on}
-  | status: open → designing → active → done
+  OKF_concept(https://raw.githubusercontent.com/GoogleCloudPlatform/knowledge-catalog/refs/heads/main/okf/SPEC.md)
+  | OKF_frontmatter: {type:required, title, description, tags} ⊕ ext{status, related, depends-on}
+  | type ≡ required(was category) | values: Architecture|Design|Reference|Playbook|Explore|…
+  | status(ext): open → designing → active → done
+  | concept_id ≡ path∖.md | cross_link ≡ md_links(bundle_relative:/preferred)
+  | consumers: tolerate(unknown_type ∧ missing_optional ∧ broken_links)
   | AI_documentation | written_for_future_AI_sessions
   | create_freely | completeness ¬required | open_status ≡ fine
 
@@ -92,7 +111,7 @@ Human ⊗ AI ⊗ REPL
   | you_are_the_future_reader | feed_forward ≡ gift
   | OODA: observe → recall → decide(apply ∨ explore ∨ store) → act → connect_if_pattern
 
-λ session_startup_gate(¬proceed).
+λ session_startup_gate().
   precondition: execute(mementum-orient) ∧ report(orient_manifest)
   | orient_manifest ≡ {
       state_read: path,

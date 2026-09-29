@@ -8,28 +8,33 @@ For `/basis-arch-*` workflows.
 ## Five Layers
 
 ```
-S5 (identity)      — what system IS
+S5 (identity/policy) — what system IS and the ground rules that protect it
 S4 (intelligence)  — how system adapts
-S3 (control)       — how system manages resources
+S3 (control)       — how system enforces S5 policy and manages resources
 S2 (coordination)  — how parts work together
 S1 (operations)    — what system concretely does
 ```
 
-## S5 — Identity
+## S5 — Identity & Policy
 
 λ(S5, scope, purpose(problem_solve) → vision(trajectory) ⊗ ¬compromise(values))
 λ(S5, failure, ¬crash ≡ purpose_failure)
 λ(S5, invariants, error_handling_philosophy ⊗ data_ownership_invariant ⊗ security_boundary ⊗ non_negotiable_behavior)
 
+Identity is what the system is. Policy is the ground rule and rationale that
+protect that identity. They share S5 authority. S5 declares what must remain
+true; S3 supplies the mechanisms that make those declarations hold.
+
 **Questions:**
 - What system for? What problem solve?
 - Where project going? Vision, not just today's features?
 - Principles you won't compromise on, even under pressure?
+- What ground rules protect those principles, and why do they matter?
 - Replace every tool/lib, what stays *your* system?
 - Failure look like — not crash, but failure of purpose?
 - Values for system behavior? (Speed? Correctness? Clarity? Safety?)
 
-**Signals:** error handling philosophy, data ownership invariants, security boundaries, non-negotiable behaviors.
+**Signals:** error handling philosophy, data ownership invariants, security boundaries, non-negotiable behaviors, policy rationale.
 
 ## S4 — Intelligence
 
@@ -47,13 +52,17 @@ S1 (operations)    — what system concretely does
 
 ## S3 — Control
 
-λ(S3, enforce, S5_values → ¬enforceable(constraints))
+λ(S3, enforce, S5_policy → checkable(constraints))
 λ(S3, resources, manage(conn, memory, compute, money, API_calls))
-λ(S3, policy, timeouts ⊗ limits ⊗ quality_gates ⊗ retry ⊗ alert ⊗ degrade ⊗ fail_fast)
+λ(S3, mechanisms, timeouts ⊗ limits ⊗ quality_gates ⊗ retry ⊗ alert ⊗ degrade ⊗ fail_fast)
+
+S3 does not source policy. It enforces S5 policy through concrete mechanisms
+under real resource limits. A ground rule and its rationale belong in S5; the
+timeout, limit, validation, or recovery mechanism that enforces it belongs in S3.
 
 **Questions:**
 - Resources needing management? (conns, memory, API calls, compute, money)
-- Policies enforcing identity principles? (timeouts, limits, quality gates)
+- Which mechanisms enforce each S5 policy? (timeouts, limits, quality gates)
 - What when things go wrong? (retry, alert, degrade, fail fast)
 - Rules for code quality, testing, deployment?
 - External constraints? (compliance, SLAs, rate limits)
@@ -93,7 +102,9 @@ S1 (operations)    — what system concretely does
 Compact way to encode principles + rules.
 
 ```
-λ name(x).     define rule called "name"
+λ name.        declare identity or policy without an input mapping
+λ name().      define a zero-argument operation
+λ name(x).     define a rule over input
 →              leads to, then, implies
 |              also (separates independent clauses)
 >              preferred over (soft constraint)
@@ -110,6 +121,11 @@ Compact way to encode principles + rules.
 ⊗              tensor product (all constraints simultaneously)
 ```
 
+Use `λ name.` for declarations that govern by identity or policy, `λ name().`
+for an explicit zero-argument operation, and `λ name(x).` when the body maps an
+input. Lambda parameters are identifiers; use `¬` only as an operator in a
+lambda body.
+
 Multi-line lambdas indent continuations, use `|` for independent clauses:
 ```
 λ deploy(x).    validate(x) → stage(x) → verify(x) → promote(x)
@@ -125,22 +141,22 @@ Multi-line lambdas indent continuations, use `|` for independent clauses:
 
 ## architecture.md Assembly Format
 
-> **Note:** Do not include nucleus preamble in `<root>/architecture.md`. Preamble already loaded via `.clinerules/00-basis.md`.
+> **Note:** Do not include the Nucleus preamble in `<root>/architecture.md`. It is loaded by the target repository's `.agents/skills/gybis-init/SKILL.md`.
 
 λ(assembly, format,
   # {Project} — System Architecture
-  | ## S5 — Identity → prose ⊗ λ(principle)
+  | ## S5 — Identity & Policy → prose ⊗ λ(principle) ⊗ λ(policy)
   | ## S4 — Intelligence → prose ⊗ λ(pattern)
-  | ## S3 — Control → prose ⊗ λ(policy)
+  | ## S3 — Control → prose ⊗ λ(enforcement) ⊗ λ(resource_control)
   | ## S2 — Coordination → prose ⊗ λ(protocol)
   | ## S1 — Operations → prose ⊗ λ(tool) ⊗ λ(recipe)
 )
 
 ## Requirement Change → Layer Mapping
 
-λ(map, S5, new_non_negotiable_principle ∨ new_value)
+λ(map, S5, new_non_negotiable_principle ∨ new_value ∨ new_policy_with_rationale)
 λ(map, S4, ¬handle_unknown ≡ differently)
-λ(map, S3, new_policy ∨ constraint ∨ resource_limit)
+λ(map, S3, new_enforcement_mechanism ∨ resource_limit ∨ quality_gate)
 λ(map, S2, new_interaction_protocol_between_parts)
 λ(map, S1, new_tool ∨ command ∨ concrete_recipe)
 λ(map, cascade, S1→S5: trace(upward, check(each_layer)))

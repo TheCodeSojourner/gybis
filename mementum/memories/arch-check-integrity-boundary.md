@@ -1,4 +1,10 @@
-💡 A dedicated `gybis-arch-check` keeps the check family consistent when it stays read-only and architecture-internal.
+---
+type: Insight
+symbol: 💡
+title: arch-check-integrity-boundary
+---
+
+A dedicated `gybis-arch-check` keeps the check family consistent when it stays read-only and architecture-internal.
 
 The durable boundary is:
 - `check` skills diagnose integrity issues and report findings.

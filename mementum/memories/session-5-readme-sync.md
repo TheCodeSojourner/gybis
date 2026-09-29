@@ -1,4 +1,10 @@
-✅ Session 5: README.md Commands Table Synchronization
+---
+type: Win
+symbol: ✅
+title: session-5-readme-sync
+---
+
+Session 5: README.md Commands Table Synchronization
 
 ## Context
 README.md had documented commands that didn't match the actual gybis/.cline/skills/ directory structure. Two key issues:

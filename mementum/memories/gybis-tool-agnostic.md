@@ -1,4 +1,10 @@
-💡 gybis is tool-agnostic — skills integrate into any AI tool supporting a `skills/` directory
+---
+type: Insight
+symbol: 💡
+title: gybis-tool-agnostic
+---
+
+gybis is tool-agnostic — skills integrate into any AI tool supporting a `skills/` directory
 
 ## Context
 Three recent commits (2026-06-23) clarified gybis positioning:

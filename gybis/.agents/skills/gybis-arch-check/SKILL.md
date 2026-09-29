@@ -29,11 +29,12 @@ description: Use for `/gybis-arch-check` or `/ga-check`.
   | precondition_holds: mode = ai
 
 λ gybis-arch-check_state_machine(state, action).
-  state ∈ {INIT, STARTUP_CHECKS, STRUCTURE_VALIDATION, COHERENCE_VALIDATION, CONSTRAINT_VALIDATION, GENERATING_REPORT, COMPLETE}
+  state ∈ {INIT, STARTUP_CHECKS, STRUCTURE_VALIDATION, COHERENCE_VALIDATION, POLICY_ENFORCEMENT_VALIDATION, CONSTRAINT_VALIDATION, GENERATING_REPORT, COMPLETE}
   | transition(INIT → STARTUP_CHECKS) only_if(startup = true)
   | transition(STARTUP_CHECKS → STRUCTURE_VALIDATION) only_if(startup_checks = true)
   | transition(STRUCTURE_VALIDATION → COHERENCE_VALIDATION) only_if(structure_complete = true)
-  | transition(COHERENCE_VALIDATION → CONSTRAINT_VALIDATION) only_if(coherence_complete = true)
+  | transition(COHERENCE_VALIDATION → POLICY_ENFORCEMENT_VALIDATION) only_if(coherence_complete = true)
+  | transition(POLICY_ENFORCEMENT_VALIDATION → CONSTRAINT_VALIDATION) only_if(policy_enforcement_checks_complete = true)
   | transition(CONSTRAINT_VALIDATION → GENERATING_REPORT) only_if(constraint_checks_complete = true)
   | transition(GENERATING_REPORT → COMPLETE) only_if(report_generated = true)
 
@@ -71,6 +72,21 @@ description: Use for `/gybis-arch-check` or `/ga-check`.
       ? collect({type: "coherence", check_id, severity: warning, location: "architecture.md", message}) → findings
   | return(coherence_complete = true ∧ findings)
 
+λ gybis-arch-check_policy_enforcement_validation(arch_model).
+  action: validate_S5_policy_and_S3_enforcement_boundary
+  | checks:
+    - S5_contains(identity ∧ non_negotiable_principles ∧ policy_with_rationale)
+    - S3_contains(enforcement_mechanisms ∧ resource_controls)
+    - policy_or_rationale_not_owned_only_by(S3)
+    - enforcement_mechanism_not_owned_only_by(S5)
+    - every(S3_enforcement_mechanism) traces_to(S5_policy ∨ explicit_external_constraint)
+    - every(enforceable_S5_policy) has(S3_enforcement_mechanism) ∨ marked(human_governed_or_nonmechanical)
+  | findings ≔ []
+  | ∀ check ∈ checks:
+    check_pass = false
+      ? collect({type: "policy_enforcement", check_id, severity: warning, location: "architecture.md", message}) → findings
+  | return(policy_enforcement_checks_complete = true ∧ findings)
+
 λ gybis-arch-check_constraint_validation(arch_model).
   action: validate_constraints_and_invariants
   | checks:
@@ -85,12 +101,12 @@ description: Use for `/gybis-arch-check` or `/ga-check`.
   | return(constraint_checks_complete = true ∧ findings)
 
 λ gybis-arch-check_recommend_action(finding).
-  finding.type ∈ {"structure", "coherence", "constraint"}
+  finding.type ∈ {"structure", "coherence", "policy_enforcement", "constraint"}
     ? recommendation ≔ "Use /gybis-arch-tend to revise architecture.md and re-run /gybis-arch-check."
   | return(recommendation)
 
-λ gybis-arch-check_generate_report(structure_findings, coherence_findings, constraint_findings).
-  findings ≔ structure_findings ∪ coherence_findings ∪ constraint_findings
+λ gybis-arch-check_generate_report(structure_findings, coherence_findings, policy_enforcement_findings, constraint_findings).
+  findings ≔ structure_findings ∪ coherence_findings ∪ policy_enforcement_findings ∪ constraint_findings
   | errors ≔ count({f | f ∈ findings ∧ f.severity = error})
   | warnings ≔ count({f | f ∈ findings ∧ f.severity = warning})
   | infos ≔ count({f | f ∈ findings ∧ f.severity = info})
@@ -112,7 +128,7 @@ description: Use for `/gybis-arch-check` or `/ga-check`.
   print(report) → stdout
   | return(report_delivered = true)
 
-λ gybis-arch-check_boundaries(¬).
+λ gybis-arch-check_boundaries().
   ¬ modify(architecture.md ∨ specs/**/*.allium ∨ implementation ∨ upstream/)
   | ¬ delete(architecture.md)
 

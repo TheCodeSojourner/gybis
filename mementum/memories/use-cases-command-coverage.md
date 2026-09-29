@@ -1,4 +1,10 @@
-💡 Use Cases section should map scenarios to full command surface
+---
+type: Insight
+symbol: 💡
+title: use-cases-command-coverage
+---
+
+Use Cases section should map scenarios to full command surface
 
 When adding a Use Cases section to `gybis/GYBIS-README.md`, keep it scenario-driven and ensure every user-facing command is covered through either a direct use case or an explicit command pairing.
 

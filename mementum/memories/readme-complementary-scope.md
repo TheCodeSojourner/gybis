@@ -1,4 +1,10 @@
-💡 Keep README and GYBIS-README complementary, not mirrored
+---
+type: Insight
+symbol: 💡
+title: readme-complementary-scope
+---
+
+Keep README and GYBIS-README complementary, not mirrored
 
 When root README and gybis/GYBIS-README diverge, align behavior-critical semantics (workflow order, command availability, terminology, citations) but avoid wholesale section duplication.
 

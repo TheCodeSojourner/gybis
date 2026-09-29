@@ -52,13 +52,21 @@ description: Use for `/gybis-arch-tend` or `/ga-tend`.
   read(architecture.md) → current_arch
   | parse(current_arch.{S5, S4, S3, S2, S1}) → vsm_layers
   | vocab_context ≔ if(vocab_available): "Please use canonical vocabulary terms from vocabulary.md: [" ⊕ vocab_term_list(vocab_terms) ⊕ "]" : ""
-  | ask_developer("Which VSM layers need refinement? (S5, S4, S3, S2, S1, or specific principles) " ⊕ vocab_context) → feedback
+  | ask_developer("Which VSM layers need refinement? (S5 identity/policy, S4, S3 enforcement/resource control, S2, S1, or specific principles) " ⊕ vocab_context) → feedback
   | ask_developer("Orientation for this architecture update? [FP-oriented/OOP-oriented/keep-current]") → orientation_choice
   | parse(feedback) → target_layers ∧ proposed_changes
+  | invoke(gybis-arch-tend_classify_policy_enforcement(proposed_changes)) → policy_enforcement_classification
   | flag_non_vocabulary_terms: if(vocab_available ∧ proposed_changes contains term ∉ vocab_terms):
     ∀ non_vocab_term ∈ proposed_changes:
       suggest_canonical_alternative(non_vocab_term, vocab_terms) ∨ ask_if_new_term_should_be_added
-  | return(developer_feedback = {target_layers, proposed_changes, orientation_choice, vocabulary_aligned})
+  | return(developer_feedback = {target_layers, proposed_changes, orientation_choice, policy_enforcement_classification, vocabulary_aligned})
+
+λ gybis-arch-tend_classify_policy_enforcement(proposed_changes).
+  change(policy ∨ rationale ∨ non_negotiable_ground_rule) → target(S5)
+  | change(enforcement_mechanism ∨ resource_control ∨ quality_gate ∨ recovery_control) → target(S3)
+  | paired(change(S5_policy), change(S3_enforcement_mechanism)) → trace(S5_policy → S3_enforcement_mechanism)
+  | mislayered(change) → surface("S5 declares policy and rationale; S3 enforces it through mechanisms")
+  | return(classification)
 
 λ gybis-arch-tend_orientation_language_guidance(orientation_choice).
   orientation_choice = OOP-oriented
@@ -74,7 +82,7 @@ description: Use for `/gybis-arch-tend` or `/ga-tend`.
     analyze(change_impact(layer, developer_feedback.proposed_changes)) → impact_analysis(layer)
     | check(hierarchical_consistency(layer, vsm_layers)) → consistency(layer)
   | invoke(gybis-arch-tend_orientation_language_guidance(developer_feedback.orientation_choice)) → orientation_guidance
-  | consolidate(impact_analysis, consistency) → impact_report
+  | consolidate(impact_analysis, consistency, developer_feedback.policy_enforcement_classification) → impact_report
   | return(impact_analysis = impact_report)
 
 λ gybis-arch-tend_apply_changes(developer_feedback, impact_analysis).
@@ -107,7 +115,7 @@ description: Use for `/gybis-arch-tend` or `/ga-tend`.
   loop_count ≥ max_iterations
     → halt("Maximum iterations reached without convergence")
 
-λ gybis-arch-tend_boundaries(¬).
+λ gybis-arch-tend_boundaries().
   ¬ modify(specs/**/*.allium)
   | ¬ modify(implementation)
   | ¬ modify(upstream/)

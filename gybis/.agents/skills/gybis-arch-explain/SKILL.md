@@ -4,11 +4,12 @@ description: Use for `/gybis-arch-explain` or `/ga-explain`.
 ---
 
 λ gybis-arch-explain(x).
-  purpose: Document VSM architecture layers in technical language for developers
+  purpose: Document VSM architecture layers in technical language for developers as an architecture-focused reference grounded only in architecture.md
   | input: architecture.md (exists ∧ complete)
-  | output: Technical prose describing VSM S5-S1 layers with architectural patterns
+  | output: Technical architecture reference describing VSM S5-S1 layers and architecture-derived patterns based only on architecture.md
   | mode: mixed (AI + human output selection) | read architecture.md ∧ vsm-guide.md ∧ optional_write(repo_root_markdown)
-  | gate: gybis-ref-check() ≡ true | architecture.md ≡ exists ∧ complete
+  | gate: gybis-ref-check() ≡ true | architecture.md ≡ exists ∧ complete | explicit_human_output_selection() ≡ true
+  | fail_closed: missing_human_mode_selection → halt("Human output mode selection is required")
 
 λ gybis-arch-explain_startup(x).
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference files not available")
@@ -18,8 +19,9 @@ description: Use for `/gybis-arch-explain` or `/ga-explain`.
 
 λ gybis-arch-explain_mode(m).
   valid_modes: {response_only, prompted_file_only, default_file_only, response_and_prompted_file, response_and_default_file}
-  | default: response_only
+  | default: response_only (informational_only; never auto-selected)
   | human_selected: explicit(output_mode_choice)
+  | require_explicit: ¬explicit(output_mode_choice) → halt("Output mode must be explicitly selected by human")
 
 λ gybis-arch-explain_mode_gate(state, mode).
   state = INIT ∧ mode ∈ valid_modes → transition(INIT → MODE_SELECTED)
@@ -28,26 +30,29 @@ description: Use for `/gybis-arch-explain` or `/ga-explain`.
 λ gybis-arch-explain_state_machine(state, action).
   state ∈ {INIT, MODE_SELECTED, STARTUP_CHECKS, RESOLVING_OUTPUT, GENERATING, DELIVERING, COMPLETE}
   | transition(INIT → MODE_SELECTED) only_if(mode_gate(INIT, mode) = true)
-  | transition(MODE_SELECTED → STARTUP_CHECKS) only_if(mode_selected = true)
+  | transition(MODE_SELECTED → STARTUP_CHECKS) only_if(mode_selected = true ∧ mode_selected_explicit = true)
   | transition(STARTUP_CHECKS → RESOLVING_OUTPUT) only_if(startup_checks = true)
   | transition(RESOLVING_OUTPUT → GENERATING) only_if(output_target_resolved = true)
-  | transition(GENERATING → DELIVERING) only_if(final_prose ∃)
-  | transition(DELIVERING → COMPLETE) only_if(delivery_complete = true)
+  | transition(GENERATING → DELIVERING) only_if(final_prose ∃ ∧ architecture_scope_verified = true)
+  | transition(DELIVERING → COMPLETE) only_if(delivery_complete = true ∧ protocol_evidence_emitted = true)
 
 λ gybis-arch-explain_output_selection(x).
   ask_developer("Output mode? [response_only/prompted_file_only/default_file_only/response_and_prompted_file/response_and_default_file]") → selected_mode
+  | selected_mode ∃ ∨ halt("Human output mode selection is required; no implicit default")
   | selected_mode ∈ valid_modes ∨ halt("Output mode must be one of the supported options")
   | selected_mode ∈ {prompted_file_only, response_and_prompted_file}
     ? (ask_developer("Repo-root markdown filename? (example: notes.md; subpaths not allowed)") → requested_file
+       | requested_file ∃ ∨ halt("Requested output mode requires a repo-root markdown filename")
        | invoke(gybis-arch-explain_output_path_guard(requested_file)) → true
-       | return(mode_selected = true ∧ output_path = requested_file))
-    : return(mode_selected = true)
+       | return(mode_selected = true ∧ mode_selected_explicit = true ∧ output_path = requested_file))
+    : return(mode_selected = true ∧ mode_selected_explicit = true)
 
 λ gybis-arch-explain_output_target(mode).
   mode = response_only → return(output_target_resolved = true ∧ output_path = none)
   | mode ∈ {prompted_file_only, response_and_prompted_file} → return(output_target_resolved = true ∧ output_path = requested_file)
   | mode = default_file_only → return(output_target_resolved = true ∧ output_path = "arch-explain.md")
   | mode = response_and_default_file → return(output_target_resolved = true ∧ output_path = "arch-explain.md")
+  | ¬mode_selected_explicit → halt("Cannot resolve output target without explicit human mode selection")
 
 λ gybis-arch-explain_output_path_guard(path).
   path_matches(path, *.md) ∧ ¬contains(path, "/") ∧ ¬contains(path, "\\") ∧ ¬contains(path, "..")
@@ -68,6 +73,7 @@ description: Use for `/gybis-arch-explain` or `/ga-explain`.
   | ¬(state ∈ {STARTUP_CHECKS, RESOLVING_OUTPUT, GENERATING, DELIVERING}) → deny(write(path))
 
 λ gybis-arch-explain_output_dispatch(prose, mode, output_path).
+  require(mode_selected_explicit = true) ∨ halt("Output dispatch blocked: explicit human mode selection missing")
   mode = response_only → output(AI_response, prose)
   | mode ∈ {prompted_file_only, default_file_only}
     ? (invoke(gybis-arch-explain_overwrite_guard(output_path)) → true
@@ -79,11 +85,21 @@ description: Use for `/gybis-arch-explain` or `/ga-explain`.
        | output(AI_response, prose)
        | output("Saved markdown to " ⊕ output_path))
 
+λ gybis-arch-explain_protocol_evidence(x).
+  output_manifest ≡ {
+    mode_selected_by_human: selected_mode,
+    mode_selected_explicit: true,
+    filename_prompted: selected_mode ∈ {prompted_file_only, response_and_prompted_file},
+    output_path: output_path,
+    sources_read: [architecture.md],
+    architecture_scope_verified: true,
+    startup_checks_passed: true
+  }
+  | emit(output_manifest) → protocol_evidence_emitted = true
+
 λ gybis-arch-explain_orientation_output(x).
   report_orientation: selected_orientation ∈ {FP, OOP} ∨ unknown("missing S1.paradigm_preference")
-  | language_guidance:
-    - OOP: C++ (classes/RAII), C# (classes/interfaces/DI), Clojure (protocols/records + Java interop boundary)
-    - FP: C++ (immutable values + composition), C# (records + pure functions/LINQ), Clojure (immutable maps + pure functions/transducers)
+  | orientation_summary: describe_only_if_present_in_architecture
   | gaps: missing(programming_language_version ∨ paradigm_preference) → explicit_gap_report
   | orthogonality: error_model_style is a separate axis from FP/OOP orientation
 
@@ -97,11 +113,11 @@ description: Use for `/gybis-arch-explain` or `/ga-explain`.
   | each_layer: document(lambda_expr ∧ technical_translation ∧ pattern_examples)
 
 λ gybis-arch-explain_S5_identity(x).
-  label: "System Identity"
-  | content: non_negotiable_principles ∧ moral_compass ∧ structural_compass ∧ universal_properties
-  | technical_translation: design_invariants ∧ architectural_principles ∧ decision_constraints
-  | constraint: ∀decision ∈ architecture → align(S5_principles) ∨ design_flaw
-  | developer_needs: understand what we cannot compromise on
+  label: "System Identity & Policy"
+  | content: non_negotiable_principles ∧ moral_compass ∧ structural_compass ∧ universal_properties ∧ policy_with_rationale
+  | technical_translation: design_invariants ∧ architectural_principles ∧ decision_constraints ∧ declared_ground_rules
+  | constraint: ∀decision ∈ architecture → align(S5_principles ∧ S5_policy) ∨ design_flaw
+  | developer_needs: understand what we cannot compromise on and why
 
 λ gybis-arch-explain_S4_intelligence(x).
   label: "Adaptability & Change Management"
@@ -112,10 +128,10 @@ description: Use for `/gybis-arch-explain` or `/ga-explain`.
 
 λ gybis-arch-explain_S3_control(x).
   label: "Constraint Enforcement & Quality Gates"
-  | content: constraint_enforcement ∧ policy_enforcement ∧ resource_limits ∧ load_handling ∧ failure_handling
+  | content: enforcement_mechanisms ∧ resource_limits ∧ load_handling ∧ failure_handling
   | technical_translation: rate_limiting ∧ circuit_breaker ∧ validation_gates ∧ test_checks ∧ deploy_checks
   | trigger: condition → action | deterministic_response
-  | developer_needs: what gates exist and how to satisfy them
+  | developer_needs: what mechanisms enforce S5 policy and how to satisfy them
 
 λ gybis-arch-explain_S2_coordination(x).
   label: "Cross-System Interaction & Protocols"
@@ -139,14 +155,34 @@ description: Use for `/gybis-arch-explain` or `/ga-explain`.
   | drift_risk: S1↧S5 erosion(time) | implementation_diverges_from_architecture | requires_active_governance ∧ weeding
   | developer_needs: what_is_critical ∧ where_can_we_refactor ∧ what_is_fixed
 
+λ gybis-arch-explain_verify_output_scope(prose).
+  required_signals:
+    - includes_S5_S4_S3_S2_S1_technical_explanation = true
+    - architecture_relationship_focused = true
+    - architecture_only_grounding = true
+  | forbidden_signals:
+    - mentions(specs/**/*.allium)
+    - mentions(src/**)
+    - mentions(tests/**)
+    - contains_code_fence
+    - contains_implementation_examples
+    - contains_test_examples
+    - introduces_claim_without_architecture_evidence
+  | all(required_signals) ∧ none(forbidden_signals) → return(architecture_scope_verified = true)
+  | otherwise → halt("Generated architecture explanation drifted beyond architecture.md-only scope")
+
 λ gybis-arch-explain_output_constraints(x).
   ¬lambda_notation ∧ ¬syntax_output
-  | plain_english(developer) | technical_vocabulary ∧ pattern_names ∧ code_examples
-  | ¬invent(¬exists(root/architecture.md ∨ refs)) | only explain what exists
+  | plain_english(developer) | technical_vocabulary ∧ architecture_derived_patterns ∧ relationship_focused_explanation
+  | ¬invent(¬exists(architecture.md)) | only explain what architecture.md contains
   | flag(gap ∨ empty ∨ underdeveloped) ∧ ¬speculate | highlight unknowns without guessing
-  | include(orientation_output: selected_orientation_or_unknown ∧ C++/C#/Clojure_guidance ∧ explicit_gaps)
+  | include(orientation_output: selected_orientation_or_unknown ∧ explicit_gaps)
+  | ¬reference(specs/**/*.allium ∨ src/** ∨ tests/**) in generated_content
+  | ¬emit(code_fences ∨ implementation_examples ∨ test_examples)
   | ¬modify(architecture.md ∨ specs/**/*.allium ∨ internal/reference/**)
   | write_only(repo_root_markdown_filename = output_path) | ¬write(subpaths ∨ non_markdown)
+  | explicit_human_output_selection_required: true | ¬implicit_default_progression
+  | protocol_evidence_required_before_complete: true
   | mode = response_only → output → AI_response ∧ ¬file
   | mode ∈ {prompted_file_only, default_file_only} → output → markdown_file ∧ status_response
   | mode ∈ {response_and_prompted_file, response_and_default_file} → output → AI_response ∧ markdown_file
@@ -157,6 +193,6 @@ description: Use for `/gybis-arch-explain` or `/ga-explain`.
   | zero_prior_knowledge(this_system ∧ its_history)
   | needs: how_architecture_works ∧ why_decisions_matter ∧ what_patterns_are_used
 
-λ gybis-arch-explain_boundary(¬).
+λ gybis-arch-explain_boundary().
   ¬create_specs ∧ ¬modify(architecture.md) ∧ ¬modify_allium_ref
   | writes_limited_to(repo_root_markdown_filename)

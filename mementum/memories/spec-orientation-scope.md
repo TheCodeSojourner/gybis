@@ -1,4 +1,10 @@
-💡 spec orientation scope belongs to gybis-spec-propagate and gybis-spec-weed
+---
+type: Insight
+symbol: 💡
+title: spec-orientation-scope
+---
+
+spec orientation scope belongs to gybis-spec-propagate and gybis-spec-weed
 
 FP/OOP orientation and language implications are architecture-level signals that should influence generation and divergence resolution, not generic spec validation or documentation.
 

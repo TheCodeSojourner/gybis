@@ -43,21 +43,20 @@ description: Internal skill - not user-facing
 
 λ allium-normalize_check_lift(file_path).
   invoke(internal/allium-check(file_path)) → diagnostics
-  | ∀ error ∈ diagnostics.errors:
-    kind ≔ allium-normalize_kind_prefixing("check", error.code)
-    | severity ≔ "error"
-    | emit({source: "check", kind, severity, location: error.location, message: error.message, detail: error.remediation})
-  | ∀ warning ∈ diagnostics.warnings:
-    kind ≔ allium-normalize_kind_prefixing("check", warning.code)
-    | severity ≔ "warning"
-    | emit({source: "check", kind, severity, location: warning.location, message: warning.message, detail: warning.remediation})
-  | uncoded_count ≔ card({d | d ∈ (errors ∪ warnings) ∧ d.code = none})
+  | ∀ diagnostic ∈ diagnostics.diagnostics:
+    kind ≔ allium-normalize_kind_prefixing("check", diagnostic.code)
+    | severity ≔ lower(diagnostic.severity)
+    | emit({source: "check", kind, severity, location: diagnostic.location, message: diagnostic.message, detail: diagnostic.remediation})
+  | uncoded_count ≔ card({d | d ∈ diagnostics.diagnostics ∧ d.code = none})
   | return({check_envelopes, uncoded_count})
 
 λ allium-normalize_analyse_lift(specs_path).
   invoke(internal/allium-analyse(specs_path)) → findings_data
+  | ∀ diagnostic ∈ findings_data.diagnostics:
+    kind ≔ allium-normalize_kind_prefixing("analyse", diagnostic.code ∨ "_uncoded")
+    | emit({source: "analyse", kind, location: diagnostic.location, message: diagnostic.message})
   | ∀ finding ∈ findings_data.findings:
-    kind ≔ allium-normalize_kind_prefixing("analyse", finding.type)
+    kind ≔ allium-normalize_kind_prefixing("analyse", finding.type ∨ finding.code ∨ "_uncoded")
     | emit({source: "analyse", kind, location: finding.affected_files, message: finding.description})
   | return({analyse_envelopes})
 
@@ -102,11 +101,12 @@ description: Internal skill - not user-facing
 
 λ allium-normalize_execution(target).
   step_1_preflight: invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
-  | step_2_dispatch: allium-normalize_dispatch(target) → (envelopes, uncoded_count)
-  | step_3_format: allium-normalize_output_format(envelopes, uncoded_count)
+  | step_2_runtime: invoke(allium-runtime-check_version()) → true ∨ halt("Allium runtime compatibility check failed")
+  | step_3_dispatch: allium-normalize_dispatch(target) → (envelopes, uncoded_count)
+  | step_4_format: allium-normalize_output_format(envelopes, uncoded_count)
   | return: formatted_envelope_set
 
-λ allium-normalize_boundaries(¬).
+λ allium-normalize_boundaries().
   ¬ mutate(target)
   | ¬ write(any_path)
   | ¬ re-classify(envelope_after_emission)
