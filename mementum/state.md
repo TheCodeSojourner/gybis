@@ -1,3 +1,4 @@
+✅ session-40 | 2026-09-29 gybis-init orient complete on branch add-requirements-layer at session-39 head (85b9a97)
 ✅ session-38 | 2026-09-29 Requirements layer added: /gybis-req-* nine-skill family scaffolded and command surfaces synchronized
 ✅ session-36 | 2026-08-20 gybis-fini closeout: downstream upgrade documentation and Allium compatibility gate committed
 ✅ session-35 | 2026-08-20 Downstream upgrade and rollout documentation synchronized across README surfaces
@@ -36,9 +37,9 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-08-26T00:00:00-06:00
-- **Sessions**: 37 (session-0 initialized through session-37 gybis-fini closeout)
-- **Status**: Session-37 terminated — gybis-fini complete
+- **Last updated**: 2026-09-29T00:00:00-06:00
+- **Sessions**: 40 (session-0 initialized through session-40 gybis-init orient)
+- **Status**: Session-40 oriented — branch add-requirements-layer at session-39 head (85b9a97)
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
@@ -314,24 +315,28 @@
 - Replaced "non-normative" jargon with plain language in all three doc surfaces: rationale line is "guidance and context only, never a rule anyone must satisfy" (never a binding obligation, never counted as coverage).
 - Note: skill files (gybis-req-*) retain the technical term "non-normative" where precision is needed for the AI executor; only user-facing docs use plain wording.
 
+## Session-41 (2026-09-29): DEV-WORKFLOW requirements-layer polish
+- Oriented (session-40 manifest acknowledged; state had uncommitted session-40 orient lines).
+- Reviewed uncommitted gybis/GYBIS-DEV-WORKFLOW.md changes (requirements layer added to durability order + new Honor Requirements section) — verdict: agree, consistent with requirements-layer-family and rationale-field-convention memories.
+- Applied two polish edits to gybis/GYBIS-DEV-WORKFLOW.md per human request:
+  - §2: added distill-first pointer — no requirements/ directory → /gybis-req-distill before the locate/tend loop (brownfield guard).
+  - §6: test-evidence sentence reworded to "A new or amended requirement designator that propagates into specifications normally requires corresponding test evidence" (traceability anchored at REQ designator level).
+- Upgrade guidance delivered for old-gybis repos: bundle-only copy (`cp -ra .../gybis/.agents/skills/. .agents/skills/`), allium ≥ 3.5.3, /gybis-init + migrate, then /gybis-req-distill bootstraps requirements/.
+- No memory candidates (two-gate test not met; work captured in state).
+
 ## Session Closeout
-- **last_session_id**: session-39
+- **last_session_id**: session-41
 - **current_timestamp**: 2026-09-29T12:00:00-06:00
-- **task**: Close out the branch-example lambda conversion + rationale field session: converted branch-example requirements to canonical nucleus lambda REQ format, added rationale support across all nine gybis-req-* skills, corrected check rules, closed session-38 open question, synchronized doc surfaces.
+- **task**: Session-41 — reviewed and polished gybis/GYBIS-DEV-WORKFLOW.md for the requirements layer (distill-first pointer in §2; REQ-designator-level traceability in §6); delivered old-gybis upgrade guidance.
 - **questions**:
-  - branch-example fixture items parked per human scoping: 4 AI_inferred rationales pending approval; FN-002G/H known-collision declaration vs tend alias; compound_by_design markers for operator clauses; cljonic wording in docs (kept for now).
-  - REQ transcription heuristics (session-38 carryover) still need refinement after first real elicit use.
+  - Carried: 4 AI_inferred rationale approvals pending; FN-002G/H collision resolution; compound_by_design markers; branch-example fixtures commit decision; REQ transcription heuristics after first real use.
+  - New: none this session.
 - **decisions**:
-  - branch-example-original/ preserved as untouched provenance ground truth; conversion applied to branch-example/ only (289 clauses, 13-prefix closed set declared in index).
-  - Rationale field adopted across the req family: non-normative intent line between body and footer; origin_artifact vs AI_inferred provenance; consumer rules in check/tend/weed/refine/propagate/describe/explain.
-  - check ordering rule corrected: definitional forward references valid (info); upward behavioral dependencies error. governed_REQs footers derived-from-clauses, never hand-maintained.
-  - Granularity-aware atomicity: compound_by_design footer marker (human-approved) downgrades compound operator clauses to info.
-  - Index conventions block (domain_prefixes, normative_mapping, granularity, deferred_marker) now expected; check warns when missing.
-  - Collision protocol: tend offers alias or approved-renumber; index-declared known-collisions downgrade to warning.
-  - Generality principle: skills are project-agnostic; no shipped default domain-prefix set (session-38 open question closed, option 1).
+  - DEV-WORKFLOW requirements-layer changes approved as-is; two polish edits applied (brownfield pointer, designator-anchored traceability) per human request.
+  - Carried from session-39: branch-example-original/ is provenance ground truth; conversion applied to branch-example/ only; generality principle holds (no shipped domain-prefix defaults).
 - **next**:
   1. Review/commit the untracked branch-example/ and branch-example-original/ fixture directories (humans decide whether fixtures enter the repo).
   2. Approve or remove the 4 AI_inferred rationale lines via /gybis-req-tend.
   3. Resolve FN-002G/H collision via tend (declare known-collision or alias).
   4. Refine gr-elicit transcription heuristics after first real use (session-38 carryover).
-- **recover**: Read mementum/memories/rationale-field-convention.md and mementum/knowledge/requirements-layer.md, then review gybis/.agents/skills/gybis-req-*/SKILL.md for the rationale and generality rules.
+- **recover**: Read mementum/state.md session-41 entry and gybis/GYBIS-DEV-WORKFLOW.md §2/§6 for the polish edits; rationale rules in mementum/memories/rationale-field-convention.md.
