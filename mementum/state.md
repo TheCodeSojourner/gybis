@@ -249,3 +249,89 @@
 - Knowledge created: `mementum/knowledge/requirements-layer.md` (layer spec: position, format, family, boundaries, open items).
 
 ⏹→state.md
+
+## Session-39 (2026-09-29): branch-example requirements lambda conversion
+- Copied `branch-example/` → `branch-example-original/` (originals preserved untouched).
+- Converted `branch-example/requirements/` to canonical nucleus lambda REQ format per gybis-req-* skills: new `requirements-index.md` declaring the 13-prefix closed domain set (PLAT, VAL, CAP, BOUNDS, ERR, DIAG, CONST, VOCAB, COLL, SEQ, FN, NUM, TEST); modules 1–7 rewritten as `λ REQ-<DOMAIN>-NNN(x).` clauses with `{source: stakeholder_decided}` attribution footers; deferred sections (REQ-SEQ-001–014, REQ-PLAT-017–023) marked non-binding.
+- 289 clauses; designator uniqueness verified — only REQ-FN-002G/H collide (pre-existing Module 3 equal/not_equal vs Module 5 map/comp), flagged in Module 5 for /gybis-req-tend reconciliation.
+- Not committed: awaiting human approval per mementum_termination.
+
+## Session-39 Addendum (2026-09-29): rationale field support across gybis-req-*
+- Surfaced during branch-example lambda conversion: requirements format had no slot for non-normative intent (why a requirement exists); prose carried rationale implicitly, lambda compression lost it.
+- Upserted all nine gybis-req-* skills to support an optional non-normative `rationale:` line per clause:
+  - elicit: grilling rounds capture stakeholder why in stakeholder words; footer grammar extended; rationale inherits clause attribution; AI-inferred rationale in stakeholder_decided clause requires tend approval.
+  - distill: rationale must be evidence-derived ({rationale_source: origin_artifact}) or explicitly marked AI_inferred; no silent fabrication.
+  - check: rationale lines non-normative, optional, never assertions; normative operators inside rationale = error; AI_inferred rationale in stakeholder_decided clause = warning.
+  - tend: rationale is part of clause identity for impact analysis; rationale-only changes are semantic changes requiring human approval.
+  - weed: rationale differences across layers are never divergence conflicts; only normative text scored.
+  - refine: split inherits rationale; differing rationales block blind merge.
+  - propagate: coverage matching and vocab-term extraction exclude rationale lines.
+  - describe/explain: render rationale as "because:" when present; never fabricate when absent.
+- Layer distinction maintained: rationale = intent (interpretation), attribution = provenance + negotiability (contractual vs negotiable). Orthogonal concerns, now both have fields.
+- Not committed: awaiting human approval per mementum_termination.
+
+## Session-39 Addendum 2 (2026-09-29): rationale upsert pass on branch-example
+- Upsert (not rewrite) applied to branch-example/requirements/ modules 1-7: 31 clauses gained non-normative `rationale:` lines under the newly-upserted format rules.
+- Provenance split: 27 clauses {rationale_source: origin_artifact} (rationale recoverable verbatim from original prose); 4 clauses {rationale_source: AI_inferred} (COLL-012A modulo hazard, FN-014C cache semantics, FN-002H transducer exclusion, PLAT-026 destructuring) — these are warnings under check rules and need human approval via /gybis-req-tend to become canonical.
+- Per-clause list: PLAT-006; BOUNDS-010/017, DIAG-008, CAP-010; COLL-012A, FN-002B/F/M/P/Q/R/008A; VAL-017D, SEQ-016, FN-013C/013D/014/014B/014C; FN-002H; NUM-000/002/003/004/005/006/007/011; PLAT-034, PLAT-026.
+- One transcription slip caught and fixed during the pass: a batch edit briefly dropped the `contains(string, index)` conjunct from REQ-COLL-012A; restored verbatim.
+- Lesson (process): multi_replace batches with near-duplicate targets should verify each replacement individually; rationale lines live between clause body and attribution footer, per elicit rationale_line grammar.
+- Not committed: awaiting human approval per mementum_termination.
+
+## Session-39 Addendum 3 (2026-09-29): gybis-req-* skill improvements from conversion experience
+- Assessment outcome: check/tend/weed boundary, coverage-as-info, strict test convergence, attribution negotiability model all held up; six improvements landed (migration/transcription attribution dropped after human clarification that requirements-to-requirements migration is not a stack goal).
+- #3 check ordering rule corrected: definitional forward references (reference to later module REQ defining a term/boundary contract, e.g. cljonic REQ-VAL-007 → REQ-PLAT-024) = info/valid; upward behavioral dependency = error. Matches the cljonic reference corpus, which check previously failed.
+- #7 footers now derived-not-maintained: governed_REQs footers always regenerated from clauses present (elicit transcribe + tend apply + check warning on hand-maintained footers).
+- #6 granularity-aware atomicity: library_contract permits compound operator clauses marked compound_by_design: true in footer (human-approved via tend); check downgrades those to info; compound clauses mixing unrelated assertions still warn.
+- #5 canonical conventions: index must declare machine-readable conventions block (domain_prefixes, normative_mapping, granularity, deferred_marker); deferred sections marked via "(Deferred" heading or non-binding blockquote; check warns when conventions missing.
+- #4 collision protocol: tend presents alias (new designator + deprecated synonym attribution) or approved-renumber menu; check downgrades index-declared known-collisions to warnings pending tend resolution; undeclared collisions remain errors. Escape hatches (compound_by_design, known-collision) both require explicit human declaration — not silent lint suppression.
+- Remaining optional: #8 branch-example as internal reference fixture — deferred until review status resolves.
+- Not committed: awaiting human approval per mementum_termination.
+
+## Session-39 Addendum 4 (2026-09-29): generality scrub of gybis-req skills
+- Human clarified: gybis-req-* skills are general-purpose; branch-example is a reference fixture, not the target.
+- Upserts: granularity rule rephrased generically ("maximum clause density ... formal library-contract corpus" replaces "cljonic-grade"); definitional-reference worked example explicitly framed as illustrative ("worked example: cljonic reference corpus, illustrative only — the rule binds to any project corpus"); added generality_principle to elicit: normative rules project-agnostic; project specifics belong to requirements-index.md; examples never bind.
+
+## Session-39 Addendum 5 (2026-09-29): completeness assessment
+- Verified: req skills exist only in the distributed bundle (gybis/.agents/skills/) — no root-copy drift risk for this family.
+- Fixed: branch-example index now declares granularity (library_contract) and deferred_marker conventions, conforming to the new check rule.
+- Docs: README/GYBIS-README mention lambda clause notation but not the rationale field — optional doc follow-up.
+- Session-38 open question "domain-prefix default set" can now be answered under the generality principle: either "no defaults; project-specific" (consistent) or a small generic starter set — human decision.
+- Outstanding human decisions: commit approval; approval of 4 AI_inferred rationales; compound_by_design markers for FN-002G/H operator clauses; FN-002G/H known-collision declaration (or tend alias resolution); whether to scrub/keep cljonic wording in docs.
+
+## Session-39 Addendum 6 (2026-09-29): domain-prefix default question closed (option 1)
+- Human approved option 1: no shipped default domain-prefix set; prefix vocabulary is project-specific per the generality principle and emerges from grilling (round-1 frontier question with per-project AI-recommended answer when stakeholders lack vocabulary; no canned list suggested).
+- Upserted gybis-req-elicit transcribe_clause: domain_prefixes rule extended + prefix_cold_start rule added.
+- Closes session-38 open question: "Domain-prefix recommended default set for requirements-index.md template not yet defined" — resolved by principle (no defaults).
+
+## Session-39 Addendum 7 (2026-09-29): rationale prose added to doc surfaces
+- README.md requirements-layer paragraph now describes the optional non-normative rationale: line (elicit captures, check validates as never-obligation/never-coverage, describe/explain render "because: ...").
+- gybis/GYBIS-README.md: rationale convention note added under Commands heading (flat table has no per-layer sections).
+- gybis-help skill: rationale convention appended as prose after the command table (kept table alphabetical/clean).
+- Command surfaces now synchronized with the rationale capability across all three doc surfaces.
+
+## Session-39 Addendum 8 (2026-09-29): user-facing wording clarified
+- Replaced "non-normative" jargon with plain language in all three doc surfaces: rationale line is "guidance and context only, never a rule anyone must satisfy" (never a binding obligation, never counted as coverage).
+- Note: skill files (gybis-req-*) retain the technical term "non-normative" where precision is needed for the AI executor; only user-facing docs use plain wording.
+
+## Session Closeout
+- **last_session_id**: session-39
+- **current_timestamp**: 2026-09-29T12:00:00-06:00
+- **task**: Close out the branch-example lambda conversion + rationale field session: converted branch-example requirements to canonical nucleus lambda REQ format, added rationale support across all nine gybis-req-* skills, corrected check rules, closed session-38 open question, synchronized doc surfaces.
+- **questions**:
+  - branch-example fixture items parked per human scoping: 4 AI_inferred rationales pending approval; FN-002G/H known-collision declaration vs tend alias; compound_by_design markers for operator clauses; cljonic wording in docs (kept for now).
+  - REQ transcription heuristics (session-38 carryover) still need refinement after first real elicit use.
+- **decisions**:
+  - branch-example-original/ preserved as untouched provenance ground truth; conversion applied to branch-example/ only (289 clauses, 13-prefix closed set declared in index).
+  - Rationale field adopted across the req family: non-normative intent line between body and footer; origin_artifact vs AI_inferred provenance; consumer rules in check/tend/weed/refine/propagate/describe/explain.
+  - check ordering rule corrected: definitional forward references valid (info); upward behavioral dependencies error. governed_REQs footers derived-from-clauses, never hand-maintained.
+  - Granularity-aware atomicity: compound_by_design footer marker (human-approved) downgrades compound operator clauses to info.
+  - Index conventions block (domain_prefixes, normative_mapping, granularity, deferred_marker) now expected; check warns when missing.
+  - Collision protocol: tend offers alias or approved-renumber; index-declared known-collisions downgrade to warning.
+  - Generality principle: skills are project-agnostic; no shipped default domain-prefix set (session-38 open question closed, option 1).
+- **next**:
+  1. Review/commit the untracked branch-example/ and branch-example-original/ fixture directories (humans decide whether fixtures enter the repo).
+  2. Approve or remove the 4 AI_inferred rationale lines via /gybis-req-tend.
+  3. Resolve FN-002G/H collision via tend (declare known-collision or alias).
+  4. Refine gr-elicit transcription heuristics after first real use (session-38 carryover).
+- **recover**: Read mementum/memories/rationale-field-convention.md and mementum/knowledge/requirements-layer.md, then review gybis/.agents/skills/gybis-req-*/SKILL.md for the rationale and generality rules.
