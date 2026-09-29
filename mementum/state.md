@@ -1,3 +1,4 @@
+✅ session-38 | 2026-09-29 Requirements layer added: /gybis-req-* nine-skill family scaffolded and command surfaces synchronized
 ✅ session-36 | 2026-08-20 gybis-fini closeout: downstream upgrade documentation and Allium compatibility gate committed
 ✅ session-35 | 2026-08-20 Downstream upgrade and rollout documentation synchronized across README surfaces
 ✅ session-34 | 2026-08-20 Allium 3.5.3 runtime compatibility gate and empty-spec guard implemented
@@ -204,38 +205,47 @@
 - **recover**: Read `gybis/.agents/skills/internal/allium-runtime-check/SKILL.md`, then exercise version, no-spec, legacy-payload, and current-payload cases.
 
 ## Session Orientation
-- **current_timestamp**: 2026-08-26T00:00:00-06:00
-- **phase**: gybis-init orient complete
+- **current_timestamp**: 2026-09-29T00:00:00-06:00
+- **phase**: gybis session-38 implementation complete
 - **state_read**: `mementum/state.md`
 - **memories_read**:
-  - `mementum/memories/gybis-tool-agnostic.md`
-  - `mementum/memories/gybis-hidden-bundle-copy.md`
-  - `mementum/memories/use-cases-command-coverage.md`
-  - `mementum/memories/spec-strict-test-convergence.md`
+  - `mementum/memories/allium-353-adapter-compatibility.md`
+  - `mementum/memories/upstream-integration-lambda-notation.md`
 - **knowledge_read**:
   - `mementum/knowledge/session-2026-05-15.md`
 - **searches_run**:
-  - "gybis-init"
-  - "mementum orient"
-  - "README"
+  - "3.5.3|target payload|adapter normalization"
+  - "gybis-init|session-36|last_session_id"
 - **open_questions_acknowledged**:
-  - No blocking questions. Current repo state reflects the previous successful gybis closeout and the active documentation bundle remains aligned.
-- **readiness**: Ready to proceed from the current repo state without re-initializing the project memory structure.
+  - Allium 3.5.3 fixture/adapter smoke test still queued; not blocking the requirements-layer work completed this session.
 
 ## Session Closeout
-- **last_session_id**: session-37
-- **current_timestamp**: 2026-08-26T00:00:00-06:00
-- **task**: Complete the current gybis-init orient pass and persist the project working memory for the next session.
+- **last_session_id**: session-38
+- **current_timestamp**: 2026-09-29T00:00:00-06:00
+- **task**: Implement the requirements layer: nine /gybis-req-* skills in lambda notation, README/GYBIS-README/help command surfaces, vocab-distill source extension, and Mementum knowledge capture.
 - **questions**:
-  - none blocking; the active repo state is coherent and no migration or recovery action is required before continuing.
+  - gr-elicit round format adapted from mattpocock/skills grilling protocol; REQ transcription heuristics need refinement after first real use.
+  - Domain-prefix recommended default set for requirements-index.md template not yet defined.
 - **decisions**:
-  - The active bootloader remains `mementum/state.md` as the durable working memory for this repo.
-  - Repo-local memory remains the correct scope; no client-scoped memory or external store was introduced.
-  - No further code or spec changes were required during this orientation-only pass.
+  - Requirements added as the new top layer: requirements/ -> vocabulary.md -> architecture.md -> specs/**/*.allium -> code/tests.
+  - Canonical form: REQ-<DOMAIN>-NNN designators with nucleus lambda clause bodies; MUST ≡ ∀/¬, SHOULD ≡ preferred, MAY ≡ ∃ permitted.
+  - Pattern adopted from branch-example/requirements (cljonic): dependency-ordered modules + index, deferred non-binding sections, REQ-to-test traceability; clause granularity made configurable (library-contract vs application).
+  - gr-elicit based on mattpocock/skills grilling protocol (frontier rounds, recommended answers, empty-frontier termination) plus decided-vs-researched attribution.
+  - gr-distill emits vocabulary term candidates handed to /gybis-vocab-tend; gybis-vocab-distill now lists requirements/ as a source; vocabulary.md never written by req skills.
+  - Boundaries preserved: check read-only diagnostics; strict test-pass convergence in propagate/weed; describe/explain session-16 output modes.
 - **next**:
-  1. Continue from the current repository state with the next task.
-  2. Re-run `gybis-init` only if a new session needs a fresh orientation reset.
-  3. Preserve working memory by keeping `mementum/state.md` and related `mementum/` files in sync with the active context.
-- **recover**: Re-read `mementum/state.md`, then follow the most recent memory and knowledge entries to reconstruct the current session context.
+  1. Run gr-elicit against a real project to refine round/transcription heuristics.
+  2. Define the recommended default domain-prefix set for requirements-index.md.
+  3. Monitor command-surface and boundary drift per the standing monitor list.
+- **recover**: Read mementum/knowledge/requirements-layer.md and mementum/memories/requirements-layer-family.md, then review gybis/.agents/skills/gybis-req-*/SKILL.md files.
+
+## Session Addendum
+- Added `gybis/requirements/.gitkeep` so the bundle ships an empty requirements stage directory (convention matches `gybis/specs/.gitkeep`).
+- Tightened `gybis-req-elicit` gate: `requirements_empty(d) ≡ d ¬∃ ∨ contents(d) ⊆ {.gitkeep}` so a freshly copied bundle does not block elicitation.
+- Stage-readiness chains in both READMEs now name the concrete artifact form: `requirements/requirements-*.md`.
+
+## Synthesis
+- Memory stored: `mementum/memories/requirements-layer-family.md` (decision record for the requirements layer).
+- Knowledge created: `mementum/knowledge/requirements-layer.md` (layer spec: position, format, family, boundaries, open items).
 
 ⏹→state.md

@@ -30,7 +30,7 @@ The goal of **gybis** is to make it easy for developers to set up, utilize, and 
 
 gybis is command-driven guidance, not always-on process enforcement.
 
-- Human operators are responsible for stage readiness (`vocabulary.md` -> `architecture.md` -> `specs/**/*.allium` -> code/tests).
+- Human operators are responsible for stage readiness (`requirements/requirements-*.md` -> `vocabulary.md` -> `architecture.md` -> `specs/**/*.allium` -> code/tests).
 - Skills execute the requested transformation and enforce only execution-critical gates.
 - Check and weed commands are available as deliberate convergence tools when operators choose to run them.
 
@@ -43,7 +43,7 @@ These operations form the core gybis convergence loop:
 - `tend` evolves one layer with explicit human intent and keeps the change localized.
 - `weed` reconciles drift between adjacent layers and the implementation so the system converges again.
 
-They work top-down: vocabulary constrains architecture, architecture constrains specs, and specs constrain tests and code. `check` finds drift, `refine` polishes local structure, `tend` makes intended layer-local changes, and `weed` resolves disagreement when two artifacts no longer agree.
+They work top-down: requirements constrain vocabulary, vocabulary constrains architecture, architecture constrains specs, and specs constrain tests and code. `check` finds drift, `refine` polishes local structure, `tend` makes intended layer-local changes, and `weed` resolves disagreement when two artifacts no longer agree.
 
 | Operation | Purpose                                         | Human role                                               | Typical outcome                    |
 | --------- | ----------------------------------------------- | -------------------------------------------------------- | ---------------------------------- |
@@ -92,6 +92,22 @@ The following commands are available after integrating gybis into a target repos
 | `/gybis-vocab-refine` (`/gv-refine`)     | Refine vocabulary structure & clarity             |
 | `/gybis-vocab-tend` (`/gv-tend`)         | Update vocabulary with impact analysis            |
 | `/gybis-vocab-weed` (`/gv-weed`)         | Upsert vocabulary/artifacts from diffs with human |
+
+### Requirements Commands (`/gr-*`)
+
+Requirements are the top layer of the stack: dependency-ordered module files containing `REQ-<DOMAIN>-NNN` clauses in nucleus lambda notation, rendered for humans on demand via describe/explain.
+
+| Command                                  | Description                                                           |
+| ---------------------------------------- | --------------------------------------------------------------------- |
+| `/gybis-req-check` (`/gr-check`)         | Validate requirements designators, ordering, & coverage               |
+| `/gybis-req-describe` (`/gr-describe`)   | Describe requirements in stakeholder prose or markdown                |
+| `/gybis-req-distill` (`/gr-distill`)     | Create initial requirements (+ vocab candidates) from arch/specs/code |
+| `/gybis-req-elicit` (`/gr-elicit`)       | Elicit requirements via grilling interview rounds                     |
+| `/gybis-req-explain` (`/gr-explain`)     | Explain requirements in dev prose or markdown                         |
+| `/gybis-req-propagate` (`/gr-propagate`) | Annotate specs/tests with REQ traceability                            |
+| `/gybis-req-refine` (`/gr-refine`)       | Refine requirements structure & clarity                               |
+| `/gybis-req-tend` (`/gr-tend`)           | Update requirements with impact analysis                              |
+| `/gybis-req-weed` (`/gr-weed`)           | Upsert requirements/downstream from diffs with human                  |
 
 ### Architecture Commands (`/ga-*`)
 
