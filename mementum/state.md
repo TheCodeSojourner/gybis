@@ -1,3 +1,4 @@
+✅ session-42 | 2026-09-29 gybis-init orient complete on branch add-requirements-layer at session-41 head (5531635)
 ✅ session-40 | 2026-09-29 gybis-init orient complete on branch add-requirements-layer at session-39 head (85b9a97)
 ✅ session-38 | 2026-09-29 Requirements layer added: /gybis-req-* nine-skill family scaffolded and command surfaces synchronized
 ✅ session-36 | 2026-08-20 gybis-fini closeout: downstream upgrade documentation and Allium compatibility gate committed
@@ -37,9 +38,9 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-09-29T00:00:00-06:00
-- **Sessions**: 40 (session-0 initialized through session-40 gybis-init orient)
-- **Status**: Session-40 oriented — branch add-requirements-layer at session-39 head (85b9a97)
+- **Last updated**: 2026-09-29T16:30:00-06:00
+- **Sessions**: 42 (session-0 initialized through session-42 gybis-init orient)
+- **Status**: Session-42 oriented — branch add-requirements-layer at session-41 head (5531635); pending human decisions carried from session-41
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
