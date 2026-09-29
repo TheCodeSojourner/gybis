@@ -28,6 +28,15 @@ CRITICAL CONSTRAINTS:
 | `/gybis-memory-recall {topic}` (`/gm-recall {topic}`) | Recall topic/summarize-latest |
 | `/gybis-memory-store {insight}` (`/gm-store {insight}`) | Store insight |
 | `/gybis-memory-synthesize` (`/gm-synthesize`) | Synthesize knowledge |
+| `/gybis-req-check` (`/gr-check`) | Validate requirements designators, ordering, & coverage |
+| `/gybis-req-describe` (`/gr-describe`) | Describe requirements in stakeholder prose |
+| `/gybis-req-distill` (`/gr-distill`) | Create initial requirements (+ vocab candidates) from arch/specs/code |
+| `/gybis-req-elicit` (`/gr-elicit`) | Elicit requirements via grilling interview rounds |
+| `/gybis-req-explain` (`/gr-explain`) | Explain requirements in dev prose |
+| `/gybis-req-propagate` (`/gr-propagate`) | Annotate specs/tests with REQ traceability |
+| `/gybis-req-refine` (`/gr-refine`) | Refine requirements structure & clarity |
+| `/gybis-req-tend` (`/gr-tend`) | Update requirements with impact analysis |
+| `/gybis-req-weed` (`/gr-weed`) | Upsert requirements/downstream from diffs with human |
 | `/gybis-spec-check` (`/gs-check {concern\|domain\|all}`) | Check/Update syntax until valid |
 | `/gybis-spec-describe` (`/gs-describe {concern\|domain\|all}`) | Describe in non-tech prose |
 | `/gybis-spec-distill` (`/gs-distill`) | Create initial specs from code/tests |
