@@ -110,11 +110,11 @@ Requirements are the top layer of the stack: dependency-ordered module files con
 
 ### Architecture Commands (`/ga-*`)
 
-| Command                                   | Description                                 |
-| ----------------------------------------- | ------------------------------------------- |
-| `/gybis-arch-check` (`/ga-check`)         | Validate architecture integrity & coherence |
-| `/gybis-arch-describe` (`/ga-describe`)   | Describe arch in non-tech prose or markdown |
-| `/gybis-arch-distill` (`/ga-distill`)     | Create initial arch from specs              |
+| Command                                 | Description                                 |
+| --------------------------------------- | ------------------------------------------- |
+| `/gybis-arch-check` (`/ga-check`)       | Validate architecture integrity & coherence |
+| `/gybis-arch-describe` (`/ga-describe`) | Describe arch in non-tech prose or markdown |
+| `/gybis-arch-distill` (`/ga-distill`)   | Create initial arch from specs              |
 
 | `/gybis-arch-explain` (`/ga-explain`)     | Explain arch in dev prose or markdown       |
 | `/gybis-arch-propagate` (`/ga-propagate`) | Create initial specs from arch              |
