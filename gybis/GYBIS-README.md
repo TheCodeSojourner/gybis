@@ -30,8 +30,8 @@ See the [allium-tools repository](https://github.com/juxt/allium-tools) for inst
 
 ### New Repository: Vocabulary-First Workflow
 
-1. **Establish vocabulary:** Run `/gybis-vocab-elicit` to elicit domain vocabulary from domain experts.
-2. **Establish architecture:** Run `/gybis-arch-elicit` to establish architecture constraints from the agreed vocabulary.
+1. **Establish requirements:** Run `/gybis-req-elicit` to elicit requirements from stakeholders via grilling interview rounds.
+2. **Establish vocabulary and architecture:** Author `vocabulary.md` and `architecture.md` with your AI tool from the agreed requirements (human-owned artifacts), then validate them with `/gybis-vocab-check` and `/gybis-arch-check`.
 3. **Derive specifications:** Run `/gybis-arch-propagate` to create specifications from architecture.
 4. **Derive code and tests:** Run `/gybis-spec-propagate` to generate initial code and test stubs.
 
@@ -107,8 +107,8 @@ Outcome: you start from the right command family instead of guessing from the fu
 
 Use this when you are building a new system and want durable constraints established before implementation.
 
-1. Run `/gybis-vocab-elicit` to establish shared domain vocabulary with domain experts.
-2. Run `/gybis-arch-elicit` to define architecture constraints from that vocabulary.
+1. Run `/gybis-req-elicit` to establish requirements with stakeholders via grilling interview rounds.
+2. Author `vocabulary.md` and `architecture.md` with your AI tool from the agreed requirements, then validate with `/gybis-vocab-check` and `/gybis-arch-check`.
 3. Run `/gybis-arch-propagate` to derive initial behavioral specifications.
 4. Run `/gybis-spec-propagate` to derive initial code and test scaffolding.
 
@@ -307,7 +307,7 @@ Vocabulary and architecture describe system-level constraints that drive behavio
 
 ### New Repository
 
-For a new repository, run `/gybis-vocab-elicit` to establish domain vocabulary with the developer first, then run `/gybis-arch-elicit` to establish durable architectural constraints, derive behavior specifications with `/gybis-arch-propagate`, and finally derive code and tests with `/gybis-spec-propagate`.
+For a new repository, run `/gybis-req-elicit` to establish requirements with stakeholders first, then author durable vocabulary and architecture constraints with your AI tool from those requirements (validate with `/gybis-vocab-check` and `/gybis-arch-check`), derive behavior specifications with `/gybis-arch-propagate`, and finally derive code and tests with `/gybis-spec-propagate`.
 
 ### Existing Repository
 
@@ -398,12 +398,13 @@ vocabulary > architecture > specification > tests > code
 
 ## Commands
 
+REQ-clause convention: requirements clauses (`/gybis-req-*` family) may carry an optional `rationale:` line recording why the requirement exists — guidance and context only, never a rule anyone must satisfy. It is captured by elicit, validated by check (never a binding obligation, never counted as coverage), and rendered as "because: ..." by describe/explain when present.
+
 | Skill Name                                                       | Description                                                           |
 | ---------------------------------------------------------------- | --------------------------------------------------------------------- |
 | `/gybis-arch-check` (`/ga-check`)                                | Validate architecture integrity & coherence                           |
 | `/gybis-arch-describe` (`/ga-describe`)                          | Describe arch in non-tech prose or markdown                           |
 | `/gybis-arch-distill` (`/ga-distill`)                            | Create initial arch from specs                                        |
-| `/gybis-arch-elicit` (`/ga-elicit`)                              | Create initial arch with human                                        |
 | `/gybis-arch-explain` (`/ga-explain`)                            | Explain arch in dev prose or markdown                                 |
 | `/gybis-arch-propagate` (`/ga-propagate`)                        | Create initial specs from arch                                        |
 | `/gybis-arch-refine` (`/ga-refine`)                              | Refine architecture structure & clarity                               |
@@ -437,7 +438,6 @@ vocabulary > architecture > specification > tests > code
 | `/gybis-vocab-check` (`/gv-check`)                               | Validate vocabulary.md syntax & semantics                             |
 | `/gybis-vocab-describe` (`/gv-describe`)                         | Describe vocabulary in business language                              |
 | `/gybis-vocab-distill` (`/gv-distill`)                           | Extract vocabulary from arch/specs/code                               |
-| `/gybis-vocab-elicit` (`/gv-elicit`)                             | Elicit vocabulary from domain experts                                 |
 | `/gybis-vocab-explain` (`/gv-explain`)                           | Explain vocabulary for developers                                     |
 | `/gybis-vocab-refine` (`/gv-refine`)                             | Refine vocabulary structure & clarity                                 |
 | `/gybis-vocab-tend` (`/gv-tend`)                                 | Update vocabulary with impact analysis                                |

@@ -63,6 +63,7 @@ description: Use for `/gybis-req-weed` or `/gr-weed`.
     - REQ_undefined_term: clause uses term not in vocabulary.md
     - REQ_non_canonical_term: clause uses non-canonical spelling of a defined term
     - downstream_conflicts_REQ: downstream artifact encodes behavior with no governing REQ
+  | rationale_exclusion: differing or missing rationale: lines across layers are ¬divergences — rationale records intent, not behavior; only normative clause text generates conflicts; never compare rationale text when scoring convergence
   | ∀ comparison result: collect({type, REQ, location, description, negotiability}) → divergences
   | negotiability: stakeholder_decided REQ conflict = contractual (resolution limited to {req, investigate, skip}); AI_researched_fact conflict = negotiable
   | return(comparison_complete = true ∧ divergences)

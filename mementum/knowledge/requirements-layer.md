@@ -20,7 +20,7 @@ requirements/ (requirements-index.md + requirements-{module}.md)
   → code/tests
 ```
 
-Forward (greenfield): `gr-elicit` → vocab-elicit → arch-elicit/propagate → spec-propagate.
+Forward (greenfield): `gr-elicit` → human-authored vocabulary.md + architecture.md (validated by `gv-check`/`ga-check`) → arch-propagate → spec-propagate. (vocab-elicit and arch-elicit were removed session-42; greenfield vocab/arch artifacts are human-authored.)
 Reverse (brownfield): `spec-distill` → `arch-distill` → `gr-distill` (+ vocab candidates) — or enter at any layer via that layer's distill.
 
 ## Canonical format

@@ -69,8 +69,8 @@ description: Use for `/gybis-req-refine` or `/gr-refine`.
 λ gybis-req-refine_apply(approved_actions).
   action: apply_approved_restructure
   | rules:
-    - split: compound clause → numbered subclauses (REQ-X-NNNA, NNNB) preserving parent semantics
-    - merge: duplicate clauses → single designator; update all references
+    - split: compound clause → numbered subclauses (REQ-X-NNNA, NNNB) preserving parent semantics; parent rationale: line inherited by all subclauses unless subdivided by human approval
+    - merge: duplicate clauses → single designator; update all references; differing rationale: lines between merged candidates block blind merge — surfaced for human decision before merging
     - move: clause between modules; update governed_REQs footers of both modules
     - renumber: only with explicit approval; update all downstream annotations list in report
   | constraint: designator semantics preserved; deletions require human confirmation

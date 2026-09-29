@@ -87,7 +87,6 @@ The following commands are available after integrating gybis into a target repos
 | `/gybis-vocab-check` (`/gv-check`)       | Validate vocabulary.md syntax & semantics         |
 | `/gybis-vocab-describe` (`/gv-describe`) | Describe vocabulary in business language          |
 | `/gybis-vocab-distill` (`/gv-distill`)   | Extract vocabulary from arch/specs/code           |
-| `/gybis-vocab-elicit` (`/gv-elicit`)     | Elicit vocabulary from domain experts             |
 | `/gybis-vocab-explain` (`/gv-explain`)   | Explain vocabulary for developers                 |
 | `/gybis-vocab-refine` (`/gv-refine`)     | Refine vocabulary structure & clarity             |
 | `/gybis-vocab-tend` (`/gv-tend`)         | Update vocabulary with impact analysis            |
@@ -95,7 +94,7 @@ The following commands are available after integrating gybis into a target repos
 
 ### Requirements Commands (`/gr-*`)
 
-Requirements are the top layer of the stack: dependency-ordered module files containing `REQ-<DOMAIN>-NNN` clauses in nucleus lambda notation, rendered for humans on demand via describe/explain.
+Requirements are the top layer of the stack: dependency-ordered module files containing `REQ-<DOMAIN>-NNN` clauses in nucleus lambda notation, rendered for humans on demand via describe/explain. Each clause may carry an optional `rationale:` line recording why the requirement exists — guidance and context only, never a rule anyone must satisfy. It is elicited from stakeholders during `/gybis-req-elicit`, validated by `/gybis-req-check` (it is never a binding obligation and never counted as test coverage), and rendered as "because: ..." by describe/explain when present.
 
 | Command                                  | Description                                                           |
 | ---------------------------------------- | --------------------------------------------------------------------- |
@@ -111,12 +110,12 @@ Requirements are the top layer of the stack: dependency-ordered module files con
 
 ### Architecture Commands (`/ga-*`)
 
-| Command                                   | Description                                 |
-| ----------------------------------------- | ------------------------------------------- |
-| `/gybis-arch-check` (`/ga-check`)         | Validate architecture integrity & coherence |
-| `/gybis-arch-describe` (`/ga-describe`)   | Describe arch in non-tech prose or markdown |
-| `/gybis-arch-distill` (`/ga-distill`)     | Create initial arch from specs              |
-| `/gybis-arch-elicit` (`/ga-elicit`)       | Create initial arch with human              |
+| Command                                 | Description                                 |
+| --------------------------------------- | ------------------------------------------- |
+| `/gybis-arch-check` (`/ga-check`)       | Validate architecture integrity & coherence |
+| `/gybis-arch-describe` (`/ga-describe`) | Describe arch in non-tech prose or markdown |
+| `/gybis-arch-distill` (`/ga-distill`)   | Create initial arch from specs              |
+
 | `/gybis-arch-explain` (`/ga-explain`)     | Explain arch in dev prose or markdown       |
 | `/gybis-arch-propagate` (`/ga-propagate`) | Create initial specs from arch              |
 | `/gybis-arch-refine` (`/ga-refine`)       | Refine architecture structure & clarity     |

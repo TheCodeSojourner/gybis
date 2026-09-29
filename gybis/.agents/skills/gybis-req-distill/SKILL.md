@@ -80,6 +80,7 @@ description: Use for `/gybis-req-distill` or `/gr-distill`.
   action: transcribe_constraints_into_lambda_clauses
   | clause_shape: λ REQ-<DOMAIN>-NNN(x). <normative expression>
   | attribution: ∀ clause: {source: AI_researched_fact, origin_artifact, origin_span}
+  | rationale_field: optional `rationale:` line per clause; when present MUST be evidence-derived — either quoted/summarized from {origin_artifact, origin_span} with {rationale_source: origin_artifact} or omitted entirely; ¬fabricate inferred rationale without explicit {rationale_source: AI_inferred} marking
   | rationale: distilled requirements are evidence-derived, not stakeholder-decided; human confirmation happens via review of output
   | output: REQ clauses grouped by module
 

@@ -59,6 +59,7 @@ description: Use for `/gybis-req-propagate` or `/gr-propagate`.
     match ∈ {spec_clause(s), test(s), both, none}
   | none → collect({REQ, coverage_gap}) → propagation_items
   | output: {REQ → downstream_targets} ∧ coverage_gaps
+  | rationale_exclusion: coverage matching operates on the lambda clause body only — rationale: lines are never coverage targets, never annotated, never counted as assertions
   | strict_convergence: ∀ REQ must resolve to target ∨ explicit_NA before COMPLETE
 
 λ gybis-req-propagate_annotate(REQ, target).
@@ -77,7 +78,7 @@ description: Use for `/gybis-req-propagate` or `/gr-propagate`.
 
 λ gybis-req-propagate_seed_vocab_candidates(reqs, coverage_map).
   action: emit_vocabulary_term_candidates
-  | source: terms used in REQ clauses lacking canonical definitions
+  | source: terms used in REQ clause bodies lacking canonical definitions — rationale: lines excluded from term extraction
   | output: candidates list → /gybis-vocab-tend ingests
   | ¬write(vocabulary.md)
 

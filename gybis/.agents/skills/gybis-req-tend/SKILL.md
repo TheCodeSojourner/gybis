@@ -53,6 +53,7 @@ description: Use for `/gybis-req-tend` or `/gr-tend`.
   | ∀ REQ touched by change_request:
     downstream ≔ {spec clauses annotated with REQ, tests referencing REQ, arch constraints tracing to REQ, vocab terms distilled from REQ}
   | impact_report ≔ {REQs_touched, modules_affected, downstream_artifacts_affected, severity}
+  | rationale_in_scope: a change touching only a clause's rationale: line is a semantic change — rationale is part of clause identity for impact analysis; human approval required
   | constraint: read-only analysis; downstream artifacts diagnosed, not modified
   | output: impact_report → human
 
@@ -63,9 +64,14 @@ description: Use for `/gybis-req-tend` or `/gr-tend`.
     - ∀ clause change: atomic (one assertion per designator)
     - new clauses get unused designators within declared domain prefixes
     - changed clauses update module governed_REQs footers
+    - footer_derivation: governed_REQs footers are regenerated from the clauses actually present after every change — never hand-edited
     - attribution updated: {source, decided_by, timestamp}
+    - rationale updates: rationale: line changes update attribution {decided_by, timestamp}; AI-inferred rationale in a stakeholder_decided clause requires explicit human approval of the rationale text
     - deferred work stays in marked non-binding sections
-  | constraint: no upward module references introduced
+  | constraint: no upward behavioral module references introduced
+  | collision_resolution: when check reports duplicate designators across modules, present the menu for human decision:
+    - alias: later module's clause gets a new unique designator; old designator recorded as deprecated synonym in the new clause's attribution; references re-synced via /gybis-req-propagate
+    - renumber: human-approved domain renumbering with full downstream re-annotation via /gybis-req-propagate (requires explicit approval; ¬default)
   | output: updated requirements/ ∧ changes_applied = true
 
 λ gybis-req-tend_verify(x).
