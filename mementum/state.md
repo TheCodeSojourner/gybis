@@ -1,7 +1,4 @@
-✅ session-47 | 2026-09-30 OKF memory conformance: 8 memories exceeded the `body<200 words` rule; each split into two sub-200 files with `related:` cross-links (e.g. canonical-existence-negation + absence-operator-selection-rule). Memories 31 → 39, all conformant
-✅ session-46 | 2026-09-30 absence-operator selection rule. Legend gained the missing `∅` entry + a presence-symmetry rule (`X ¬∃` when `X ∃` = presence; `X = ∅` for collections). Aligned 5 presence-symmetry violations (gybis-arch-propagate glob ×4, gybis-spec-propagate implementation ×1) from `∅` → `¬∃`; collection `∅` untouched. Forcing spelling uniformity was rejected as a goal — see memories/canonical-existence-negation.md
-✅ session-45 | 2026-09-30 existence-notation canonicalisation. Operator authority is SYSTEM_DESIGN.md: `∃`/`¬∃` and `∅` are BOTH canonical (different operators); verbal `exists` is not an operator. Canonicalised operator-form `exists`/`¬exists` → `∃`/`¬∃` across ~20 files incl. internal/reference/vsm-guide.md; left `∅`, `X_exists` identifiers, prose, and Allium DSL untouched — see memories/canonical-existence-negation.md
-✅ session-44 | 2026-09-30 skill-contract consistency sweep: fixed 6 real findings (vocab-distill create-only guard; fini/init contract fields; memory-migrate input/output; req-describe/explain boundary; req-check boundaries+regression) and re-derived 4 checker rules from the corpus (distill universally create-only; boundaries required for read-only skills too; memory `delegate` not required; absence-guard grammar) [AMENDED session-45: the earlier claim that `∅` is non-canonical drift was WRONG — `∅` is a canonical operator in SYSTEM_DESIGN.md]
+✅ session-44 | 2026-09-30 skill-contract enforcement, adapter namespacing, notation canonicalisation, and mementum OKF conformance. Added internal/gybis-skill-contract-check and `kind` on 41 skills; fixed 6 contract findings; renamed internal allium-* → gybis-allium-* (6 adapters); added gybis-vocab-propagate; uniform loop guards / _pass_accounting / _boundaries / _regression_contract / _deliver; split skill `mode` into interaction + output_mode; conditional weed validity gating; canonicalised `exists`/`¬exists` → `∃`/`¬∃` and documented the `∅` presence-symmetry rule; 18 new memories + 8 split for OKF `body<200 words`. Commits 6b9cdc8 + 8e2002e (local, unpushed)
 ✅ session-42 | 2026-09-29 gybis-vocab-elicit and gybis-arch-elicit removed; greenfield vocab/arch artifacts now human-authored [SUPERSEDED — see memories/propagate-seed-then-own.md: architecture is bootstrapped by /gybis-vocab-propagate and vocabulary by /gybis-req-propagate + /gybis-vocab-tend]; doc surfaces synchronized (commit c20b767 then removal commit)
 ✅ session-40 | 2026-09-29 gybis-init orient complete on branch add-requirements-layer at session-39 head (85b9a97)
 ✅ session-38 | 2026-09-29 Requirements layer added: /gybis-req-* nine-skill family scaffolded and command surfaces synchronized
@@ -42,16 +39,16 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-09-30T00:00:00-06:00
-- **Sessions**: 47 (session-0 initialized through session-47 OKF memory conformance)
-- **Status**: Session-47 — all 39 memories conform to OKF (`body<200 words`, frontmatter `type`); 8 over-long memories split with `related:` cross-links
+- **Last updated**: 2026-09-30T16:00:00-06:00
+- **Sessions**: 44 (session-0 initialized through session-44 closeout)
+- **Status**: Session-44 — skill-contract enforcement, adapter namespacing, notation canonicalisation, mementum OKF conformance; 2 local commits await push
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
 - **Core stack**: Nucleus (math notation base context) + Allium (behavioral DSL) + Mementum (persistent memory)
 - **Architecture**: VSM derivative (5-layer architectural spec)
 - **GitHub**: TheCodeSojourner/gybis
-- **Latest work**: Session-33 completed Mementum OKF migration capability and Nucleus Lambda/VSM integration; queued Allium 3.5.3 adapter compatibility work.
+- **Latest work**: Session-44 added the skill-contract checker, namespaced internal Allium adapters, canonicalised existence notation, added gybis-vocab-propagate, and brought all memories to OKF conformance; commits 6b9cdc8 and 8e2002e await push.
 
 ## Recent Activity
 - Initial commit: README with project definition, glossary, overview
@@ -387,3 +384,32 @@
   3. Resolve FN-002G/H collision via tend (declare known-collision or alias).
   4. Refine gr-elicit transcription heuristics after first real use.
 - **recover**: Read mementum/state.md session-42 closeout for the current recovery path; git index confirmed clean at dd9c657 on add-requirements-layer.
+
+## Session Closeout
+- **last_session_id**: session-44
+- **current_timestamp**: 2026-09-30T16:00:00-06:00
+- **task**: Enforce skill contracts mechanically, namespace internal Allium adapters, canonicalise existence notation, add the vocab-propagate bootstrap, and bring mementum to OKF conformance.
+- **questions**:
+  - Carried: `branch-example/` + `branch-example-original/` fixtures untracked (commit decision); 4 AI_inferred rationale lines pending `/gybis-req-tend`; FN-002G/H collision resolution; gr-elicit heuristics after first real use.
+  - New: should the root local subset (`.agents/skills/`) adopt the contract fields (`kind`/`purpose`/`interaction`), or stay in the older local format per `local-root-skill-subset`?
+- **decisions**:
+  - Invocation authorizes the writes a command defines; distill/propagate persist autonomously, reviewed afterwards via check/weed; only unrequested writes are prohibited.
+  - Check diagnoses; refine/tend/weed act; spec-check is the sole repair exception because an external deterministic oracle (`gybis-allium-gate`) verifies it.
+  - Skill `mode` splits into `interaction {autonomous, interactive}` (+ `output_mode` for describe/explain); ai/auto/mixed/auto_polish/supervised retired.
+  - Build the enforcement mechanism before the taxonomy it polices; declare only `kind`, derive mutates/verifier/authority.
+  - Internal Allium adapters namespace as `gybis-allium-*` to end collision with the external `allium` CLI.
+  - Propagate bootstraps a layer; tend/refine/weed own it. Convention: `X-propagate` creates the layer below X; req-propagate gained `vocabulary.md` write authority.
+  - All four weeders gate completion on validity of what they modified (conditional on `modified_artifacts`), with deadlock avoidance.
+  - Existence is canonically `∃`/`¬∃`; `∅` is canonical but a distinct operator; verbal `exists` is drift; choose by presence-symmetry.
+  - Bundle keeps `gybis-memory-*` names; repo root keeps `gybis-mementum-*` — intentional and mandatory.
+  - OKF `body<200 words`: split 8 over-long memories into paired files with `related:` cross-links.
+- **next**:
+  1. Confirm/push the two local session commits (`6b9cdc8`, `8e2002e`) to origin.
+  2. Decide commit-or-discard for untracked `branch-example/` + `branch-example-original/` fixtures.
+  3. Approve or remove the 4 AI_inferred rationale lines via `/gybis-req-tend`.
+  4. Resolve FN-002G/H collision via tend (declare known-collision or alias).
+  5. Decide whether the root local subset adopts contract fields.
+  6. Refine gr-elicit transcription heuristics after first real use.
+- **recover**: Confirm the two session commits are on origin, then read `mementum/knowledge/skill-contract-system.md` and re-run `internal/gybis-skill-contract-check` over `gybis/.agents/skills/` before resuming contract work.
+
+⏹→state.md
