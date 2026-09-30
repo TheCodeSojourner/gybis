@@ -1,5 +1,6 @@
 ---
 name: gybis-help
+kind: help
 description: Use for `/gybis-help`.
 ---
 
@@ -29,7 +30,7 @@ CRITICAL CONSTRAINTS:
 | `/gybis-memory-synthesize` (`/gm-synthesize`) | Synthesize knowledge |
 | `/gybis-req-check` (`/gr-check`) | Validate requirements designators, ordering, & coverage |
 | `/gybis-req-describe` (`/gr-describe`) | Describe requirements in stakeholder prose |
-| `/gybis-req-distill` (`/gr-distill`) | Create initial requirements (+ vocab candidates) from arch/specs/code |
+| `/gybis-req-distill` (`/gr-distill`) | Create initial requirements (+ vocab candidates) from vocab/arch/specs/code |
 | `/gybis-req-elicit` (`/gr-elicit`) | Elicit requirements via grilling interview rounds |
 | `/gybis-req-explain` (`/gr-explain`) | Explain requirements in dev prose |
 | `/gybis-req-propagate` (`/gr-propagate`) | Annotate specs/tests with REQ traceability |
@@ -47,6 +48,7 @@ CRITICAL CONSTRAINTS:
 | `/gybis-vocab-describe` (`/gv-describe`) | Describe vocabulary in business language |
 | `/gybis-vocab-distill` (`/gv-distill`) | Extract vocabulary from arch/specs/code |
 | `/gybis-vocab-explain` (`/gv-explain`) | Explain vocabulary for developers |
+| `/gybis-vocab-propagate` (`/gv-propagate`) | Bootstrap architecture from req + vocab |
 | `/gybis-vocab-tend` (`/gv-tend`) | Update vocabulary with impact analysis |
 | `/gybis-vocab-weed` (`/gv-weed`) | Upsert vocabulary/artifacts from diffs with human |
 

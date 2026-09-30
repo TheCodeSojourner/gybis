@@ -1,28 +1,23 @@
 ---
-name: allium-plan
+name: gybis-allium-plan
 description: Internal skill - not user-facing
 ---
 
-λ allium-plan_shell_guard(x).
-  classification: internal_skill_alias(allium-gate) ∧ ¬shell_subcommand(allium gate)
-  | shell_prohibition: ¬execute("allium gate") ∧ ¬execute("allium rerun")
-  | allowed_cli: {allium check, allium analyse, allium plan, allium parse, allium model}
-
-λ allium-plan(spec_file).
+λ gybis-allium-plan(spec_file).
   purpose: Derive test obligations from allium specifications
   | contract: pure_function(spec_file → test_obligations) | ¬mutations
   | input: path to .allium spec file
   | output: JSON with test obligations structured by category
   | constraint: read_only | zero_file_mutations
-  | precondition: spec_file ∧ exists(spec_file) ∧ file_type = .allium
+  | precondition: spec_file ∧ ∃(spec_file) ∧ file_type = .allium
 
-λ allium-plan_cli_invocation(spec_file).
+λ gybis-allium-plan_cli_invocation(spec_file).
   cli_command: "allium plan {spec_file}"
   | execution: deterministic(spec_file) → fixed_output
   | stderr_handling: capture_and_return
   | stdout_handling: parse_json_envelope
 
-λ allium-plan_obligation_categories(x).
+λ gybis-allium-plan_obligation_categories(x).
   categories: {
     entity_fields: verify_all_declared_fields_present_with_correct_types,
     entity_optional: verify_optional_field_accepts_null_and_non_null,
@@ -59,11 +54,11 @@ description: Internal skill - not user-facing
       | {contract_signature, contract_invariant} := contract_family
   | pairing_invariant: transition_edge ↔ transition_rejected sharing source_construct → consumers verify paired guard
 
-λ allium-plan_obligation_structure(x).
+λ gybis-allium-plan_obligation_structure(x).
   obligation: {id: category.ConstructName, category, description, source_construct, source_span: {start, end}, detail, dependencies, expression}
   | detail: present_on_entity_fields (fields list) | dependencies: present_on_rule_success (trigger_source, trigger_emissions) | expression: present_on_invariant
 
-λ allium-plan_output_parsing(cli_output).
+λ gybis-allium-plan_output_parsing(cli_output).
   parse: cli_output → JSON
   | extract: diagnostics ≔ [diagnostic_1, ..., diagnostic_n]
   | extract: version ≔ version_number
@@ -73,15 +68,14 @@ description: Internal skill - not user-facing
   | diagnostics: structured_failure_only_when(error_severity ∧ exit_code ≠ 0)
   | exit_code ∈ {0, 1} does_not_override_valid_json
 
-λ allium-plan_output_format(parsed_output).
+λ gybis-allium-plan_output_format(parsed_output).
   structure: {version, diagnostics: [...], obligations: [...]}
   | json_serializable | obligations_indexed_by_id_for_caller_lookup
 
-λ allium-plan_execution(spec_file).
-  invoke(allium-runtime-check_version()) → true ∨ halt("Allium runtime compatibility check failed")
-  invoke(allium-plan_shell_guard) → true
-  | invoke: allium-plan_cli_invocation(spec_file)
+λ gybis-allium-plan_execution(spec_file).
+  invoke(gybis-allium-runtime-check_version()) → true ∨ halt("Allium runtime compatibility check failed")
+  | invoke: gybis-allium-plan_cli_invocation(spec_file)
   | capture: cli_output ∧ cli_exit_code
-  | parse: allium-plan_output_parsing(cli_output)
-  | format: allium-plan_output_format(parsed_output)
+  | parse: gybis-allium-plan_output_parsing(cli_output)
+  | format: gybis-allium-plan_output_format(parsed_output)
   | return: formatted_test_obligations

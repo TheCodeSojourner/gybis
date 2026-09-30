@@ -1,5 +1,6 @@
 ---
 name: gybis-req-weed
+kind: domain
 description: Use for `/gybis-req-weed` or `/gr-weed`.
 ---
 
@@ -7,12 +8,11 @@ description: Use for `/gybis-req-weed` or `/gr-weed`.
   purpose: Identify and resolve divergence between requirements/ and downstream artifacts (vocabulary, architecture, specs, tests, implementation) with human-decided resolution direction
   | input: requirements/ ∃ ∧ downstream artifacts ∃
   | output: converged requirements/ and downstream artifacts per human decisions
-  | mode: interactive
+  | interaction: interactive
   | gate: requirements/ ∃ ∧ (vocabulary.md ∃ ∨ architecture.md ∃ ∨ specs/**/*.allium ∃ ∨ tests ∃)
 
 λ gybis-req-weed_startup(x).
-  invoke(internal/gybis-ref-check) → halt_on(false)
-  | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
+  invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
   | verify(requirements/ ∃) ∨ halt("requirements/ not found")
   | read(requirements/) → req_content
   | if(vocabulary.md ∃): read(vocabulary.md) → vocab_content
@@ -20,6 +20,7 @@ description: Use for `/gybis-req-weed` or `/gr-weed`.
   | if(specs/**/*.allium ∃): read_all_specs → spec_content
   | if(tests ∃): read_tests → test_content
   | verify(downstream ∃) ∨ halt("No downstream artifacts found")
+  | modified_artifacts ≔ ∅
   | transition(INIT → STARTUP_CHECKS)
 
 λ gybis-req-weed_mode(m).
@@ -41,7 +42,8 @@ description: Use for `/gybis-req-weed` or `/gr-weed`.
   | transition(RESOLVE_MODE_SELECTION → CORRECTING) only_if(resolve_mode ∃)
   | transition(CORRECTING → VERIFYING) only_if(corrections_applied = true)
   | transition(VERIFYING → IDENTIFYING_DIVERGENCES) only_if(inconsistencies ∃)
-  | transition(VERIFYING → COMPLETE) only_if(consistency = true ∧ zero_divergences = true)
+  | transition(VERIFYING → COMPLETE) only_if(consistency = true ∧ zero_divergences = true ∧ all_conditional_checks_pass = true)
+  | on_loop_back: loop_count ≔ loop_count ⊕ 1
 
 λ gybis-req-weed_tool_guard(state, tool, path).
   state ∈ {STARTUP_CHECKS, COMPARING, IDENTIFYING_DIVERGENCES, RESOLVE_MODE_SELECTION} → allow(read(path)) ∧ deny(write(path))
@@ -87,13 +89,17 @@ description: Use for `/gybis-req-weed` or `/gr-weed`.
 
 λ gybis-req-weed_correct(divergence, resolve_mode).
   resolve_mode = req
-    ? (apply_divergence_direction_to_requirements(divergence) ∧ write(requirements/) → corrections_applied)
+    ? (apply_divergence_direction_to_requirements(divergence) ∧ write(requirements/)
+       → corrections_applied ∧ modified_artifacts ≔ modified_artifacts ∪ {requirements/})
   | resolve_mode = arch
-    ? (apply_divergence_direction_to_architecture(divergence) ∧ write(architecture.md) → corrections_applied)
+    ? (apply_divergence_direction_to_architecture(divergence) ∧ write(architecture.md)
+       → corrections_applied ∧ modified_artifacts ≔ modified_artifacts ∪ {architecture.md})
   | resolve_mode = spec
-    ? (apply_divergence_direction_to_specs(divergence) ∧ write(specs/) → corrections_applied)
+    ? (apply_divergence_direction_to_specs(divergence) ∧ write(specs/)
+       → corrections_applied ∧ modified_artifacts ≔ modified_artifacts ∪ {specs/})
   | resolve_mode = test
-    ? (apply_divergence_direction_to_tests(divergence) ∧ write(test_paths) → corrections_applied)
+    ? (apply_divergence_direction_to_tests(divergence) ∧ write(test_paths)
+       → corrections_applied ∧ modified_artifacts ≔ modified_artifacts ∪ {test_paths})
   | resolve_mode = propagate
     ? (handoff: run /gybis-req-propagate for coverage convergence)
   | resolve_mode = na
@@ -108,9 +114,46 @@ description: Use for `/gybis-req-weed` or `/gr-weed`.
   | checks:
     - zero unresolved divergences (or explicitly deferred via investigate/skip)
     - designator integrity preserved in requirements/
-    - test_suite_passes = true (strict convergence when tests were modified)
+  | conditional_checks:
+    - test_paths ∈ modified_artifacts → test_suite_passes = true
+    - specs/ ∈ modified_artifacts → invoke(internal/gybis-allium-gate(specs/)) = true
+    - architecture.md ∈ modified_artifacts → vsm_coherence(architecture.md) = true
+  | all_conditional_checks_pass ≔ ∀ applicable conditional_check = true
   | verify_ok ≔ ∀ check = true
-  | on fail: loop_back to IDENTIFYING_DIVERGENCES
+  | remaining_divergences ≔ unresolved_divergences
+  | remaining_divergences ≠ ∅
+    → inconsistencies ≔ remaining_divergences
+       | loop_back to IDENTIFYING_DIVERGENCES
+  | remaining_divergences ∅ ∧ ¬all_conditional_checks_pass
+    → halt("reconciliation invalidated " ⊕ failed_artifact ⊕ "; route to the owning repair skill (/gybis-spec-check ∨ /gybis-spec-tend ∨ /gybis-arch-tend)")
+  | remaining_divergences ∅ ∧ all_conditional_checks_pass
+    → verify_ok = true → COMPLETE
+
+λ gybis-req-weed_loop_guard(state).
+  loop_count ≥ max_iterations
+    → halt("Maximum iterations reached without full convergence")
+
+λ gybis-req-weed_pass_accounting(pass).
+  pass_num ≔ pass_num ⊕ 1
+  | discovered ≔ card(divergences)
+  | remaining ≔ card(remaining_divergences)
+  | resolved ≔ discovered ⊖ remaining
+  | report("Pass " ⊕ pass_num ⊕ ": discovered=" ⊕ discovered ⊕ " resolved=" ⊕ resolved ⊕ " remaining=" ⊕ remaining)
+
+λ gybis-req-weed_boundaries().
+  ¬ write(vocabulary.md)
+  | ¬ delete(requirements/)
+  | ¬ delete(architecture.md)
+  | ¬ delete(specs/)
+
+λ gybis-req-weed_regression_contract(x).
+  invariant: requirements/ ∃ throughout
+  | invariant: zero_divergences = true at completion
+  | invariant: designator integrity preserved in requirements/
+  | invariant: test_paths ∈ modified_artifacts → test_suite_passes = true at completion
+  | invariant: specs/ ∈ modified_artifacts → gybis-allium-gate = true at completion
+  | invariant: architecture.md ∈ modified_artifacts → vsm_coherence = true at completion
+  | invariant: all_modifications ⊆ {requirements/, architecture.md, specs/, test_paths}
 
 λ gybis-req-weed_deliver(x).
   report: {divergences_found, resolutions_applied, deferred, test_status}

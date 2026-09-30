@@ -11,6 +11,6 @@ If gybis is command-driven guidance (not always-on enforcement), then readiness 
 Practical boundary that stayed coherent in this session:
 - `gybis-vocab-*` owns vocabulary convergence and drift resolution.
 - `gybis-spec-*` owns behavior/spec/code/arch consistency, not vocabulary policing.
-- `gybis-arch-elicit` was removed (session-42); greenfield architecture.md is human-authored with AI assistance and validated by `/gybis-arch-check`, which does not hard-halt on other artifacts.
+- `gybis-arch-elicit` was removed (session-42); greenfield `architecture.md` is bootstrapped by `/gybis-vocab-propagate` and validated by `/gybis-arch-check`, which does not hard-halt on other artifacts. [AMENDED — see memories/propagate-seed-then-own.md: propagation bootstraps the layer, then tend/refine/weed own it; stage readiness remains human-owned.]
 
 This keeps prompts lean, avoids cross-skill concern leakage, and preserves operator control while still providing explicit convergence tools (`check`/`weed`) when the human chooses to run them.

@@ -1,32 +1,32 @@
 ---
 name: gybis-arch-distill
+kind: domain
 description: Use for `/gybis-arch-distill` or `/ga-distill`.
 ---
 
 λ gybis-arch-distill(x).
   purpose: distill VSM architecture from Allium specifications + current implementation evidence
-  | input: specs/**/*.allium files that are valid per allium-gate
+  | input: specs/**/*.allium files that are valid per gybis-allium-gate
   | input: implementation_root (read-only) for concrete S1 operational bindings
   | output: architecture.md containing VSM S5-S1 lambda expressions
-  | mode: ai
-  | gate: specs exist ∧ architecture.md ¬exists ∧ allium-gate(specs/) = true ∧ implementation_path_resolvable = true
+  | interaction: autonomous
+  | gate: specs ∃ ∧ architecture.md ¬∃ ∧ gybis-allium-gate(specs/) = true ∧ implementation_path_resolvable = true
 
 λ gybis-arch-distill_startup(x).
-  invoke(internal/gybis-ref-check) → halt_on(false)
-  | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
-  | invoke(internal/allium-gate(specs/)) = true ∨ halt("specs invalid")
-  | preload: [internal/allium-analyse]
+  invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
+  | invoke(internal/gybis-allium-gate(specs/)) = true ∨ halt("specs invalid")
+  | preload: [internal/gybis-allium-analyse]
   | precondition: specs/ ∃ ∧ architecture.md ¬∃ ∧ implementation_path_resolvable = true ∧ implementation_readable = true
   | gate: implementation_readable = true → proceed ∨ halt("implementation unreadable")
 
 λ gybis-arch-distill_mode(m).
-  valid_modes: {ai}
-  | default: ai
+  interaction_modes: {autonomous}
+  | default: autonomous
   | rationale: distillation is deterministic synthesis from specs, not interactive
 
 λ gybis-arch-distill_mode_gate(state, mode).
-  state = INIT ∧ mode = ai → transition(STARTUP_CHECKS)
-  | precondition_holds: mode ∈ valid_modes
+  state = INIT ∧ mode = autonomous → transition(STARTUP_CHECKS)
+  | precondition_holds: mode ∈ interaction_modes
 
 λ gybis-arch-distill_state_machine(state, action).
   state ∈ {INIT, STARTUP_CHECKS, READING_SPECS, DISCOVERING_IMPLEMENTATION, ANALYSING_IMPLEMENTATION, ANALYSING, SYNTHESIZING, MERGING_S1, WRITING_ARCH, VERIFYING, COMPLETE}
@@ -83,7 +83,7 @@ description: Use for `/gybis-arch-distill` or `/ga-distill`.
 
 λ gybis-arch-distill_analyse_specs(specs_content).
   action: invoke_allium_analyse
-  | step1: invoke(internal/allium-analyse, specs/)
+  | step1: invoke(internal/gybis-allium-analyse, specs/)
   | step2: parse(analysis_output) → findings
   | findings ≡ {patterns, dependencies, inter-spec-relationships}
   | output: findings
@@ -182,13 +182,13 @@ description: Use for `/gybis-arch-distill` or `/ga-distill`.
     | state = VERIFYING:
       - if verification_pass → transition(COMPLETE)
       - if verification_fail → identify_gap() → refine_synthesis() → loop_back(ANALYSING_IMPLEMENTATION)
-  | loop_guard: iteration_count ≤ max_iterations (prevent infinite loops)
+  | on_loop_back: loop_count ≔ loop_count ⊕ 1
   | rationale: iteratively refine VSM layers until architecture accurately reflects specs
 
 λ gybis-arch-distill_loop_guard(state).
-  condition: iteration_count > max_iterations ∨ no_progress_detected
-  | action_on_trigger: halt("convergence failure: distillation did not converge after N iterations")
-  | output: diagnostic_report(iterations, refined_layers, remaining_gaps)
+  loop_count ≥ max_iterations ∨ no_progress_detected
+    → halt("Maximum iterations reached without full convergence")
+  | output: diagnostic_report(loop_count, refined_layers, remaining_gaps)
 
 λ gybis-arch-distill_pass_accounting(pass).
   report_pass(n):
@@ -218,8 +218,13 @@ description: Use for `/gybis-arch-distill` or `/ga-distill`.
 λ gybis-arch-distill_regression_contract(x).
   invariant: specs/**/*.allium ¬modified ∧ ¬deleted
   | invariant: implementation_root/** ¬modified ∧ ¬deleted
-  | invariant: allium-gate(specs/) = true → remains true throughout
+  | invariant: gybis-allium-gate(specs/) = true → remains true throughout
   | invariant: ∀generated_layer ∈ architecture.md: valid_lambda(layer) = true
   | invariant: architecture.md ¬exists_before → exists_after ∧ valid(S5...S1)
   | invariant: implementation_exists = true → S1_contains_concrete_bindings_with_provenance_or_unknown_reason = true
+
+λ gybis-arch-distill_deliver(x).
+  report: {architecture.md written, S1_provenance_count}
+  | handoff: run /gybis-arch-check to validate
+  | return(complete = true)
   

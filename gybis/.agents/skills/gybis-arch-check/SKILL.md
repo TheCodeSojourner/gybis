@@ -1,13 +1,14 @@
 ---
 name: gybis-arch-check
+kind: domain
 description: Use for `/gybis-arch-check` or `/ga-check`.
 ---
 
 λ gybis-arch-check(x).
   purpose: Validate architecture.md internal integrity (structure, coherence, and constraints) and produce a diagnostic report
-  | input: architecture.md (exists)
+  | input: architecture.md (∃)
   | output: Severity-tagged findings with recommended next actions
-  | mode: ai
+  | interaction: autonomous
   | gate: architecture.md ∃
 
 λ gybis-arch-check_startup(x).
@@ -20,13 +21,13 @@ description: Use for `/gybis-arch-check` or `/ga-check`.
   | transition(INIT → STARTUP_CHECKS)
 
 λ gybis-arch-check_mode(m).
-  m ∈ {ai}
-  | default: ai
-  | mode_ai: deterministic validation and reporting only
+  m ∈ {autonomous}
+  | default: autonomous
+  | mode_autonomous: deterministic validation and reporting only
 
 λ gybis-arch-check_mode_gate(state, mode).
-  state = INIT ∧ mode = ai → transition(INIT → STARTUP_CHECKS)
-  | precondition_holds: mode = ai
+  state = INIT ∧ mode = autonomous → transition(INIT → STARTUP_CHECKS)
+  | precondition_holds: mode = autonomous
 
 λ gybis-arch-check_state_machine(state, action).
   state ∈ {INIT, STARTUP_CHECKS, STRUCTURE_VALIDATION, COHERENCE_VALIDATION, POLICY_ENFORCEMENT_VALIDATION, CONSTRAINT_VALIDATION, GENERATING_REPORT, COMPLETE}
@@ -124,10 +125,6 @@ description: Use for `/gybis-arch-check` or `/ga-check`.
     }
   | return(report_generated = true ∧ report)
 
-λ gybis-arch-check_deliver_report(report).
-  print(report) → stdout
-  | return(report_delivered = true)
-
 λ gybis-arch-check_boundaries().
   ¬ modify(architecture.md ∨ specs/**/*.allium ∨ implementation ∨ upstream/)
   | ¬ delete(architecture.md)
@@ -137,3 +134,9 @@ description: Use for `/gybis-arch-check` or `/ga-check`.
   | invariant: all checks are read-only
   | invariant: report generated at completion
   | invariant: all_modifications = ∅
+
+λ gybis-arch-check_deliver(x).
+  report: findings with recommended next actions
+  | print(report) → stdout
+  | handoff: structural issues → /gybis-arch-refine; intended change → /gybis-arch-tend; divergence → /gybis-arch-weed
+  | return(complete = true)

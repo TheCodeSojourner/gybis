@@ -1,4 +1,8 @@
-✅ session-42 | 2026-09-29 gybis-vocab-elicit and gybis-arch-elicit removed; greenfield vocab/arch artifacts now human-authored; doc surfaces synchronized (commit c20b767 then removal commit)
+✅ session-47 | 2026-09-30 OKF memory conformance: 8 memories exceeded the `body<200 words` rule; each split into two sub-200 files with `related:` cross-links (e.g. canonical-existence-negation + absence-operator-selection-rule). Memories 31 → 39, all conformant
+✅ session-46 | 2026-09-30 absence-operator selection rule. Legend gained the missing `∅` entry + a presence-symmetry rule (`X ¬∃` when `X ∃` = presence; `X = ∅` for collections). Aligned 5 presence-symmetry violations (gybis-arch-propagate glob ×4, gybis-spec-propagate implementation ×1) from `∅` → `¬∃`; collection `∅` untouched. Forcing spelling uniformity was rejected as a goal — see memories/canonical-existence-negation.md
+✅ session-45 | 2026-09-30 existence-notation canonicalisation. Operator authority is SYSTEM_DESIGN.md: `∃`/`¬∃` and `∅` are BOTH canonical (different operators); verbal `exists` is not an operator. Canonicalised operator-form `exists`/`¬exists` → `∃`/`¬∃` across ~20 files incl. internal/reference/vsm-guide.md; left `∅`, `X_exists` identifiers, prose, and Allium DSL untouched — see memories/canonical-existence-negation.md
+✅ session-44 | 2026-09-30 skill-contract consistency sweep: fixed 6 real findings (vocab-distill create-only guard; fini/init contract fields; memory-migrate input/output; req-describe/explain boundary; req-check boundaries+regression) and re-derived 4 checker rules from the corpus (distill universally create-only; boundaries required for read-only skills too; memory `delegate` not required; absence-guard grammar) [AMENDED session-45: the earlier claim that `∅` is non-canonical drift was WRONG — `∅` is a canonical operator in SYSTEM_DESIGN.md]
+✅ session-42 | 2026-09-29 gybis-vocab-elicit and gybis-arch-elicit removed; greenfield vocab/arch artifacts now human-authored [SUPERSEDED — see memories/propagate-seed-then-own.md: architecture is bootstrapped by /gybis-vocab-propagate and vocabulary by /gybis-req-propagate + /gybis-vocab-tend]; doc surfaces synchronized (commit c20b767 then removal commit)
 ✅ session-40 | 2026-09-29 gybis-init orient complete on branch add-requirements-layer at session-39 head (85b9a97)
 ✅ session-38 | 2026-09-29 Requirements layer added: /gybis-req-* nine-skill family scaffolded and command surfaces synchronized
 ✅ session-36 | 2026-08-20 gybis-fini closeout: downstream upgrade documentation and Allium compatibility gate committed
@@ -38,9 +42,9 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-09-29T16:30:00-06:00
-- **Sessions**: 42 (session-0 initialized through session-42 gybis-init orient)
-- **Status**: Session-42 — vocab-elicit/arch-elicit removed; surfaces synchronized; branch add-requirements-layer
+- **Last updated**: 2026-09-30T00:00:00-06:00
+- **Sessions**: 47 (session-0 initialized through session-47 OKF memory conformance)
+- **Status**: Session-47 — all 39 memories conform to OKF (`body<200 words`, frontmatter `type`); 8 over-long memories split with `related:` cross-links
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
@@ -158,10 +162,10 @@
   - Stored memory: `mementum/memories/gybis-fini-commit-default-blocker-escalation.md`
 
 ## Feed-Forward Signals
-- Allium adapters now perform a shared executable version preflight through `internal/allium-runtime-check`
+- Allium adapters now perform a shared executable version preflight through `internal/gybis-allium-runtime-check`
 - Runtime compatibility distinguishes unsupported executables from `NO_SPECS` empty-target results
 - Downstream upgrade instructions now cover command-bundle-only copying, Allium `3.5.3+`, Mementum migration, `NO_SPECS`, and independent fleet rollout
-- `allium-gate` requires at least one `.allium` file before per-file or set-level validation
+- `gybis-allium-gate` requires at least one `.allium` file before per-file or set-level validation
 - README.md now synchronized with actual gybis/.agents/skills/ directory
 - Hidden bundle layouts require `cp -ra <bundle>/. .`; `*` globs skip `.agents/`
 - Command tables synchronized with current command surface, including `/gybis-vocab-weed`
@@ -204,7 +208,7 @@
   1. Run a real valid `.allium` fixture through the new target payload probe and adapter normalization path.
   2. Keep upstream pins unchanged unless upstream heads advance.
   3. Continue standard monitoring for command-surface, output-mode, and architecture policy/enforcement drift.
-- **recover**: Read `gybis/.agents/skills/internal/allium-runtime-check/SKILL.md`, then exercise version, no-spec, legacy-payload, and current-payload cases.
+- **recover**: Read `gybis/.agents/skills/internal/gybis-allium-runtime-check/SKILL.md`, then exercise version, no-spec, legacy-payload, and current-payload cases.
 
 ## Session Orientation
 - **current_timestamp**: 2026-09-29T00:00:00-06:00
@@ -233,8 +237,8 @@
   - Canonical form: REQ-<DOMAIN>-NNN designators with nucleus lambda clause bodies; MUST ≡ ∀/¬, SHOULD ≡ preferred, MAY ≡ ∃ permitted.
   - Pattern adopted from branch-example/requirements (cljonic): dependency-ordered modules + index, deferred non-binding sections, REQ-to-test traceability; clause granularity made configurable (library-contract vs application).
   - gr-elicit based on mattpocock/skills grilling protocol (frontier rounds, recommended answers, empty-frontier termination) plus decided-vs-researched attribution.
-  - gr-distill emits vocabulary term candidates handed to /gybis-vocab-tend; gybis-vocab-distill now lists requirements/ as a source; vocabulary.md never written by req skills.
-  - Boundaries preserved: check read-only diagnostics; strict test-pass convergence in propagate/weed; describe/explain session-16 output modes.
+  - gr-distill emits vocabulary term candidates handed to /gybis-vocab-tend; gybis-vocab-distill now lists requirements/ as a source; vocabulary.md never written by req skills. [SUPERSEDED — see memories/distill-input-direction.md: direction reversed to vocab → req; vocab-distill no longer reads requirements/, req-distill now reads vocabulary.md.]
+  - Boundaries preserved: check read-only diagnostics; strict test-pass convergence in propagate/weed; describe/explain session-16 output modes. [AMENDED — see memories/check-boundary-verifier-exception.md: spec-check is now the documented exception, permitted to repair because the allium CLI verifies it.]
 - **next**:
   1. Run gr-elicit against a real project to refine round/transcription heuristics.
   2. Define the recommended default domain-prefix set for requirements-index.md.
@@ -347,7 +351,7 @@
 - Rationale: requirements layer now sits atop the durability order (req > vocab > arch > spec > tests > code); elicit skills created vocabulary.md/architecture.md without requirements grounding — layer-ordering inversion. Precedent: /gybis-spec-elicit was removed the same way.
 - Deleted: gybis/.agents/skills/gybis-vocab-elicit/, gybis/.agents/skills/gybis-arch-elicit/.
 - Updated: gybis-arch-describe and gybis-arch-explain halt pointers (now /gybis-arch-distill only); gybis-spec-propagate S1_source_of_truth (lambda-arch-distill.md only); internal/reference/allium-recommended-loops.md no_spec entry path (req-elicit → checks → arch-propagate → spec-tend) and forbidden-skill constraints.
-- Greenfield replacement: vocabulary.md and architecture.md are human-authored with AI assistance from requirements, validated by /gybis-vocab-check and /gybis-arch-check (tend gates require artifacts to exist, so no creation skill remains for these layers — consistent with human-owned stage readiness).
+- Greenfield replacement: vocabulary.md and architecture.md are human-authored with AI assistance from requirements, validated by /gybis-vocab-check and /gybis-arch-check (tend gates require artifacts to exist, so no creation skill remains for these layers — consistent with human-owned stage readiness). [SUPERSEDED — see memories/propagate-seed-then-own.md: /gybis-vocab-propagate now creates architecture.md, and /gybis-req-propagate seeds vocabulary resolved by /gybis-vocab-tend.]
 - Doc surfaces synchronized: GYBIS-README (Quick Start, Start a New Repository, New Repository philosophy, command table rows), README.md (command table rows), gybis-help (table rows).
 - Memory stored: mementum/memories/elicit-skills-removed.md; knowledge page requirements-layer.md forward path updated; human-owned-stage-readiness.md memory refreshed.
 
@@ -359,8 +363,8 @@
   - Carried: 4 AI_inferred rationale approvals pending; FN-002G/H collision resolution; compound_by_design markers; branch-example fixtures commit decision; gr-elicit heuristics after first real use.
   - New: none this session.
 - **decisions**:
-  - Elicit skills removed rather than subordinated; greenfield vocabulary.md/architecture.md become human-authored artifacts validated by check skills.
-  - Requirements-first greenfield chain: /gybis-req-elicit → human-authored vocab/arch → checks → /gybis-arch-propagate → /gybis-spec-propagate.
+  - Elicit skills removed rather than subordinated; greenfield vocabulary.md/architecture.md become human-authored artifacts validated by check skills. [SUPERSEDED — see memories/propagate-seed-then-own.md.]
+  - Requirements-first greenfield chain: /gybis-req-elicit → human-authored vocab/arch → checks → /gybis-arch-propagate → /gybis-spec-propagate. [SUPERSEDED — see memories/propagate-seed-then-own.md: now /gybis-req-elicit → /gybis-req-propagate → /gybis-vocab-propagate → /gybis-arch-propagate → /gybis-spec-propagate.]
 - **next**:
   1. Review/commit the untracked branch-example/ and branch-example-original/ fixture directories.
   2. Approve or remove the 4 AI_inferred rationale lines via /gybis-req-tend.

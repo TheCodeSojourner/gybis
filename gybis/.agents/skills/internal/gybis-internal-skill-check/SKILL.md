@@ -13,17 +13,18 @@ description: Internal skill - not user-facing
 
 λ gybis-internal-skill-check_required_skills(manifest).
   files_to_check: {
-    internal/allium-analyse/SKILL.md
-    internal/allium-check/SKILL.md
-    internal/allium-gate/SKILL.md
-    internal/allium-normalize/SKILL.md
-    internal/allium-plan/SKILL.md
-    internal/allium-runtime-check/SKILL.md
+    internal/gybis-allium-analyse/SKILL.md
+    internal/gybis-allium-check/SKILL.md
+    internal/gybis-allium-gate/SKILL.md
+    internal/gybis-allium-normalize/SKILL.md
+    internal/gybis-allium-plan/SKILL.md
+    internal/gybis-allium-runtime-check/SKILL.md
+    internal/gybis-skill-contract-check/SKILL.md
   }
   | all_paths ⊂ repository_root ∧ readable(file)
 
 λ gybis-internal-skill-check_validation(file_path).
-  check: exists(file_path) ∧ readable(file_path)
+  check: ∃(file_path) ∧ readable(file_path)
   | on_success: → true
   | on_failure: → (false, diagnostic)
   | diagnostic: "Internal skill missing: {file_path}"

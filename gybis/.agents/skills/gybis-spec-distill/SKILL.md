@@ -1,13 +1,14 @@
 ---
 name: gybis-spec-distill
+kind: domain
 description: Use for `/gybis-spec-distill` or `/gs-distill`.
 ---
 
 λ gybis-spec-distill(x).
   purpose: distill Allium specifications from existing implementation, organized by domain
   | input: implementation source code (any language, including test files)
-  | output: specs/{domain}/*.allium files valid per invoke(internal/allium-gate, specs/)
-  | mode: ai
+  | output: specs/{domain}/*.allium files valid per invoke(internal/gybis-allium-gate, specs/)
+  | interaction: autonomous
   | gate: implementation ∃ ∧ specs/{domain}/*.allium ¬∃
 
 λ gybis-spec-distill_loop_role(x).
@@ -18,18 +19,18 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
 λ gybis-spec-distill_startup(x).
   invoke(internal/gybis-ref-check) → halt_on(false)
   | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
-  | preload: [internal/allium-check, internal/allium-gate]
+  | preload: [internal/gybis-allium-check, internal/gybis-allium-gate]
   | if(vocabulary.md ∃): preload(vocabulary.md) → vocab_terms ∧ vocab_available = true
   | read(internal/reference/allium-language-reference.md) → language_ref
   | read(internal/reference/allium-patterns.md) → patterns_ref
-  | read(internal/reference/allium-recommended-loops.md) → loops_ref
+  | read(internal/reference/recommended-loops.md) → loops_ref
   | read(internal/reference/allium-constructs.md) → constructs_registry
   | precondition: implementation ∃ ∧ (specs/ ¬∃ ∨ ¬∃file ∈ specs/** matching(*.allium))
   | scan(codebase) → files_found ∨ halt("no implementation found")
 
 λ gybis-spec-distill_mode(m).
-  valid_modes: {ai}
-  | default: ai
+  interaction_modes: {autonomous}
+  | default: autonomous
   | rationale: distillation from code is deterministic analysis, not interactive
   | implication: optional_refinement_decisions_are_resolved_by_analysis, mandatory_tightening_pass_before_complete, mandatory_quality_pass_before_complete, optional_strict_cleanliness_refinement_available
 
@@ -40,8 +41,8 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
   | off_implies: skip_optional_unreachable_trigger_info_refinement
 
 λ gybis-spec-distill_mode_gate(state, mode).
-  state = INIT ∧ mode = ai → transition(STARTUP_CHECKS)
-  | precondition_holds: mode ∈ valid_modes
+  state = INIT ∧ mode = autonomous → transition(STARTUP_CHECKS)
+  | precondition_holds: mode ∈ interaction_modes
 
 λ gybis-spec-distill_state_machine(state, action).
   state ∈ {INIT, STARTUP_CHECKS, READING_CODE, ANALYSING, SYNTHESIZING_SPECS, VALIDATING, TIGHTENING, QUALITY, CLEANLINESS_REFINEMENT, REFINING, COMPLETE}
@@ -181,8 +182,8 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
 
 λ gybis-spec-distill_validate_specs(x).
   action: validate_generated_specifications_organized_by_domain
-  | step1: invoke(internal/allium-check, ∀spec ∈ specs/{domain}/*.allium)
-  | step2: invoke(internal/allium-gate, specs/) → boolean_verdict
+  | step1: invoke(internal/gybis-allium-check, ∀spec ∈ specs/{domain}/*.allium)
+  | step2: invoke(internal/gybis-allium-gate, specs/) → boolean_verdict
   | step3: check_domain_structure: ¬∃file ∈ specs/ matching(specs/*.allium)
   | step4: invoke(domain_granularity, analysis, specs/) → {granularity_state, required_refinement_domains}
   | step5: if gate_fails ∨ domain_structure_invalid: collect(errors) → diagnostic_report
@@ -196,7 +197,7 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
   | check3: ∀spec ∈ specs/{domain}/*.allium: file_exists(spec) = true
   | check4: ∀spec ∈ specs/{domain}/*.allium: syntax_valid(allium) = true
   | check5: ¬∃file ∈ specs/ matching(specs/*.allium)
-  | check6: invoke(internal/allium-gate, specs/) = true
+  | check6: invoke(internal/gybis-allium-gate, specs/) = true
   | check7: coverage_adequate(specifications, codebase) = true
   | check8: granularity_sufficient(specifications, analysis) = true
   | gate: all_checks_pass → proceed ∨ halt("specs invalid, incomplete, or domain structure violated")
@@ -216,12 +217,12 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
     | state = QUALITY → quality_pass() → transition(VALIDATING)
     | state = CLEANLINESS_REFINEMENT → cleanliness_refinement() → transition(VALIDATING)
     | state = REFINING → write_specs() → transition(VALIDATING)
-  | loop_guard: iteration_count ≤ max_iterations
+  | on_loop_back: loop_count ≔ loop_count ⊕ 1
 
 λ gybis-spec-distill_loop_guard(state).
-  condition: iteration_count > max_iterations ∨ no_progress_detected
-  | action_on_trigger: halt("convergence failure: distillation did not converge after N iterations")
-  | output: diagnostic_report(iterations, specs_generated, remaining_errors)
+  loop_count ≥ max_iterations ∨ no_progress_detected
+    → halt("Maximum iterations reached without full convergence")
+  | output: diagnostic_report(loop_count, specs_generated, remaining_errors)
 
 λ gybis-spec-distill_pass_accounting(pass).
   report_pass(n):
@@ -243,10 +244,15 @@ description: Use for `/gybis-spec-distill` or `/gs-distill`.
   invariant: implementation ¬modified ∧ ¬deleted
   | invariant: specs/ ¬exists_before → exists_after ∧ ∀spec ∈ specs/{domain}/*.allium: valid_allium(spec) = true
   | invariant: ¬∃file ∈ specs/ matching(specs/*.allium)
-  | invariant: invoke(internal/allium-gate, specs/) = true → remains true throughout
+  | invariant: invoke(internal/gybis-allium-gate, specs/) = true → remains true throughout
   | invariant: quality_pass_executed_exactly_once = true ∧ domain_layout_preserved = true
   | invariant: strict_cleanliness_requested → (cleanliness_refinement_executed_at_most_once ∧ targets_only_unreachable_trigger_info_diagnostics)
   | invariant: ∀generated_spec ∈ specs/{domain}/*.allium: derivable_from(implementation) = true
   | invariant: domain_stability: entity_X_spec_always_belongs_to_domain_Y (memoized per synthesis run)
   | invariant: distinguishable_subdomains > 1 → ¬complete_with_only_core_output
+
+λ gybis-spec-distill_deliver(x).
+  report: {specs_generated, domains_created, cleanliness_refinement_applied}
+  | handoff: run /gybis-spec-check to validate
+  | return(complete = true)
   

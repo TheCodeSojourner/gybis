@@ -114,8 +114,9 @@ Compact way to encode principles + rules.
 ¬              not, never
 ≡              defined as, always equals
 ≢              not, don't conflate
-∃              there exists
+∃              there exists (a named artifact or matching file exists)
 ∀              for all
+∅              empty set / no result (a collection or result is empty)
 ∝              scales with
 ∘              compose (f ∘ g applies f after g)
 ⊗              tensor product (all constraints simultaneously)
@@ -125,6 +126,12 @@ Use `λ name.` for declarations that govern by identity or policy, `λ name().`
 for an explicit zero-argument operation, and `λ name(x).` when the body maps an
 input. Lambda parameters are identifiers; use `¬` only as an operator in a
 lambda body.
+
+Absence has two canonical forms, chosen by the presence idiom. Write `X ¬∃`
+when `X ∃` expresses presence — a named artifact or a file-glob
+(`architecture.md ¬∃`, `specs/**/*.allium ¬∃`). Write `X = ∅` when `X` is a
+collection, accumulator, or result with no `X ∃` form (`violations = ∅`,
+`proposals ≔ ∅`).
 
 Multi-line lambdas indent continuations, use `|` for independent clauses:
 ```
@@ -136,7 +143,7 @@ Multi-line lambdas indent continuations, use `|` for independent clauses:
 ## Installation Process
 
 λ(install, cycle, S5→S1: observe() → ask() → propose(2-4 lambdas + prose) → refine(feedback) → confirm(lock) → descend(Sn-1))
-λ(install, entry, exists(architecture.md) → read_as_input ∧ ask(vision) | ¬exists → ask(what + why) → start(S5))
+λ(install, entry, ∃(architecture.md) → read_as_input ∧ ask(vision) | ¬∃ → ask(what + why) → start(S5))
 λ(install, output, ¬overwrite(architecture.md) ≡ explicit(human_approval))
 
 ## architecture.md Assembly Format

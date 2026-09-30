@@ -1,5 +1,6 @@
 ---
 name: gybis-vocab-refine
+kind: domain
 description: Use for `/gybis-vocab-refine` or `/gv-refine`.
 ---
 
@@ -7,12 +8,12 @@ description: Use for `/gybis-vocab-refine` or `/gv-refine`.
   purpose: Refine vocabulary.md structure, clarity, and maintainability while preserving canonical meaning
   | input: vocabulary.md ∃ ∧ parseable
   | output: vocabulary.md structurally refined with semantic-preservation evidence
-  | mode: mixed
+  | interaction: interactive ∨ autonomous(safe_only)
   | gate: vocabulary.md ∃ ∧ explicit_human_mode_selection() ≡ true
   | fail_closed: missing_human_mode_selection → halt("Human mode selection is required")
 
 λ gybis-vocab-refine_loop_role(x).
-  role: improve(vocab_hygiene)
+  role: maintain(vocab_hygiene)
   | meaning: reorganize and polish vocabulary.md so humans and AI can understand and evolve it more easily without changing intended term meaning
   | suggested_next: run vocabulary validation
 
@@ -21,27 +22,28 @@ description: Use for `/gybis-vocab-refine` or `/gv-refine`.
   | verify(vocabulary.md ∃) ∨ halt("vocabulary.md not found")
   | read(vocabulary.md) → vocab_content
   | parse(vocab_content) → vocabulary_terms ∨ halt("vocabulary.md parse failed")
-  | read(internal/reference/allium-recommended-loops.md) → loops_ref
+  | read(internal/reference/recommended-loops.md) → loops_ref
   | read(internal/reference/vsm-guide.md) → vsm_ref
   | transition(INIT → STARTUP_CHECKS)
 
 λ gybis-vocab-refine_mode(m).
-  m ∈ {interactive, auto_polish}
+  m ∈ {interactive, autonomous}
   | default: interactive (informational_only; never auto-selected)
   | mode_interactive: AI proposes refinements and applies only approved set
-  | mode_auto_polish: AI applies only safe non-breaking hygiene refinements
+  | mode_autonomous: AI applies refinements without human approval, restricted to scope = safe_only (safe non-breaking hygiene)
+  | scope: autonomous ⇒ safe_only
   | require_explicit: ¬explicit(mode_choice) → halt("Refine mode must be explicitly selected by human")
 
 λ gybis-vocab-refine_mode_selection(x).
-  ask_developer("Refine mode? [interactive/auto_polish]") → selected_mode
+  ask_developer("Refine mode? [interactive/autonomous]") → selected_mode
   | selected_mode ∃ ∨ halt("Human mode selection is required; no implicit default")
-  | selected_mode ∈ {interactive, auto_polish} ∨ halt("Refine mode must be one of the supported options")
+  | selected_mode ∈ {interactive, autonomous} ∨ halt("Refine mode must be one of the supported options")
   | return(mode_selected = true ∧ mode_selected_explicit = true ∧ mode = selected_mode)
 
 λ gybis-vocab-refine_mode_gate(state, mode).
-  state = INIT ∧ mode ∈ {interactive, auto_polish} ∧ mode_selected_explicit = true → transition(INIT → MODE_SELECTED)
+  state = INIT ∧ mode ∈ {interactive, autonomous} ∧ mode_selected_explicit = true → transition(INIT → MODE_SELECTED)
   | state = INIT ∧ ¬mode_selected_explicit → halt("Explicit human mode selection is required before startup")
-  | ¬(state = INIT) ∨ ¬(mode ∈ {interactive, auto_polish}) → halt("Invalid mode selection")
+  | ¬(state = INIT) ∨ ¬(mode ∈ {interactive, autonomous}) → halt("Invalid mode selection")
 
 λ gybis-vocab-refine_state_machine(state, action).
   state ∈ {INIT, MODE_SELECTED, STARTUP_CHECKS, READING_VOCAB, ANALYZING_STRUCTURE, PROPOSING_REFINEMENTS, CLASSIFYING_IMPACT, APPROVAL_GATE, APPLYING_REFINEMENTS, VERIFYING_VALIDITY, VERIFYING_SEMANTICS, COMPLETE}
@@ -124,7 +126,7 @@ description: Use for `/gybis-vocab-refine` or `/gv-refine`.
     ? collect({change: dedupe_list_items, targets: structure_report.self_synonym_violations}) → proposals
   | structure_report.orphan_terms ≠ ∅
     ? collect({change: insert_navigation_index, targets: structure_report.orphan_terms}) → proposals
-  | mode = auto_polish
+  | mode = autonomous
     ? proposals ≔ {p | p ∈ proposals ∧ gybis-vocab-refine_refinement_taxonomy(p.change) = non_breaking_polish}
   | return(refinement_proposals = proposals)
 
@@ -151,7 +153,7 @@ description: Use for `/gybis-vocab-refine` or `/gv-refine`.
   | return(deferred_report ≔ {deferred_semantic, deferred_external_drift})
 
 λ gybis-vocab-refine_approval_gate(impact_report, mode).
-  mode = auto_polish
+  mode = autonomous
     ? (verify(impact_report.breaking_candidates = ∅) ∧ verify(impact_report.unknown_candidates = ∅)
        | approved_changes ≔ {c.proposal | c ∈ impact_report.classified_proposals}
        | semantic_override_approved ≔ false)
@@ -234,5 +236,10 @@ description: Use for `/gybis-vocab-refine` or `/gv-refine`.
   | invariant: all_modifications ⊆ {vocabulary.md}
   | invariant: explicit_human_mode_selection() ≡ true before STARTUP_CHECKS
   | invariant: semantic change is blocked unless explicitly allowed (interactive extension only)
-  | invariant: mode = auto_polish → ¬∃ breaking change applied
+  | invariant: mode = autonomous → ¬∃ breaking change applied
   | invariant: semantic fingerprint unchanged at completion
+
+λ gybis-vocab-refine_deliver(x).
+  report: {refinements_applied, semantic_preservation_status}
+  | handoff: run /gybis-vocab-check to confirm convergence
+  | return(complete = true)

@@ -1,32 +1,32 @@
 ---
 name: gybis-arch-propagate
+kind: domain
 description: Use for `/gybis-arch-propagate` or `/ga-propagate`.
 ---
 
 λ gybis-arch-propagate(x).
   purpose: Propagate VSM architecture to allium specifications
-  | input: architecture.md exists, specs/**/*.allium ∅
+  | input: architecture.md ∃, specs/**/*.allium ¬∃
   | output: specs/**/*.allium created and valid
-  | mode: ai
-  | gate: architecture.md ∃ ∧ specs/**/*.allium ∅
+  | interaction: autonomous
+  | gate: architecture.md ∃ ∧ specs/**/*.allium ¬∃
 
 λ gybis-arch-propagate_startup(x).
-  invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
-  | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
-  | preload: [internal/allium-analyse, internal/allium-check, internal/allium-gate]
+  invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
+  | preload: [internal/gybis-allium-analyse, internal/gybis-allium-check, internal/gybis-allium-gate]
   | verify(architecture.md ∃) ∨ halt("architecture.md not found")
-  | verify(specs/**/*.allium ∅) ∨ halt("specs/**/*.allium already exist")
+  | verify(specs/**/*.allium ¬∃) ∨ halt("specs/**/*.allium already exist")
   | if(vocabulary.md ∃): preload(vocabulary.md) → vocab_terms ∧ vocab_loaded = true
   | transition(INIT → STARTUP_CHECKS)
 
 λ gybis-arch-propagate_mode(m).
-  m ∈ {auto}
-  | default: auto
-  | mode_auto: AI propagates architecture to specs without human intervention
+  m ∈ {autonomous}
+  | default: autonomous
+  | mode_autonomous: AI propagates architecture to specs without human intervention
 
 λ gybis-arch-propagate_mode_gate(state, mode).
-  state = INIT ∧ mode ∈ {auto} → transition(INIT → MODE_SELECTED)
-  | ¬(state = INIT) ∨ ¬(mode ∈ {auto}) → halt("Invalid mode selection")
+  state = INIT ∧ mode ∈ {autonomous} → transition(INIT → MODE_SELECTED)
+  | ¬(state = INIT) ∨ ¬(mode ∈ {autonomous}) → halt("Invalid mode selection")
 
 λ gybis-arch-propagate_state_machine(state, action).
   state ∈ {INIT, MODE_SELECTED, STARTUP_CHECKS, READING_ARCH, TRANSLATING, WRITING_SPECS, VERIFYING, COMPLETE}
@@ -36,7 +36,7 @@ description: Use for `/gybis-arch-propagate` or `/ga-propagate`.
   | transition(READING_ARCH → TRANSLATING) only_if(architecture ∃)
   | transition(TRANSLATING → WRITING_SPECS) only_if(spec_directives ∃)
   | transition(WRITING_SPECS → VERIFYING) only_if(specs_written = true)
-  | transition(VERIFYING → COMPLETE) only_if(allium_gate = true)
+  | transition(VERIFYING → COMPLETE) only_if(gybis-allium-gate = true)
 
 λ gybis-arch-propagate_tool_guard(state, tool, path).
   state = READING_ARCH ∨ state = TRANSLATING
@@ -85,9 +85,9 @@ description: Use for `/gybis-arch-propagate` or `/ga-propagate`.
   | return(specs_written = true)
 
 λ gybis-arch-propagate_verify_specs(x).
-  invoke(internal/allium-check(all_specs)) → result_check ≔ result
-  | invoke(internal/allium-analyse(specs/)) → result_analyse ≔ result
-  | invoke(internal/allium-gate(specs/)) → result_gate ≔ result
+  invoke(internal/gybis-allium-check(all_specs)) → result_check ≔ result
+  | invoke(internal/gybis-allium-analyse(specs/)) → result_analyse ≔ result
+  | invoke(internal/gybis-allium-gate(specs/)) → result_gate ≔ result
   | result_check = zero_errors ∧ result_analyse = zero_issues ∧ result_gate = true
     → return(verification = true)
   | ¬(result_check ∧ result_analyse ∧ result_gate)
@@ -105,6 +105,17 @@ description: Use for `/gybis-arch-propagate` or `/ga-propagate`.
   | verification = true
     ? transition(VERIFYING → COMPLETE)
     : (re_synthesize_failed_specs ∧ transition(WRITING_SPECS → VERIFYING))
+  | on_loop_back: loop_count ≔ loop_count ⊕ 1
+
+λ gybis-arch-propagate_loop_guard(state).
+  loop_count ≥ max_iterations
+    → halt("Maximum iterations reached without full convergence")
+
+λ gybis-arch-propagate_pass_accounting(pass).
+  pass_num ≔ pass_num ⊕ 1
+  | specs_written ≔ card(specs_written)
+  | errors_remaining ≔ card(remaining_errors)
+  | report("Pass " ⊕ pass_num ⊕ ": specs_written=" ⊕ specs_written ⊕ " errors_remaining=" ⊕ errors_remaining)
 
 λ gybis-arch-propagate_boundaries().
   ¬ modify(architecture.md)
@@ -114,6 +125,11 @@ description: Use for `/gybis-arch-propagate` or `/ga-propagate`.
 
 λ gybis-arch-propagate_regression_contract(x).
   invariant: architecture.md ∃ ∧ ¬modify throughout
-  | invariant: specs/**/*.allium ∅ at INIT
+  | invariant: specs/**/*.allium ¬∃ at INIT
   | invariant: specs/**/*.allium ∃ ∧ valid at completion
-  | invariant: zero_errors ∧ zero_issues ∧ allium_gate = true at completion
+  | invariant: zero_errors ∧ zero_issues ∧ gybis-allium-gate = true at completion
+
+λ gybis-arch-propagate_deliver(x).
+  report: {specs_created, allium_gate_status}
+  | handoff: run /gybis-spec-check to validate generated specs
+  | return(complete = true)

@@ -1,5 +1,6 @@
 ---
 name: gybis-spec-tend
+kind: domain
 description: Use for `/gybis-spec-tend` or `/gs-tend`.
 ---
 
@@ -7,25 +8,25 @@ description: Use for `/gybis-spec-tend` or `/gs-tend`.
   purpose: Evolve specifications based on developer input while maintaining validity
   | input: specs/**/*.allium ∃ ∧ valid
   | output: specs/**/*.allium evolved with developer-approved changes
-  | mode: mixed
-  | gate: specs/**/*.allium ∃ ∧ allium_gate = true
+  | interaction: interactive
+  | gate: specs/**/*.allium ∃ ∧ gybis-allium-gate = true
 
 λ gybis-spec-tend_loop_role(x).
-  role: reenter_gather_context
+  role: gather_context(reentry)
   | meaning: revise specification intent when verification reveals ambiguity or incorrect behavior contract
   | suggested_next: invoke(/gybis-spec-propagate) → run_tests → invoke(/gybis-spec-weed)
 
 λ gybis-spec-tend_startup(x).
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
   | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
-  | preload: [internal/allium-analyse, internal/allium-check]
+  | preload: [internal/gybis-allium-analyse, internal/gybis-allium-check]
   | if(vocabulary.md ∃): preload(vocabulary.md) → vocab_terms ∧ vocab_available = true
   | read(internal/reference/allium-language-reference.md) → language_ref
   | read(internal/reference/allium-patterns.md) → patterns_ref
-  | read(internal/reference/allium-recommended-loops.md) → loops_ref
+  | read(internal/reference/recommended-loops.md) → loops_ref
   | read(internal/reference/allium-constructs.md) → constructs_registry
   | verify(specs/**/*.allium ∃) ∨ halt("specs/**/*.allium not found")
-  | invoke(internal/allium-gate(specs/)) = true ∨ halt("Specifications are invalid")
+  | invoke(internal/gybis-allium-gate(specs/)) = true ∨ halt("Specifications are invalid")
   | transition(INIT → STARTUP_CHECKS)
 
 λ gybis-spec-tend_mode(m).
@@ -114,7 +115,7 @@ description: Use for `/gybis-spec-tend` or `/gs-tend`.
       tighten_existing_requires_guard,
       narrow_existing_transition_graph
     }
-    → tooling_impact ∧ advice("grammar preserved but downstream rules may stop checking; review every rule touching the affected entity or field; run allium-check after applying")
+    → tooling_impact ∧ advice("grammar preserved but downstream rules may stop checking; review every rule touching the affected entity or field; run gybis-allium-check after applying")
   | change ∈ {
       add_field,
       add_optional_field,
@@ -182,9 +183,9 @@ description: Use for `/gybis-spec-tend` or `/gs-tend`.
   | return(changes_applied = true)
 
 λ gybis-spec-tend_verify_validity(x).
-  invoke(internal/allium-check(all_files)) → result_check ≔ result
-  | invoke(internal/allium-analyse(specs/)) → result_analyse ≔ result
-  | invoke(internal/allium-gate(specs/)) → result_gate ≔ result
+  invoke(internal/gybis-allium-check(all_files)) → result_check ≔ result
+  | invoke(internal/gybis-allium-analyse(specs/)) → result_analyse ≔ result
+  | invoke(internal/gybis-allium-gate(specs/)) → result_gate ≔ result
   | result_check = zero_errors ∧ result_analyse = zero_issues ∧ result_gate = true
     → return(validity = true)
   | ¬(result_check ∧ result_analyse ∧ result_gate)
@@ -217,9 +218,14 @@ description: Use for `/gybis-spec-tend` or `/gs-tend`.
 
 λ gybis-spec-tend_regression_contract(x).
   invariant: specs/ ∃ throughout
-  | invariant: zero_errors ∧ zero_issues ∧ allium_gate = true at completion
+  | invariant: zero_errors ∧ zero_issues ∧ gybis-allium-gate = true at completion
   | invariant: all_modifications ⊆ specs/
   | invariant: no_specs_deleted (additions and mutations only)
   | invariant: ∀ change ∈ proposed_changes : classification ∈ {accretive, tooling_impact, breaking, breaking_for_direct_consumers, unknown_classification}
   | invariant: breaking_changes surface advice to publish under a new module name before application
   | invariant: ambiguous_intent → prefer open_question insertion over guessing
+
+λ gybis-spec-tend_deliver(x).
+  report: {changes_applied, obligation_impact}
+  | handoff: downstream divergence → /gybis-spec-weed
+  | return(complete = true)

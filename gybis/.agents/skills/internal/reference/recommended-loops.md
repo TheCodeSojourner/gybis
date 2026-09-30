@@ -5,13 +5,38 @@
   | objective: convergence(spec, tests, code)
   | mode: ai_first | prose_minimal
 
+λ loop_role_contract(x).
+  role ∈ canonical_roles
+  | scope: spec ∧ tests ∧ code
+  | declaration: skill_local
+  | rationale: self_locating(skill) ∧ ¬requires(cross_file_read)
+  | evidence: declare(_loop_role) → read(internal/reference/recommended-loops.md)
+  | agreement: role ∈ canonical_roles ∧ suggested_next ≡ (loop_A_spec_ready ∨ loop_B_code_first ∨ divergence_triage)
+
+λ canonical_roles(x).
+  loop_entry(mode)  → entry(loop)           | mode ∈ {spec_ready, code_first}
+  | gather_context  → produce_or_revise(spec)
+  | take_action     → project(spec → tests)
+  | verify          → evaluate(convergence_invariant)
+  | maintain(layer) → hygiene(layer) | ¬phase(tick)
+
+λ role_scope(x).
+  tick_roles: {loop_entry, gather_context, take_action, verify} → part_of(tick_sequence)
+  | maintain(layer) → between_ticks ∧ ¬part_of(tick_sequence)
+  | layer ∈ {spec, vocab, arch}
+
+λ role_disambiguation(x).
+  _loop_role: position ∈ agentic_convergence_loop | scope: spec ∧ tests ∧ code
+  | _fixed_point_loop ∧ _loop_guard ∧ _pass_accounting: internal_retry | scope: single_skill
+  | distinct(_loop_role, _fixed_point_loop)
+
 λ entry_gate(x).
   entry ∈ {spec_ready, code_first, no_spec}
   | spec_ready → /gybis-spec-tend
   | code_first → /gybis-spec-distill
-  | no_spec → /gybis-req-elicit → /gybis-arch-check → /gybis-arch-propagate → /gybis-spec-tend
-  | constraint: ¬exists(/gybis-spec-elicit) ∧ ¬exists(/gybis-arch-elicit) ∧ ¬exists(/gybis-vocab-elicit)
-  | greenfield_vocab_arch: human-authored vocabulary.md ∧ architecture.md validated by /gybis-vocab-check ∧ /gybis-arch-check
+  | no_spec → /gybis-req-elicit → /gybis-req-propagate → /gybis-vocab-propagate → /gybis-arch-propagate → /gybis-spec-propagate
+  | constraint: ¬∃(/gybis-spec-elicit) ∧ ¬∃(/gybis-arch-elicit) ∧ ¬∃(/gybis-vocab-elicit)
+  | greenfield_bootstrap: req-propagate bootstraps vocabulary.md from requirement terms → vocab-propagate derives architecture from req + vocab → arch-propagate derives specs. Each propagate bootstraps a layer; tend/refine/weed own it thereafter.
 
 λ loop_phases(x).
   gather_context → take_action → verify → repeat

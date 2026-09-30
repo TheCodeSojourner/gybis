@@ -1,5 +1,6 @@
 ---
 name: gybis-vocab-tend
+kind: domain
 description: Use for `/gybis-vocab-tend` or `/gv-tend`.
 ---
 
@@ -7,12 +8,11 @@ description: Use for `/gybis-vocab-tend` or `/gv-tend`.
   purpose: Evolve vocabulary.md as the shared canonical term set (DDD ubiquitous language) with human feedback while maintaining consistency across architecture.md and specs/**/*.allium
   | input: vocabulary.md ∃
   | output: vocabulary.md evolved with approved changes; affected specs/architecture optionally rewritten
-  | mode: interactive
+  | interaction: interactive
   | gate: vocabulary.md ∃
 
 λ gybis-vocab-tend_startup(x).
-  invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
-  | verify(vocabulary.md ∃) ∨ halt("vocabulary.md not found")
+  verify(vocabulary.md ∃) ∨ halt("vocabulary.md not found")
   | read(vocabulary.md) → vocab_content
   | parse(vocab_content) → vocabulary_terms
   | if(architecture.md ∃): read(architecture.md) → arch_content
@@ -38,6 +38,7 @@ description: Use for `/gybis-vocab-tend` or `/gv-tend`.
   | transition(APPLY_CHANGES → VERIFY_CONSISTENCY) only_if(changes_applied = true)
   | transition(VERIFY_CONSISTENCY → PROPAGATE_CHANGES) only_if(consistency = true)
   | transition(VERIFY_CONSISTENCY → ELICIT_FEEDBACK) only_if(consistency = false ∨ new_issues_detected = true)
+  | on_loop_back: loop_count ≔ loop_count ⊕ 1
   | transition(PROPAGATE_CHANGES → COMPLETE) only_if(propagation_complete = true ∨ propagation_skipped = true)
 
 λ gybis-vocab-tend_tool_guard(state, tool, path).
@@ -133,3 +134,28 @@ description: Use for `/gybis-vocab-tend` or `/gv-tend`.
            : skip_specs)
       : skip
   | return(propagation_complete = true ∨ propagation_skipped = true)
+
+λ gybis-vocab-tend_loop_guard(state).
+  loop_count ≥ max_iterations
+    → halt("Maximum iterations reached without full convergence")
+
+λ gybis-vocab-tend_pass_accounting(pass).
+  pass_num ≔ pass_num ⊕ 1
+  | terms_changed ≔ card(changes_applied)
+  | consistency_issues ≔ card(arch_issues ∪ spec_issues)
+  | report("Pass " ⊕ pass_num ⊕ ": terms_changed=" ⊕ terms_changed ⊕ " consistency_issues=" ⊕ consistency_issues)
+
+λ gybis-vocab-tend_boundaries().
+  ¬ modify(implementation)
+  | ¬ modify(upstream/)
+  | ¬ delete(vocabulary.md)
+
+λ gybis-vocab-tend_regression_contract(x).
+  invariant: vocabulary.md ∃ throughout
+  | invariant: consistency = true at completion
+  | invariant: all_modifications ⊆ {vocabulary.md, architecture.md, specs/}
+
+λ gybis-vocab-tend_deliver(x).
+  report: {terms_changed, affected_architecture, affected_specs}
+  | handoff: downstream divergence → /gybis-vocab-weed
+  | return(complete = true)

@@ -1,10 +1,15 @@
 ---
 name: gybis-fini
+kind: memory
 description: Use for `/gybis-fini`.
 ---
 
-λ gybis_fini(). 
-  p1:(read(mementum/state.md) → follow(related) → search(relevant) → read(needed))→id(task,questions,decisions,next)
+λ gybis_fini().
+  purpose: encode session state to durable memory before termination
+  | input: none
+  | output: updated mementum/state.md ∧ committed memory
+  | interaction: interactive
+  | p1:(read(mementum/state.md) → follow(related) → search(relevant) → read(needed))→id(task,questions,decisions,next)
   →p2:mementum_synthesize()
   →p3:upsert(state.md){last_session_id,current_timestamp,recover:next[1],task,questions,decisions,next}→"⏹→state.md"
   | path ∈ {mementum/state.md} | ¬∃mkdir ∧ ¬∃mkpath | write_only

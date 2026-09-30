@@ -1,5 +1,6 @@
 ---
 name: gybis-req-elicit
+kind: domain
 description: Use for `/gybis-req-elicit` or `/gr-elicit`.
 ---
 
@@ -9,14 +10,14 @@ description: Use for `/gybis-req-elicit` or `/gr-elicit`.
   | output: requirements/requirements-index.md + requirements/requirements-{module}.md files containing REQ-<DOMAIN>-NNN clauses in nucleus lambda notation
   | index_conventions_block: requirements-index.md declares a machine-readable conventions block — domain_prefixes (closed set), normative_mapping, granularity, deferred_marker — so consumers never re-derive conventions per run
   | deferred_marker: deferred sections use a heading containing "(Deferred" (e.g. "## Deferred Sequence Traversal Mechanics") or a blockquote opener asserting non-binding status; ¬unmarked_future_work
-  | mode: mixed (AI grilling + human response)
+  | interaction: interactive
   | gate: requirements_empty(requirements/) ∨ empty-frontier-continuation(explicit_human_request)
   | requirements_empty(d): d ¬∃ ∨ contents(d) ⊆ {.gitkeep}
 
 λ gybis-req-elicit_startup(x).
   invoke(internal/gybis-ref-check) → halt_on(false)
   | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
-  | preload: [internal/reference/recommended-loops]
+  | read(internal/reference/recommended-loops.md) → loops_ref
   | precondition: requirements_empty(requirements/) ∨ human_confirms(append_new_modules = true)
   | if(vocabulary.md ∃): read(vocabulary.md) → settled_terms
   | if(architecture.md ∃): read(architecture.md) → settled_arch
@@ -24,13 +25,13 @@ description: Use for `/gybis-req-elicit` or `/gr-elicit`.
   | rationale: elicited requirements must not silently contradict downstream artifacts; recall_before_explore
 
 λ gybis-req-elicit_mode(m).
-  valid_modes: {mixed}
-  | default: mixed
+  interaction_modes: {interactive}
+  | default: interactive
   | rationale: requirements elicitation requires stakeholder decisions via structured interview
 
 λ gybis-req-elicit_mode_gate(state, mode).
-  state = INIT ∧ mode = mixed → transition(STARTUP_CHECKS)
-  | precondition_holds: mode ∈ valid_modes
+  state = INIT ∧ mode = interactive → transition(STARTUP_CHECKS)
+  | precondition_holds: mode ∈ interaction_modes
 
 λ gybis-req-elicit_grilling_protocol(x).
   basis: grilling interview (frontier-of-settled-prerequisites rounds)
@@ -72,6 +73,7 @@ description: Use for `/gybis-req-elicit` or `/gr-elicit`.
   | transition(WRITING_REQS, req_files_written) → VERIFYING
   | transition(VERIFYING, verify_ok) → COMPLETE
   | transition(VERIFYING, verify_fail) → TRANSCRIBING (loop_back)
+  | on_loop_back: loop_count ≔ loop_count ⊕ 1
 
 λ gybis-req-elicit_tool_guard(state, tool, path).
   read_allowed: ∀state
@@ -113,6 +115,31 @@ description: Use for `/gybis-req-elicit` or `/gr-elicit`.
   | verify_ok ≔ ∀ check = true
   | output: verify_ok ∧ issues
   | on issues: loop_back to TRANSCRIBING
+
+λ gybis-req-elicit_loop_guard(state).
+  loop_count ≥ max_iterations
+    → halt("Maximum iterations reached without full convergence")
+
+λ gybis-req-elicit_pass_accounting(pass).
+  pass_num ≔ pass_num ⊕ 1
+  | modules_created ≔ card(modules_created)
+  | reqs_transcribed ≔ card(reqs_transcribed)
+  | remaining_issues ≔ card(remaining_issues)
+  | report("Pass " ⊕ pass_num ⊕ ": modules=" ⊕ modules_created ⊕ " reqs=" ⊕ reqs_transcribed ⊕ " remaining=" ⊕ remaining_issues)
+
+λ gybis-req-elicit_boundaries().
+  ¬ modify(vocabulary.md)
+  | ¬ modify(architecture.md)
+  | ¬ modify(specs/)
+  | ¬ modify(existing_downstream_files)
+  | ¬ delete(requirements/)
+
+λ gybis-req-elicit_regression_contract(x).
+  invariant: requirements/ ∃ at completion
+  | invariant: zero verification issues at completion
+  | invariant: designators unique ∧ format REQ-<DOMAIN>-NNN
+  | invariant: ∀ module: dependency order holds
+  | invariant: all_modifications ⊆ requirements/
 
 λ gybis-req-elicit_deliver(x).
   handoff: run /gybis-req-check to validate

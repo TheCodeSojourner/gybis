@@ -14,7 +14,7 @@ Before exploring broadly, recall the existing vocabulary, architecture, specific
 
 ## 2. Honor Requirements
 
-Requirements are the top layer of the durability order (`req > vocab > arch > spec > tests > code`). If the repository has no `requirements/` directory yet, run `/gybis-req-distill` first to extract the initial requirement set from existing code, tests, and specifications. Otherwise, locate the requirement designators governing the capability (e.g., REQ-FN-002G), confirm their behavior is intended, and amend them with `/gybis-req-tend` before touching anything downstream. New durable behavior starts as a requirement change; implementation changes must remain subordinate to the approved requirements.
+Requirements are the top layer of the durability order (`req > vocab > arch > spec > tests > code`). If the repository has no `requirements/` directory yet, run `/gybis-req-distill` first to extract the initial requirement set from existing vocabulary, architecture, specifications, code, and tests. Otherwise, locate the requirement designators governing the capability (e.g., REQ-FN-002G), confirm their behavior is intended, and amend them with `/gybis-req-tend` before touching anything downstream. New durable behavior starts as a requirement change; implementation changes must remain subordinate to the approved requirements.
 
 Do not let existing code or tests silently redefine behavioral truth. Use `/gybis-req-check` when the requirements inventory has drifted, and `/gybis-req-weed` when requirements and the layers below them no longer describe the same truth.
 

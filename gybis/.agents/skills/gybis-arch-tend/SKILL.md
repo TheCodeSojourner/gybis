@@ -1,5 +1,6 @@
 ---
 name: gybis-arch-tend
+kind: domain
 description: Use for `/gybis-arch-tend` or `/ga-tend`.
 ---
 
@@ -7,7 +8,7 @@ description: Use for `/gybis-arch-tend` or `/ga-tend`.
   purpose: Evolve architecture based on developer input while maintaining VSM integrity
   | input: architecture.md ∃
   | output: architecture.md evolved with developer-approved changes
-  | mode: mixed
+  | interaction: interactive
   | gate: architecture.md ∃
 
 λ gybis-arch-tend_startup(x).
@@ -114,7 +115,11 @@ description: Use for `/gybis-arch-tend` or `/ga-tend`.
 λ gybis-arch-tend_loop_guard(state).
   loop_count ≥ max_iterations
     → halt("Maximum iterations reached without convergence")
-
+λ gybis-arch-tend_pass_accounting(pass).
+  pass_num ≔ pass_num ⊕ 1
+  | layers_changed ≔ card(layers_changed)
+  | remaining_issues ≔ card(remaining_issues)
+  | report("Pass " ⊕ pass_num ⊕ ": layers_changed=" ⊕ layers_changed ⊕ " remaining=" ⊕ remaining_issues)
 λ gybis-arch-tend_boundaries().
   ¬ modify(specs/**/*.allium)
   | ¬ modify(implementation)
@@ -127,3 +132,8 @@ description: Use for `/gybis-arch-tend` or `/ga-tend`.
   | invariant: S5 ⊇ S4 ⊇ S3 ⊇ S2 ⊇ S1 (hierarchy preserved)
   | invariant: internal_consistency = true at completion
   | invariant: all_modifications ⊆ architecture.md
+
+λ gybis-arch-tend_deliver(x).
+  report: {layers_changed, internal_consistency_status}
+  | handoff: downstream divergence → /gybis-arch-weed
+  | return(complete = true)

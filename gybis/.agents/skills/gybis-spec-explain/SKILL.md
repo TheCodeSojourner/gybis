@@ -1,38 +1,39 @@
 ---
 name: gybis-spec-explain
+kind: domain
 description: Use for `/gybis-spec-explain` or `/gs-explain`.
 ---
 
 λ gybis-spec-explain(input_type, input_args).
   purpose: Document allium specifications in technical language for developers as a specification-focused reference grounded only in specs/**/*.allium
-  | input: specs/**/*.allium (exists ∧ valid ∧ passes allium-gate)
+  | input: specs/**/*.allium (∃ ∧ valid ∧ passes gybis-allium-gate)
   | output: Technical specification reference describing behaviors, rules, guarantees, and construct usage based only on specs/**/*.allium
-  | mode: mixed (AI + human output selection) | read specs ∧ allium-ref ∧ optional_write(repo_root_markdown)
-  | gate: gybis-ref-check() ≡ true | allium-gate() ≡ true | explicit_human_output_selection() ≡ true
+  | interaction: autonomous | output_mode: human-selected | read specs ∧ allium-ref ∧ optional_write(repo_root_markdown)
+  | gate: gybis-allium-gate() ≡ true | explicit_human_output_selection() ≡ true
   | fail_closed: missing_human_mode_selection → halt("Human output mode selection is required")
 
 λ gybis-spec-explain_startup(x).
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference files not available")
   | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
-  | invoke(internal/allium-gate) → true ∨ halt("Specification integrity check failed")
+  | invoke(internal/gybis-allium-gate) → true ∨ halt("Specification integrity check failed")
   | read(internal/reference/allium-language-reference.md) → language_ref
   | read(internal/reference/allium-patterns.md) → patterns_ref
   | read(internal/reference/allium-constructs.md) → constructs_registry
-  | read(specs/**/*.allium) → exists ∧ parse | halt("No specifications found")
+  | read(specs/**/*.allium) → ∃ ∧ parse | halt("No specifications found")
 
-λ gybis-spec-explain_mode(m).
-  valid_modes: {response_only, prompted_file_only, default_file_only, response_and_prompted_file, response_and_default_file}
+λ gybis-spec-explain_output_mode(m).
+  output_modes: {response_only, prompted_file_only, default_file_only}
   | default: response_only (informational_only; never auto-selected)
   | human_selected: explicit(output_mode_choice)
   | require_explicit: ¬explicit(output_mode_choice) → halt("Output mode must be explicitly selected by human")
 
-λ gybis-spec-explain_mode_gate(state, mode).
-  state = INIT ∧ mode ∈ valid_modes → transition(INIT → MODE_SELECTED)
-  | ¬(state = INIT) ∨ ¬(mode ∈ valid_modes) → halt("Invalid output mode selection")
+λ gybis-spec-explain_output_mode_gate(state, output_mode).
+  state = INIT ∧ output_mode ∈ output_modes → transition(INIT → MODE_SELECTED)
+  | ¬(state = INIT) ∨ ¬(output_mode ∈ output_modes) → halt("Invalid output mode selection")
 
 λ gybis-spec-explain_state_machine(state, action).
   state ∈ {INIT, MODE_SELECTED, STARTUP_CHECKS, RESOLVING_OUTPUT, GENERATING, DELIVERING, COMPLETE}
-  | transition(INIT → MODE_SELECTED) only_if(mode_gate(INIT, mode) = true)
+  | transition(INIT → MODE_SELECTED) only_if(output_mode_gate(INIT, output_mode) = true)
   | transition(MODE_SELECTED → STARTUP_CHECKS) only_if(mode_selected = true ∧ mode_selected_explicit = true)
   | transition(STARTUP_CHECKS → RESOLVING_OUTPUT) only_if(startup_checks = true)
   | transition(RESOLVING_OUTPUT → GENERATING) only_if(output_target_resolved = true)
@@ -40,21 +41,20 @@ description: Use for `/gybis-spec-explain` or `/gs-explain`.
   | transition(DELIVERING → COMPLETE) only_if(delivery_complete = true ∧ protocol_evidence_emitted = true)
 
 λ gybis-spec-explain_output_selection(x).
-  ask_developer("Output mode? [response_only/prompted_file_only/default_file_only/response_and_prompted_file/response_and_default_file]") → selected_mode
+  ask_developer("Output mode? [response_only/prompted_file_only/default_file_only]") → selected_mode
   | selected_mode ∃ ∨ halt("Human output mode selection is required; no implicit default")
-  | selected_mode ∈ valid_modes ∨ halt("Output mode must be one of the supported options")
-  | selected_mode ∈ {prompted_file_only, response_and_prompted_file}
+  | selected_mode ∈ output_modes ∨ halt("Output mode must be one of the supported options")
+  | selected_mode ∈ {prompted_file_only}
     ? (ask_developer("Repo-root markdown filename? (example: notes.md; subpaths not allowed)") → requested_file
        | requested_file ∃ ∨ halt("Requested output mode requires a repo-root markdown filename")
        | invoke(gybis-spec-explain_output_path_guard(requested_file)) → true
        | return(mode_selected = true ∧ mode_selected_explicit = true ∧ output_path = requested_file))
     : return(mode_selected = true ∧ mode_selected_explicit = true)
 
-λ gybis-spec-explain_output_target(mode).
-  mode = response_only → return(output_target_resolved = true ∧ output_path = none)
-  | mode ∈ {prompted_file_only, response_and_prompted_file} → return(output_target_resolved = true ∧ output_path = requested_file)
-  | mode = default_file_only → return(output_target_resolved = true ∧ output_path = "spec-explain.md")
-  | mode = response_and_default_file → return(output_target_resolved = true ∧ output_path = "spec-explain.md")
+λ gybis-spec-explain_output_target(output_mode).
+  output_mode = response_only → return(output_target_resolved = true ∧ output_path = none)
+  | output_mode = prompted_file_only → return(output_target_resolved = true ∧ output_path = requested_file)
+  | output_mode = default_file_only → return(output_target_resolved = true ∧ output_path = "spec-explain.md")
   | ¬mode_selected_explicit → halt("Cannot resolve output target without explicit human mode selection")
 
 λ gybis-spec-explain_output_path_guard(path).
@@ -75,24 +75,19 @@ description: Use for `/gybis-spec-explain` or `/gs-explain`.
     → allow(read(path)) ∧ allow(write(path)) only_if(path = output_path ∧ path_matches(path, *.md))
   | ¬(state ∈ {STARTUP_CHECKS, RESOLVING_OUTPUT, GENERATING, DELIVERING}) → deny(write(path))
 
-λ gybis-spec-explain_output_dispatch(prose, mode, output_path).
+λ gybis-spec-explain_output_dispatch(prose, output_mode, output_path).
   require(mode_selected_explicit = true) ∨ halt("Output dispatch blocked: explicit human mode selection missing")
-  mode = response_only → output(AI_response, prose)
-  | mode ∈ {prompted_file_only, default_file_only}
+  output_mode = response_only → output(AI_response, prose)
+  | output_mode ∈ {prompted_file_only, default_file_only}
     ? (invoke(gybis-spec-explain_overwrite_guard(output_path)) → true
        | write(output_path, prose)
-       | output("Saved markdown to " ⊕ output_path))
-  | mode ∈ {response_and_prompted_file, response_and_default_file}
-    ? (invoke(gybis-spec-explain_overwrite_guard(output_path)) → true
-       | write(output_path, prose)
-       | output(AI_response, prose)
        | output("Saved markdown to " ⊕ output_path))
 
 λ gybis-spec-explain_protocol_evidence(x).
   output_manifest ≡ {
     mode_selected_by_human: selected_mode,
     mode_selected_explicit: true,
-    filename_prompted: selected_mode ∈ {prompted_file_only, response_and_prompted_file},
+    filename_prompted: selected_mode = prompted_file_only,
     output_path: output_path,
     sources_read: [specs/**/*.allium],
     spec_scope_verified: true,
@@ -163,7 +158,7 @@ description: Use for `/gybis-spec-explain` or `/gs-explain`.
 λ gybis-spec-explain_output_constraints(x).
   ¬lambda_notation ∧ ¬syntax_output
   | plain_english(developer) | technical_vocabulary ∧ pattern_names ∧ construct_framing
-  | ¬invent(¬exists(specs/**/*.allium)) | only explain what specs/**/*.allium contains
+  | ¬invent(¬∃(specs/**/*.allium)) | only explain what specs/**/*.allium contains
   | flag(gap ∨ empty ∨ ambiguous) ∧ ¬speculate | highlight unknowns without guessing
   | ¬reference(architecture.md ∨ src/** ∨ tests/**) in generated_content
   | ¬emit(code_fences ∨ implementation_examples ∨ test_examples)
@@ -171,10 +166,14 @@ description: Use for `/gybis-spec-explain` or `/gs-explain`.
   | write_only(repo_root_markdown_filename = output_path) | ¬write(subpaths ∨ non_markdown)
   | explicit_human_output_selection_required: true | ¬implicit_default_progression
   | protocol_evidence_required_before_complete: true
-  | mode = response_only → output → AI_response ∧ ¬file
-  | mode ∈ {prompted_file_only, default_file_only} → output → markdown_file ∧ status_response
-  | mode ∈ {response_and_prompted_file, response_and_default_file} → output → AI_response ∧ markdown_file
+  | output_mode = response_only → output → AI_response ∧ ¬file
+  | output_mode ∈ {prompted_file_only, default_file_only} → output → markdown_file ∧ status_response
 
 λ gybis-spec-explain_boundary().
   ¬create_specs ∧ ¬modify_allium_ref ∧ ¬write_specs
   | writes_limited_to(repo_root_markdown_filename)
+
+λ gybis-spec-explain_deliver(prose, output_mode).
+  report: {output_mode, delivered_prose: prose}
+  | handoff: none
+  | return(complete = true)

@@ -1,5 +1,6 @@
 ---
 name: gybis-req-check
+kind: domain
 description: Use for `/gybis-req-check`.
 ---
 
@@ -7,12 +8,11 @@ description: Use for `/gybis-req-check`.
   purpose: Validate requirements/ internal integrity (designators, module ordering, clause well-formedness, coverage status, traceability) and produce a diagnostic report
   | input: requirements/requirements-index.md + requirements/requirements-{module}.md (exist)
   | output: Severity-tagged findings with recommended next actions
-  | mode: ai
+  | interaction: autonomous
   | gate: requirements/ ∃ ∧ index ∃
 
 λ gybis-req-check_startup(x).
-  invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
-  | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
+  invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
   | verify(requirements/requirements-index.md ∃) ∨ halt("requirements index not found")
   | read(requirements/requirements-index.md) → index_content
   | index_conventions: verify index declares domain_prefixes (closed set) ∧ normative_mapping; missing conventions declarations = warning (consumers would have to re-derive them)
@@ -21,13 +21,13 @@ description: Use for `/gybis-req-check`.
   | transition(INIT → STARTUP_CHECKS)
 
 λ gybis-req-check_mode(m).
-  m ∈ {ai}
-  | default: ai
+  m ∈ {autonomous}
+  | default: autonomous
   | rationale: validation is deterministic; no human choice required
 
 λ gybis-req-check_mode_gate(state, mode).
-  state = INIT ∧ mode = ai → transition(INIT → STARTUP_CHECKS)
-  | precondition_holds: mode = ai
+  state = INIT ∧ mode = autonomous → transition(INIT → STARTUP_CHECKS)
+  | precondition_holds: mode = autonomous
 
 λ gybis-req-check_state_machine(state, action).
   state ∈ {INIT, STARTUP_CHECKS, DESIGNATOR_VALIDATION, ORDERING_VALIDATION, CLAUSE_VALIDATION, COVERAGE_VALIDATION, TRACEABILITY_VALIDATION, GENERATING_REPORT, COMPLETE}
@@ -125,6 +125,18 @@ description: Use for `/gybis-req-check`.
   | report ≔ {title: "Requirements Integrity Report", status: overall_status, errors, warnings, info, findings: report_items}
   | return(report_generated = true ∧ report)
 
-λ gybis-req-check_deliver_report(report).
-  print(report) → stdout
-  | return(report_delivered = true)
+λ gybis-req-check_boundaries().
+  ¬ modify(requirements/ ∨ vocabulary.md ∨ architecture.md ∨ specs/**/*.allium ∨ implementation ∨ upstream/)
+  | ¬ delete(requirements/)
+
+λ gybis-req-check_regression_contract(x).
+  invariant: requirements/ ∃ throughout
+  | invariant: all checks are read-only
+  | invariant: report generated at completion
+  | invariant: all_modifications = ∅
+
+λ gybis-req-check_deliver(report).
+  report: report
+  | print(report) → stdout
+  | handoff: structural issues → /gybis-req-refine; intended change → /gybis-req-tend; divergence → /gybis-req-weed
+  | return(complete = true)

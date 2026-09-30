@@ -1,25 +1,22 @@
 ---
 name: gybis-spec-check
+kind: domain
 description: Use for `/gybis-spec-check` or `/gs-check`.
 ---
 
 λ gybis-spec-check(x).
-  purpose: Validate specs/**/*.allium and resolve all errors without human intervention
+  purpose: Validate specs/**/*.allium and repair errors until valid
   | input: specs/**/*.allium files exist
   | output: All .allium files valid, zero errors reported
-  | mode: ai
+  | interaction: autonomous
   | gate: specs/**/*.allium ∃ ∧ ¬∅
-
-λ gybis-spec-check_shell_guard(x).
-  classification: internal_skill_alias(allium-gate) ∧ ¬shell_subcommand(allium gate)
-  | shell_prohibition: ¬execute("allium gate") ∧ ¬execute("allium rerun")
-  | allowed_cli: {allium check, allium analyse, allium plan, allium parse, allium model}
+  | constraint: writing_check_exception ∧ verifier_grounded(gybis-allium-gate)
+  | rationale: sole writing check in the check family; repair is justified only by the external allium CLI verdict, not model judgement
 
 λ gybis-spec-check_startup(x).
-  invoke(gybis-spec-check_shell_guard) → true
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
   | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
-  | preload: [internal/allium-analyse, internal/allium-check, internal/allium-normalize, internal/allium-gate]
+  | preload: [internal/gybis-allium-analyse, internal/gybis-allium-check, internal/gybis-allium-normalize, internal/gybis-allium-gate]
   | read(internal/reference/allium-language-reference.md) → language_ref
   | read(internal/reference/allium-constructs.md) → constructs_registry
   | verify(specs/ ∃) ∨ halt("No specs/ directory found")
@@ -27,13 +24,13 @@ description: Use for `/gybis-spec-check` or `/gs-check`.
   | transition(INIT → STARTUP_CHECKS)
 
 λ gybis-spec-check_mode(m).
-  m ∈ {auto}
-  | default: auto
-  | mode_auto: AI validates and fixes without human intervention
+  m ∈ {autonomous}
+  | default: autonomous
+  | mode_autonomous: AI validates and repairs without human intervention
 
 λ gybis-spec-check_mode_gate(state, mode).
-  state = INIT ∧ mode ∈ {auto} → transition(INIT → MODE_SELECTED)
-  | ¬(state = INIT) ∨ ¬(mode ∈ {auto}) → halt("Invalid mode selection")
+  state = INIT ∧ mode ∈ {autonomous} → transition(INIT → MODE_SELECTED)
+  | ¬(state = INIT) ∨ ¬(mode ∈ {autonomous}) → halt("Invalid mode selection")
 
 λ gybis-spec-check_state_machine(state, action).
   state ∈ {INIT, MODE_SELECTED, STARTUP_CHECKS, CHECKING_FILES, ANALYZING_SET, NORMALIZING, FIXING_ERRORS, VERIFYING, COMPLETE}
@@ -44,8 +41,8 @@ description: Use for `/gybis-spec-check` or `/gs-check`.
   | transition(ANALYZING_SET → NORMALIZING) only_if(issues ∃)
   | transition(NORMALIZING → FIXING_ERRORS) only_if(envelopes_derived = true)
   | transition(FIXING_ERRORS → VERIFYING) only_if(fixes_applied = true)
-  | transition(VERIFYING → COMPLETE) only_if(allium_gate = true)
-  | transition(ANALYZING_SET → COMPLETE) only_if(issues ∅ ∧ allium_gate = true)
+  | transition(VERIFYING → COMPLETE) only_if(gybis-allium-gate = true)
+  | transition(ANALYZING_SET → COMPLETE) only_if(issues ∅ ∧ gybis-allium-gate = true)
 
 λ gybis-spec-check_tool_guard(state, tool, path).
   state = CHECKING_FILES ∨ state = ANALYZING_SET ∨ state = NORMALIZING ∨ state = VERIFYING
@@ -60,18 +57,18 @@ description: Use for `/gybis-spec-check` or `/gs-check`.
 
 λ gybis-spec-check_check_files(x).
   ∀ file ∈ specs/**/*.allium:
-    invoke(internal/allium-check(file)) → diagnostics(file)
+    invoke(internal/gybis-allium-check(file)) → diagnostics(file)
   | collect(diagnostics) → per_file_diagnostics
   | return(per_file_diagnostics)
 
 λ gybis-spec-check_analyze_set(x).
-  invoke(internal/allium-analyse(specs/)) → findings(set_level)
+  invoke(internal/gybis-allium-analyse(specs/)) → findings(set_level)
   | findings ∃ → issues ≔ findings
   | findings ∅ → issues ≔ ∅
   | return(issues)
 
 λ gybis-spec-check_normalize_diagnostics(x).
-  invoke(internal/allium-normalize(specs/)) → {envelopes, counts}
+  invoke(internal/gybis-allium-normalize(specs/)) → {envelopes, counts}
   | check_envelopes ≔ {e | e ∈ envelopes ∧ e.source = "check"}
   | analyse_envelopes ≔ {e | e ∈ envelopes ∧ e.source = "analyse"}
   | uncoded_envelopes ≔ {e | e ∈ envelopes ∧ e.kind = "check:_uncoded"}
@@ -141,9 +138,9 @@ description: Use for `/gybis-spec-check` or `/gs-check`.
   | otherwise → permit
 
 λ gybis-spec-check_verification(x).
-  invoke(internal/allium-check(all_files)) → result_check ≔ result
-  | invoke(internal/allium-analyse(specs/)) → result_analyse ≔ result
-  | invoke(internal/allium-gate(specs/)) → result_gate ≔ result
+  invoke(internal/gybis-allium-check(all_files)) → result_check ≔ result
+  | invoke(internal/gybis-allium-analyse(specs/)) → result_analyse ≔ result
+  | invoke(internal/gybis-allium-gate(specs/)) → result_gate ≔ result
   | result_check = zero_errors ∧ result_analyse = zero_issues ∧ result_gate = true
     → return(verification = true)
   | ¬(result_check ∧ result_analyse ∧ result_gate)
@@ -151,7 +148,7 @@ description: Use for `/gybis-spec-check` or `/gs-check`.
 
 λ gybis-spec-check_fixed_point_loop(state).
   state = ANALYZING_SET
-    → issues ∅ ∧ allium_gate = true
+    → issues ∅ ∧ gybis-allium-gate = true
         ? transition(ANALYZING_SET → COMPLETE)
         : (transition(ANALYZING_SET → NORMALIZING)
            ∧ invoke(gybis-spec-check_normalize_diagnostics) → envelopes
@@ -163,11 +160,11 @@ description: Use for `/gybis-spec-check` or `/gs-check`.
               ? (issues ≔ ∅ ∧ transition(VERIFYING → COMPLETE))
               : transition(VERIFYING → ANALYZING_SET)
               ))
+  | on_loop_back: loop_count ≔ loop_count ⊕ 1
 
 λ gybis-spec-check_loop_guard(state).
   loop_count ≥ max_iterations
-    → halt("Maximum iterations reached without convergence")
-  | loop_count ≔ loop_count ⊕ 1
+    → halt("Maximum iterations reached without full convergence")
 
 λ gybis-spec-check_pass_accounting(pass).
   pass_num ≔ pass_num ⊕ 1
@@ -181,7 +178,12 @@ description: Use for `/gybis-spec-check` or `/gs-check`.
 
 λ gybis-spec-check_regression_contract(x).
   invariant: specs/ ∃ throughout ∧ all_modifications ⊆ specs/ ∧ no_specs_deleted
-  | invariant: zero_errors ∧ zero_issues ∧ allium_gate = true at completion
+  | invariant: zero_errors ∧ zero_issues ∧ gybis-allium-gate = true at completion
   | invariant: ∀ envelope ∈ check_envelopes : envelope.kind ∈ catalogued_codes ∨ envelope.kind = "check:_uncoded"
   | invariant: opt-in features (transitions block, when clause on field) never synthesised onto entities/fields lacking them — see _opt_in_guard
   | invariant: drift errors (rule 7d transition graph vs enum, rules 24a–24b default literal vs field) flagged for spec correction, never silently masked
+
+λ gybis-spec-check_deliver(x).
+  report: {files_validated, errors_repaired, allium_gate_status}
+  | handoff: structural issues → /gybis-spec-refine; intended behavior change → /gybis-spec-tend; divergence → /gybis-spec-weed
+  | return(complete = true)

@@ -1,5 +1,6 @@
 ---
 name: gybis-req-refine
+kind: domain
 description: Use for `/gybis-req-refine` or `/gr-refine`.
 ---
 
@@ -7,12 +8,11 @@ description: Use for `/gybis-req-refine` or `/gr-refine`.
   purpose: Refine requirements structure and clarity locally — atomicity, deduplication, module organization — without cross-layer changes
   | input: requirements/ ∃
   | output: restructured requirements/ preserving designator semantics
-  | mode: interactive
+  | interaction: interactive
   | gate: requirements/ ∃
 
 λ gybis-req-refine_startup(x).
-  invoke(internal/gybis-ref-check) → halt_on(false)
-  | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
+  invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
   | verify(requirements/ ∃) ∨ halt("requirements/ not found")
   | read(requirements/requirements-index.md) → index_content
   | read_all(requirements/requirements-*.md) → module_contents
@@ -38,6 +38,7 @@ description: Use for `/gybis-req-refine` or `/gr-refine`.
   | transition(APPLYING → VERIFYING) only_if(restructure_applied = true)
   | transition(VERIFYING → COMPLETE) only_if(verify_ok = true)
   | transition(VERIFYING → APPLYING) only_if(verify_fail = true)
+  | on_loop_back: loop_count ≔ loop_count ⊕ 1
 
 λ gybis-req-refine_tool_guard(state, tool, path).
   state ∈ {STARTUP_CHECKS, ANALYSING_STRUCTURE, PROPOSING_RESTRUCTURE, APPROVAL, VERIFYING} → allow(read(path)) ∧ deny(write(path))
@@ -85,6 +86,30 @@ description: Use for `/gybis-req-refine` or `/gr-refine`.
     - footers consistent
   | verify_ok ≔ ∀ check = true
   | on fail: loop_back to APPLYING
+
+λ gybis-req-refine_loop_guard(state).
+  loop_count ≥ max_iterations
+    → halt("Maximum iterations reached without full convergence")
+
+λ gybis-req-refine_pass_accounting(pass).
+  pass_num ≔ pass_num ⊕ 1
+  | actions_applied ≔ card(actions_applied)
+  | designators_affected ≔ card(designators_affected)
+  | report("Pass " ⊕ pass_num ⊕ ": actions=" ⊕ actions_applied ⊕ " designators_affected=" ⊕ designators_affected)
+
+λ gybis-req-refine_boundaries().
+  ¬ modify(vocabulary.md)
+  | ¬ modify(architecture.md)
+  | ¬ modify(specs/)
+  | ¬ modify(implementation)
+  | ¬ delete(requirements/)
+
+λ gybis-req-refine_regression_contract(x).
+  invariant: designator uniqueness ∧ format preserved
+  | invariant: dependency order preserved
+  | invariant: ∀ restructured clause: semantics preserved (no meaning drift)
+  | invariant: module footers consistent
+  | invariant: all_modifications ⊆ requirements/
 
 λ gybis-req-refine_deliver(x).
   handoff: run /gybis-req-check to confirm convergence

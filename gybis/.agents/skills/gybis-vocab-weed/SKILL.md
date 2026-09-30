@@ -1,5 +1,6 @@
 ---
 name: gybis-vocab-weed
+kind: domain
 description: Use for `/gybis-vocab-weed` or `/gv-weed`.
 ---
 
@@ -7,12 +8,11 @@ description: Use for `/gybis-vocab-weed` or `/gv-weed`.
   purpose: Identify and resolve vocabulary drift between vocabulary.md and downstream artifacts (architecture, specs, implementation)
   | input: vocabulary.md ∃ ∧ (architecture.md ∃ ∨ specs/**/*.allium ∃ ∨ implementation ∃)
   | output: vocabulary.md and downstream artifacts use canonical terms consistently
-  | mode: interactive
+  | interaction: interactive
   | gate: vocabulary.md ∃
 
 λ gybis-vocab-weed_startup(x).
-  invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
-  | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
+  invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
   | verify(vocabulary.md ∃) ∨ halt("vocabulary.md not found")
   | read(vocabulary.md) → vocab_content
   | parse(vocab_content) → vocabulary_terms
@@ -20,6 +20,7 @@ description: Use for `/gybis-vocab-weed` or `/gv-weed`.
   | if(specs/**/*.allium ∃): read_all_specs → spec_content
   | if(implementation ∃): recursively_read(implementation) → impl_content
   | verify(architecture.md ∃ ∨ specs/**/*.allium ∃ ∨ implementation ∃) ∨ halt("No downstream artifacts found (need architecture.md, specs/**/*.allium, or implementation)")
+  | modified_artifacts ≔ ∅
   | transition(INIT → STARTUP_CHECKS)
 
 λ gybis-vocab-weed_mode(m).
@@ -41,7 +42,7 @@ description: Use for `/gybis-vocab-weed` or `/gv-weed`.
   | transition(RESOLVE_MODE_SELECTION → CORRECTING) only_if(resolve_mode ∃)
   | transition(CORRECTING → VERIFYING) only_if(corrections_applied = true)
   | transition(VERIFYING → IDENTIFYING_DIVERGENCES) only_if(inconsistencies ∃)
-  | transition(VERIFYING → COMPLETE) only_if(consistency = true ∧ zero_divergences = true)
+  | transition(VERIFYING → COMPLETE) only_if(consistency = true ∧ zero_divergences = true ∧ all_conditional_checks_pass = true)
 
 λ gybis-vocab-weed_tool_guard(state, tool, path).
   state = COMPARING ∨ state = IDENTIFYING_DIVERGENCES ∨ state = RESOLVE_MODE_SELECTION
@@ -114,14 +115,17 @@ description: Use for `/gybis-vocab-weed` or `/gv-weed`.
   resolve_mode = arch
     ? (replace_all(divergence.term, divergence.canonical, architecture.md) → updated_arch
        | write(architecture.md) → persisted
+       | modified_artifacts ≔ modified_artifacts ∪ {architecture.md}
        | return(corrections_applied = true))
   | resolve_mode = spec
     ? (replace_all(divergence.term, divergence.canonical, specs/) → updated_specs
        | write(specs/) → persisted
+       | modified_artifacts ≔ modified_artifacts ∪ {specs/}
        | return(corrections_applied = true))
   | resolve_mode = code
     ? (replace_all(divergence.term, divergence.canonical, implementation) → updated_impl
        | write(implementation) → persisted
+       | modified_artifacts ≔ modified_artifacts ∪ {implementation}
        | return(corrections_applied = true))
   | resolve_mode = vocab
     ? (ask_developer("Update vocabulary.md to include or re-canonicalize this term? (yes/no)") → approval
@@ -152,14 +156,21 @@ description: Use for `/gybis-vocab-weed` or `/gv-weed`.
   | if(implementation ∃): recursively_read(implementation) → impl_content
   | invoke(gybis-vocab-weed_compare_artifacts(vocabulary_terms, arch_content, spec_content, impl_content)) → comparison
   | invoke(gybis-vocab-weed_identify_divergences(comparison)) → remaining_divergences
-  | remaining_divergences ∅
-    → return(consistency = true ∧ zero_divergences = true)
+  | conditional_checks:
+    - specs/ ∈ modified_artifacts → invoke(internal/gybis-allium-gate(specs/)) = true
+    - implementation ∈ modified_artifacts → test_suite_passes = true
+    - architecture.md ∈ modified_artifacts → vsm_coherence(architecture.md) = true
+  | all_conditional_checks_pass ≔ ∀ applicable conditional_check = true
   | remaining_divergences ≠ ∅
     → return(consistency = false ∧ inconsistencies = remaining_divergences)
+  | remaining_divergences ∅ ∧ ¬all_conditional_checks_pass
+    → halt("term replacement invalidated " ⊕ failed_artifact ⊕ "; route to the owning repair skill (/gybis-spec-check ∨ /gybis-spec-tend ∨ /gybis-arch-tend)")
+  | remaining_divergences ∅ ∧ all_conditional_checks_pass
+    → return(consistency = true ∧ zero_divergences = true ∧ all_conditional_checks_pass = true)
 
 λ gybis-vocab-weed_fixed_point_loop(state).
   state = VERIFYING
-    → consistency = true ∧ zero_divergences = true
+    → consistency = true ∧ zero_divergences = true ∧ all_conditional_checks_pass = true
         ? transition(VERIFYING → COMPLETE)
         : (transition(VERIFYING → IDENTIFYING_DIVERGENCES)
            ∧ loop_count ≔ loop_count ⊕ 1)
@@ -182,5 +193,13 @@ description: Use for `/gybis-vocab-weed` or `/gv-weed`.
 λ gybis-vocab-weed_regression_contract(x).
   invariant: vocabulary.md ∃ throughout
   | invariant: zero_divergences = true at completion
+  | invariant: specs/ ∈ modified_artifacts → gybis-allium-gate = true at completion
+  | invariant: implementation ∈ modified_artifacts → test_suite_passes = true at completion
+  | invariant: architecture.md ∈ modified_artifacts → vsm_coherence = true at completion
   | invariant: all_modifications ⊆ {vocabulary.md, architecture.md, specs/, implementation}
   | invariant: divergence.type ∈ {"non_canonical_term_in_arch", "non_canonical_term_in_specs", "non_canonical_term_in_code", "undefined_term_in_arch", "undefined_term_in_specs", "undefined_term_in_code", "unused_canonical_term"}
+
+λ gybis-vocab-weed_deliver(x).
+  report: {divergences_found, resolutions_applied, deferred}
+  | handoff: none
+  | return(complete = true)

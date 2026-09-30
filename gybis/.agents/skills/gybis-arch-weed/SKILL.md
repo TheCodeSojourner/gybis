@@ -1,5 +1,6 @@
 ---
 name: gybis-arch-weed
+kind: domain
 description: Use for `/gybis-arch-weed` or `/ga-weed`.
 ---
 
@@ -7,15 +8,15 @@ description: Use for `/gybis-arch-weed` or `/ga-weed`.
   purpose: Identify and resolve divergences between architecture and specifications
   | input: architecture.md ∃, specs/**/*.allium ∃ ∧ valid
   | output: architecture.md and specs/**/*.allium mutually consistent
-  | mode: mixed
-  | gate: architecture.md ∃ ∧ specs/**/*.allium ∃ ∧ allium_gate = true
+  | interaction: interactive
+  | gate: architecture.md ∃ ∧ specs/**/*.allium ∃ ∧ gybis-allium-gate = true
 
 λ gybis-arch-weed_startup(x).
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
   | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
   | verify(architecture.md ∃) ∨ halt("architecture.md not found")
   | verify(specs/**/*.allium ∃) ∨ halt("specs/**/*.allium not found")
-  | invoke(internal/allium-gate(specs/)) = true ∨ halt("Specifications are invalid")
+  | invoke(internal/gybis-allium-gate(specs/)) = true ∨ halt("Specifications are invalid")
   | if(vocabulary.md ∃): preload(vocabulary.md) → vocab_terms ∧ vocab_check_enabled = true
   | read(internal/reference/vsm-guide.md) → vsm_reference
   | transition(INIT → STARTUP_CHECKS)
@@ -125,7 +126,7 @@ description: Use for `/gybis-arch-weed` or `/ga-weed`.
   | return(corrections_applied = true)
 
 λ gybis-arch-weed_verify_consistency(x).
-  invoke(internal/allium-gate(specs/)) → result_gate ≔ result
+  invoke(internal/gybis-allium-gate(specs/)) → result_gate ≔ result
   | verify(vsm_coherence(architecture.md)) → vsm_coherence ≔ result
   | invoke(gybis-arch-weed_identify_divergences(vsm_layers, spec_directives, vocab_check_enabled, vocab_terms)) → remaining_divergences
   | result_gate = true ∧ vsm_coherence = true ∧ remaining_divergences ∅
@@ -161,6 +162,11 @@ description: Use for `/gybis-arch-weed` or `/ga-weed`.
 λ gybis-arch-weed_regression_contract(x).
   invariant: architecture.md ∃ ∧ specs/ ∃ throughout
   | invariant: zero_divergences = true at completion
-  | invariant: allium_gate = true at completion
+  | invariant: gybis-allium-gate = true at completion
   | invariant: vsm_coherence = true at completion
   | invariant: all_modifications ⊆ {architecture.md, specs/}
+
+λ gybis-arch-weed_deliver(x).
+  report: {divergences_found, resolutions_applied, deferred}
+  | handoff: none
+  | return(complete = true)

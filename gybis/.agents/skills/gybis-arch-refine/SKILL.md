@@ -1,5 +1,6 @@
 ---
 name: gybis-arch-refine
+kind: domain
 description: Use for `/gybis-arch-refine` or `/ga-refine`.
 ---
 
@@ -7,18 +8,19 @@ description: Use for `/gybis-arch-refine` or `/ga-refine`.
   purpose: Refine architecture.md structure, clarity, and maintainability while preserving architectural intent
   | input: architecture.md ∃ ∧ parseable
   | output: architecture.md structurally refined with dependency-preservation evidence
-  | mode: mixed
+  | interaction: interactive ∨ autonomous(safe_only)
   | gate: architecture.md ∃ ∧ explicit_human_mode_selection() ≡ true
   | fail_closed: missing_human_mode_selection → halt("Human mode selection is required")
 
 λ gybis-arch-refine_loop_role(x).
-  role: improve(architecture_hygiene)
+  role: maintain(architecture_hygiene)
   | meaning: reorganize a valid architecture so humans and AI can navigate and evolve it more safely without changing intended constraints
   | suggested_next: invoke(/gybis-arch-propagate) when specs are missing; invoke(/gybis-arch-weed) when architecture/spec convergence is needed
 
 λ gybis-arch-refine_startup(x).
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
   | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
+  | read(internal/reference/recommended-loops.md) → loops_ref
   | verify(architecture.md ∃) ∨ halt("architecture.md not found")
   | if(vocabulary.md ∃): preload(vocabulary.md) → vocab_terms ∧ vocab_available = true
   | read(internal/reference/vsm-guide.md) → vsm_reference
@@ -28,22 +30,23 @@ description: Use for `/gybis-arch-refine` or `/ga-refine`.
   | transition(INIT → STARTUP_CHECKS)
 
 λ gybis-arch-refine_mode(m).
-  m ∈ {interactive, auto_polish}
+  m ∈ {interactive, autonomous}
   | default: interactive (informational_only; never auto-selected)
   | mode_interactive: AI proposes structural refinements and waits for human approval before applying them
-  | mode_auto_polish: AI applies only safe non-breaking hygiene refinements without rename or delete operations
+  | mode_autonomous: AI applies refinements without human approval, restricted to scope = safe_only (safe non-breaking hygiene; no rename or delete operations)
+  | scope: autonomous ⇒ safe_only
   | require_explicit: ¬explicit(mode_choice) → halt("Refine mode must be explicitly selected by human")
 
 λ gybis-arch-refine_mode_selection(x).
-  ask_developer("Refine mode? [interactive/auto_polish]") → selected_mode
+  ask_developer("Refine mode? [interactive/autonomous]") → selected_mode
   | selected_mode ∃ ∨ halt("Human mode selection is required; no implicit default")
-  | selected_mode ∈ {interactive, auto_polish} ∨ halt("Refine mode must be one of the supported options")
+  | selected_mode ∈ {interactive, autonomous} ∨ halt("Refine mode must be one of the supported options")
   | return(mode_selected = true ∧ mode_selected_explicit = true ∧ mode = selected_mode)
 
 λ gybis-arch-refine_mode_gate(state, mode).
-  state = INIT ∧ mode ∈ {interactive, auto_polish} ∧ mode_selected_explicit = true → transition(INIT → MODE_SELECTED)
+  state = INIT ∧ mode ∈ {interactive, autonomous} ∧ mode_selected_explicit = true → transition(INIT → MODE_SELECTED)
   | state = INIT ∧ ¬mode_selected_explicit → halt("Explicit human mode selection is required before startup")
-  | ¬(state = INIT) ∨ ¬(mode ∈ {interactive, auto_polish}) → halt("Invalid mode selection")
+  | ¬(state = INIT) ∨ ¬(mode ∈ {interactive, autonomous}) → halt("Invalid mode selection")
 
 λ gybis-arch-refine_state_machine(state, action).
   state ∈ {INIT, MODE_SELECTED, STARTUP_CHECKS, READING_ARCH, ANALYZING_STRUCTURE, PROPOSING_REFINEMENTS, CLASSIFYING_IMPACT, APPROVAL_GATE, APPLYING_REFINEMENTS, VERIFYING_VALIDITY, VERIFYING_DEPENDENCY_PRESERVATION, COMPLETE}
@@ -124,7 +127,7 @@ description: Use for `/gybis-arch-refine` or `/ga-refine`.
     ? collect({change: insert_navigation_index, targets: structure_report.orphan_principle_candidates}) → proposals
   | structure_report.non_canonical_terms ≠ ∅
     ? collect({change: improve_cross_reference_labels, targets: structure_report.non_canonical_terms}) → proposals
-  | mode = auto_polish
+  | mode = autonomous
     ? proposals ≔ {p | p ∈ proposals ∧ gybis-arch-refine_refinement_taxonomy(p.change) = non_breaking_polish}
   | return(refinement_proposals = proposals)
 
@@ -152,7 +155,7 @@ description: Use for `/gybis-arch-refine` or `/ga-refine`.
     → halt("Requested change is a convergence problem; route to /gybis-arch-weed")
 
 λ gybis-arch-refine_approval_gate(impact_report, mode).
-  mode = auto_polish
+  mode = autonomous
     ? (verify(impact_report.breaking_candidates = ∅) ∧ verify(impact_report.unknown_candidates = ∅)
        | approved_changes ≔ {c.proposal | c ∈ impact_report.classified_proposals}
        | breaking_cleanup_approved ≔ false)
@@ -238,7 +241,12 @@ description: Use for `/gybis-arch-refine` or `/ga-refine`.
   | invariant: S5 ⊇ S4 ⊇ S3 ⊇ S2 ⊇ S1 (hierarchy preserved)
   | invariant: all_modifications ⊆ {architecture.md}
   | invariant: explicit_human_mode_selection() ≡ true before STARTUP_CHECKS
-  | invariant: mode = auto_polish → ¬∃ change ∈ approved_changes : gybis-arch-refine_impact_classification(change.change).category = breaking
+  | invariant: mode = autonomous → ¬∃ change ∈ approved_changes : gybis-arch-refine_impact_classification(change.change).category = breaking
   | invariant: breaking_or_dependency_impact changes require interactive approval
   | invariant: dependency fingerprint unchanged at completion unless explicitly approved in interactive mode
   | invariant: convergence problems halt and route to /gybis-arch-weed
+
+λ gybis-arch-refine_deliver(x).
+  report: {refinements_applied, dependency_preservation_status}
+  | handoff: run /gybis-arch-check to confirm convergence
+  | return(complete = true)

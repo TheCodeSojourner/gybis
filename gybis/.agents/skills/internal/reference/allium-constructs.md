@@ -2,7 +2,7 @@
 
 Single source of truth for how each Allium construct is recognised, framed for product managers and developers, synthesized into implementation, and tested. Loaded by all `gybis-spec-*` skills (and `gybis-arch-*` where applicable). Skills override only where their dispatch needs deviate. Each entry references `allium-language-reference.md` sections and numbered validation rules.
 
-Columns: **Cues** (source patterns → construct, for `distill`) | **PM frame** (one-sentence plain English, for `describe`) | **Dev frame** (technical framing + validation semantics, for `explain`) | **Synthesis** (code-gen expectation, for `propagate`) | **Obligation categories** (from `internal/allium-plan`, for `propagate` and `weed`) | **Validation rules** (numbers in language-ref §Validation rules) | **Gotchas** (drift, mistakes, breakage modes, for `check`/`tend`/`weed`)
+Columns: **Cues** (source patterns → construct, for `distill`) | **PM frame** (one-sentence plain English, for `describe`) | **Dev frame** (technical framing + validation semantics, for `explain`) | **Synthesis** (code-gen expectation, for `propagate`) | **Obligation categories** (from `internal/gybis-allium-plan`, for `propagate` and `weed`) | **Validation rules** (numbers in language-ref §Validation rules) | **Gotchas** (drift, mistakes, breakage modes, for `check`/`tend`/`weed`)
 
 ---
 

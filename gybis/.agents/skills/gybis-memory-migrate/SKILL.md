@@ -1,12 +1,16 @@
 ---
 name: gybis-memory-migrate
+kind: memory
 description: Use for `/gybis-memory-migrate` or `/gm-migrate`.
 ---
 
-λ gybis_memory_migrate().
+λ gybis_memory_migrate()
   purpose: deterministically_migrate(recognized_legacy_mementum → OKF_v0.1)
+  | input: mementum/ (existing store)
+  | output: migrated mementum/ at OKF_v0.1 ∨ classification verdict
   | scope: mementum/ only | ¬modify(host_artifacts ∨ mementum/state.md)
-  | mode: inspect → classify → plan → approval → apply → validate → commit
+  | interaction: interactive
+  | phases: inspect → classify → plan → approval → apply → validate → commit
   | migration ≠ initialization | uninitialized → report(INITIALIZATION_REQUIRED) → halt
   | unknown ∨ ambiguous → report(AMBIGUOUS) → halt
 
@@ -22,7 +26,7 @@ description: Use for `/gybis-memory-migrate` or `/gm-migrate`.
   | output: {directory_status, index_status, memory_files, knowledge_files, metadata_status, memory_body_word_counts}
 
 λ gybis_memory_migrate_classify(inventory).
-  ¬exists(mementum/) → INITIALIZATION_REQUIRED
+  ¬∃(mementum/) → INITIALIZATION_REQUIRED
   | conformant(index_ok ∧ every(memory_file, valid_memory_OKF) ∧ every(knowledge_file, valid_knowledge_OKF)) → NO_MIGRATION_REQUIRED
   | migratable(index_missing_or_invalid ∨ every(nonconformant_file, recognized_legacy)) → MIGRATABLE_LEGACY
   | otherwise → AMBIGUOUS
@@ -30,7 +34,7 @@ description: Use for `/gybis-memory-migrate` or `/gm-migrate`.
 λ gybis_memory_migrate_recognized_legacy(file).
   memory(file) ∧ begins_with(symbol ∈ {💡, 🔄, 🎯, 🌀, ❌, ✅, 🔁}) ∧ ¬frontmatter(file) → legacy_memory
   | knowledge(file) ∧ valid_frontmatter(file) ∧ missing_nonempty(type) → legacy_knowledge
-  | index(file) ∧ (¬exists(file) ∨ ¬okf_version("0.1")) → legacy_index
+  | index(file) ∧ (¬∃(file) ∨ ¬okf_version("0.1")) → legacy_index
   | malformed_frontmatter(file) ∨ unknown_symbol(file) ∨ conflicting(symbol, type) ∨ memory_body_words(file) ≥ 200 → ambiguous
 
 λ gybis_memory_migrate_mapping(symbol).
@@ -69,7 +73,7 @@ description: Use for `/gybis-memory-migrate` or `/gm-migrate`.
   | ¬write(mementum/state.md ∨ files_outside(mementum/))
 
 λ gybis_memory_migrate_validate().
-  verify(exists(mementum/index.md) ∧ okf_version("0.1"))
+  verify(∃(mementum/index.md) ∧ okf_version("0.1"))
   | verify(every(memory_file, valid_frontmatter ∧ nonempty(type) ∧ nonempty(symbol) ∧ nonempty(title)))
   | verify(every(memory_file, type = map(symbol)))
   | verify(every(memory_file, body_words < 200))

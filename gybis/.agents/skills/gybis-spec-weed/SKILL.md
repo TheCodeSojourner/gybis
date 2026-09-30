@@ -1,5 +1,6 @@
 ---
 name: gybis-spec-weed
+kind: domain
 description: Use for `/gybis-spec-weed` or `/gs-weed`.
 ---
 
@@ -7,9 +8,9 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
   purpose: Identify and resolve divergences between architecture, specs, and implementation
   | input: architecture.md ∃, specs/**/*.allium ∃ ∧ valid, implementation ∃
   | output: architecture.md, specs/**/*.allium, and implementation mutually consistent, traceable, and test-passing
-  | mode: mixed
-  | gate: architecture.md ∃ ∧ specs/**/*.allium ∃ ∧ allium_gate = true ∧ implementation ∃ ∧ strict_spec_coverage = true
-  | derivation: test_obligations ≔ allium-normalize(specs/) → {envelopes | source = "plan"} → deterministic obligation enumeration
+  | interaction: interactive
+  | gate: architecture.md ∃ ∧ specs/**/*.allium ∃ ∧ gybis-allium-gate = true ∧ implementation ∃ ∧ strict_spec_coverage = true
+  | derivation: test_obligations ≔ gybis-allium-normalize(specs/) → {envelopes | source = "plan"} → deterministic obligation enumeration
 
 λ gybis-spec-weed_loop_role(x).
   role: verify(convergence)
@@ -20,14 +21,14 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
 λ gybis-spec-weed_startup(x).
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
   | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
-  | preload: [internal/allium-normalize]
+  | preload: [internal/gybis-allium-normalize]
   | verify(architecture.md ∃) ∨ halt("architecture.md not found")
   | verify(specs/**/*.allium ∃) ∨ halt("specs/**/*.allium not found")
-  | invoke(internal/allium-gate(specs/)) = true ∨ halt("Specifications are invalid")
+  | invoke(internal/gybis-allium-gate(specs/)) = true ∨ halt("Specifications are invalid")
   | verify(implementation ∃) ∨ halt("Implementation not found")
   | read(internal/reference/allium-language-reference.md) → language_ref
   | read(internal/reference/allium-patterns.md) → patterns_ref
-  | read(internal/reference/allium-recommended-loops.md) → loops_ref
+  | read(internal/reference/recommended-loops.md) → loops_ref
   | read(internal/reference/allium-constructs.md) → constructs_registry
   | read(internal/reference/vsm-guide.md) → vsm_reference
   | transition(INIT → STARTUP_CHECKS)
@@ -71,7 +72,7 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
   tool_guard(state, tool, path) = true ∨ halt("Tool not permitted in state " ⊕ state)
 
 λ gybis-spec-weed_normalize_obligations(specifications).
-  invoke(internal/allium-normalize(specs/)) → {envelopes, counts}
+  invoke(internal/gybis-allium-normalize(specs/)) → {envelopes, counts}
   | plan_envelopes ≔ {e | e ∈ envelopes ∧ e.source = "plan"}
   | report("Normalized: plan=" ⊕ counts.plan ⊕ " check=" ⊕ counts.check ⊕ " uncoded=" ⊕ counts.uncoded)
   | ∀ envelope ∈ plan_envelopes:
@@ -211,7 +212,7 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
   | return(corrections_applied = true)
 
 λ gybis-spec-weed_verify_consistency(x).
-  invoke(internal/allium-gate(specs/)) → result_gate ≔ result
+  invoke(internal/gybis-allium-gate(specs/)) → result_gate ≔ result
   | verify(vsm_coherence(architecture.md)) → vsm_coherence ≔ result
   | invoke(gybis-spec-weed_normalize_obligations(specs/**/*.allium)) → obligations ∧ obligations_derived
   | invoke(gybis-spec-weed_compare_specs_code(obligations)) → {comparison_complete: spec_compare_complete, divergences: spec_code_divergences}
@@ -271,7 +272,7 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
 
 λ gybis-spec-weed_regression_contract(x).
   invariant: architecture.md ∧ specs/ ∧ implementation ∃ throughout
-  | invariant: zero_divergences ∧ allium_gate ∧ vsm_coherence at completion
+  | invariant: zero_divergences ∧ gybis-allium-gate ∧ vsm_coherence at completion
   | invariant: test_suite_passes = true at completion (strict gate)
   | invariant: ¬complete_when_tests_fail
   | invariant: all_obligation_ids_checked_by_spec_comparison (comprehensive obligation coverage)
@@ -280,3 +281,8 @@ description: Use for `/gybis-spec-weed` or `/gs-weed`.
   | invariant: divergence.type ∈ {"obligation_missing_in_code", "obligation_contradicts_implementation", "when_field_not_enforced", "transition_not_guarded", "terminal_state_not_enforced", "variant_not_handled", "contract_not_honoured", "surface_obligation_not_enforced", "module_state_missing", "ensures_pre_rule_vs_resulting_state_confusion", "backtick_literal_normalised", "arch_missing_in_code"} (closed divergence catalogue)
   | invariant: ∀ obligation.category → corresponding divergence-check exercised in _compare_specs_code (per-category mapping codified there)
   | invariant: all_modifications ⊆ {architecture.md, specs/, implementation}
+
+λ gybis-spec-weed_deliver(x).
+  report: {divergences_found, resolutions_applied, deferred, test_status}
+  | handoff: none
+  | return(complete = true)

@@ -9,7 +9,8 @@ description: Internal skill - not user-facing
   | input: (implicit) reference file manifest
   | output: true ∨ (false + error_message)
   | halt_condition: any_required_file_missing
-  | gate: pre_condition | runs_before(all_user_facing_skills)
+  | gate: pre_condition | runs_before(skills_that_read_reference_files)
+  | scope: reference-reading skills only; skills that do not read internal/reference/** must not invoke this (a missing reference file is an installation fault, not their precondition)
 
 λ gybis-ref-check_reference_roots(roots).
   roots_to_check: {
@@ -25,7 +26,7 @@ description: Internal skill - not user-facing
     allium-assessing-specs.md
     allium-language-reference.md
     allium-patterns.md
-    allium-recommended-loops.md
+    recommended-loops.md
     allium-constructs.md
     allium-actioning-findings.md
     allium-library-spec-signals.md
@@ -34,7 +35,7 @@ description: Internal skill - not user-facing
   | all_paths resolved_via(reference_roots) ∧ readable(file)
 
 λ gybis-ref-check_validation(file_name, roots).
-  check: ∃ root ∈ roots, exists(root/file_name) ∧ readable(root/file_name)
+  check: ∃ root ∈ roots, ∃(root/file_name) ∧ readable(root/file_name)
   | on_success: → true
   | on_failure: → (false, diagnostic)
   | diagnostic: "Reference file missing: {file_name} (checked roots: internal/reference, .agents/skills/internal/reference)"

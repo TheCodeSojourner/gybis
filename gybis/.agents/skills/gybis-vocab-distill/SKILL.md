@@ -1,32 +1,32 @@
 ---
 name: gybis-vocab-distill
+kind: domain
 description: Use for `/gybis-vocab-distill` or `/gv-distill`.
 ---
 
 λ gybis-vocab-distill(x).
-  purpose: Extract emergent terms from requirements/ + architecture.md + specs/**/*.allium + implementation evidence and consolidate them into a shared canonical term set (DDD ubiquitous language) through human conflict resolution
-  | input: requirements/ (∃ optional), architecture.md (∃ + complete), specs/**/*.allium (all ∃ + valid), implementation source
+  purpose: Extract emergent terms from architecture.md + specs/**/*.allium + implementation evidence and consolidate them into a shared canonical term set (DDD ubiquitous language) through human conflict resolution
+  | input: architecture.md (∃ + complete), specs/**/*.allium (all ∃ + valid), implementation source
   | output: vocabulary.md with candidate terms, conflicts, and human-resolved canonical forms
-  | mode: mixed (AI synthesis + human conflict resolution)
-  | gate: architecture.md ∃ ∧ specs/**/*.allium ∃ ∧ allium_gate = true
+  | interaction: interactive
+  | gate: architecture.md ∃ ∧ specs/**/*.allium ∃ ∧ gybis-allium-gate = true ∧ vocabulary.md ¬∃
 
 λ gybis-vocab-distill_startup(x).
-  invoke(internal/gybis-ref-check) → halt_on(false)
-  | invoke(internal/gybis-internal-skill-check) → halt_on(false)
+  invoke(internal/gybis-internal-skill-check) → halt_on(false)
   | verify(architecture.md ∃) ∨ halt("architecture.md not found")
   | verify(specs/**/*.allium ∃) ∨ halt("specs/**/*.allium not found")
-  | invoke(internal/allium-gate(specs/)) = true ∨ halt("Specifications are invalid")
+  | invoke(internal/gybis-allium-gate(specs/)) = true ∨ halt("Specifications are invalid")
   | implementation_path_resolvable = true ∨ halt("Implementation path unresolvable")
   | transition(INIT → STARTUP_CHECKS)
 
 λ gybis-vocab-distill_mode(m).
-  valid_modes: {mixed}
-  | default: mixed
+  interaction_modes: {interactive}
+  | default: interactive
   | rationale: distillation requires human conflict resolution for term selection
 
 λ gybis-vocab-distill_mode_gate(state, mode).
-  state = INIT ∧ mode = mixed → transition(INIT → MODE_SELECTED)
-  | ¬(state = INIT) ∨ ¬(mode ∈ {mixed}) → halt("Invalid mode selection")
+  state = INIT ∧ mode = interactive → transition(INIT → MODE_SELECTED)
+  | ¬(state = INIT) ∨ ¬(mode ∈ {interactive}) → halt("Invalid mode selection")
 
 λ gybis-vocab-distill_state_machine(state, action).
   state ∈ {INIT, MODE_SELECTED, STARTUP_CHECKS, READING_ARCH, READING_SPECS, SCANNING_IMPL, IDENTIFYING_CANDIDATES, CONFLICT_DETECTION, RESOLUTION_LOOP, WRITING_VOCAB, VERIFYING, COMPLETE}
@@ -44,6 +44,7 @@ description: Use for `/gybis-vocab-distill` or `/gv-distill`.
   | transition(WRITING_VOCAB → VERIFYING) only_if(vocab_written = true)
   | transition(VERIFYING → COMPLETE) only_if(verify_ok = true)
   | transition(VERIFYING → CONFLICT_DETECTION) only_if(verify_fail = true ∧ new_conflicts_found = true)
+  | on_loop_back: loop_count ≔ loop_count ⊕ 1
 
 λ gybis-vocab-distill_tool_guard(state, tool, path).
   read_allowed: ∀state ∈ {READING_ARCH, READING_SPECS, SCANNING_IMPL, IDENTIFYING_CANDIDATES, CONFLICT_DETECTION, RESOLUTION_LOOP}
@@ -150,3 +151,32 @@ description: Use for `/gybis-vocab-distill` or `/gv-distill`.
   | result: all_checks_pass
     ? return(verification = true)
     : (suggest_fixes ∧ return(verification = false))
+
+λ gybis-vocab-distill_loop_guard(state).
+  loop_count ≥ max_iterations
+    → halt("Maximum iterations reached without full convergence")
+
+λ gybis-vocab-distill_pass_accounting(pass).
+  pass_num ≔ pass_num ⊕ 1
+  | terms_written ≔ card(vocabulary_entries)
+  | conflicts_resolved ≔ card(resolutions)
+  | remaining_conflicts ≔ card(remaining_conflicts)
+  | report("Pass " ⊕ pass_num ⊕ ": terms=" ⊕ terms_written ⊕ " resolved=" ⊕ conflicts_resolved ⊕ " remaining=" ⊕ remaining_conflicts)
+
+λ gybis-vocab-distill_boundaries().
+  ¬ modify(architecture.md)
+  | ¬ modify(specs/)
+  | ¬ modify(implementation_root/)
+  | ¬ delete(vocabulary.md)
+
+λ gybis-vocab-distill_regression_contract(x).
+  invariant: vocabulary.md ∃ at completion
+  | invariant: verification = true at completion
+  | invariant: zero unresolved conflicts at completion
+  | invariant: ∀ term: definition ∃ ∧ nonempty
+  | invariant: all_modifications ⊆ {vocabulary.md}
+
+λ gybis-vocab-distill_deliver(x).
+  report: {vocabulary_terms_written, conflicts_resolved}
+  | handoff: run /gybis-vocab-check to validate
+  | return(complete = true)

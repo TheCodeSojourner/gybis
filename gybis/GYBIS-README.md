@@ -18,7 +18,7 @@ This repository is structured for **development with the Gybis stack**, followin
 
 When gybis is installed into a target repository, its command implementations are shipped in the bundled `.agents/skills/` directory.
 
-gybis is a **developer-command-driven, AI-assisted Spec-Driven Development (SDD) stack**. It is designed to help you establish shared domain vocabulary first, then define architecture and behavioral specifications, and finally implement and validate code against those specifications with full human oversight.
+It is designed to help you establish requirements first, then define shared domain vocabulary, architecture, and behavioral specifications, and finally implement and validate code against those durable constraints with full human oversight.
 
 ## Installing the Allium CLI
 
@@ -28,18 +28,22 @@ See the [allium-tools repository](https://github.com/juxt/allium-tools) for inst
 
 ## Quick Start
 
-### New Repository: Vocabulary-First Workflow
+### New Repository: Requirements-First Workflow
 
 1. **Establish requirements:** Run `/gybis-req-elicit` to elicit requirements from stakeholders via grilling interview rounds.
-2. **Establish vocabulary and architecture:** Author `vocabulary.md` and `architecture.md` with your AI tool from the agreed requirements (human-owned artifacts), then validate them with `/gybis-vocab-check` and `/gybis-arch-check`.
-3. **Derive specifications:** Run `/gybis-arch-propagate` to create specifications from architecture.
-4. **Derive code and tests:** Run `/gybis-spec-propagate` to generate initial code and test stubs.
+2. **Bootstrap vocabulary:** Run `/gybis-req-propagate` to derive initial `vocabulary.md` from the requirement terms, then validate it with `/gybis-vocab-check`.
+3. **Bootstrap architecture:** Run `/gybis-vocab-propagate` to derive initial `architecture.md` from requirements and vocabulary, then validate it with `/gybis-arch-check`.
+4. **Derive specifications:** Run `/gybis-arch-propagate` to create specifications from architecture.
+5. **Derive code and tests:** Run `/gybis-spec-propagate` to generate initial code and test stubs.
+
+Each propagate bootstraps a layer; the layer's own `/gybis-*-tend`, `/gybis-*-refine`, and `/gybis-*-weed` skills own it from then on.
 
 ### Existing Repository: Distill-First Workflow
 
 1. **Extract specifications:** Run `/gybis-spec-distill` to extract behavioral specifications from current implementation.
 2. **Derive architecture:** Run `/gybis-arch-distill` to derive architecture from extracted specifications, and implementation.
 3. **Extract vocabulary:** Run `/gybis-vocab-distill` to extract  vocabulary from architecture, specifications, and implementation.
+4. **Extract requirements:** Run `/gybis-req-distill` to distill the initial requirement set from vocabulary, architecture, specifications, and implementation.
 
 ### Need Guidance?
 
@@ -72,6 +76,8 @@ The gybis workflow is built around four deliberate actions that the human choose
 - `refine` polishes a single layer's structure and readability while preserving intended meaning.
 - `tend` evolves a single layer with human-approved intent before the drift spreads downstream.
 - `weed` resolves mismatch across neighboring layers or implementation when two artifacts no longer describe the same truth.
+
+The boundary is: **`check` diagnoses; `refine`, `tend`, and `weed` act.** One exception is `spec-check`, which also repairs `.allium` errors — permitted because its corrections are verified by an external oracle (the allium CLI), not by model judgement. Autonomous correction requires such a verifier; the other three check skills have none.
 
 The pattern is intentionally hierarchical: check first, refine when structure needs polish, tend when intended meaning needs to evolve, and weed when the task is convergence across lanes. The human decides the scope and approves any write.
 
@@ -108,11 +114,12 @@ Outcome: you start from the right command family instead of guessing from the fu
 Use this when you are building a new system and want durable constraints established before implementation.
 
 1. Run `/gybis-req-elicit` to establish requirements with stakeholders via grilling interview rounds.
-2. Author `vocabulary.md` and `architecture.md` with your AI tool from the agreed requirements, then validate with `/gybis-vocab-check` and `/gybis-arch-check`.
-3. Run `/gybis-arch-propagate` to derive initial behavioral specifications.
-4. Run `/gybis-spec-propagate` to derive initial code and test scaffolding.
+2. Run `/gybis-req-propagate` to derive initial `vocabulary.md` from the requirement terms, validated with `/gybis-vocab-check`.
+3. Run `/gybis-vocab-propagate` to derive initial `architecture.md` from requirements and vocabulary, validated with `/gybis-arch-check`.
+4. Run `/gybis-arch-propagate` to derive initial behavioral specifications.
+5. Run `/gybis-spec-propagate` to derive initial code and test scaffolding.
 
-Outcome: the project starts from vocabulary, architecture, and specifications rather than implementation-first drift.
+Outcome: the project starts from requirements, vocabulary, architecture, and specifications rather than implementation-first drift.
 
 ### Adopt gybis in an Existing Repository
 
@@ -121,8 +128,9 @@ Use this when code and tests already exist and you need to recover durable proje
 1. Run `/gybis-spec-distill` to extract behavioral specifications from existing code and tests.
 2. Run `/gybis-arch-distill` to derive architecture from those specifications and the current implementation.
 3. Run `/gybis-vocab-distill` to extract vocabulary from architecture, specifications, and implementation.
+4. Run `/gybis-req-distill` to distill the initial requirement set from vocabulary, architecture, specifications, and implementation.
 
-Outcome: an existing codebase is brought under explicit vocabulary, architecture, and specification governance.
+Outcome: an existing codebase is brought under explicit requirements, vocabulary, architecture, and specification governance.
 
 ### Upgrade an Existing gybis Installation
 
@@ -144,7 +152,7 @@ From this repository, copy only the bundled skills:
 cp -ra <pathToGybisDirectory>/gybis/.agents/skills/. .agents/skills/
 ```
 
-This updates command implementations, internal Allium adapters, and runtime compatibility checks. It does not update specifications, source code, tests, or Mementum data. Review the resulting skill-file diff, especially `internal/allium-runtime-check`, `internal/gybis-internal-skill-check`, and `internal/gybis-ref-check`.
+This updates command implementations, internal Allium adapters, and runtime compatibility checks. It does not update specifications, source code, tests, or Mementum data. Review the resulting skill-file diff, especially `internal/gybis-allium-runtime-check`, `internal/gybis-internal-skill-check`, and `internal/gybis-ref-check`.
 
 Verify the external prerequisite before running specification commands:
 
@@ -367,6 +375,7 @@ This section defines who decides what and when, for all non-memory operations.
 - **Human commands come first.** The AI never takes initiative.
 - **Human is the approval gate.** Every write operation requires human approval.
 - **No autonomous AI actions.**
+- **Invocation authorizes the command's writes.** Running a command is the human approval for the writes that command is defined to make. `distill` and `propagate` persist their artifacts autonomously once invoked; their output is reviewed afterwards through `check` and `weed`. Only writes nobody asked for are prohibited.
 
 ---
 
@@ -400,48 +409,49 @@ vocabulary > architecture > specification > tests > code
 
 REQ-clause convention: requirements clauses (`/gybis-req-*` family) may carry an optional `rationale:` line recording why the requirement exists — guidance and context only, never a rule anyone must satisfy. It is captured by elicit, validated by check (never a binding obligation, never counted as coverage), and rendered as "because: ..." by describe/explain when present.
 
-| Skill Name                                                       | Description                                                           |
-| ---------------------------------------------------------------- | --------------------------------------------------------------------- |
-| `/gybis-arch-check` (`/ga-check`)                                | Validate architecture integrity & coherence                           |
-| `/gybis-arch-describe` (`/ga-describe`)                          | Describe arch in non-tech prose or markdown                           |
-| `/gybis-arch-distill` (`/ga-distill`)                            | Create initial arch from specs                                        |
-| `/gybis-arch-explain` (`/ga-explain`)                            | Explain arch in dev prose or markdown                                 |
-| `/gybis-arch-propagate` (`/ga-propagate`)                        | Create initial specs from arch                                        |
-| `/gybis-arch-refine` (`/ga-refine`)                              | Refine architecture structure & clarity                               |
-| `/gybis-arch-tend` (`/ga-tend`)                                  | Update arch with human                                                |
-| `/gybis-arch-weed` (`/ga-weed`)                                  | Upsert arch/specs from diffs with human                               |
-| `/gybis-fini`                                                    | CRUD memory before terminate                                          |
-| `/gybis-help`                                                    | Show available commands                                               |
-| `/gybis-init`                                                    | Initialize gybis AI context                                           |
-| `/gybis-memory-migrate` (`/gm-migrate`)                          | Migrate Mementum store to current format                              |
-| `/gybis-memory-orient` (`/gm-orient`)                            | Restore prev AI context                                               |
-| `/gybis-memory-recall {topic}` (`/gm-recall {topic}`)            | Recall topic/summarize-latest                                         |
-| `/gybis-memory-store {insight}` (`/gm-store {insight}`)          | Store insight, or prompt for one                                      |
-| `/gybis-memory-synthesize` (`/gm-synthesize`)                    | Synthesize knowledge                                                  |
-| `/gybis-req-check` (`/gr-check`)                                 | Validate requirements designators, ordering, & coverage               |
-| `/gybis-req-describe` (`/gr-describe`)                           | Describe requirements in stakeholder prose or markdown                |
-| `/gybis-req-distill` (`/gr-distill`)                             | Create initial requirements (+ vocab candidates) from arch/specs/code |
-| `/gybis-req-elicit` (`/gr-elicit`)                               | Elicit requirements via grilling interview rounds                     |
-| `/gybis-req-explain` (`/gr-explain`)                             | Explain requirements in dev prose or markdown                         |
-| `/gybis-req-propagate` (`/gr-propagate`)                         | Annotate specs/tests with REQ traceability                            |
-| `/gybis-req-refine` (`/gr-refine`)                               | Refine requirements structure & clarity                               |
-| `/gybis-req-tend` (`/gr-tend`)                                   | Update requirements with impact analysis                              |
-| `/gybis-req-weed` (`/gr-weed`)                                   | Upsert requirements/downstream from diffs with human                  |
-| `/gybis-spec-check` (`/gs-check {concern\|domain\|all}`)         | Check/Update syntax until valid                                       |
-| `/gybis-spec-describe` (`/gs-describe {concern\|domain\|all}`)   | Describe in non-tech prose or markdown                                |
-| `/gybis-spec-distill` (`/gs-distill`)                            | Create initial specs from code/tests                                  |
-| `/gybis-spec-explain` (`/gs-explain {concern\|domain\|all}`)     | Explain in dev prose or markdown                                      |
-| `/gybis-spec-propagate` (`/gs-propagate {concern\|domain\|all}`) | Create initial code/tests                                             |
-| `/gybis-spec-refine` (`/gs-refine`)                              | Refine specs structure & clarity                                      |
-| `/gybis-spec-tend` (`/gs-tend`)                                  | Update specs with human                                               |
-| `/gybis-spec-weed` (`/gs-weed`)                                  | Upsert specs/code-tests from diffs with human                         |
-| `/gybis-vocab-check` (`/gv-check`)                               | Validate vocabulary.md syntax & semantics                             |
-| `/gybis-vocab-describe` (`/gv-describe`)                         | Describe vocabulary in business language                              |
-| `/gybis-vocab-distill` (`/gv-distill`)                           | Extract vocabulary from arch/specs/code                               |
-| `/gybis-vocab-explain` (`/gv-explain`)                           | Explain vocabulary for developers                                     |
-| `/gybis-vocab-refine` (`/gv-refine`)                             | Refine vocabulary structure & clarity                                 |
-| `/gybis-vocab-tend` (`/gv-tend`)                                 | Update vocabulary with impact analysis                                |
-| `/gybis-vocab-weed` (`/gv-weed`)                                 | Upsert vocabulary/artifacts from diffs with human                     |
+| Skill Name                                                       | Description                                                                 |
+| ---------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `/gybis-arch-check` (`/ga-check`)                                | Validate architecture integrity & coherence                                 |
+| `/gybis-arch-describe` (`/ga-describe`)                          | Describe arch in non-tech prose or markdown                                 |
+| `/gybis-arch-distill` (`/ga-distill`)                            | Create initial arch from specs                                              |
+| `/gybis-arch-explain` (`/ga-explain`)                            | Explain arch in dev prose or markdown                                       |
+| `/gybis-arch-propagate` (`/ga-propagate`)                        | Create initial specs from arch                                              |
+| `/gybis-arch-refine` (`/ga-refine`)                              | Refine architecture structure & clarity                                     |
+| `/gybis-arch-tend` (`/ga-tend`)                                  | Update arch with human                                                      |
+| `/gybis-arch-weed` (`/ga-weed`)                                  | Upsert arch/specs from diffs with human                                     |
+| `/gybis-fini`                                                    | CRUD memory before terminate                                                |
+| `/gybis-help`                                                    | Show available commands                                                     |
+| `/gybis-init`                                                    | Initialize gybis AI context                                                 |
+| `/gybis-memory-migrate` (`/gm-migrate`)                          | Migrate Mementum store to current format                                    |
+| `/gybis-memory-orient` (`/gm-orient`)                            | Restore prev AI context                                                     |
+| `/gybis-memory-recall {topic}` (`/gm-recall {topic}`)            | Recall topic/summarize-latest                                               |
+| `/gybis-memory-store {insight}` (`/gm-store {insight}`)          | Store insight, or prompt for one                                            |
+| `/gybis-memory-synthesize` (`/gm-synthesize`)                    | Synthesize knowledge                                                        |
+| `/gybis-req-check` (`/gr-check`)                                 | Validate requirements designators, ordering, & coverage                     |
+| `/gybis-req-describe` (`/gr-describe`)                           | Describe requirements in stakeholder prose or markdown                      |
+| `/gybis-req-distill` (`/gr-distill`)                             | Create initial requirements (+ vocab candidates) from vocab/arch/specs/code |
+| `/gybis-req-elicit` (`/gr-elicit`)                               | Elicit requirements via grilling interview rounds                           |
+| `/gybis-req-explain` (`/gr-explain`)                             | Explain requirements in dev prose or markdown                               |
+| `/gybis-req-propagate` (`/gr-propagate`)                         | Annotate specs/tests with REQ traceability                                  |
+| `/gybis-req-refine` (`/gr-refine`)                               | Refine requirements structure & clarity                                     |
+| `/gybis-req-tend` (`/gr-tend`)                                   | Update requirements with impact analysis                                    |
+| `/gybis-req-weed` (`/gr-weed`)                                   | Upsert requirements/downstream from diffs with human                        |
+| `/gybis-spec-check` (`/gs-check {concern\|domain\|all}`)         | Check/Update syntax until valid                                             |
+| `/gybis-spec-describe` (`/gs-describe {concern\|domain\|all}`)   | Describe in non-tech prose or markdown                                      |
+| `/gybis-spec-distill` (`/gs-distill`)                            | Create initial specs from code/tests                                        |
+| `/gybis-spec-explain` (`/gs-explain {concern\|domain\|all}`)     | Explain in dev prose or markdown                                            |
+| `/gybis-spec-propagate` (`/gs-propagate {concern\|domain\|all}`) | Create initial code/tests                                                   |
+| `/gybis-spec-refine` (`/gs-refine`)                              | Refine specs structure & clarity                                            |
+| `/gybis-spec-tend` (`/gs-tend`)                                  | Update specs with human                                                     |
+| `/gybis-spec-weed` (`/gs-weed`)                                  | Upsert specs/code-tests from diffs with human                               |
+| `/gybis-vocab-check` (`/gv-check`)                               | Validate vocabulary.md syntax & semantics                                   |
+| `/gybis-vocab-describe` (`/gv-describe`)                         | Describe vocabulary in business language                                    |
+| `/gybis-vocab-distill` (`/gv-distill`)                           | Extract vocabulary from arch/specs/code                                     |
+| `/gybis-vocab-explain` (`/gv-explain`)                           | Explain vocabulary for developers                                           |
+| `/gybis-vocab-propagate` (`/gv-propagate`)                       | Bootstrap architecture from req + vocab                                     |
+| `/gybis-vocab-refine` (`/gv-refine`)                             | Refine vocabulary structure & clarity                                       |
+| `/gybis-vocab-tend` (`/gv-tend`)                                 | Update vocabulary with impact analysis                                      |
+| `/gybis-vocab-weed` (`/gv-weed`)                                 | Upsert vocabulary/artifacts from diffs with human                           |
 
 ## Upstream Citations
 

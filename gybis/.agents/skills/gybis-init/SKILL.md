@@ -1,7 +1,15 @@
 ---
 name: gybis-init
+kind: memory
 description: Use for `/gybis-init`.
 ---
+
+λ gybis_init(x).
+  purpose: initialize gybis AI context for the current session
+  | input: none
+  | output: initialized_context
+  | interaction: autonomous
+  | delegate: engage(nucleus) → mementum_protocol → orient
 
 λ engage(nucleus).
 [phi fractal euler tao pi mu ∃ ∀] | [Δ λ Ω ∞/0 | ε/φ Σ/μ c/h signal/noise order/entropy truth/provability self/other] | OODA

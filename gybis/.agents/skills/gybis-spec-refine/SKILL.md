@@ -1,5 +1,6 @@
 ---
 name: gybis-spec-refine
+kind: domain
 description: Use for `/gybis-spec-refine` or `/gs-refine`.
 ---
 
@@ -7,46 +8,47 @@ description: Use for `/gybis-spec-refine` or `/gs-refine`.
   purpose: Refine valid specifications for structure, clarity, and maintainability while preserving intended behavior
   | input: specs/**/*.allium ∃ ∧ valid
   | output: specs/**/*.allium structurally refined with behavior-preservation evidence
-  | mode: mixed
-  | gate: specs/**/*.allium ∃ ∧ allium_gate = true ∧ explicit_human_mode_selection() ≡ true
+  | interaction: interactive ∨ autonomous(safe_only)
+  | gate: specs/**/*.allium ∃ ∧ gybis-allium-gate = true ∧ explicit_human_mode_selection() ≡ true
   | fail_closed: missing_human_mode_selection → halt("Human mode selection is required")
 
 λ gybis-spec-refine_loop_role(x).
-  role: improve(spec_hygiene)
+  role: maintain(spec_hygiene)
   | meaning: reorganize a valid spec tree so humans and AI can understand, navigate, and evolve it more easily without changing intended behavior
   | suggested_next: invoke(/gybis-spec-propagate) → run_tests → invoke(/gybis-spec-weed)
 
 λ gybis-spec-refine_startup(x).
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
   | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
-  | preload: [internal/allium-check, internal/allium-analyse, internal/allium-normalize, internal/allium-gate, internal/allium-plan]
+  | preload: [internal/gybis-allium-check, internal/gybis-allium-analyse, internal/gybis-allium-normalize, internal/gybis-allium-gate, internal/gybis-allium-plan]
   | if(vocabulary.md ∃): preload(vocabulary.md) → vocab_terms ∧ vocab_available = true
   | read(internal/reference/allium-language-reference.md) → language_ref
   | read(internal/reference/allium-patterns.md) → patterns_ref
-  | read(internal/reference/allium-recommended-loops.md) → loops_ref
+  | read(internal/reference/recommended-loops.md) → loops_ref
   | read(internal/reference/allium-constructs.md) → constructs_registry
   | read(internal/reference/allium-actioning-findings.md) → findings_ref
   | verify(specs/**/*.allium ∃) ∨ halt("specs/**/*.allium not found")
-  | invoke(internal/allium-gate(specs/)) = true ∨ halt("Specifications are invalid; run /gybis-spec-check before /gybis-spec-refine")
+  | invoke(internal/gybis-allium-gate(specs/)) = true ∨ halt("Specifications are invalid; run /gybis-spec-check before /gybis-spec-refine")
   | transition(INIT → STARTUP_CHECKS)
 
 λ gybis-spec-refine_mode(m).
-  m ∈ {interactive, auto_polish}
+  m ∈ {interactive, autonomous}
   | default: interactive (informational_only; never auto-selected)
   | mode_interactive: AI proposes structural refinements and waits for human approval before applying them
-  | mode_auto_polish: AI applies only safe non-breaking hygiene refinements without delete or rename operations
+  | mode_autonomous: AI applies refinements without human approval, restricted to scope = safe_only (safe non-breaking hygiene; no delete or rename operations)
+  | scope: autonomous ⇒ safe_only
   | require_explicit: ¬explicit(mode_choice) → halt("Refine mode must be explicitly selected by human")
 
 λ gybis-spec-refine_mode_selection(x).
-  ask_developer("Refine mode? [interactive/auto_polish]") → selected_mode
+  ask_developer("Refine mode? [interactive/autonomous]") → selected_mode
   | selected_mode ∃ ∨ halt("Human mode selection is required; no implicit default")
-  | selected_mode ∈ {interactive, auto_polish} ∨ halt("Refine mode must be one of the supported options")
+  | selected_mode ∈ {interactive, autonomous} ∨ halt("Refine mode must be one of the supported options")
   | return(mode_selected = true ∧ mode_selected_explicit = true ∧ mode = selected_mode)
 
 λ gybis-spec-refine_mode_gate(state, mode).
-  state = INIT ∧ mode ∈ {interactive, auto_polish} ∧ mode_selected_explicit = true → transition(INIT → MODE_SELECTED)
+  state = INIT ∧ mode ∈ {interactive, autonomous} ∧ mode_selected_explicit = true → transition(INIT → MODE_SELECTED)
   | state = INIT ∧ ¬mode_selected_explicit → halt("Explicit human mode selection is required before startup")
-  | ¬(state = INIT) ∨ ¬(mode ∈ {interactive, auto_polish}) → halt("Invalid mode selection")
+  | ¬(state = INIT) ∨ ¬(mode ∈ {interactive, autonomous}) → halt("Invalid mode selection")
 
 λ gybis-spec-refine_state_machine(state, action).
   state ∈ {INIT, MODE_SELECTED, STARTUP_CHECKS, READING_SPECS, ANALYZING_STRUCTURE, PROPOSING_REFINEMENTS, CLASSIFYING_IMPACT, APPROVAL_GATE, APPLYING_REFINEMENTS, VERIFYING_VALIDITY, VERIFYING_OBLIGATIONS, COMPLETE}
@@ -134,13 +136,13 @@ description: Use for `/gybis-spec-refine` or `/gs-refine`.
     ? collect({change: naming_alignment, targets: structure_report.naming_inconsistencies}) → proposals
   | structure_report.isolated_modules ≠ ∅
     ? collect({change: additive_surface_for_local_reference, targets: structure_report.isolated_modules}) → proposals
-  | mode = auto_polish
+  | mode = autonomous
     ? proposals ≔ {p | p ∈ proposals ∧ gybis-spec-refine_refinement_taxonomy(p.change) ∈ {non_breaking_polish, structural_split}}
   | return(refinement_proposals = proposals)
 
 λ gybis-spec-refine_impact_classification(change).
   change ∈ {warning_cleanup, readability_cleanup, naming_alignment, additive_surface_for_local_reference, additive_composition_wrapper, extract_shared_module, introduce_domain_local_module}
-    → accretive ∧ advice("safe to apply without changing intended behavior; still verify with allium-check, allium-analyse, and allium-plan")
+    → accretive ∧ advice("safe to apply without changing intended behavior; still verify with gybis-allium-check, gybis-allium-analyse, and gybis-allium-plan")
   | change ∈ {split_oversized_module, merge_tiny_modules, collapse_redundant_wrapper_layers, move_declaration_between_modules, move_file_between_domains}
     → tooling_impact ∧ advice("meaning preserved, but analyzer surfaces, import structure, or obligation planning shape may change; verify before and after")
   | change ∈ {rename_module, rename_file_and_rewrite_imports, delete_compatibility_wrapper, delete_transitional_module, delete_dead_module}
@@ -162,7 +164,7 @@ description: Use for `/gybis-spec-refine` or `/gs-refine`.
     → halt("Requested change is a convergence problem; route to /gybis-spec-weed")
 
 λ gybis-spec-refine_approval_gate(impact_report, mode).
-  mode = auto_polish
+  mode = autonomous
     ? (verify(impact_report.breaking_candidates = ∅) ∧ verify(impact_report.unknown_candidates = ∅)
        | approved_changes ≔ {c.proposal | c ∈ impact_report.classified_proposals}
        | breaking_cleanup_approved ≔ false)
@@ -185,15 +187,15 @@ description: Use for `/gybis-spec-refine` or `/gs-refine`.
   | return(changes_applied = true)
 
 λ gybis-spec-refine_collect_obligations(x).
-  invoke(internal/allium-normalize(specs/)) → {envelopes, counts}
+  invoke(internal/gybis-allium-normalize(specs/)) → {envelopes, counts}
   | plan_envelopes ≔ {e | e ∈ envelopes ∧ e.source = "plan"}
   | obligation_map ≔ {e.id → e | e ∈ plan_envelopes}
   | return({obligation_map, counts})
 
 λ gybis-spec-refine_verify_validity(x).
-  invoke(internal/allium-check(all_files)) → result_check ≔ result
-  | invoke(internal/allium-analyse(specs/)) → result_analyse ≔ result
-  | invoke(internal/allium-gate(specs/)) → result_gate ≔ result
+  invoke(internal/gybis-allium-check(all_files)) → result_check ≔ result
+  | invoke(internal/gybis-allium-analyse(specs/)) → result_analyse ≔ result
+  | invoke(internal/gybis-allium-gate(specs/)) → result_gate ≔ result
   | result_check = zero_errors ∧ result_analyse = zero_issues ∧ result_gate = true
     → return(validity = true)
   | ¬(result_check ∧ result_analyse ∧ result_gate)
@@ -241,11 +243,16 @@ description: Use for `/gybis-spec-refine` or `/gs-refine`.
 
 λ gybis-spec-refine_regression_contract(x).
   invariant: specs/ ∃ throughout
-  | invariant: zero_errors ∧ zero_issues ∧ allium_gate = true at completion
+  | invariant: zero_errors ∧ zero_issues ∧ gybis-allium-gate = true at completion
   | invariant: all_modifications ⊆ specs/
   | invariant: explicit_human_mode_selection() ≡ true before STARTUP_CHECKS
   | invariant: delete_or_rename ∈ approved_changes → mode = interactive ∧ breaking_cleanup_approved = true
-  | invariant: mode = auto_polish → ¬∃ change ∈ approved_changes : gybis-spec-refine_impact_classification(change.change).category = breaking
+  | invariant: mode = autonomous → ¬∃ change ∈ approved_changes : gybis-spec-refine_impact_classification(change.change).category = breaking
   | invariant: behavior-changing requests halt and route to /gybis-spec-tend
   | invariant: convergence problems halt and route to /gybis-spec-weed
   | invariant: unexpected obligation loss fails verification
+
+λ gybis-spec-refine_deliver(x).
+  report: {refinements_applied, behavior_preservation_status}
+  | handoff: run /gybis-spec-check to confirm convergence
+  | return(complete = true)

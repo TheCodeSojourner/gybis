@@ -20,8 +20,8 @@ requirements/ (requirements-index.md + requirements-{module}.md)
   → code/tests
 ```
 
-Forward (greenfield): `gr-elicit` → human-authored vocabulary.md + architecture.md (validated by `gv-check`/`ga-check`) → arch-propagate → spec-propagate. (vocab-elicit and arch-elicit were removed session-42; greenfield vocab/arch artifacts are human-authored.)
-Reverse (brownfield): `spec-distill` → `arch-distill` → `gr-distill` (+ vocab candidates) — or enter at any layer via that layer's distill.
+Forward (greenfield): `gr-elicit` → `gr-propagate` (bootstraps vocabulary.md) → `vocab-propagate` → `arch-propagate` → `spec-propagate`. (vocab-elicit and arch-elicit were removed session-42; the propagate family bootstraps vocab and arch instead — see memories/propagate-seed-then-own.md.)
+Reverse (brownfield): `spec-distill` → `arch-distill` → `vocab-distill` → `gr-distill` — or enter at any layer via that layer's distill.
 
 ## Canonical format
 
@@ -37,7 +37,7 @@ Reverse (brownfield): `spec-distill` → `arch-distill` → `gr-distill` (+ voca
 | -------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | `gr-elicit`    | Grilling-protocol interview → REQ transcription; decided-vs-researched attribution                                      |
 | `gr-check`     | Read-only diagnostics: designators, ordering, clause well-formedness, coverage, traceability                            |
-| `gr-distill`   | Brownfield bridge: REQ clauses from arch/specs/code + vocab candidates → vocab-tend                                     |
+| `gr-distill`   | Brownfield bridge: REQ clauses from vocab/arch/specs/code + new term candidates → vocab-tend                            |
 | `gr-propagate` | Annotate specs/tests with REQ designators; strict test-pass convergence; arch delta report; vocab candidates            |
 | `gr-tend`      | Layer-local changes with impact analysis + human approval                                                               |
 | `gr-refine`    | Structural polish: atomicity, dedupe, moves; human-approved                                                             |
@@ -47,7 +47,7 @@ Reverse (brownfield): `spec-distill` → `arch-distill` → `gr-distill` (+ voca
 
 ## Boundaries (inherited gybis rules)
 
-- `check` diagnoses only; resolution in `tend`/`weed` (arch-check boundary).
+- `check` diagnoses only; resolution in `tend`/`weed` (arch-check boundary). Exception: `spec-check` may repair, because its corrections are verified by the external allium CLI — autonomous correction requires an external verifier.
 - `vocabulary.md` is only written by vocabulary skills; req skills emit candidates.
 - Stage readiness is human-owned; missing requirements/ never hard-halts downstream skills.
 - Code/test-affecting commands require `test_suite_passes = true` before COMPLETE.

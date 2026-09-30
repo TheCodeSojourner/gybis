@@ -1,5 +1,6 @@
 ---
 name: gybis-req-tend
+kind: domain
 description: Use for `/gybis-req-tend` or `/gr-tend`.
 ---
 
@@ -7,12 +8,11 @@ description: Use for `/gybis-req-tend` or `/gr-tend`.
   purpose: Apply layer-local requirement updates with impact analysis and explicit human approval
   | input: requirements/ ∃ ∧ human_directed_change
   | output: updated requirements/{index, module files} with downstream impact report
-  | mode: interactive
+  | interaction: interactive
   | gate: requirements/ ∃
 
 λ gybis-req-tend_startup(x).
-  invoke(internal/gybis-ref-check) → halt_on(false)
-  | invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
+  invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
   | verify(requirements/ ∃) ∨ halt("requirements/ not found")
   | read(requirements/requirements-index.md) → index_content
   | read_all(requirements/requirements-*.md) → module_contents
@@ -38,6 +38,7 @@ description: Use for `/gybis-req-tend` or `/gr-tend`.
   | transition(APPLYING → VERIFYING) only_if(changes_applied = true)
   | transition(VERIFYING → COMPLETE) only_if(verify_ok = true)
   | transition(VERIFYING → APPLYING) only_if(verify_fail = true)
+  | on_loop_back: loop_count ≔ loop_count ⊕ 1
 
 λ gybis-req-tend_tool_guard(state, tool, path).
   state ∈ {STARTUP_CHECKS, IMPACT_ANALYSIS, APPROVAL, VERIFYING} → allow(read(path)) ∧ deny(write(path))
@@ -83,6 +84,29 @@ description: Use for `/gybis-req-tend` or `/gr-tend`.
     - impact_report items either addressed or explicitly deferred
   | verify_ok ≔ ∀ check = true
   | on fail: loop_back to APPLYING
+
+λ gybis-req-tend_loop_guard(state).
+  loop_count ≥ max_iterations
+    → halt("Maximum iterations reached without full convergence")
+
+λ gybis-req-tend_pass_accounting(pass).
+  pass_num ≔ pass_num ⊕ 1
+  | reqs_changed ≔ card(reqs_changed)
+  | downstream_affected ≔ card(downstream_artifacts_affected)
+  | report("Pass " ⊕ pass_num ⊕ ": reqs_changed=" ⊕ reqs_changed ⊕ " downstream_affected=" ⊕ downstream_affected)
+
+λ gybis-req-tend_boundaries().
+  ¬ modify(vocabulary.md)
+  | ¬ modify(architecture.md)
+  | ¬ modify(specs/)
+  | ¬ delete(requirements/)
+
+λ gybis-req-tend_regression_contract(x).
+  invariant: designator uniqueness preserved
+  | invariant: dependency order preserved
+  | invariant: module footers consistent with clauses
+  | invariant: impact_report items addressed ∨ explicitly deferred
+  | invariant: all_modifications ⊆ requirements/
 
 λ gybis-req-tend_deliver(x).
   handoff: downstream divergence → /gybis-req-weed

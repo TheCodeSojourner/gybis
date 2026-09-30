@@ -25,7 +25,7 @@ allium check <file>
 λ(consumer, contract, code = none → kind ≔ "check:_uncoded" ∧ preserve(severity, location, message))
 λ(consumer, fallback, "check:_uncoded" → prose_heuristic_synthesis)
 
-Any code path dispatching on `code` MUST implement a codeless fallback. `internal/allium-normalize` emits these as `kind: "check:_uncoded"`; downstream consumers (e.g. `gybis-spec-check`) route through prose-heuristic synthesis rather than category-specific dispatch.
+Any code path dispatching on `code` MUST implement a codeless fallback. `internal/gybis-allium-normalize` emits these as `kind: "check:_uncoded"`; downstream consumers (e.g. `gybis-spec-check`) route through prose-heuristic synthesis rather than category-specific dispatch.
 
 
 **Common diagnostics:**
@@ -35,7 +35,7 @@ Any code path dispatching on `code` MUST implement a codeless fallback. `interna
 λ(diag, contradictory_requires, requires(A) ⊗ requires(B) ⊗ conflict(field) → "Which correct?")
 λ(diag, when_clause_obligation, when(transition(Entity, state)) → needs(field[name]) ∧ ¬rule_sets(it) → "Which rule sets it?")
 λ(diag, no_when_clause, ¬when: on rule → "Rule [Name] has no trigger — when should it fire?")
-λ(diag, stale_traces, traces(file) ∧ ¬exists(file) → "Update or remove?")
+λ(diag, stale_traces, traces(file) ∧ ¬∃(file) → "Update or remove?")
 λ(diag, unused_use, use(alias) ∧ ¬used(alias) → "Remove?")
 λ(diag, first_last_on_set, .first/.last(Set) → "Make [field] `List<T>`?")
 λ(diag, custom_dot_method, collection.filter(pred) → "Use free-standing: `filter(collection, pred)`")

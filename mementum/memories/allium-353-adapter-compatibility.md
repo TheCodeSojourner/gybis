@@ -16,8 +16,8 @@ internal skills:
 - `allium plan`, `parse`, and `model` emit diagnostics alongside their primary
   data; nonzero exit with error diagnostics must be treated as a structured
   failure rather than malformed output.
-- Update `internal/allium-check`, `internal/allium-analyse`,
-  `internal/allium-plan`, and `internal/allium-normalize` to consume the actual
+- Update `internal/gybis-allium-check`, `internal/gybis-allium-analyse`,
+  `internal/gybis-allium-plan`, and `internal/gybis-allium-normalize` to consume the actual
   v3.5.3 JSON shapes. Do not change upstream pins solely because of this work.
 
 Keep this pass separate from the completed Nucleus Lambda/VSM update.

@@ -33,6 +33,7 @@ gybis is command-driven guidance, not always-on process enforcement.
 - Human operators are responsible for stage readiness (`requirements/requirements-*.md` -> `vocabulary.md` -> `architecture.md` -> `specs/**/*.allium` -> code/tests).
 - Skills execute the requested transformation and enforce only execution-critical gates.
 - Check and weed commands are available as deliberate convergence tools when operators choose to run them.
+- Running a command authorizes the writes that command is defined to make. `distill` and `propagate` persist their artifacts autonomously once invoked; their output is reviewed afterwards through `check` and `weed`. Only unrequested writes are prohibited.
 
 ## Check, Refine, Tend, and Weed Philosophy
 
@@ -82,31 +83,32 @@ The following commands are available after integrating gybis into a target repos
 
 ### Vocabulary Commands (`/gv-*`)
 
-| Command                                  | Description                                       |
-| ---------------------------------------- | ------------------------------------------------- |
-| `/gybis-vocab-check` (`/gv-check`)       | Validate vocabulary.md syntax & semantics         |
-| `/gybis-vocab-describe` (`/gv-describe`) | Describe vocabulary in business language          |
-| `/gybis-vocab-distill` (`/gv-distill`)   | Extract vocabulary from arch/specs/code           |
-| `/gybis-vocab-explain` (`/gv-explain`)   | Explain vocabulary for developers                 |
-| `/gybis-vocab-refine` (`/gv-refine`)     | Refine vocabulary structure & clarity             |
-| `/gybis-vocab-tend` (`/gv-tend`)         | Update vocabulary with impact analysis            |
-| `/gybis-vocab-weed` (`/gv-weed`)         | Upsert vocabulary/artifacts from diffs with human |
+| Command                                    | Description                                       |
+| ------------------------------------------ | ------------------------------------------------- |
+| `/gybis-vocab-check` (`/gv-check`)         | Validate vocabulary.md syntax & semantics         |
+| `/gybis-vocab-describe` (`/gv-describe`)   | Describe vocabulary in business language          |
+| `/gybis-vocab-distill` (`/gv-distill`)     | Extract vocabulary from arch/specs/code           |
+| `/gybis-vocab-explain` (`/gv-explain`)     | Explain vocabulary for developers                 |
+| `/gybis-vocab-propagate` (`/gv-propagate`) | Bootstrap architecture from req + vocab           |
+| `/gybis-vocab-refine` (`/gv-refine`)       | Refine vocabulary structure & clarity             |
+| `/gybis-vocab-tend` (`/gv-tend`)           | Update vocabulary with impact analysis            |
+| `/gybis-vocab-weed` (`/gv-weed`)           | Upsert vocabulary/artifacts from diffs with human |
 
 ### Requirements Commands (`/gr-*`)
 
 Requirements are the top layer of the stack: dependency-ordered module files containing `REQ-<DOMAIN>-NNN` clauses in nucleus lambda notation, rendered for humans on demand via describe/explain. Each clause may carry an optional `rationale:` line recording why the requirement exists — guidance and context only, never a rule anyone must satisfy. It is elicited from stakeholders during `/gybis-req-elicit`, validated by `/gybis-req-check` (it is never a binding obligation and never counted as test coverage), and rendered as "because: ..." by describe/explain when present.
 
-| Command                                  | Description                                                           |
-| ---------------------------------------- | --------------------------------------------------------------------- |
-| `/gybis-req-check` (`/gr-check`)         | Validate requirements designators, ordering, & coverage               |
-| `/gybis-req-describe` (`/gr-describe`)   | Describe requirements in stakeholder prose or markdown                |
-| `/gybis-req-distill` (`/gr-distill`)     | Create initial requirements (+ vocab candidates) from arch/specs/code |
-| `/gybis-req-elicit` (`/gr-elicit`)       | Elicit requirements via grilling interview rounds                     |
-| `/gybis-req-explain` (`/gr-explain`)     | Explain requirements in dev prose or markdown                         |
-| `/gybis-req-propagate` (`/gr-propagate`) | Annotate specs/tests with REQ traceability                            |
-| `/gybis-req-refine` (`/gr-refine`)       | Refine requirements structure & clarity                               |
-| `/gybis-req-tend` (`/gr-tend`)           | Update requirements with impact analysis                              |
-| `/gybis-req-weed` (`/gr-weed`)           | Upsert requirements/downstream from diffs with human                  |
+| Command                                  | Description                                                                 |
+| ---------------------------------------- | --------------------------------------------------------------------------- |
+| `/gybis-req-check` (`/gr-check`)         | Validate requirements designators, ordering, & coverage                     |
+| `/gybis-req-describe` (`/gr-describe`)   | Describe requirements in stakeholder prose or markdown                      |
+| `/gybis-req-distill` (`/gr-distill`)     | Create initial requirements (+ vocab candidates) from vocab/arch/specs/code |
+| `/gybis-req-elicit` (`/gr-elicit`)       | Elicit requirements via grilling interview rounds                           |
+| `/gybis-req-explain` (`/gr-explain`)     | Explain requirements in dev prose or markdown                               |
+| `/gybis-req-propagate` (`/gr-propagate`) | Annotate specs/tests with REQ traceability                                  |
+| `/gybis-req-refine` (`/gr-refine`)       | Refine requirements structure & clarity                                     |
+| `/gybis-req-tend` (`/gr-tend`)           | Update requirements with impact analysis                                    |
+| `/gybis-req-weed` (`/gr-weed`)           | Upsert requirements/downstream from diffs with human                        |
 
 ### Architecture Commands (`/ga-*`)
 
