@@ -126,7 +126,7 @@ Requirements are the top layer of the stack: dependency-ordered module files con
 | `/gybis-vocab-describe` (`/gv-describe`)   | Describe vocabulary in business language          |
 | `/gybis-vocab-distill` (`/gv-distill`)     | Extract vocabulary from arch/specs/code           |
 | `/gybis-vocab-explain` (`/gv-explain`)     | Explain vocabulary for developers                 |
-| `/gybis-vocab-propagate` (`/gv-propagate`) | Bootstrap architecture from req + vocab           |
+| `/gybis-vocab-propagate` (`/gv-propagate`) | Create initial architecture from req + vocab      |
 | `/gybis-vocab-refine` (`/gv-refine`)       | Refine vocabulary structure & clarity             |
 | `/gybis-vocab-tend` (`/gv-tend`)           | Update vocabulary with impact analysis            |
 | `/gybis-vocab-weed` (`/gv-weed`)           | Upsert vocabulary/artifacts from diffs with human |
