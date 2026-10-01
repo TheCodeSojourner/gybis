@@ -106,17 +106,17 @@ The following commands are available after integrating gybis into a target repos
 
 Requirements are the top layer of the stack: dependency-ordered module files containing `REQ-<DOMAIN>-NNN` clauses in nucleus lambda notation, elicited from stakeholders with `/gybis-req-elicit` and rendered for humans on demand via describe/explain.
 
-| Command                                  | Description                                                                 |
-| ---------------------------------------- | --------------------------------------------------------------------------- |
-| `/gybis-req-check` (`/gr-check`)         | Validate individual requirements, ordering, & coverage                      |
-| `/gybis-req-describe` (`/gr-describe`)   | Describe requirements in stakeholder prose or markdown                      |
-| `/gybis-req-distill` (`/gr-distill`)     | Create initial requirements (+ vocab candidates) from vocab/arch/specs/code |
-| `/gybis-req-elicit` (`/gr-elicit`)       | Elicit requirements via grilling interview rounds                           |
-| `/gybis-req-explain` (`/gr-explain`)     | Explain requirements in dev prose or markdown                               |
-| `/gybis-req-propagate` (`/gr-propagate`) | Annotate specs/tests with REQ traceability                                  |
-| `/gybis-req-refine` (`/gr-refine`)       | Refine requirements structure & clarity                                     |
-| `/gybis-req-tend` (`/gr-tend`)           | Update requirements with impact analysis                                    |
-| `/gybis-req-weed` (`/gr-weed`)           | Upsert requirements/downstream from diffs with human                        |
+| Command                                  | Description                                            |
+| ---------------------------------------- | ------------------------------------------------------ |
+| `/gybis-req-check` (`/gr-check`)         | Validate individual requirements, ordering, & coverage |
+| `/gybis-req-describe` (`/gr-describe`)   | Describe requirements in stakeholder prose or markdown |
+| `/gybis-req-distill` (`/gr-distill`)     | Create initial requirements from vocab/arch/specs/code |
+| `/gybis-req-elicit` (`/gr-elicit`)       | Elicit requirements via grilling interview rounds      |
+| `/gybis-req-explain` (`/gr-explain`)     | Explain requirements in dev prose or markdown          |
+| `/gybis-req-propagate` (`/gr-propagate`) | Annotate specs/tests with REQ traceability             |
+| `/gybis-req-refine` (`/gr-refine`)       | Refine requirements structure & clarity                |
+| `/gybis-req-tend` (`/gr-tend`)           | Update requirements with impact analysis               |
+| `/gybis-req-weed` (`/gr-weed`)           | Upsert requirements/downstream from diffs with human   |
 
 ### Vocabulary Commands (`/gv-*`)
 
