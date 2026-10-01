@@ -79,6 +79,25 @@ Think of the sequence as a convergence loop rather than a one-off command.
 
 - **AI Session Persistent memory**: [Mementum](https://github.com/michaelwhitford/mementum) manages decisions, patterns, and insights as files under your repository's version control (`mementum/`), recalled during AI sessions, so previous context is available between sessions. Because the store is git-based and project-owned, memory survives changes of AI tool, client, or machine, and stays reviewable and recoverable through git history.
 
+## AI Is Nondeterministic: Expect to Rerun
+
+Set this expectation before you start: the same gybis command, run twice against the same repository, can produce different results. This is a property of the underlying AI model, not a defect in gybis or in the repository. Plan for iteration rather than expecting one perfect pass. If that surprises you, it is the single biggest adjustment for developers new to AI-assisted work.
+
+The command families behave differently on repeat:
+
+- `check`, `describe`, and `explain` are read-only with respect to your durable layers, so they can be rerun freely.
+- `distill` and `propagate` are bootstrap commands. They are gated on their target artifact *not* existing, so once the artifact exists a rerun halts by design instead of overwriting your work.
+- `refine`, `tend`, and `weed` are the iterative loops. They are gated on the artifact existing and are meant to be run repeatedly.
+
+To converge an artifact:
+
+1. Run `check` and keep the findings.
+2. Apply `refine`, `tend`, or `weed` as the change requires.
+3. Re-run `check` and compare. Fewer findings is progress.
+4. Stop when `check` passes and a fresh pass produces no further change; the artifact has then stabilized.
+
+Because gybis keeps every durable artifact in source control, each run is reviewable and recoverable: inspect the diff or commit between runs, and discard any result you do not want. Treat an AI output as a draft to converge, not a finished artifact to accept.
+
 ## Available User Commands
 
 The following commands are available after integrating gybis into a target repository. Use them with any compatible AI tool configured to consume the bundled gybis `.agents/skills/` directory:
