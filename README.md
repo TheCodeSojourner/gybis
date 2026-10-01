@@ -68,7 +68,7 @@ Think of the sequence as a convergence loop rather than a one-off command.
 - **AI base context**: [Nucleus](https://github.com/michaelwhitford/nucleus) mathematical notation engages
   the AI model's structured reasoning rather than its conversational defaults. The inherent precision means significantly fewer hallucinations, and the inherent density means significantly fewer tokens to convey the same context.
 
-- **Requirements layer**: Requirements are the top of the durability order (`requirements/` -> `vocabulary.md` -> `architecture.md` -> `specs/**/*.allium` -> code/tests). Dependency-ordered module files hold `REQ-<DOMAIN>-NNN` clauses written in the same nucleus lambda notation, capturing `what` a system must do before vocabulary and architecture are derived from them. Requirements are elicited from stakeholders with `/gybis-req-elicit` and kept aligned with the layers below by the requirements command family.
+- **Requirements layer**: Requirements are the top of the durability order (`requirements/` -> `vocabulary.md` -> `architecture.md` -> `specs/**/*.allium` -> code/tests). Dependency-ordered module files hold `REQ-<DOMAIN>-NNN` clauses written in the same nucleus lambda notation, capturing `what` a system must do before vocabulary and architecture are derived from them. Requirements are binding by default; only an explicit REQ deferral changes that, while downstream stage readiness is tracked separately. Requirements are elicited from stakeholders with `/gybis-req-elicit` and kept aligned with the layers below by the requirements command family.
 
 - **Ubiquitous language**: In the context of Domain-Driven Design (DDD), a ubiquitous language is a shared, precise vocabulary that both technical and non-technical people use consistently when talking about a system. In gybis, vocabulary commands establish and maintain a project's ubiquitous language in `vocabulary.md`, thus reducing ambiguity and keeping requirements, architecture, specifications, tests, and code artifacts aligned to shared terms.
  
@@ -106,74 +106,74 @@ The following commands are available after integrating gybis into a target repos
 
 Requirements are the top layer of the stack: dependency-ordered module files containing `REQ-<DOMAIN>-NNN` clauses in nucleus lambda notation, elicited from stakeholders with `/gybis-req-elicit` and rendered for humans on demand via describe/explain.
 
-| Command                                   | Description                                             |
-| ----------------------------------------- | ------------------------------------------------------- |
-| `/gybis-req-check` (`/gr-check`)          | Validate individual requirements, ordering, & coverage  |
-| `/gybis-req-describe` (`/gr-describe`)    | Describe requirements in stakeholder prose or markdown  |
-| `/gybis-req-distill` (`/gr-distill`)      | Create initial requirements from vocab/arch/specs/code  |
-| `/gybis-req-elicit` (`/gr-elicit`)        | Elicit requirements via grilling interview rounds       |
-| `/gybis-req-explain` (`/gr-explain`)      | Explain requirements in dev prose or markdown           |
-| `/gybis-req-propagate` (`/gr-propagate`)  | Annotate specs/tests with REQ traceability              |
-| `/gybis-req-refine` (`/gr-refine`)        | Refine requirements structure & clarity                 |
-| `/gybis-req-tend` (`/gr-tend`)            | Update requirements with impact analysis                |
-| `/gybis-req-weed` (`/gr-weed`)            | Resolve divergence between requirements and downstream  |
+| Command                                  | Description                                               |
+| ---------------------------------------- | --------------------------------------------------------- |
+| `/gybis-req-check` (`/gr-check`)         | Check requirements; optionally repair after plan approval |
+| `/gybis-req-describe` (`/gr-describe`)   | Describe requirements in stakeholder prose or markdown    |
+| `/gybis-req-distill` (`/gr-distill`)     | Create initial requirements from vocab/arch/specs/code    |
+| `/gybis-req-elicit` (`/gr-elicit`)       | Elicit requirements via grilling interview rounds         |
+| `/gybis-req-explain` (`/gr-explain`)     | Explain requirements in dev prose or markdown             |
+| `/gybis-req-propagate` (`/gr-propagate`) | Annotate specs/tests with REQ traceability                |
+| `/gybis-req-refine` (`/gr-refine`)       | Refine requirements structure & clarity                   |
+| `/gybis-req-tend` (`/gr-tend`)           | Update requirements with impact analysis                  |
+| `/gybis-req-weed` (`/gr-weed`)           | Resolve divergence between requirements and downstream    |
 
 ### Vocabulary Commands (`/gv-*`)
 
-| Command                                     | Description                                      |
-| ------------------------------------------- | ------------------------------------------------ |
-| `/gybis-vocab-check` (`/gv-check`)          | Validate vocabulary.md syntax & semantics        |
-| `/gybis-vocab-describe` (`/gv-describe`)    | Describe vocabulary in stakeholder prose         |
-| `/gybis-vocab-distill` (`/gv-distill`)      | Extract vocabulary from arch/specs/code          |
-| `/gybis-vocab-explain` (`/gv-explain`)      | Explain vocabulary in dev prose                  |
-| `/gybis-vocab-propagate` (`/gv-propagate`)  | Create initial architecture from req + vocab     |
-| `/gybis-vocab-refine` (`/gv-refine`)        | Refine vocabulary structure & clarity            |
-| `/gybis-vocab-tend` (`/gv-tend`)            | Update vocabulary with impact analysis           |
-| `/gybis-vocab-weed` (`/gv-weed`)            | Resolve divergence between vocab and downstream  |
+| Command                                    | Description                                     |
+| ------------------------------------------ | ----------------------------------------------- |
+| `/gybis-vocab-check` (`/gv-check`)         | Validate vocabulary.md syntax & semantics       |
+| `/gybis-vocab-describe` (`/gv-describe`)   | Describe vocabulary in stakeholder prose        |
+| `/gybis-vocab-distill` (`/gv-distill`)     | Extract vocabulary from arch/specs/code         |
+| `/gybis-vocab-explain` (`/gv-explain`)     | Explain vocabulary in dev prose                 |
+| `/gybis-vocab-propagate` (`/gv-propagate`) | Create initial architecture from req + vocab    |
+| `/gybis-vocab-refine` (`/gv-refine`)       | Refine vocabulary structure & clarity           |
+| `/gybis-vocab-tend` (`/gv-tend`)           | Update vocabulary with impact analysis          |
+| `/gybis-vocab-weed` (`/gv-weed`)           | Resolve divergence between vocab and downstream |
 
 ### Architecture Commands (`/ga-*`)
 
-| Command                                    | Description                                    |
-| ------------------------------------------ | ---------------------------------------------- |
-| `/gybis-arch-check` (`/ga-check`)          | Validate architecture integrity & coherence    |
-| `/gybis-arch-describe` (`/ga-describe`)    | Describe arch in stakeholder prose or markdown |
-| `/gybis-arch-distill` (`/ga-distill`)      | Create initial arch from specs                 |
-| `/gybis-arch-explain` (`/ga-explain`)      | Explain arch in dev prose or markdown          |
-| `/gybis-arch-propagate` (`/ga-propagate`)  | Create initial specs from arch                 |
-| `/gybis-arch-refine` (`/ga-refine`)        | Refine architecture structure & clarity        |
-| `/gybis-arch-tend` (`/ga-tend`)            | Update arch with impact analysis               |
-| `/gybis-arch-weed` (`/ga-weed`)            | Resolve divergence between arch and specs      |
+| Command                                   | Description                                    |
+| ----------------------------------------- | ---------------------------------------------- |
+| `/gybis-arch-check` (`/ga-check`)         | Validate architecture integrity & coherence    |
+| `/gybis-arch-describe` (`/ga-describe`)   | Describe arch in stakeholder prose or markdown |
+| `/gybis-arch-distill` (`/ga-distill`)     | Create initial arch from specs                 |
+| `/gybis-arch-explain` (`/ga-explain`)     | Explain arch in dev prose or markdown          |
+| `/gybis-arch-propagate` (`/ga-propagate`) | Create initial specs from arch                 |
+| `/gybis-arch-refine` (`/ga-refine`)       | Refine architecture structure & clarity        |
+| `/gybis-arch-tend` (`/ga-tend`)           | Update arch with impact analysis               |
+| `/gybis-arch-weed` (`/ga-weed`)           | Resolve divergence between arch and specs      |
 
 ### Spec Commands (`/gs-*`)
 
-| Command                                                           | Description                                     |
-| ----------------------------------------------------------------- | ----------------------------------------------- |
-| `/gybis-spec-check` (`/gs-check {concern\|domain\|all}`)          | Validate and repair spec syntax                 |
-| `/gybis-spec-describe` (`/gs-describe {concern\|domain\|all}`)    | Describe specs in stakeholder prose or markdown |
-| `/gybis-spec-distill` (`/gs-distill`)                             | Create initial specs from code/tests            |
-| `/gybis-spec-explain` (`/gs-explain {concern\|domain\|all}`)      | Explain specs in dev prose or markdown          |
-| `/gybis-spec-propagate` (`/gs-propagate {concern\|domain\|all}`)  | Create initial code/tests                       |
-| `/gybis-spec-refine` (`/gs-refine`)                               | Refine specs structure & clarity                |
-| `/gybis-spec-tend` (`/gs-tend`)                                   | Update specs with impact analysis               |
-| `/gybis-spec-weed` (`/gs-weed`)                                   | Resolve divergence between specs and code       |
+| Command                                                          | Description                                     |
+| ---------------------------------------------------------------- | ----------------------------------------------- |
+| `/gybis-spec-check` (`/gs-check {concern\|domain\|all}`)         | Validate and repair spec syntax                 |
+| `/gybis-spec-describe` (`/gs-describe {concern\|domain\|all}`)   | Describe specs in stakeholder prose or markdown |
+| `/gybis-spec-distill` (`/gs-distill`)                            | Create initial specs from code/tests            |
+| `/gybis-spec-explain` (`/gs-explain {concern\|domain\|all}`)     | Explain specs in dev prose or markdown          |
+| `/gybis-spec-propagate` (`/gs-propagate {concern\|domain\|all}`) | Create initial code/tests                       |
+| `/gybis-spec-refine` (`/gs-refine`)                              | Refine specs structure & clarity                |
+| `/gybis-spec-tend` (`/gs-tend`)                                  | Update specs with impact analysis               |
+| `/gybis-spec-weed` (`/gs-weed`)                                  | Resolve divergence between specs and code       |
 
 ### Memory Commands (`/gm-*`)
 
-| Command                                                  | Description                               |
-| -------------------------------------------------------- | ----------------------------------------- |
-| `/gybis-fini`                                            | Persist memory → Terminate                |
-| `/gybis-init`                                            | Orient → Recall → Ready                   |
-| `/gybis-memory-migrate` (`/gm-migrate`)                  | Migrate Mementum store to current format  |
-| `/gybis-memory-orient` (`/gm-orient`)                    | Restore prev AI context                   |
-| `/gybis-memory-recall {topic}` (`/gm-recall {topic}`)    | Recall topic, or summarize latest         |
-| `/gybis-memory-store {insight}` (`/gm-store {insight}`)  | Store insight, or prompt for one          |
-| `/gybis-memory-synthesize` (`/gm-synthesize`)            | Synthesize knowledge from memories        |
+| Command                                                 | Description                              |
+| ------------------------------------------------------- | ---------------------------------------- |
+| `/gybis-fini`                                           | Persist memory → Terminate               |
+| `/gybis-init`                                           | Orient → Recall → Ready                  |
+| `/gybis-memory-migrate` (`/gm-migrate`)                 | Migrate Mementum store to current format |
+| `/gybis-memory-orient` (`/gm-orient`)                   | Restore prev AI context                  |
+| `/gybis-memory-recall {topic}` (`/gm-recall {topic}`)   | Recall topic, or summarize latest        |
+| `/gybis-memory-store {insight}` (`/gm-store {insight}`) | Store insight, or prompt for one         |
+| `/gybis-memory-synthesize` (`/gm-synthesize`)           | Synthesize knowledge from memories       |
 
 ### Help
 
-| Command        | Description                         |
-| -------------- | ----------------------------------- |
-| `/gybis-help`  | Show all available gybis commands.  |
+| Command       | Description                        |
+| ------------- | ---------------------------------- |
+| `/gybis-help` | Show all available gybis commands. |
 
 ## Available Developer Commands
 
@@ -181,21 +181,21 @@ The following commands are available while developing gybis in this repository. 
 
 ### Memory Commands (`/gm-*`)
 
-| Command                                                    | Description                               |
-| ---------------------------------------------------------- | ----------------------------------------- |
-| `/gybis-fini`                                              | Persist memory → Terminate                |
-| `/gybis-init`                                              | Orient → Recall → Ready                   |
-| `/gybis-mementum-migrate` (`/gm-migrate`)                  | Migrate Mementum store to current format  |
-| `/gybis-mementum-orient` (`/gm-orient`)                    | Restore prev AI context                   |
-| `/gybis-mementum-recall {topic}` (`/gm-recall {topic}`)    | Recall topic, or summarize latest         |
-| `/gybis-mementum-store {insight}` (`/gm-store {insight}`)  | Store insight, or prompt for one          |
-| `/gybis-mementum-synthesize` (`/gm-synthesize`)            | Synthesize knowledge from memories        |
+| Command                                                   | Description                              |
+| --------------------------------------------------------- | ---------------------------------------- |
+| `/gybis-fini`                                             | Persist memory → Terminate               |
+| `/gybis-init`                                             | Orient → Recall → Ready                  |
+| `/gybis-mementum-migrate` (`/gm-migrate`)                 | Migrate Mementum store to current format |
+| `/gybis-mementum-orient` (`/gm-orient`)                   | Restore prev AI context                  |
+| `/gybis-mementum-recall {topic}` (`/gm-recall {topic}`)   | Recall topic, or summarize latest        |
+| `/gybis-mementum-store {insight}` (`/gm-store {insight}`) | Store insight, or prompt for one         |
+| `/gybis-mementum-synthesize` (`/gm-synthesize`)           | Synthesize knowledge from memories       |
 
 ### Help
 
-| Command        | Description                         |
-| -------------- | ----------------------------------- |
-| `/gybis-help`  | Show all available gybis commands.  |
+| Command       | Description                        |
+| ------------- | ---------------------------------- |
+| `/gybis-help` | Show all available gybis commands. |
 
 ## Versioning
 
@@ -326,8 +326,8 @@ where the `SKILL.md` file contains the following, which is derived from the nucl
 Human ⊗ AI ⊗ REPL
 
 λ bridge(x). prose ↔ lambda | structural_equivalence
-| preserve(semantics)      | analyze(¬execute)         |
-| ------------------------ | ------------------------- |
+| preserve(semantics) | analyze(¬execute) |
+| ------------------- | ----------------- |
 
 Output λ notation only. No prose. No code fences.
 ```
