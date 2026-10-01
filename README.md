@@ -44,12 +44,12 @@ These operations form the core gybis convergence loop:
 - `tend` evolves one layer with explicit human intent and keeps the change localized.
 - `weed` reconciles drift between adjacent layers and the implementation so the system converges again.
 
-They work top-down: requirements constrain vocabulary, vocabulary constrains architecture, architecture constrains specs, and specs constrain tests and code. `check` finds drift, `refine` polishes local structure, `tend` makes intended layer-local changes, and `weed` resolves disagreement when two artifacts no longer agree.
+They work top-down: requirements constrain vocabulary, vocabulary constrains architecture, architecture constrains specs, and specs constrain tests and code. `check` finds drift and structural issues, and its findings nominate the next move: `refine` polishes local structure, `tend` makes intended layer-local changes, and `weed` resolves disagreement when two artifacts no longer agree.
 
 | Operation | Purpose                                         | Human role                                               | Typical outcome                    |
 | --------- | ----------------------------------------------- | -------------------------------------------------------- | ---------------------------------- |
 | `check`   | Diagnose a layer and surface integrity issues   | Choose when to run it and review the report              | Severity-tagged findings           |
-| `refine`  | Polish one layer's structure and readability    | Choose safe polish scope and approve edits               | Clearer artifact with same meaning |
+| `refine`  | Polish one layer's structure and readability    | Approve structural or clarity edits                      | Clearer artifact with same meaning |
 | `tend`    | Evolve one layer with developer-approved intent | State the desired change and approve edits               | Updated artifact in one layer      |
 | `weed`    | Reconcile divergence across adjacent layers     | Decide which side should move and approve the correction | Mutually consistent artifacts      |
 
