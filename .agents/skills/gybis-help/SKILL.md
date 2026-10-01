@@ -13,7 +13,7 @@ CRITICAL CONSTRAINTS:
 
 | Skill Name | Description |
 |---|---|
-| `/gybis-fini` | CRUD memory before terminate |
+| `/gybis-fini` | Persist memory before terminate |
 | `/gybis-init` | Initialize AI context |
 | `/gybis-mementum-migrate` (`/gm-migrate`) | Migrate Mementum store to current format |
 | `/gybis-mementum-orient` (`/gm-orient`) | Restore prev AI context |

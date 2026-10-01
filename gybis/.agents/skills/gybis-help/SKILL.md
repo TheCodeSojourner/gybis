@@ -21,7 +21,7 @@ CRITICAL CONSTRAINTS:
 | `/gybis-arch-propagate` (`/ga-propagate`) | Create initial specs from arch |
 | `/gybis-arch-tend` (`/ga-tend`) | Update arch with human |
 | `/gybis-arch-weed` (`/ga-weed`) | Upsert arch/specs from diffs with human |
-| `/gybis-fini` | CRUD memory before terminate |
+| `/gybis-fini` | Persist memory before terminate |
 | `/gybis-init` | Initialize gybis AI context |
 | `/gybis-memory-migrate` (`/gm-migrate`) | Migrate Mementum store to current format |
 | `/gybis-memory-orient` (`/gm-orient`) | Restore prev AI context |
