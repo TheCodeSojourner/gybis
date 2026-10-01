@@ -10,7 +10,7 @@ Each layer constrains the layer below it. Code is the replaceable implementation
 
 Start with one concrete capability, defect, or unanswered design question. Keep the first slice small enough to describe with a few observable behaviors.
 
-Before exploring broadly, recall the existing vocabulary, architecture, specifications, tests, and mementum records that may already govern the area.
+Before exploring broadly, recall the existing requirements, vocabulary, architecture, specifications, tests, and mementum records that may already govern the area.
 
 ## 2. Honor Requirements
 
