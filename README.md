@@ -116,20 +116,20 @@ Requirements are the top layer of the stack: dependency-ordered module files con
 | `/gybis-req-propagate` (`/gr-propagate`) | Annotate specs/tests with REQ traceability             |
 | `/gybis-req-refine` (`/gr-refine`)       | Refine requirements structure & clarity                |
 | `/gybis-req-tend` (`/gr-tend`)           | Update requirements with impact analysis               |
-| `/gybis-req-weed` (`/gr-weed`)           | Upsert requirements/downstream from diffs with human   |
+| `/gybis-req-weed` (`/gr-weed`)           | Resolve divergence between requirements and downstream |
 
 ### Vocabulary Commands (`/gv-*`)
 
-| Command                                    | Description                                       |
-| ------------------------------------------ | ------------------------------------------------- |
-| `/gybis-vocab-check` (`/gv-check`)         | Validate vocabulary.md syntax & semantics         |
-| `/gybis-vocab-describe` (`/gv-describe`)   | Describe vocabulary in business language          |
-| `/gybis-vocab-distill` (`/gv-distill`)     | Extract vocabulary from arch/specs/code           |
-| `/gybis-vocab-explain` (`/gv-explain`)     | Explain vocabulary for developers                 |
-| `/gybis-vocab-propagate` (`/gv-propagate`) | Create initial architecture from req + vocab      |
-| `/gybis-vocab-refine` (`/gv-refine`)       | Refine vocabulary structure & clarity             |
-| `/gybis-vocab-tend` (`/gv-tend`)           | Update vocabulary with impact analysis            |
-| `/gybis-vocab-weed` (`/gv-weed`)           | Upsert vocabulary/artifacts from diffs with human |
+| Command                                    | Description                                     |
+| ------------------------------------------ | ----------------------------------------------- |
+| `/gybis-vocab-check` (`/gv-check`)         | Validate vocabulary.md syntax & semantics       |
+| `/gybis-vocab-describe` (`/gv-describe`)   | Describe vocabulary in business language        |
+| `/gybis-vocab-distill` (`/gv-distill`)     | Extract vocabulary from arch/specs/code         |
+| `/gybis-vocab-explain` (`/gv-explain`)     | Explain vocabulary for developers               |
+| `/gybis-vocab-propagate` (`/gv-propagate`) | Create initial architecture from req + vocab    |
+| `/gybis-vocab-refine` (`/gv-refine`)       | Refine vocabulary structure & clarity           |
+| `/gybis-vocab-tend` (`/gv-tend`)           | Update vocabulary with impact analysis          |
+| `/gybis-vocab-weed` (`/gv-weed`)           | Resolve divergence between vocab and downstream |
 
 ### Architecture Commands (`/ga-*`)
 
@@ -141,21 +141,21 @@ Requirements are the top layer of the stack: dependency-ordered module files con
 | `/gybis-arch-explain` (`/ga-explain`)     | Explain arch in dev prose or markdown       |
 | `/gybis-arch-propagate` (`/ga-propagate`) | Create initial specs from arch              |
 | `/gybis-arch-refine` (`/ga-refine`)       | Refine architecture structure & clarity     |
-| `/gybis-arch-tend` (`/ga-tend`)           | Update arch with human                      |
-| `/gybis-arch-weed` (`/ga-weed`)           | Upsert arch/specs from diffs with human     |
+| `/gybis-arch-tend` (`/ga-tend`)           | Update arch with impact analysis            |
+| `/gybis-arch-weed` (`/ga-weed`)           | Resolve divergence between arch and specs   |
 
 ### Spec Commands (`/gs-*`)
 
-| Command                                                          | Description                                   |
-| ---------------------------------------------------------------- | --------------------------------------------- |
-| `/gybis-spec-check` (`/gs-check {concern\|domain\|all}`)         | Check/update syntax until valid               |
-| `/gybis-spec-describe` (`/gs-describe {concern\|domain\|all}`)   | Describe in non-tech prose or markdown        |
-| `/gybis-spec-distill` (`/gs-distill`)                            | Create initial specs from code/tests          |
-| `/gybis-spec-explain` (`/gs-explain {concern\|domain\|all}`)     | Explain in dev prose or markdown              |
-| `/gybis-spec-propagate` (`/gs-propagate {concern\|domain\|all}`) | Create initial code/tests                     |
-| `/gybis-spec-refine` (`/gs-refine`)                              | Refine specs structure & clarity              |
-| `/gybis-spec-tend` (`/gs-tend`)                                  | Update specs with human                       |
-| `/gybis-spec-weed` (`/gs-weed`)                                  | Upsert specs/code-tests from diffs with human |
+| Command                                                          | Description                                  |
+| ---------------------------------------------------------------- | -------------------------------------------- |
+| `/gybis-spec-check` (`/gs-check {concern\|domain\|all}`)         | Check/update syntax until valid              |
+| `/gybis-spec-describe` (`/gs-describe {concern\|domain\|all}`)   | Describe specs in non-tech prose or markdown |
+| `/gybis-spec-distill` (`/gs-distill`)                            | Create initial specs from code/tests         |
+| `/gybis-spec-explain` (`/gs-explain {concern\|domain\|all}`)     | Explain specs in dev prose or markdown       |
+| `/gybis-spec-propagate` (`/gs-propagate {concern\|domain\|all}`) | Create initial code/tests                    |
+| `/gybis-spec-refine` (`/gs-refine`)                              | Refine specs structure & clarity             |
+| `/gybis-spec-tend` (`/gs-tend`)                                  | Update specs with impact analysis            |
+| `/gybis-spec-weed` (`/gs-weed`)                                  | Resolve divergence between specs and code    |
 
 ### Memory Commands (`/gm-*`)
 
