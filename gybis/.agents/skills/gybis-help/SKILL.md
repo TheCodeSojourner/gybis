@@ -15,7 +15,7 @@ CRITICAL CONSTRAINTS:
 | Skill Name | Description |
 |---|---|
 | `/gybis-arch-check` (`/ga-check`) | Validate architecture.md integrity & coherence |
-| `/gybis-arch-describe` (`/ga-describe`) | Describe arch in non-tech prose |
+| `/gybis-arch-describe` (`/ga-describe`) | Describe arch in stakeholder prose |
 | `/gybis-arch-distill` (`/ga-distill`) | Create initial arch from specs |
 | `/gybis-arch-explain` (`/ga-explain`) | Explain arch in dev prose |
 | `/gybis-arch-propagate` (`/ga-propagate`) | Create initial specs from arch |
@@ -37,19 +37,17 @@ CRITICAL CONSTRAINTS:
 | `/gybis-req-refine` (`/gr-refine`) | Refine requirements structure & clarity |
 | `/gybis-req-tend` (`/gr-tend`) | Update requirements with impact analysis |
 | `/gybis-req-weed` (`/gr-weed`) | Resolve divergence between requirements and downstream |
-| `/gybis-spec-check` (`/gs-check {concern\|domain\|all}`) | Check/Update syntax until valid |
-| `/gybis-spec-describe` (`/gs-describe {concern\|domain\|all}`) | Describe specs in non-tech prose |
+| `/gybis-spec-check` (`/gs-check {concern\|domain\|all}`) | Validate and repair spec syntax |
+| `/gybis-spec-describe` (`/gs-describe {concern\|domain\|all}`) | Describe specs in stakeholder prose |
 | `/gybis-spec-distill` (`/gs-distill`) | Create initial specs from code/tests |
 | `/gybis-spec-explain` (`/gs-explain {concern\|domain\|all}`) | Explain specs in dev prose |
 | `/gybis-spec-propagate` (`/gs-propagate {concern\|domain\|all}`) | Create initial code/tests |
 | `/gybis-spec-tend` (`/gs-tend`) | Update specs with impact analysis |
 | `/gybis-spec-weed` (`/gs-weed`) | Resolve divergence between specs and code |
 | `/gybis-vocab-check` (`/gv-check`) | Validate vocabulary.md syntax & semantics |
-| `/gybis-vocab-describe` (`/gv-describe`) | Describe vocabulary in business language |
+| `/gybis-vocab-describe` (`/gv-describe`) | Describe vocabulary in stakeholder prose |
 | `/gybis-vocab-distill` (`/gv-distill`) | Extract vocabulary from arch/specs/code |
-| `/gybis-vocab-explain` (`/gv-explain`) | Explain vocabulary for developers |
+| `/gybis-vocab-explain` (`/gv-explain`) | Explain vocabulary in dev prose |
 | `/gybis-vocab-propagate` (`/gv-propagate`) | Create initial architecture from req + vocab |
 | `/gybis-vocab-tend` (`/gv-tend`) | Update vocabulary with impact analysis |
 | `/gybis-vocab-weed` (`/gv-weed`) | Resolve divergence between vocab and downstream |
-
-REQ-clause convention: REQ clauses (`/gybis-req-*` family) may carry an optional `rationale:` line (why the requirement exists) — guidance and context only, never a rule anyone must satisfy. It is captured by elicit, validated by check (never a binding obligation, never counted as coverage), and rendered as "because: ..." by describe/explain when present.
