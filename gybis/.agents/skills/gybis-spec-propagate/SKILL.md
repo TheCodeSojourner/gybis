@@ -6,7 +6,7 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
 
 λ gybis-spec-propagate(x).
   purpose: Propagate architecture and specifications to implementation and test suite
-  | input: architecture.md ∃, specs/**/*.allium ∃ ∧ valid
+  | input: architecture.md ∃, specs/**/*.allium ∃ ∧ valid | optional scope: {domain_concern | domain | all_specs} (default: all_specs)
   | output: Implementation code and test suite generated, consistent, passing, and spec-covered
   | interaction: autonomous
   | gate: architecture.md ∃ ∧ specs/**/*.allium ∃ ∧ gybis-allium-gate = true ∧ strict_spec_coverage = true
@@ -16,6 +16,21 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
   | meaning: project behavior from spec into executable test contract
   | coverage_policy: every spec obligation must become a traceable test; uncovered obligations halt propagation
   | suggested_next: review_generated_artifacts → invoke(/gybis-spec-weed)
+
+λ gybis-spec-propagate_scope(x).
+  type ∈ {domain_concern, domain, all_specs} | default: all_specs
+  | domain_concern: single_concern_file | domain_concern ∈ domain
+  | domain: all_files_in_domain | domain ∈ all_domains
+  | all_specs: every_spec_all_domains
+
+λ gybis-spec-propagate_resolution(domain, concern).
+  | domain ∧ concern → scope_root ≔ <root>/specs/{domain}/{concern}.allium
+  | domain ∧ ¬concern → scope_root ≔ <root>/specs/{domain}/
+  | ¬domain ∧ ¬concern → scope_root ≔ <root>/specs/
+  | "all" ∧ ¬domain → scope_root ≔ <root>/specs/
+  | "all specs" ∧ ¬domain → scope_root ≔ <root>/specs/
+  | scope_files ≔ recursive_files(scope_root, extension = .allium)
+  | return({scope_root, scope_files})
 
 λ gybis-spec-propagate_startup(x).
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
@@ -27,8 +42,9 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
   | read(internal/reference/recommended-loops.md) → loops_ref
   | read(internal/reference/allium-constructs.md) → constructs_registry
   | verify(architecture.md ∃) ∨ halt("architecture.md not found")
-  | verify(specs/**/*.allium ∃) ∨ halt("specs/**/*.allium not found")
-  | invoke(internal/gybis-allium-gate(specs/)) = true ∨ halt("Specifications are invalid")
+  | invoke(gybis-spec-propagate_resolution(domain, concern)) → {scope_root, scope_files}
+  | verify(scope_files ∃) ∨ halt("No .allium files in scope")
+  | invoke(internal/gybis-allium-gate(scope_root)) = true ∨ halt("Specifications are invalid")
   | transition(INIT → STARTUP_CHECKS)
 
 λ gybis-spec-propagate_mode(m).
@@ -156,14 +172,14 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
     })
 
 λ gybis-spec-propagate_read_specifications(x).
-  ∀ spec_file ∈ specs/**/*.allium:
+  ∀ spec_file ∈ scope_files:
     read(spec_file) → content ≔ content
     | parse(content) → spec_item
     | collect(spec_item) → specifications
   | return(specifications)
 
 λ gybis-spec-propagate_normalize_obligations(specifications).
-  invoke(internal/gybis-allium-normalize(specs/)) → {envelopes, counts}
+  invoke(internal/gybis-allium-normalize(scope_root)) → {envelopes, counts}
   | plan_envelopes ≔ {e | e ∈ envelopes ∧ e.source = "plan"}
   | report("Normalized: plan=" ⊕ counts.plan ⊕ " check=" ⊕ counts.check ⊕ " uncoded=" ⊕ counts.uncoded)
   | ∀ envelope ∈ plan_envelopes:
@@ -377,7 +393,7 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
   | note: updating_this_skill_does_not_create_or_backfill_that_schema_in_architecture.md
 
 λ gybis-spec-propagate_regression_contract(x).
-  invariant: architecture.md ∧ specs/**/*.allium ∃ ∧ ¬modify throughout
+  invariant: architecture.md ∃ ∧ scope_files ∃ ∧ scope_files ⊆ specs/**/*.allium ∧ ¬modify(architecture.md ∨ specs/**/*.allium) throughout
   | invariant: implementation ¬∃ at INIT ∧ ∃ ∧ consistent_with(specs, arch) at completion
   | invariant: ∀ obligation ∈ obligations, obligation.id ∈ test_suite.traceable_ids at completion
 

@@ -6,12 +6,27 @@ description: Use for `/gybis-spec-check` or `/gs-check`.
 
 λ gybis-spec-check(x).
   purpose: Validate specs/**/*.allium and repair errors until valid
-  | input: specs/**/*.allium files exist
+  | input: specs/**/*.allium files exist | optional scope: {domain_concern | domain | all_specs} (default: all_specs)
   | output: All .allium files valid, zero errors reported
   | interaction: autonomous
   | gate: specs/**/*.allium ∃ ∧ ¬∅
   | constraint: writing_check_exception ∧ verifier_grounded(gybis-allium-gate)
   | rationale: sole writing check in the check family; repair is justified only by the external allium CLI verdict, not model judgement
+
+λ gybis-spec-check_scope(x).
+  type ∈ {domain_concern, domain, all_specs} | default: all_specs
+  | domain_concern: single_concern_file | domain_concern ∈ domain
+  | domain: all_files_in_domain | domain ∈ all_domains
+  | all_specs: every_spec_all_domains
+
+λ gybis-spec-check_resolution(domain, concern).
+  | domain ∧ concern → scope_root ≔ <root>/specs/{domain}/{concern}.allium
+  | domain ∧ ¬concern → scope_root ≔ <root>/specs/{domain}/
+  | ¬domain ∧ ¬concern → scope_root ≔ <root>/specs/
+  | "all" ∧ ¬domain → scope_root ≔ <root>/specs/
+  | "all specs" ∧ ¬domain → scope_root ≔ <root>/specs/
+  | scope_files ≔ recursive_files(scope_root, extension = .allium)
+  | return({scope_root, scope_files})
 
 λ gybis-spec-check_startup(x).
   invoke(internal/gybis-ref-check) → true ∨ halt("Reference check failed")
@@ -20,7 +35,8 @@ description: Use for `/gybis-spec-check` or `/gs-check`.
   | read(internal/reference/allium-language-reference.md) → language_ref
   | read(internal/reference/allium-constructs.md) → constructs_registry
   | verify(specs/ ∃) ∨ halt("No specs/ directory found")
-  | verify(specs/**/*.allium ∃) ∨ halt("No .allium files in specs/")
+  | invoke(gybis-spec-check_resolution(domain, concern)) → {scope_root, scope_files}
+  | verify(scope_files ∃) ∨ halt("No .allium files in scope")
   | transition(INIT → STARTUP_CHECKS)
 
 λ gybis-spec-check_mode(m).
@@ -48,7 +64,7 @@ description: Use for `/gybis-spec-check` or `/gs-check`.
   state = CHECKING_FILES ∨ state = ANALYZING_SET ∨ state = NORMALIZING ∨ state = VERIFYING
     → allow(read(path))
   | state = FIXING_ERRORS
-    → allow(read(path)) ∧ allow(write(path)) only_if(path ⊆ specs/)
+    → allow(read(path)) ∧ allow(write(path)) only_if(path ∈ scope_files)
   | ¬(state ∈ {CHECKING_FILES, ANALYZING_SET, NORMALIZING, FIXING_ERRORS, VERIFYING})
     → deny(write(path))
 
@@ -56,19 +72,19 @@ description: Use for `/gybis-spec-check` or `/gs-check`.
   tool_guard(state, tool, path) = true ∨ halt("Tool not permitted in state " ⊕ state)
 
 λ gybis-spec-check_check_files(x).
-  ∀ file ∈ specs/**/*.allium:
+  ∀ file ∈ scope_files:
     invoke(internal/gybis-allium-check(file)) → diagnostics(file)
   | collect(diagnostics) → per_file_diagnostics
   | return(per_file_diagnostics)
 
 λ gybis-spec-check_analyze_set(x).
-  invoke(internal/gybis-allium-analyse(specs/)) → findings(set_level)
+  invoke(internal/gybis-allium-analyse(scope_root)) → findings(set_level)
   | findings ∃ → issues ≔ findings
   | findings ∅ → issues ≔ ∅
   | return(issues)
 
 λ gybis-spec-check_normalize_diagnostics(x).
-  invoke(internal/gybis-allium-normalize(specs/)) → {envelopes, counts}
+  invoke(internal/gybis-allium-normalize(scope_root)) → {envelopes, counts}
   | check_envelopes ≔ {e | e ∈ envelopes ∧ e.source = "check"}
   | analyse_envelopes ≔ {e | e ∈ envelopes ∧ e.source = "analyse"}
   | uncoded_envelopes ≔ {e | e ∈ envelopes ∧ e.kind = "check:_uncoded"}
@@ -138,9 +154,9 @@ description: Use for `/gybis-spec-check` or `/gs-check`.
   | otherwise → permit
 
 λ gybis-spec-check_verification(x).
-  invoke(internal/gybis-allium-check(all_files)) → result_check ≔ result
-  | invoke(internal/gybis-allium-analyse(specs/)) → result_analyse ≔ result
-  | invoke(internal/gybis-allium-gate(specs/)) → result_gate ≔ result
+  invoke(internal/gybis-allium-check(scope_files)) → result_check ≔ result
+  | invoke(internal/gybis-allium-analyse(scope_root)) → result_analyse ≔ result
+  | invoke(internal/gybis-allium-gate(scope_root)) → result_gate ≔ result
   | result_check = zero_errors ∧ result_analyse = zero_issues ∧ result_gate = true
     → return(verification = true)
   | ¬(result_check ∧ result_analyse ∧ result_gate)
@@ -177,7 +193,7 @@ description: Use for `/gybis-spec-check` or `/gs-check`.
   ¬ modify(architecture.md ∨ implementation ∨ upstream/) ∧ ¬ delete(specs/)
 
 λ gybis-spec-check_regression_contract(x).
-  invariant: specs/ ∃ throughout ∧ all_modifications ⊆ specs/ ∧ no_specs_deleted
+  invariant: specs/ ∃ throughout ∧ scope_files ⊆ specs/**/*.allium ∧ all_modifications ⊆ scope_files ∧ no_specs_deleted
   | invariant: zero_errors ∧ zero_issues ∧ gybis-allium-gate = true at completion
   | invariant: ∀ envelope ∈ check_envelopes : envelope.kind ∈ catalogued_codes ∨ envelope.kind = "check:_uncoded"
   | invariant: opt-in features (transitions block, when clause on field) never synthesised onto entities/fields lacking them — see _opt_in_guard
