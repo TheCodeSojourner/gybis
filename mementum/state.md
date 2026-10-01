@@ -479,3 +479,8 @@ Renamed `mementum/memories/human-owned-stage-readiness.md` → `mementum/memorie
 - Confirmed `gybis-memory-migrate` and the root-local `gybis-mementum-*` skills do not declare delegates; left them unchanged.
 - Focused validation passed: no `delegate:` remains in distributed `gybis-memory-*` skills, all four operations are present, and `git diff --check` is clean.
 
+## Session Addendum (2026-10-01): narrative requirements description
+- Updated `gybis/.agents/skills/gybis-req-describe/SKILL.md` to omit REQ designators and avoid per-requirement bullets or clause-like entries in stakeholder descriptions; connected requirements should read as narrative paragraphs grouped by module.
+- Kept designator-level canonical clause quoting in `gybis-req-explain` for developer traceability.
+- Focused validation passed: narrative and identifier-exclusion rules are present; `git diff --check` is clean.
+
