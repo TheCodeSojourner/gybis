@@ -256,7 +256,7 @@ Then start a session with `/gybis-init` using the new installation. This loads t
 
 From that initialized session, run `/gybis-memory-migrate` (`/gm-migrate`). Migration inspects the target repository's existing `mementum/` store, reports `NO_MIGRATION_REQUIRED` when it is already conformant, previews recognized legacy conversions, and requires explicit approval before writing. It reports `MIGRATION_VALIDATED` only after verifying the resulting store and preserving `mementum/state.md`. It halts without changes for malformed or ambiguous data.
 
-Finally, run `/gybis-spec-check {concern|domain|all}` when the target contains `.allium` specifications. This smoke-tests the upgraded Allium adapters and runtime gate against your installed CLI; the version preflight above only confirms the executable is supported, not that its JSON contract matches. The runtime gate reports `NO_SPECS` for an empty specification directory; this is an absence-of-work result, not an Allium compatibility failure. Repositories that have not created specifications yet can complete the bundle update and create them later.
+Finally, run `/gybis-spec-check` when the target contains `.allium` specifications. This smoke-tests the upgraded Allium adapters and runtime gate against your installed CLI; the version preflight above only confirms the executable is supported, not that its JSON contract matches. The runtime gate reports `NO_SPECS` for an empty specification directory; this is an absence-of-work result, not an Allium compatibility failure. Repositories that have not created specifications yet can complete the bundle update and create them later.
 
 See the `gybis/GYBIS-README.md` for usage instructions, best practices, and workflow suggestions.
 
