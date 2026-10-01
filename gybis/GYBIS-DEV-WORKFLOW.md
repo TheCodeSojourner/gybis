@@ -18,6 +18,8 @@ Requirements are the top layer of the durability order (`req > vocab > arch > sp
 
 Do not let existing code or tests silently redefine behavioral truth. Use `/gybis-req-check` when the requirements inventory has drifted, and `/gybis-req-weed` when requirements and the layers below them no longer describe the same truth.
 
+Requirements are binding by default; defer one only through an explicitly marked section and a stakeholder decision. A requirement may lead vocabulary, architecture, specifications, tests, and code. `/gybis-req-check` reports a downstream stage as pending until its artifact exists and passes its owning check; it does not treat that absence as deferral or N/A. Its repair plan remains read-only until you approve it.
+
 ## 3. Curate Vocabulary
 
 Check whether the capability needs a durable cross-layer term in [vocabulary.md](vocabulary.md).
