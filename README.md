@@ -22,7 +22,7 @@ The goal of **gybis** is to make it easy for developers to set up, utilize, and 
 
 ## What is SDD and why gybis?
 
-**Spec-Driven Development** is a practice where shared domain vocabulary, architectural and behavioral specifications of `what` a system `is` and `what` it `does` drive the implementation of `how` it does it (e.g., code and tests). A system vocabulary provides the context for its `architecture`, a specification of the system's `architecture` provides the context for the specification of its `behavior`, and the specification of its `behavior` provides the context for its `implementation` (e.g., code and tests). This creates a virtuous cycle where `vocabulary`, `architecture`, `behavior` and `implementation` inform and constrain one another as the system evolves. In SDD, specifications are the source of truth for the system's intended behavior, and implementation is done by AI, with full developer visibility. Specs are written before or alongside implementation, kept in source control, and used directly to guide/generate implementation, and detect architectural/behavioral/implementation drift.
+**Spec-Driven Development** is a practice where shared requirements, domain vocabulary, architectural and behavioral specifications of `what` a system `is` and `what` it `does` drive the implementation of `how` it does it (e.g., code and tests). A system's `requirements` provide the context for its `vocabulary`, its `vocabulary` provides the context for its `architecture`, a specification of the system's `architecture` provides the context for the specification of its `behavior`, and the specification of its `behavior` provides the context for its `implementation` (e.g., code and tests). This creates a virtuous cycle where `requirements`, `vocabulary`, `architecture`, `behavior` and `implementation` inform and constrain one another as the system evolves. In SDD, specifications are the source of truth for the system's intended behavior, and implementation is done by AI, with full developer visibility. Requirements, vocabulary, architecture, and specifications are written before or alongside implementation, kept in source control, and used directly to guide/generate implementation, and detect requirements, vocabulary, architectural, behavioral and implementation drift.
 
 **gybis** adds Developer-Command-Driven AI-Assistance to SDD by adding AI/Developer conversation to the entire workflow. All phases of the software development workflow are verified, harmonized and accelerated by AI assistance, while at the same time, making all phases of the workflow transparent and accessible to the developer. The AI is a collaborator that can be consulted at any time, but the developer is always in control of the process and the final decisions.
 
@@ -50,12 +50,12 @@ They work top-down: requirements constrain vocabulary, vocabulary constrains arc
 | --------- | ----------------------------------------------- | -------------------------------------------------------- | ---------------------------------- |
 | `check`   | Diagnose a layer and surface integrity issues   | Choose when to run it and review the report              | Severity-tagged findings           |
 | `refine`  | Polish one layer's structure and readability    | Choose safe polish scope and approve edits               | Clearer artifact with same meaning |
-| `tend`    | Evolve one layer with developer-approved intent | State the desired change and approve edits               | Updated artifact in the same lane  |
+| `tend`    | Evolve one layer with developer-approved intent | State the desired change and approve edits               | Updated artifact in one layer      |
 | `weed`    | Reconcile divergence across adjacent layers     | Decide which side should move and approve the correction | Mutually consistent artifacts      |
 
 ## Workflow Cheat Sheet
 
-Use `check` when you want a diagnostic snapshot, `refine` when the task is structural polish, `tend` when you already know the intended layer change, and `weed` when the real task is convergence across layers rather than a single artifact edit.
+Think of the sequence as a convergence loop rather than a one-off command.
 
 1. Run `check` first to expose drift or broken assumptions.
 2. Run `refine` next when the needed change is structure and clarity without changing intended meaning.
@@ -68,31 +68,20 @@ Use `check` when you want a diagnostic snapshot, `refine` when the task is struc
 - **AI base context**: [Nucleus](https://github.com/michaelwhitford/nucleus) mathematical notation engages
   the AI model's structured reasoning rather than its conversational defaults. The inherent precision means significantly fewer hallucinations, and the inherent density means significantly fewer tokens to convey the same context.
 
-- **Ubiquitous language**: In the context of Domain-Driven Design (DDD), a ubiquitous language is a shared, precise vocabulary that both technical and non-technical people use consistently when talking about a system. In gybis, vocabulary commands establish and maintain a project's ubiquitous language in `vocabulary.md`, thus reducing ambiguity and keeping architecture/specification artifacts aligned to shared terms.
+- **Requirements layer**: Requirements are the top of the durability order (`requirements/` -> `vocabulary.md` -> `architecture.md` -> `specs/**/*.allium` -> code/tests). Dependency-ordered module files hold `REQ-<DOMAIN>-NNN` clauses written in the same nucleus lambda notation, capturing `what` a system must do before vocabulary and architecture are derived from them. Requirements are elicited from stakeholders with `/gybis-req-elicit` and kept aligned with the layers below by the requirements command family.
+
+- **Ubiquitous language**: In the context of Domain-Driven Design (DDD), a ubiquitous language is a shared, precise vocabulary that both technical and non-technical people use consistently when talking about a system. In gybis, vocabulary commands establish and maintain a project's ubiquitous language in `vocabulary.md`, thus reducing ambiguity and keeping requirements, architecture, specifications, tests, and code artifacts aligned to shared terms.
  
 - **Architecture model**: A derivative of the [Nucleus VSM](https://github.com/michaelwhitford/nucleus/blob/main/VSM.md) allows an AI to generate and maintain a 5-layer architectural specification, stored in a `architecture.md` file, that AI keeps up to date as projects evolve.
  
 - **Behavioral Domain Specific Language (DSL)**: The [Allium](https://github.com/juxt/allium) DSL is a behavioral specification language the AI can read and write precisely, not
   pseudocode, not free-form prose, but a structured DSL with rules, triggers, surfaces, and transition graphs that AI can reason about directly and minimize hallucinations. Behavioral specifications are saved in one or more files per domain (e.g., orders, payments).
 
-- **AI Session Persistent memory**: [Mementum](https://github.com/michaelwhitford/mementum) is used to manage decisions, patterns, and insights that are stored in files and recalled during AI sessions, so previous context is available between sessions.
+- **AI Session Persistent memory**: [Mementum](https://github.com/michaelwhitford/mementum) manages decisions, patterns, and insights as files under your repository's version control (`mementum/`), recalled during AI sessions, so previous context is available between sessions. Because the store is git-based and project-owned, memory survives changes of AI tool, client, or machine, and stays reviewable and recoverable through git history.
 
 ## Available User Commands
 
 The following commands are available after integrating gybis into a target repository. Use them with any compatible AI tool configured to consume the bundled gybis `.agents/skills/` directory:
-
-### Vocabulary Commands (`/gv-*`)
-
-| Command                                    | Description                                       |
-| ------------------------------------------ | ------------------------------------------------- |
-| `/gybis-vocab-check` (`/gv-check`)         | Validate vocabulary.md syntax & semantics         |
-| `/gybis-vocab-describe` (`/gv-describe`)   | Describe vocabulary in business language          |
-| `/gybis-vocab-distill` (`/gv-distill`)     | Extract vocabulary from arch/specs/code           |
-| `/gybis-vocab-explain` (`/gv-explain`)     | Explain vocabulary for developers                 |
-| `/gybis-vocab-propagate` (`/gv-propagate`) | Bootstrap architecture from req + vocab           |
-| `/gybis-vocab-refine` (`/gv-refine`)       | Refine vocabulary structure & clarity             |
-| `/gybis-vocab-tend` (`/gv-tend`)           | Update vocabulary with impact analysis            |
-| `/gybis-vocab-weed` (`/gv-weed`)           | Upsert vocabulary/artifacts from diffs with human |
 
 ### Requirements Commands (`/gr-*`)
 
@@ -110,14 +99,26 @@ Requirements are the top layer of the stack: dependency-ordered module files con
 | `/gybis-req-tend` (`/gr-tend`)           | Update requirements with impact analysis                                    |
 | `/gybis-req-weed` (`/gr-weed`)           | Upsert requirements/downstream from diffs with human                        |
 
+### Vocabulary Commands (`/gv-*`)
+
+| Command                                    | Description                                       |
+| ------------------------------------------ | ------------------------------------------------- |
+| `/gybis-vocab-check` (`/gv-check`)         | Validate vocabulary.md syntax & semantics         |
+| `/gybis-vocab-describe` (`/gv-describe`)   | Describe vocabulary in business language          |
+| `/gybis-vocab-distill` (`/gv-distill`)     | Extract vocabulary from arch/specs/code           |
+| `/gybis-vocab-explain` (`/gv-explain`)     | Explain vocabulary for developers                 |
+| `/gybis-vocab-propagate` (`/gv-propagate`) | Bootstrap architecture from req + vocab           |
+| `/gybis-vocab-refine` (`/gv-refine`)       | Refine vocabulary structure & clarity             |
+| `/gybis-vocab-tend` (`/gv-tend`)           | Update vocabulary with impact analysis            |
+| `/gybis-vocab-weed` (`/gv-weed`)           | Upsert vocabulary/artifacts from diffs with human |
+
 ### Architecture Commands (`/ga-*`)
 
-| Command                                 | Description                                 |
-| --------------------------------------- | ------------------------------------------- |
-| `/gybis-arch-check` (`/ga-check`)       | Validate architecture integrity & coherence |
-| `/gybis-arch-describe` (`/ga-describe`) | Describe arch in non-tech prose or markdown |
-| `/gybis-arch-distill` (`/ga-distill`)   | Create initial arch from specs              |
-
+| Command                                   | Description                                 |
+| ----------------------------------------- | ------------------------------------------- |
+| `/gybis-arch-check` (`/ga-check`)         | Validate architecture integrity & coherence |
+| `/gybis-arch-describe` (`/ga-describe`)   | Describe arch in non-tech prose or markdown |
+| `/gybis-arch-distill` (`/ga-distill`)     | Create initial arch from specs              |
 | `/gybis-arch-explain` (`/ga-explain`)     | Explain arch in dev prose or markdown       |
 | `/gybis-arch-propagate` (`/ga-propagate`) | Create initial specs from arch              |
 | `/gybis-arch-refine` (`/ga-refine`)       | Refine architecture structure & clarity     |
@@ -141,7 +142,7 @@ Requirements are the top layer of the stack: dependency-ordered module files con
 
 | Command                                                 | Description                              |
 | ------------------------------------------------------- | ---------------------------------------- |
-| `/gybis-fini`                                           | Encode → Terminate                       |
+| `/gybis-fini`                                           | Persist memory → Terminate               |
 | `/gybis-init`                                           | Orient → Recall → Ready                  |
 | `/gybis-memory-migrate` (`/gm-migrate`)                 | Migrate Mementum store to current format |
 | `/gybis-memory-orient` (`/gm-orient`)                   | Restore prev AI context                  |
@@ -163,7 +164,7 @@ The following commands are available while developing gybis in this repository. 
 
 | Command                                                   | Description                              |
 | --------------------------------------------------------- | ---------------------------------------- |
-| `/gybis-fini`                                             | Encode → Terminate                       |
+| `/gybis-fini`                                             | Persist memory → Terminate               |
 | `/gybis-init`                                             | Orient → Recall → Ready                  |
 | `/gybis-mementum-migrate` (`/gm-migrate`)                 | Migrate Mementum store to current format |
 | `/gybis-mementum-orient` (`/gm-orient`)                   | Restore prev AI context                  |
@@ -179,7 +180,7 @@ The following commands are available while developing gybis in this repository. 
 
 ## Versioning
 
-gybis tries to follow [Clojure's](https://github.com/clojure/clojure) versioning philosophy by prioritizing stability, backward compatibility, and minimal breakage over rapid evolution or strict adherence to semantic versioning ([SemVer](https://semver.org/)). 
+gybis follows [Clojure's](https://github.com/clojure/clojure) versioning philosophy by prioritizing stability, backward compatibility, and minimal breakage over rapid evolution or strict adherence to semantic versioning ([SemVer](https://semver.org/)). 
 
 - **Strong emphasis on backward compatibility**: Development will take a measured, thoughtful approach to evolution. Breaking changes will be avoided whenever possible. Releases will focus on enhancements, performance, and new capabilities while making every attempt to preserve existing behavior.
 - **No fixed roadmap**: Development is open-ended. Alpha/beta/RC phases allow visibility into changes, but final releases will be very stable. Deprecations will be handled carefully, and transparently.
@@ -196,17 +197,27 @@ This copies the complete gybis bundle, including the hidden `.agents/skills/` di
 
 ### Upgrading an Existing Installation
 
-Do not rerun the full installation copy against an existing target repository: its live `mementum/` directory is project-owned durable memory and must be preserved.
+Do not rerun the full installation copy against an existing target repository. It would overwrite project-owned content (`mementum/state.md`, `mementum/index.md`, and locally edited docs) with template files. Update only the command bundle.
 
 Finish or deliberately pause any current work in the target repository before upgrading. If a gybis session is active, run `/gybis-fini` using the existing installation to save its session state before replacing `.agents/skills/`.
 
 From the target repository, update only the command bundle:
 
 ```bash
-cp -ra <pathToGybisDirectory>/gybis/.agents/skills/. .agents/skills/
+rm -rf .agents/skills/gybis-* .agents/skills/internal && cp -ra <pathToGybisDirectory>/gybis/.agents/skills/. .agents/skills/
 ```
 
-This replaces the distributed command implementations, including internal Allium adapters and the runtime compatibility gate. It does not replace project specifications, source code, tests, or the target repository's `mementum/` store. Review the resulting diff before continuing; it should contain only the intended `.agents/skills/` changes at this point.
+This replaces the distributed command implementations, including internal Allium adapters and the runtime compatibility gate. Remove first, because `cp` merges rather than replaces: a plain copy would leave skills the bundle has removed or renamed behind. That `rm` removes only gybis-owned entries (`gybis-*` skill directories and `internal/`), and `&&` copies only if the removal succeeds. Skills from other tools in `.agents/skills/` are preserved untouched and are neither removed nor overwritten. This does not replace project specifications, source code, tests, or the target repository's `mementum/` store. Review the resulting diff before continuing; it should contain only the intended `.agents/skills/` changes at this point.
+
+The command-bundle copy installs skills only; it does not create the top-level stage directories. Their absence is normal for a repository that predates a layer, and most are created on demand:
+
+- `requirements/` — created by the first `/gybis-req-elicit` or `/gybis-req-distill`. Until then, other `/gybis-req-*` commands report `requirements/ not found`.
+- `specs/` — created by `/gybis-arch-propagate` or `/gybis-spec-distill`. Specification commands treat an absent or empty directory as `NO_SPECS`, an absence-of-work result rather than a failure.
+- `mementum/` — created by no command. If it is absent, seed the bundle's empty OKF store before starting the session (`cp` creates the directory):
+
+```bash
+cp -ra <pathToGybisDirectory>/gybis/mementum/. mementum/
+```
 
 The distributed documentation can be updated separately after reviewing any local edits to `GYBIS-README.md`:
 
@@ -214,7 +225,7 @@ The distributed documentation can be updated separately after reviewing any loca
 cp -a <pathToGybisDirectory>/gybis/GYBIS-README.md GYBIS-README.md
 ```
 
-This replaces only the installed gybis README. Do not run the command if the target repository has intentionally customized that file without first preserving or reconciling those changes.
+This replaces only the installed GYBIS-README.md. Do not run the command if the target repository has intentionally customized that file without first preserving or reconciling those changes.
 
 Before running specification commands, verify the target machine has a supported Allium CLI:
 
@@ -224,11 +235,9 @@ allium --version # current bundle requirement: 3.5.3 or newer
 
 Then start a session with `/gybis-init` using the new installation. This loads the Nucleus and Mementum operating context and completes the session startup gate.
 
-From that initialized session, run `/gybis-memory-migrate` (`/gm-migrate`). Migration and initialization remain separate operations: migration inspects the target repository's existing `mementum/` store, reports `NO_MIGRATION_REQUIRED` when it is already conformant, previews recognized legacy conversions, and requires explicit approval before writing. It reports `MIGRATION_VALIDATED` only after verifying the resulting store and preserving `mementum/state.md`. If it reports `INITIALIZATION_REQUIRED`, initialize Mementum separately; do not treat initialization as migration. It halts without changes for malformed or ambiguous data.
+From that initialized session, run `/gybis-memory-migrate` (`/gm-migrate`). Migration inspects the target repository's existing `mementum/` store, reports `NO_MIGRATION_REQUIRED` when it is already conformant, previews recognized legacy conversions, and requires explicit approval before writing. It reports `MIGRATION_VALIDATED` only after verifying the resulting store and preserving `mementum/state.md`. It halts without changes for malformed or ambiguous data.
 
-Finally, run `/gybis-spec-check {concern|domain|all}` when the target contains `.allium` specifications. The runtime gate reports `NO_SPECS` for an empty specification directory; this is an absence-of-work result, not an Allium compatibility failure. Repositories that have not created specifications yet can complete the bundle update and create them later.
-
-For several downstream repositories, repeat this command-bundle update separately in each repository. Keep the same source bundle version for the batch, and commit each downstream repository's skill update independently so its migration and validation history remain visible.
+Finally, run `/gybis-spec-check {concern|domain|all}` when the target contains `.allium` specifications. This smoke-tests the upgraded Allium adapters and runtime gate against your installed CLI; the version preflight above only confirms the executable is supported, not that its JSON contract matches. The runtime gate reports `NO_SPECS` for an empty specification directory; this is an absence-of-work result, not an Allium compatibility failure. Repositories that have not created specifications yet can complete the bundle update and create them later.
 
 See the `gybis/GYBIS-README.md` for usage instructions, best practices, and workflow suggestions.
 
@@ -236,13 +245,13 @@ See the `gybis/GYBIS-README.md` for usage instructions, best practices, and work
 
 * [**allium**](https://github.com/juxt/allium) - Behavioral specification
 * [**allium-tools**](https://github.com/juxt/allium-tools) - Behavioral specification CLI tools
-* [**grill-with-docs**](https://github.com/mattpocock/skills/tree/main/skills/engineering/grill-with-docs) - Vocabulary tools
+* [**grill-with-docs**](https://github.com/mattpocock/skills/tree/main/skills/engineering/grill-with-docs) - Requirements elicitation tool
 * [**mementum**](https://github.com/michaelwhitford/mementum) - AI Session Persistent memory
 * [**nucleus**](https://github.com/michaelwhitford/nucleus) - AI base context, and VSM architectural specifications
 
 ## For gybis Developers: Upstream Derivation
 
-This repository is an integration layer over multiple upstream projects. The content under `gybis/` is derived from pinned upstream commits, then adapted into one coherent developer-command-driven stack. The distributed gybis bundle now ships its commands under `.agents/skills/`, and this repository uses the same layout during local development. gybis is not a direct mirror of any single upstream repository.
+This repository is an integration layer over multiple upstream projects. The content under `gybis/` is derived from pinned upstream commits, then adapted into one coherent developer-command-driven stack. The distributed gybis bundle ships its commands under `.agents/skills/`, and this repository uses the same layout during local development. gybis is not a direct mirror of any single upstream repository.
 
 ### General Derivation Approach
 
@@ -263,13 +272,13 @@ In practice, upstream inputs are handled in three modes:
 | ------------------- | ------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **allium**          | `527cd52`     | Allium language semantics and behavioral-spec structure       | Curated into gybis lang/ref docs, and encoded into spec skills.                                                                                                    |
 | **allium-tools**    | `08d3139`     | CLI validate/analyze capabilities                             | Executed in gybis spec skill workflows. User dependency only. Not integrated in `gybis/` in any way.                                                               |
-| **grill-with-docs** | `0ab1b63`     | The grill-with-docs skill, and its dependencies               | Used to derive gybis vocabulary skills.                                                                                                                            |
+| **grill-with-docs** | `0ab1b63`     | The grill-with-docs skill, and its dependencies               | Used to derive the gybis requirements elicitation skill (gr-elicit).                                                                                               |
 | **mementum**        | `4968400`     | Mementum protocol semantics                                   | Used to derive gybis memory skills.                                                                                                                                |
 | **nucleus**         | `64880ed`     | Nucleus notation + VSM model + `LAMBDA-COMPILER.md` semantics | Used to derive gybis skills. gybis uses the lambda compiler defined by the nucleus `LAMBDA-COMPILER.md` even though the file is not included in gybis in any form. |
 
 ### Maintainer Notes
 
-#### Nucleus Lambda Compilerubiquitous language
+#### Nucleus Lambda Compiler
 
 gybis relies heavily on the lambda notation and operator semantics defined upstream in nucleus `LAMBDA-COMPILER.md`.
 That upstream file is a semantic source of truth for how lambda-heavy gybis artifacts should be read and authored, even though it is not copied into this repository.
