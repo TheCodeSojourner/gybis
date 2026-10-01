@@ -14,7 +14,7 @@ related: mementum/memories/propagate-seed-then-own.md, mementum/memories/req-pro
 
 Propagation is a bootstrap, not an authority. `X-propagate` creates the initial
 artifact of the layer below `X`; the layer's own `tend`/`refine`/`weed` skills
-own it thereafter. Vocabulary and architecture stay human-owned durable
+own it thereafter. Vocabulary and architecture stay developer-owned durable
 artifacts — propagation only gets the project off the blank page.
 
 Why not pure derivation: if `req → vocab` were mechanical, vocabulary would

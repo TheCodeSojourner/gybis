@@ -2,7 +2,7 @@
 type: Decision
 symbol: 🎯
 title: requirements-layer-family
-related: gybis-hidden-bundle-copy, human-owned-stage-readiness, upstream-integration-lambda-notation
+related: gybis-hidden-bundle-copy, developer-owned-stage-readiness, upstream-integration-lambda-notation
 ---
 
 Requirements added as a new top layer of the gybis stack, with a `/gybis-req-*` (`/gr-*`) nine-skill family modeled on the arch family: elicit, check, distill, explain, propagate, refine, tend, weed, describe.

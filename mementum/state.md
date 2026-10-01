@@ -413,3 +413,8 @@
 - **recover**: Confirm the two session commits are on origin, then read `mementum/knowledge/skill-contract-system.md` and re-run `internal/gybis-skill-contract-check` over `gybis/.agents/skills/` before resuming contract work.
 
 ⏹→state.md
+
+## 🔄 update: developer-owned-stage-readiness (2026-10-01)
+
+Renamed `mementum/memories/human-owned-stage-readiness.md` → `mementum/memories/developer-owned-stage-readiness.md`. Earlier path references in this file (session-24 at line 128, session-38 at line 353) point at the old slug and are historical; the current file is `developer-owned-stage-readiness.md`. All live `related:` back-links (`elicit-skills-removed`, `rationale-field-convention`, `requirements-layer-family`) and the knowledge pages now use the new slug. Rationale: "operator" and "developer" denote the same actor, and gybis is Developer-Command-Driven, so developer is the canonical term.
+

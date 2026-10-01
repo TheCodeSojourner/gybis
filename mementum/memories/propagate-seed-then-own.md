@@ -7,7 +7,7 @@ related: distill-input-direction, requirements-layer-family, req-propagate-write
 
 Propagate bootstraps a layer; tend/refine/weed then own it.
 
-Propagation is a bootstrap, not an authority. A `*-propagate` skill creates the initial artifact of the layer below it; that layer's own `tend`/`refine`/`weed` skills own it thereafter. Vocab and architecture remain human-owned durable artifacts — propagation only gets the project off the blank page.
+Propagation is a bootstrap, not an authority. A `*-propagate` skill creates the initial artifact of the layer below it; that layer's own `tend`/`refine`/`weed` skills own it thereafter. Vocab and architecture remain developer-owned durable artifacts — propagation only gets the project off the blank page.
 
 Why not pure derivation: if `req → vocab` were purely mechanical, vocabulary would restate requirements and lose the independent authority that makes it a constraint layer. Under seed-then-own, each layer is authored against its own concerns (vocab = domain language agreement; arch = VSM structure) and stays more durable than the layer below.
 

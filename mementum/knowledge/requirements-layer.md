@@ -49,7 +49,7 @@ Reverse (brownfield): `spec-distill` → `arch-distill` → `vocab-distill` → 
 
 - `check` diagnoses only; resolution in `tend`/`weed` (arch-check boundary). Exception: `spec-check` may repair, because its corrections are verified by the external allium CLI — autonomous correction requires an external verifier.
 - `vocabulary.md` is only written by vocabulary skills; req skills emit candidates.
-- Stage readiness is human-owned; missing requirements/ never hard-halts downstream skills.
+- Stage readiness is developer-owned; missing requirements/ never hard-halts downstream skills.
 - Code/test-affecting commands require `test_suite_passes = true` before COMPLETE.
 - `describe`/`explain` use the session-16 output-mode convention.
 

@@ -2,7 +2,7 @@
 type: Decision
 symbol: 🎯
 title: elicit-skills-removed
-related: requirements-layer-family, human-owned-stage-readiness
+related: requirements-layer-family, developer-owned-stage-readiness
 ---
 
 `gybis-vocab-elicit` and `gybis-arch-elicit` were removed (session-42) at human direction.

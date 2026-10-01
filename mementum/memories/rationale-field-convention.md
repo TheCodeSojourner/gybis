@@ -2,7 +2,7 @@
 type: Decision
 symbol: 🎯
 title: Requirements rationale field — intent, placement, provenance
-related: requirements-layer-family, human-owned-stage-readiness, check-refine-heading-alignment, rationale-consumer-rules
+related: requirements-layer-family, developer-owned-stage-readiness, check-refine-heading-alignment, rationale-consumer-rules
 ---
 
 Requirements clauses may carry an optional non-normative `rationale:` line recording why the requirement exists, supported across all nine gybis-req-* skills (session-39).
