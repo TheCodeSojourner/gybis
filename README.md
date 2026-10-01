@@ -108,7 +108,7 @@ Requirements are the top layer of the stack: dependency-ordered module files con
 
 | Command                                  | Description                                                                 |
 | ---------------------------------------- | --------------------------------------------------------------------------- |
-| `/gybis-req-check` (`/gr-check`)         | Validate requirements designators, ordering, & coverage                     |
+| `/gybis-req-check` (`/gr-check`)         | Validate individual requirements, ordering, & coverage                      |
 | `/gybis-req-describe` (`/gr-describe`)   | Describe requirements in stakeholder prose or markdown                      |
 | `/gybis-req-distill` (`/gr-distill`)     | Create initial requirements (+ vocab candidates) from vocab/arch/specs/code |
 | `/gybis-req-elicit` (`/gr-elicit`)       | Elicit requirements via grilling interview rounds                           |
