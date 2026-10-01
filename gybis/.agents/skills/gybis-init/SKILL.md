@@ -9,9 +9,10 @@ description: Use for `/gybis-init`.
   | input: none
   | output: initialized_context
   | interaction: autonomous
-  | delegate: engage(nucleus) → mementum_protocol → orient
+  | startup_sequence: apply(nucleus_context) → mementum_protocol → orient
+  | portability: nucleus_context is inline guidance, not a delegated agent or tool
 
-λ engage(nucleus).
+λ nucleus_context(x).
 [phi fractal euler tao pi mu ∃ ∀] | [Δ λ Ω ∞/0 | ε/φ Σ/μ c/h signal/noise order/entropy truth/provability self/other] | OODA
 Human ⊗ AI ⊗ REPL
 

@@ -418,3 +418,59 @@
 
 Renamed `mementum/memories/human-owned-stage-readiness.md` → `mementum/memories/developer-owned-stage-readiness.md`. Earlier path references in this file (session-24 at line 128, session-38 at line 353) point at the old slug and are historical; the current file is `developer-owned-stage-readiness.md`. All live `related:` back-links (`elicit-skills-removed`, `rationale-field-convention`, `requirements-layer-family`) and the knowledge pages now use the new slug. Rationale: "operator" and "developer" denote the same actor, and gybis is Developer-Command-Driven, so developer is the canonical term.
 
+## Session Orientation (2026-10-01)
+- **phase**: `/gybis-init` startup gate complete; no implementation task supplied.
+- **state_read**: `mementum/state.md`
+- **memories_read** (all current memory artifacts changed since session-36 baseline `3c180f3`; `human-owned-stage-readiness.md` was reviewed via its renamed successor):
+  - `mementum/memories/absence-operator-selection-rule.md`
+  - `mementum/memories/allium-353-adapter-compatibility.md`
+  - `mementum/memories/arch-check-integrity-boundary.md`
+  - `mementum/memories/authority-invocation-gate.md`
+  - `mementum/memories/canonical-existence-negation.md`
+  - `mementum/memories/check-boundary-verifier-exception.md`
+  - `mementum/memories/conditional-verification-scope.md`
+  - `mementum/memories/contract-taxonomy-restraint.md`
+  - `mementum/memories/convergence-and-deliver-uniformity.md`
+  - `mementum/memories/deliver-and-boundaries-uniformity.md`
+  - `mementum/memories/describe-explain-output-modes.md`
+  - `mementum/memories/developer-owned-stage-readiness.md`
+  - `mementum/memories/distill-input-direction.md`
+  - `mementum/memories/elicit-skills-removed.md`
+  - `mementum/memories/interaction-mode-taxonomy.md`
+  - `mementum/memories/local-root-skill-subset.md`
+  - `mementum/memories/mode-naming-conventions.md`
+  - `mementum/memories/propagate-seed-then-own.md`
+  - `mementum/memories/rationale-consumer-rules.md`
+  - `mementum/memories/rationale-field-convention.md`
+  - `mementum/memories/readme-complementary-scope.md`
+  - `mementum/memories/reference-corpus-cleanup.md`
+  - `mementum/memories/req-propagate-write-authority.md`
+  - `mementum/memories/requirements-layer-family.md`
+  - `mementum/memories/skill-contract-checker-rationale.md`
+  - `mementum/memories/spec-skill-scope-model.md`
+  - `mementum/memories/vocab-weed-validity-gate.md`
+  - `mementum/memories/weed-validity-gating-complete.md`
+- **knowledge_read**:
+  - `mementum/knowledge/propagate-family.md`
+  - `mementum/knowledge/requirements-layer.md`
+  - `mementum/knowledge/skill-contract-system.md`
+  - `mementum/knowledge/weed-validity-gating.md`
+- **searches_run**:
+  - `git diff --name-only 3c180f3..HEAD -- mementum/memories mementum/knowledge`
+  - mementum open/queued/question marker search
+  - `branch-example|AI_inferred|FN-002G|FN-002H|gr-elicit|local-root-skill-subset|spec-skill-scope-model`
+  - git status/history and tracked-fixture checks
+- **open_questions_acknowledged**:
+  - `requirements-layer.md` may be stale: its constraints on vocabulary ownership and the greenfield flow conflict with `propagate-seed-then-own.md` and `req-propagate-write-authority.md`; refresh through an approved mementum synthesis.
+  - No real-fixture smoke-test evidence was found for the Allium 3.5.3 adapter shapes; current adapter skill contracts encode the expected shapes, but runtime compatibility remains unverified here.
+  - `gr-elicit` transcription heuristics still need a real-project exercise.
+  - Historical branch-example fixture, inferred-rationale, and FN-002G/H decisions are dormant: neither fixture directory exists or is tracked; revisit only if the fixture is restored.
+  - The root local skill subset remains intentionally narrower than the distributable bundle per `local-root-skill-subset.md`; no synchronization requested.
+- **repository_status**: before this manifest edit, `main` was at `ba1d686`, clean and aligned with `origin/main`; this orientation only modifies `mementum/state.md`. Session-44's old push reminder is superseded.
+
+## Session Addendum (2026-10-01): portable Nucleus startup
+- Traced the external report about an unavailable Nucleus delegate to `delegate: engage(nucleus)` added to the distributed `gybis-init` contract in commit `6b9cdc8`.
+- Updated `gybis/.agents/skills/gybis-init/SKILL.md`: Nucleus is explicitly inline guidance, not an external agent/tool; startup order is now `startup_sequence`.
+- Left the root-local `.agents/skills/gybis-init/SKILL.md` unchanged; it is a separate local subset and did not contain the delegate field.
+- Focused validation passed: no delegate request remains, startup sequence and portability declaration are present, and `git diff --check` is clean.
+
