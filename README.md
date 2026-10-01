@@ -26,13 +26,13 @@ The goal of **gybis** is to make it easy for developers to set up, utilize, and 
 
 **gybis** adds Developer-Command-Driven AI-Assistance to SDD by adding AI/Developer conversation to the entire workflow. All phases of the software development workflow are verified, harmonized and accelerated by AI assistance, while at the same time, making all phases of the workflow transparent and accessible to the developer. The AI is a collaborator that can be consulted at any time, but the developer is always in control of the process and the final decisions.
 
-## Operator Responsibility Model
+## Developer Responsibility Model
 
 gybis is command-driven guidance, not always-on process enforcement.
 
-- Human operators are responsible for stage readiness (`requirements/requirements-*.md` -> `vocabulary.md` -> `architecture.md` -> `specs/**/*.allium` -> code/tests).
+- Developers are responsible for stage readiness (`requirements/requirements-*.md` -> `vocabulary.md` -> `architecture.md` -> `specs/**/*.allium` -> code/tests).
 - Skills execute the requested transformation and enforce only execution-critical gates.
-- Check and weed commands are available as deliberate convergence tools when operators choose to run them.
+- Check and weed commands are available as deliberate convergence tools when developers choose to run them.
 - Running a command authorizes the writes that command is defined to make. `distill` and `propagate` persist their artifacts autonomously once invoked; their output is reviewed afterwards through `check` and `weed`. Only unrequested writes are prohibited.
 
 ## Check, Refine, Tend, and Weed Philosophy
@@ -60,7 +60,7 @@ Think of the sequence as a convergence loop rather than a one-off command.
 1. Run `check` first to expose drift or broken assumptions.
 2. Run `refine` next when the needed change is structure and clarity without changing intended meaning.
 3. Run `tend` when the needed change belongs to one layer and the intent is clear.
-4. Run `weed` when architecture, specs, or implementation disagree and need a human decision about which artifact should change.
+4. Run `weed` when requirements, vocabulary, architecture, specs, or implementation disagree and need a human decision about which artifact should change.
 5. Re-run `check` after `weed` to confirm the target layer is back in a valid state.
 
 **gybis** provides the scaffolding to make AI-assisted SDD practical:
