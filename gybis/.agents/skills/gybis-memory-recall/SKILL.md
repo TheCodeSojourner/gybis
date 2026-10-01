@@ -9,4 +9,5 @@ description: Use for `/gybis-memory-recall {topic}` or `/gm-recall {topic}`.
   | input: topic (optional) | ¬topic → latest_mementum_summary
   | output: recalled_context ∨ latest_session_summary
   | interaction: autonomous
-  | delegate: mementum_recall(topic)
+  | operation: mementum_recall(topic)
+  | execution: inline protocol; no external agent or tool call

@@ -9,4 +9,5 @@ description: Use for `/gybis-memory-synthesize` or `/gm-synthesize`.
   | input: none
   | output: synthesized_knowledge
   | interaction: autonomous
-  | delegate: mementum_synthesize()
+  | operation: mementum_synthesize()
+  | execution: inline protocol; no external agent or tool call

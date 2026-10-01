@@ -474,3 +474,8 @@ Renamed `mementum/memories/human-owned-stage-readiness.md` → `mementum/memorie
 - Left the root-local `.agents/skills/gybis-init/SKILL.md` unchanged; it is a separate local subset and did not contain the delegate field.
 - Focused validation passed: no delegate request remains, startup sequence and portability declaration are present, and `git diff --check` is clean.
 
+## Session Addendum (2026-10-01): memory operation portability
+- Replaced misleading `delegate:` fields with `operation:` in the four distributed memory skills: orient, recall, store, and synthesize. Each now states its Mementum procedure is inline protocol guidance, not an external agent/tool call.
+- Confirmed `gybis-memory-migrate` and the root-local `gybis-mementum-*` skills do not declare delegates; left them unchanged.
+- Focused validation passed: no `delegate:` remains in distributed `gybis-memory-*` skills, all four operations are present, and `git diff --check` is clean.
+

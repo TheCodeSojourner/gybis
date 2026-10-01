@@ -9,4 +9,5 @@ description: Use for `/gybis-memory-orient` or `/gm-orient`.
   | input: none
   | output: restored_context
   | interaction: autonomous
-  | delegate: mementum_orient()
+  | operation: mementum_orient()
+  | execution: inline protocol; no external agent or tool call

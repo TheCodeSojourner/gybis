@@ -9,4 +9,5 @@ description: Use for `/gybis-memory-store {insight}` or `/gm-store {insight}`.
   | input: insight (optional) | ¬input → prompt(user, provide(insight))
   | output: stored_memory
   | interaction: interactive
-  | delegate: mementum_store(insight)
+  | operation: mementum_store(insight)
+  | execution: inline protocol; no external agent or tool call
