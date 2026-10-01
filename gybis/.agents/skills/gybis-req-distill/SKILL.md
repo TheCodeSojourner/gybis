@@ -47,7 +47,7 @@ description: Use for `/gybis-req-distill` or `/gr-distill`.
   | write_allowed: state = WRITING_REQS ∧ path ∈ requirements/ ∪ {requirements/requirements-index.md}
   | deny_write: state ≠ WRITING_REQS ∨ path ∉ requirements/
   | constraint: ¬mutate(vocabulary.md) ∨ ¬mutate(architecture.md) ∨ ¬mutate(specs/) ∨ ¬mutate(implementation)
-  | rationale: vocabulary.md is only written by vocab skills, except the greenfield bootstrap in /gybis-req-propagate (operator-responsibility boundary)
+  | rationale: vocabulary.md is only written by vocab skills, except the greenfield bootstrap in /gybis-req-propagate (developer-responsibility boundary)
 
 λ gybis-req-distill_pre_tool_check(state, tool, path).
   enforce(tool_guard(state, tool, path)) → permit(tool) ∨ halt("tool not permitted in this state")
