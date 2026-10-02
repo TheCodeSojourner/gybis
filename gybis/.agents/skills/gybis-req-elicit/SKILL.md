@@ -8,8 +8,9 @@ description: Use for `/gybis-req-elicit` or `/gr-elicit`.
   purpose: Elicit requirements from stakeholders via grilling-style interview rounds and transcribe the resolved design tree into lambda-notation requirement clauses
   | input: user conversation via frontier-based interview rounds
   | output: requirements/requirements-index.md + requirements/requirements-{module}.md files containing REQ-<DOMAIN>-NNN clauses in nucleus lambda notation
+  | binding_default: every requirement is binding unless the stakeholder explicitly defers it
   | index_conventions_block: requirements-index.md declares a machine-readable conventions block — domain_prefixes (closed set), normative_mapping, granularity, deferred_marker — so consumers never re-derive conventions per run
-  | deferred_marker: deferred sections use a heading containing "(Deferred" (e.g. "## Deferred Sequence Traversal Mechanics") or a blockquote opener asserting non-binding status; ¬unmarked_future_work
+  | deferred_marker: only REQ clauses may be deferred; deferred sections use a heading containing "(Deferred" or a blockquote opener asserting non-binding status; deferred status requires explicit stakeholder decision; ¬infer(deferred, downstream_absence ∨ roadmap_wording_alone)
   | interaction: interactive
   | gate: requirements_empty(requirements/) ∨ empty-frontier-continuation(explicit_human_request)
   | requirements_empty(d): d ¬∃ ∨ contents(d) ⊆ {.gitkeep}
@@ -43,6 +44,7 @@ description: Use for `/gybis-req-elicit` or `/gr-elicit`.
   | question depending_on(open_question_in_current_round) → belongs_to(later_round)
   | facts_are_AI_job: frontier question needing environment fact → AI researches (filesystem, repo, tools) before asking; ¬block(rest_of_frontier)
   | decisions_are_human_job: put each decision to stakeholders ∧ wait
+  | binding_status: unresolved future timing alone does not defer a requirement; ask only when binding_now_vs_explicitly_deferred is unclear
   | termination: frontier = ∅ ∧ human_confirms(shared_understanding)
   | ¬act_before(human_confirmation)
 

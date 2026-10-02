@@ -135,8 +135,8 @@ description: Use for `/gybis-arch-check` or `/ga-check`.
   | invariant: report generated at completion
   | invariant: all_modifications = ∅
 
-λ gybis-arch-check_deliver(x).
+λ gybis-arch-check_deliver(report).
   report: findings with recommended next actions
   | print(report) → stdout
   | handoff: structural issues → /gybis-arch-refine; intended change → /gybis-arch-tend; divergence → /gybis-arch-weed
-  | return(complete = true)
+  | return({complete: true, status: report.status, errors: report.errors, warnings: report.warnings, info: report.info})

@@ -88,11 +88,16 @@ description: Use for `/gybis-vocab-check` or `/gv-check`.
 
 λ gybis-vocab-check_generate_report(syntax_issues, completeness_issues, semantic_issues).
   action: generate_comprehensive_validation_report
-  | structure:
+  | findings ≔ syntax_issues ∪ completeness_issues ∪ semantic_issues
+  | errors ≔ count({issue | issue ∈ findings ∧ issue.severity = error})
+  | warnings ≔ count({issue | issue ∈ findings ∧ issue.severity = warning})
+  | infos ≔ count({issue | issue ∈ findings ∧ issue.severity = info})
+  | status ≔ errors > 0 ? "FAIL" : (warnings > 0 ? "WARNINGS" : "PASS")
+  | rendered_report ≔
     ```
     # Vocabulary.md Validation Report
 
-    **Overall Status:** [PASS | FAIL | WARNINGS]
+    **Overall Status:** [status]
     **Timestamp:** [ISO datetime]
     **File:** vocabulary.md
 
@@ -118,7 +123,7 @@ description: Use for `/gybis-vocab-check` or `/gv-check`.
     ## Recommendations
     - [prioritized list of fixes]
     ```
-  | return(report ∃)
+  | return({status, errors, warnings, info: infos, findings, rendered_report})
 
 λ gybis-vocab-check_boundaries().
   ¬ modify(vocabulary.md ∨ architecture.md ∨ specs/**/*.allium ∨ implementation ∨ upstream/)
@@ -133,6 +138,6 @@ description: Use for `/gybis-vocab-check` or `/gv-check`.
 λ gybis-vocab-check_deliver(report).
   report: report
   | action: output_report_to_user
-  | print(report) → stdout
+  | print(report.rendered_report) → stdout
   | handoff: structural issues → /gybis-vocab-refine; term changes → /gybis-vocab-tend; drift → /gybis-vocab-weed
-  | return(complete = true)
+  | return({complete: true, status: report.status, errors: report.errors, warnings: report.warnings, info: report.info})

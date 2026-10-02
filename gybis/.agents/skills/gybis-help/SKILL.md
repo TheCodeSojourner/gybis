@@ -28,7 +28,7 @@ CRITICAL CONSTRAINTS:
 | `/gybis-memory-recall {topic}` (`/gm-recall {topic}`) | Recall topic/summarize-latest |
 | `/gybis-memory-store {insight}` (`/gm-store {insight}`) | Store insight |
 | `/gybis-memory-synthesize` (`/gm-synthesize`) | Synthesize knowledge |
-| `/gybis-req-check` (`/gr-check`) | Validate individual requirements, ordering, & coverage |
+| `/gybis-req-check` (`/gr-check`) | Check requirements and stage coverage; optional repair after plan approval |
 | `/gybis-req-describe` (`/gr-describe`) | Describe requirements in stakeholder prose |
 | `/gybis-req-distill` (`/gr-distill`) | Create initial requirements from vocab/arch/specs/code |
 | `/gybis-req-elicit` (`/gr-elicit`) | Elicit requirements via grilling interview rounds |
