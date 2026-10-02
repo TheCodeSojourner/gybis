@@ -53,7 +53,9 @@ Retired interaction tokens: `ai`, `auto`, `mixed`, `auto_polish`, `supervised`.
 
 ## Check vs act
 
-`check` diagnoses; `refine`/`tend`/`weed` act. `spec-check` is the sole repair
-exception, because it has a deterministic external oracle (`gybis-allium-gate`)
-it must satisfy before COMPLETE. The other checks make semantic judgements and
-stay read-only, handing off to the acting skills.
+`check` normally diagnoses; `refine`/`tend`/`weed` act. `spec-check` may repair
+autonomously only because a deterministic external oracle (`gybis-allium-gate`)
+must pass before COMPLETE. `req-check` is a separate human-authorized exception:
+it remains read-only through diagnosis and plan preparation, then may run a
+bounded repair loop after one explicit approval, within that approved scope and
+through the owning skills. `arch-check` and `vocab-check` remain read-only.

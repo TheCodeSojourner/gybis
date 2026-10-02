@@ -1,18 +1,18 @@
 ---
 type: Decision
 symbol: 🎯
-title: check-boundary-verifier-exception
+title: Check repair requires an oracle or explicit human authorization
 related: arch-check-integrity-boundary, interaction-mode-taxonomy, requirements-layer-family
 ---
 
-Rule: `check` diagnoses; `refine`, `tend`, and `weed` act. `spec-check` is the sole exception — it may also repair.
+Rule: checks diagnose by default. `spec-check` may repair autonomously under the Allium verifier; `req-check` may repair only after explicit approval of a bounded plan.
 
-Why the exception is principled and not drift:
-- `spec-check` has a deterministic external oracle: it fixes, then re-invokes `allium check` / `allium analyse` through `gybis-allium-gate`. Its `fixed_point_loop` cannot reach COMPLETE unless the tool agrees.
-- `arch-check`, `req-check`, and `vocab-check` have no equivalent verifier. Their findings are semantic judgements (VSM coherence, requirement coverage, term completeness), so autonomous repair would mean the model deciding semantic questions unattended and rewriting the artifact.
+- `spec-check` re-runs `allium check` / `allium analyse` through `gybis-allium-gate`; it cannot complete unless that deterministic external oracle passes.
+- `req-check` diagnoses and plans read-only. Approval authorizes only the scoped repairs through owning skills; unresolved semantic conflicts stop the loop.
+- `arch-check` and `vocab-check` remain read-only because their findings include semantic judgements without an equivalent verifier.
 
-Generalized rule: autonomous correction requires `verifier(external ∧ deterministic)`. Absent an oracle, a check must stay read-only and hand off to `refine`/`tend`/`weed`.
+Autonomous correction requires `verifier(external ∧ deterministic)`. Without one, repair needs explicit human authorization and bounded scope; otherwise checks hand off to `refine`/`tend`/`weed`.
 
-Rejected alternative: making all four checks repair autonomously (the "consistency by promoting the outlier" direction). It would have unified the family while removing the human gate for semantic change and duplicating the `refine`/`tend`/`weed` skill set.
+Rejected: making every check repair autonomously would remove the semantic-change approval gate and duplicate `refine`/`tend`/`weed`.
 
-Naming consequence: `check` still carries two behaviors, so `spec-check`'s purpose block and the check-family docs state the exception explicitly rather than leaving it implicit.
+Document both exceptions and their distinct gates; do not imply all checks behave alike.
