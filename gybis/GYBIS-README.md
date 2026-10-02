@@ -97,16 +97,16 @@ The gybis workflow is built around four deliberate actions that the human choose
 - `tend` evolves a single layer with human-approved intent before the drift spreads downstream.
 - `weed` resolves mismatch across neighboring layers or implementation when two artifacts no longer describe the same truth.
 
-The boundary is: **`check` diagnoses; `refine`, `tend`, and `weed` act.** One exception is `spec-check`, which also repairs `.allium` errors directly; the other check skills only diagnose and hand off to the acting skills.
+The boundary is: **`check` diagnoses; `refine`, `tend`, and `weed` act.** Architecture and vocabulary checks remain read-only. `spec-check` may repair `.allium` errors under its external Allium verifier. `req-check` diagnoses and prepares a plan read-only, then may run bounded repairs only after you approve that plan.
 
 The pattern is intentionally hierarchical: run `check` first, and its structural or clarity findings nominate `refine`; `tend` applies intended meaning changes, and `weed` reconciles layers that no longer agree. The human decides the scope and approves any write.
 
-| Operation | When to use it                                    | Human role                                                     | Typical outcome                    |
-| --------- | ------------------------------------------------- | -------------------------------------------------------------- | ---------------------------------- |
-| `check`   | You want a diagnostic pass before making changes  | Review the report and decide whether the layer needs attention | Findings or a clean pass           |
-| `refine`  | `check` reports structural or clarity issues      | Approve local hygiene edits and verify meaning is preserved    | Clearer artifact with same meaning |
-| `tend`    | You know the intended refinement for one artifact | Explain the change, review impact, and approve edits           | A layer updated in place           |
-| `weed`    | The real problem is divergence between artifacts  | Choose which side should move, then approve the correction     | Layers realigned and re-verified   |
+| Operation | When to use it                                    | Human role                                                         | Typical outcome                    |
+| --------- | ------------------------------------------------- | ------------------------------------------------------------------ | ---------------------------------- |
+| `check`   | You want a diagnostic pass before making changes  | Review findings; approve a scoped req-check repair plan if offered | Findings or a clean pass           |
+| `refine`  | `check` reports structural or clarity issues      | Approve local hygiene edits and verify meaning is preserved        | Clearer artifact with same meaning |
+| `tend`    | You know the intended refinement for one artifact | Explain the change, review impact, and approve edits               | A layer updated in place           |
+| `weed`    | The real problem is divergence between artifacts  | Choose which side should move, then approve the correction         | Layers realigned and re-verified   |
 
 ## Workflow Cheat Sheet
 
