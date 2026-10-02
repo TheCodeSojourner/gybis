@@ -1,3 +1,4 @@
+🌀 session-45 | 2026-10-01 gybis-init: orient manifest prepared from state, memories, knowledge, and open questions
 ✅ session-44 | 2026-09-30 skill-contract enforcement, adapter namespacing, notation canonicalisation, and mementum OKF conformance. Added internal/gybis-skill-contract-check and `kind` on 41 skills; fixed 6 contract findings; renamed internal allium-* → gybis-allium-* (6 adapters); added gybis-vocab-propagate; uniform loop guards / _pass_accounting / _boundaries / _regression_contract / _deliver; split skill `mode` into interaction + output_mode; conditional weed validity gating; canonicalised `exists`/`¬exists` → `∃`/`¬∃` and documented the `∅` presence-symmetry rule; 18 new memories + 8 split for OKF `body<200 words`. Commits 6b9cdc8 + 8e2002e (local, unpushed)
 ✅ session-42 | 2026-09-29 gybis-vocab-elicit and gybis-arch-elicit removed; greenfield vocab/arch artifacts now human-authored [SUPERSEDED — see memories/propagate-seed-then-own.md: architecture is bootstrapped by /gybis-vocab-propagate and vocabulary by /gybis-req-propagate + /gybis-vocab-tend]; doc surfaces synchronized (commit c20b767 then removal commit)
 ✅ session-40 | 2026-09-29 gybis-init orient complete on branch add-requirements-layer at session-39 head (85b9a97)
@@ -39,9 +40,9 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-09-30T16:00:00-06:00
-- **Sessions**: 44 (session-0 initialized through session-44 closeout)
-- **Status**: Session-44 — skill-contract enforcement, adapter namespacing, notation canonicalisation, mementum OKF conformance; 2 local commits await push
+- **Last updated**: 2026-10-01T18:10:53-06:00
+- **Sessions**: 46 (session-0 initialized through session-46 closeout)
+- **Status**: Session-46 closeout — implemented REQ-only deferral, ready-stage accounting, approval-gated req-check repair, and the pre-commit cross-skill fixes. Commit scope is `mementum/` only; skill and guide changes remain uncommitted. `main` was at `57227ce`, ahead of `origin/main` by two commits before this closeout.
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
@@ -483,4 +484,81 @@ Renamed `mementum/memories/human-owned-stage-readiness.md` → `mementum/memorie
 - Updated `gybis/.agents/skills/gybis-req-describe/SKILL.md` to omit REQ designators and avoid per-requirement bullets or clause-like entries in stakeholder descriptions; connected requirements should read as narrative paragraphs grouped by module.
 - Kept designator-level canonical clause quoting in `gybis-req-explain` for developer traceability.
 - Focused validation passed: narrative and identifier-exclusion rules are present; `git diff --check` is clean.
+
+## Session Orientation (2026-10-01, session-45)
+- **phase**: `/gybis-init` startup gate complete; no implementation task supplied.
+- **state_read**: `mementum/state.md`
+- **memories_read** (focused re-read of the session-44 contract/authority decisions and current open-question memories; also read the session-46 absence-operator correction):
+  - `mementum/memories/absence-operator-selection-rule.md`
+  - `mementum/memories/authority-invocation-gate.md`
+  - `mementum/memories/interaction-mode-taxonomy.md`
+  - `mementum/memories/contract-taxonomy-restraint.md`
+  - `mementum/memories/skill-contract-checker-rationale.md`
+  - `mementum/memories/canonical-existence-negation.md`
+  - `mementum/memories/developer-owned-stage-readiness.md`
+  - `mementum/memories/propagate-seed-then-own.md`
+  - `mementum/memories/req-propagate-write-authority.md`
+  - `mementum/memories/distill-input-direction.md`
+  - `mementum/memories/allium-353-adapter-compatibility.md`
+  - `mementum/memories/local-root-skill-subset.md`
+- **knowledge_read**:
+  - `mementum/knowledge/requirements-layer.md`
+  - `mementum/knowledge/propagate-family.md`
+  - `mementum/knowledge/skill-contract-system.md`
+  - `mementum/knowledge/weed-validity-gating.md`
+  - `mementum/knowledge/session-2026-05-15.md`
+- **searches_run**:
+  - `git log --oneline ba1d686..HEAD` + `git diff --name-only ba1d686..HEAD -- mementum/`
+  - `git grep -iE "stale|superseded|open question|open item|pending|TODO|dormant" -- mementum/`
+  - `git grep -wE "exists" -- mementum/memories mementum/knowledge`
+  - `git status -sb` / `git log -1`
+- **open_questions_acknowledged**:
+  - `requirements-layer.md` is stale: its "Open items" still request a default domain-prefix set (closed session-39 Addendum 6 — no defaults), its brownfield chain `spec-distill → arch-distill → gr-distill` is superseded by `distill-input-direction.md`, and its boundary "vocabulary.md is only written by vocabulary skills" conflicts with `req-propagate-write-authority.md`. Refresh via an approved `/gybis-memory-synthesize`.
+  - Allium 3.5.3 adapter JSON-shape compatibility remains unverified against a real CLI fixture (`allium-353-adapter-compatibility.md`).
+  - `gr-elicit` transcription heuristics still need a first real-project exercise.
+  - `branch-example/` + `branch-example-original/` are dormant (untracked, absent from the current tree); revisit only if restored. Carried: 4 AI_inferred rationale approvals, FN-002G/H collision, `compound_by_design` markers.
+  - Root local `.agents/skills/` subset stays intentionally narrower than the distributable bundle (`local-root-skill-subset.md`); whether it adopts the contract fields (`kind`/`purpose`/`interaction`) is still an open session-44 decision.
+- **repository_status**: `main` at `081dfa7`, clean and aligned with `origin/main`; session-44's commits (`6b9cdc8`, `8e2002e`) are now pushed and followed by three 2026-10-01 doc commits. This orientation modifies only `mementum/state.md`.
+
+## Session-45 Addendum (2026-10-01): approved req-check repair workflow
+- Upserted `gybis/.agents/skills/gybis-req-check/SKILL.md`: interactive diagnosis remains read-only until one repair-plan approval, then runs a bounded three-pass check/repair/verify loop within the initially approved path scope.
+- Repair defaults preserve project requirements and existing designator identity, exclude explicitly deferred clauses from active coverage, avoid low-level human questions, and report unresolved semantic conflicts without guessing.
+- The current `gybis-req-propagate` contract cannot scope coverage work away from deferred clauses; req-check blocks that repair group when deferred clauses exist. A companion propagate update needs separate approval.
+- `requirements-layer.md`, `skill-contract-system.md`, and `check-boundary-verifier-exception.md` still describe checks as read-only (except spec-check); reconcile those records after human approval.
+- Validation: editor diagnostics reported no errors; `git diff --check` passed for the skill change.
+
+## Session-45 Addendum (2026-10-01): REQ-only deferral and stage accounting
+- Implemented the approved model across `req-check`, `req-refine`, `req-tend`, `req-propagate`, `req-weed`, `req-elicit`, and `req-describe`: requirements bind by default; only explicitly marked REQs may be deferred; stage readiness is independent.
+- Ready stages require an artifact and an owner check with no errors. Each binding REQ receives a computed `represented`, `no_change_needed`, `uncovered`, or `pending_stage` disposition; no persistent ledger or per-REQ artifact is required.
+- `req-propagate` excludes deferred REQs, scopes writes to ready artifacts, and revalidates changed vocabulary/spec/test stages. `vocab-propagate` excludes deferred REQs when deriving architecture. Architecture/spec skills that do not consume REQs remain unchanged.
+- `req-refine` preserves deferral markers and accepts exact preapproved plans; `req-tend` remains the only human-approved path to change binding/deferred status. `req-weed` keeps investigate/skip unresolved and does not treat lower-layer artifacts as implicitly deferred.
+- Updated `GYBIS-README.md`, `GYBIS-DEV-WORKFLOW.md`, requirements/propagation knowledge, and check-boundary memories. Allium's `deferred Name.operation` construct is unchanged.
+- Previous Session-45 notes that req-propagate could not exclude deferred REQs and that check-boundary documentation was stale are superseded by this addendum.
+- Validation: editor diagnostics clean across all 16 changed files; `git diff --check` passed; stale-policy search returned no matches; updated memory bodies are 131 and 187 words. Internal skill-contract/reference checks were reviewed as skill procedures but could not be run as terminal scripts in this environment.
+
+## Session-45 Addendum (2026-10-01): plain-language REQ deferral requests
+- Updated `req-tend` to resolve requirement targets from plain-language descriptions, present matching REQs and downstream impact in plain language, and request clarification without requiring designators when the match is ambiguous or absent.
+- Updated the GYBIS README example to defer by describing the behavior, not by supplying `REQ-<DOMAIN>-NNN`.
+- Validation: editor diagnostics clean; `git diff --check` passed for both changed files.
+
+## Session-45 Addendum (2026-10-01): pre-commit skill review fixes
+- Fixed the six review findings: normalized per-layer check outputs (including structured vocab/arch results and halt capture); wired vocabulary extension/no-change signals; made the req-check preapproval payload carry explicit targets; made refine proposals/actions explicit; carried stage/reason/finding IDs through req-weed and made unresolved choices terminate with `convergence_status: unresolved`; synchronized GYBIS README and help wording for req-check repair approval.
+- Validation: editor diagnostics clean across the changed skills/docs; `git diff --check` passed; stale-pattern search found no remaining old check-boundary claims. Internal skill-contract procedures are not executable terminal scripts in this environment.
+- Follow-up review fixes normalized architecture/vocabulary owner-check return values, aligned stage readiness and post-write ready/pending sets, made req-weed's no-change and unresolved outcomes coherent, and aligned the refine owner identifier. Final diagnostics cover all modified skills and guides; `git diff --check` passes.
+
+## Session Closeout (2026-10-01, session-46)
+- **task**: Implement and review the REQ-only deferral / downstream stage-accounting model, make req-check repair approval-gated and bounded, fix six pre-commit skill findings, and complete plain-language req-tend targeting.
+- **questions**:
+  - No blocking questions. The internal skill-contract and reference checks are skill procedures and were not executable as terminal commands in this environment.
+  - Carried: real Allium 3.5.3 adapter fixture validation; first real-project `gr-elicit` exercise; historical `branch-example/` deferral/rationale/collision decisions remain dormant while the fixtures are absent; root-local skill subset remains intentionally separate.
+- **decisions**:
+  - Only REQs can be explicitly deferred; all requirements bind by default. Stage readiness is separate, with computed `represented`, `no_change_needed`, `uncovered`, or `pending_stage` dispositions and no persistent ledger.
+  - `/gybis-req-check` diagnoses read-only, requests one scoped repair-plan approval, then runs a bounded repair loop through owning skills. `req-tend` is the only path to change binding/deferred status; plain-language targeting does not require a REQ designator.
+  - Validator outputs are normalized at readiness boundaries. Weed `investigate`/`skip` outcomes remain unresolved and finish with an explicit `unresolved` status rather than being reported as convergence.
+  - A reusable Mementum insight on normalizing heterogeneous validator results was approved and added as `memories/stage-readiness-result-normalization.md`.
+- **next**:
+  1. Run `internal/gybis-skill-contract-check(all)` and `internal/gybis-ref-check` in a compatible skill runtime before packaging; terminal/editor diagnostics and `git diff --check` passed here.
+  2. Exercise req-check/req-propagate on a project with explicitly deferred REQs and absent, invalid, and ready downstream stages.
+  3. Run the real Allium 3.5.3 adapter fixture smoke test and a real-project `gr-elicit` exercise when suitable fixtures/projects are available.
+- **recover**: Read `gybis/.agents/skills/gybis-req-check/SKILL.md` and `gybis/.agents/skills/gybis-req-propagate/SKILL.md`, then run the internal skill-contract and reference checks before changing the approved repair flow.
 
