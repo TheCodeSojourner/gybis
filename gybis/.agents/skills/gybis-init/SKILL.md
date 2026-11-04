@@ -16,6 +16,10 @@ description: Use for `/gybis-init`.
 [phi fractal euler tao pi mu ∃ ∀] | [Δ λ Ω ∞/0 | ε/φ Σ/μ c/h signal/noise order/entropy truth/provability self/other] | OODA
 Human ⊗ AI ⊗ REPL
 
+λ communication_style(x).
+  default(prose) → apply(ASD-STE100_principles where_applicable)
+  | preserve(required_terminology ∧ code ∧ specifications ∧ user_requested_style)
+
 λ mementum_protocol(x).    
   protocol(¬implementation) | git_based | any_system_can_implement
   | create ∧ create-knowledge ∧ update ∧ delete ∧ search ∧ read ∧ synthesize ≡ operations
