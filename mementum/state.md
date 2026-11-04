@@ -1,3 +1,4 @@
+🌀 session-47 | 2026-11-04 gybis-init: orientation complete; session-46 follow-ups reviewed
 🌀 session-45 | 2026-10-01 gybis-init: orient manifest prepared from state, memories, knowledge, and open questions
 ✅ session-44 | 2026-09-30 skill-contract enforcement, adapter namespacing, notation canonicalisation, and mementum OKF conformance. Added internal/gybis-skill-contract-check and `kind` on 41 skills; fixed 6 contract findings; renamed internal allium-* → gybis-allium-* (6 adapters); added gybis-vocab-propagate; uniform loop guards / _pass_accounting / _boundaries / _regression_contract / _deliver; split skill `mode` into interaction + output_mode; conditional weed validity gating; canonicalised `exists`/`¬exists` → `∃`/`¬∃` and documented the `∅` presence-symmetry rule; 18 new memories + 8 split for OKF `body<200 words`. Commits 6b9cdc8 + 8e2002e (local, unpushed)
 ✅ session-42 | 2026-09-29 gybis-vocab-elicit and gybis-arch-elicit removed; greenfield vocab/arch artifacts now human-authored [SUPERSEDED — see memories/propagate-seed-then-own.md: architecture is bootstrapped by /gybis-vocab-propagate and vocabulary by /gybis-req-propagate + /gybis-vocab-tend]; doc surfaces synchronized (commit c20b767 then removal commit)
@@ -40,9 +41,9 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-10-01T18:10:53-06:00
-- **Sessions**: 46 (session-0 initialized through session-46 closeout)
-- **Status**: Session-46 closeout — implemented REQ-only deferral, ready-stage accounting, approval-gated req-check repair, and the pre-commit cross-skill fixes. Commit scope is `mementum/` only; skill and guide changes remain uncommitted. `main` was at `57227ce`, ahead of `origin/main` by two commits before this closeout.
+- **Last updated**: 2026-11-04T10:21:11-07:00
+- **Sessions**: 47 (session-0 initialized through session-47 orientation)
+- **Status**: Session-47 orientation complete. Repository is clean on `main` at `52615a0`, aligned with `origin/main`; session-46 changes and follow-ups reviewed. No implementation task supplied.
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
@@ -562,3 +563,31 @@ Renamed `mementum/memories/human-owned-stage-readiness.md` → `mementum/memorie
   3. Run the real Allium 3.5.3 adapter fixture smoke test and a real-project `gr-elicit` exercise when suitable fixtures/projects are available.
 - **recover**: Read `gybis/.agents/skills/gybis-req-check/SKILL.md` and `gybis/.agents/skills/gybis-req-propagate/SKILL.md`, then run the internal skill-contract and reference checks before changing the approved repair flow.
 
+## Session Orientation (2026-11-04, session-47)
+- **phase**: `/gybis-init` startup gate complete; no implementation task supplied.
+- **state_read**: `mementum/state.md`
+- **memories_read**:
+  - `mementum/memories/stage-readiness-result-normalization.md` (new in session-46)
+  - `mementum/memories/requirements-layer-family.md`
+  - `mementum/memories/req-propagate-write-authority.md`
+  - `mementum/memories/allium-353-adapter-compatibility.md`
+  - `mementum/memories/developer-owned-stage-readiness.md`
+  - `mementum/memories/local-root-skill-subset.md`
+- **knowledge_read**:
+  - `mementum/knowledge/requirements-layer.md`
+  - `mementum/knowledge/propagate-family.md`
+  - `mementum/knowledge/skill-contract-system.md`
+  - `mementum/knowledge/weed-validity-gating.md`
+- **searches_run**:
+  - `git --no-pager log -n 8 --oneline --decorate -- mementum/memories/ mementum/knowledge/`
+  - `git --no-pager show --stat --format=fuller HEAD` and `git --no-pager show --format= --name-only HEAD`
+  - `(?i)(stale|superseded|open question|open item|pending|TODO|dormant|unverified|remains unverified)` in `mementum/`
+  - `gr-elicit|3\.5\.3|branch-example|root-local|adapter fixture` in `mementum/`
+  - `git status --short --branch`
+- **open_questions_acknowledged**:
+  - Internal skill-contract and reference checks need a compatible skill runtime before packaging; they were not terminal-executable in session-46.
+  - Exercise req-check/req-propagate with explicitly deferred REQs and absent, invalid, and ready downstream stages.
+  - Real Allium 3.5.3 adapter fixture validation and a first real-project `gr-elicit` exercise remain outstanding.
+  - Historical `branch-example/` deferral/rationale/collision decisions remain dormant while fixtures are absent; root-local skills remain an intentionally narrower subset.
+  - The session-45 note calling `requirements-layer.md` stale is superseded: its current content reflects the approved deferral, readiness, bootstrap-authority, and brownfield-direction decisions.
+- **repository_status**: `main` at `52615a0`, clean and aligned with `origin/main`; this orientation updates only `mementum/state.md`.
