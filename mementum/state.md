@@ -1,3 +1,4 @@
+✅ session-48 | 2026-11-04 default ASD-STE100 prose guidance added to both gybis-init skills (c3289e0)
 🌀 session-47 | 2026-11-04 gybis-init: orientation complete; session-46 follow-ups reviewed
 🌀 session-45 | 2026-10-01 gybis-init: orient manifest prepared from state, memories, knowledge, and open questions
 ✅ session-44 | 2026-09-30 skill-contract enforcement, adapter namespacing, notation canonicalisation, and mementum OKF conformance. Added internal/gybis-skill-contract-check and `kind` on 41 skills; fixed 6 contract findings; renamed internal allium-* → gybis-allium-* (6 adapters); added gybis-vocab-propagate; uniform loop guards / _pass_accounting / _boundaries / _regression_contract / _deliver; split skill `mode` into interaction + output_mode; conditional weed validity gating; canonicalised `exists`/`¬exists` → `∃`/`¬∃` and documented the `∅` presence-symmetry rule; 18 new memories + 8 split for OKF `body<200 words`. Commits 6b9cdc8 + 8e2002e (local, unpushed)
@@ -41,9 +42,9 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-11-04T10:21:11-07:00
-- **Sessions**: 47 (session-0 initialized through session-47 orientation)
-- **Status**: Session-47 orientation complete. Repository is clean on `main` at `52615a0`, aligned with `origin/main`; session-46 changes and follow-ups reviewed. No implementation task supplied.
+- **Last updated**: 2026-11-04T10:34:58-07:00
+- **Sessions**: 48 (session-0 initialized through session-48 closeout)
+- **Status**: Session-48 closeout — added default ASD-STE100 prose guidance to both root-local and bundled `gybis-init` skills. Skill changes are committed as `c3289e0`; this closeout records the decision and carries forward validation follow-ups. Repository was clean on `main` at `c3289e0`, aligned with `origin/main`, before this state update.
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
@@ -591,3 +592,17 @@ Renamed `mementum/memories/human-owned-stage-readiness.md` → `mementum/memorie
   - Historical `branch-example/` deferral/rationale/collision decisions remain dormant while fixtures are absent; root-local skills remain an intentionally narrower subset.
   - The session-45 note calling `requirements-layer.md` stale is superseded: its current content reflects the approved deferral, readiness, bootstrap-authority, and brownfield-direction decisions.
 - **repository_status**: `main` at `52615a0`, clean and aligned with `origin/main`; this orientation updates only `mementum/state.md`.
+
+## Session Closeout (2026-11-04, session-48)
+- **task**: Update the root-local and bundled `/gybis-init` skills to make ASD-STE100 principles the default for prose where applicable.
+- **questions**: None blocking.
+- **decisions**:
+  - Encode the guidance in each skill's Nucleus Lambda format as `default(prose) → apply(ASD-STE100_principles where_applicable)`.
+  - Preserve required terminology, code, specifications, and the user's requested style.
+  - Keep the change limited to the two requested skill copies; both skill edits were committed as `c3289e0`.
+- **next**:
+  1. Exercise req-check/req-propagate with explicitly deferred REQs and absent, invalid, and ready downstream stages.
+  2. Run internal skill-contract/reference checks in a compatible skill runtime before packaging.
+  3. Validate Allium 3.5.3 adapter behavior with real CLI fixtures and exercise `gr-elicit` on a real project when available.
+- **recover**: Read `gybis/.agents/skills/gybis-req-check/SKILL.md` and `gybis/.agents/skills/gybis-req-propagate/SKILL.md`, then exercise deferred-REQ stage accounting before modifying the approved repair flow.
+- **repository_status**: Skill changes are in `c3289e0`; this closeout updates only `mementum/state.md`.
