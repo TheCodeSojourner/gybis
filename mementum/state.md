@@ -1,3 +1,4 @@
+✅ session-49 | 2026-11-07 gybis-allium-analyse stream contract updated (75a9173); check file/directory output reviewed; check skill unchanged
 ✅ session-48 | 2026-11-04 default ASD-STE100 prose guidance added to both gybis-init skills (c3289e0)
 🌀 session-47 | 2026-11-04 gybis-init: orientation complete; session-46 follow-ups reviewed
 🌀 session-45 | 2026-10-01 gybis-init: orient manifest prepared from state, memories, knowledge, and open questions
@@ -42,9 +43,10 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-11-04T10:34:58-07:00
-- **Sessions**: 48 (session-0 initialized through session-48 closeout)
-- **Status**: Session-48 closeout — added default ASD-STE100 prose guidance to both root-local and bundled `gybis-init` skills. Skill changes are committed as `c3289e0`; this closeout records the decision and carries forward validation follow-ups. Repository was clean on `main` at `c3289e0`, aligned with `origin/main`, before this state update.
+- **Last updated**: 2026-11-07T14:43:05-07:00
+- **Sessions**: 49 (session-0 initialized through session-49 closeout)
+- **Last session ID**: session-49
+- **Status**: Session-49 closeout — bundled `internal/gybis-allium-analyse` stream parsing and aggregation update is committed as `75a9173`. Reviewed user-supplied check output: directory mode streams per-file objects; single-file mode matches the existing check skill's input contract. Check skill unchanged. Only this state record is being committed at closeout; real CLI fixture and end-to-end skill-runtime validation remain open.
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
@@ -606,3 +608,29 @@ Renamed `mementum/memories/human-owned-stage-readiness.md` → `mementum/memorie
   3. Validate Allium 3.5.3 adapter behavior with real CLI fixtures and exercise `gr-elicit` on a real project when available.
 - **recover**: Read `gybis/.agents/skills/gybis-req-check/SKILL.md` and `gybis/.agents/skills/gybis-req-propagate/SKILL.md`, then exercise deferred-REQ stage accounting before modifying the approved repair flow.
 - **repository_status**: Skill changes are in `c3289e0`; this closeout updates only `mementum/state.md`.
+
+## Session-49 Update (2026-11-07): directory analyse JSON stream
+- **evidence**: The user supplied actual directory-command stdout containing successive pretty-printed JSON objects, each with `command: analyse`, `diagnostics`, `findings`, and `spec_file`. This is neither a single JSON document nor line-delimited JSON.
+- **approval**: The user approved updating the analyse skill for complete-stream decoding, file attribution, aggregation, directory report construction, and explicit malformed/incomplete-output failures.
+- **changes**: Updated only bundled `gybis/.agents/skills/internal/gybis-allium-analyse/SKILL.md` and this state record. Added envelope validation, recursive inventory comparison, original per-file result preservation, compatible top-level aggregate entry fields, severity/count/status rules, separate stderr capture, structured failure halts, and regression invariants. Directory invocation alone no longer implies inter-spec analysis.
+- **validation**: Editor diagnostics report no errors; `git diff --check` passes. This is an instruction-contract update, not an executable parser implementation. No real CLI fixture or end-to-end skill-runtime test was run.
+- **next**: Exercise the skill with real clean and nonempty results plus malformed, truncated, missing-file, and duplicate-file streams. Prior Allium adapter and deferred-REQ validation follow-ups remain open.
+- **repository_status**: Analyse skill changes were subsequently committed as `75a9173`; this state record is included in the session closeout. No memory or knowledge page was created.
+
+## Session Closeout (2026-11-07, session-49)
+- **task**: Correct the analyse adapter's directory-output contract and assess check-command output compatibility.
+- **questions**: None blocking closeout. Directory support for `gybis-allium-check` was recommended but not approved or implemented; its existing contract accepts only a single `.allium` file.
+- **decisions**:
+  - User-supplied directory output for both `analyse` and `check` consists of successive pretty-printed per-file JSON objects, not one JSON document and not NDJSON. Single-file `check` emits one matching envelope plus whitespace.
+  - The approved analyse update decodes every envelope, preserves original per-file results, aggregates attributed entries, compares coverage against the recursive inventory, and halts with a structured report on invalid/incomplete output. Existing top-level entry fields remain available to consumers.
+  - Empty per-file findings do not prove inter-spec analysis. No CLI version or exit code was supplied with the examples; do not treat them as version-specific fixture or failure-path validation.
+  - `gybis-allium-check` remains unchanged. Its nonempty findings handling, severity mapping, and structured failures remain underspecified; directory support requires an explicit input-contract extension, not just a parsing change.
+- **synthesis**: Output framing is part of the adapter contract, independently of each object's schema. This lesson is recorded here; a separate memory update is a candidate for future approval. The older `allium-353-adapter-compatibility` memory remains historical and should not be read as proof that every adapter path is verified.
+- **validation**: Analyse skill editor diagnostics, procedure/frontmatter structure checks, and `git diff --check` passed. No executable parser was added, no real CLI fixture was run, and no end-to-end skill-runtime test was performed.
+- **next**:
+  1. Exercise the updated analyse skill with real multi-file clean and nonempty results, then malformed/truncated and missing/duplicate-file streams; verify consumers stop on structured analysis failure.
+  2. If directory support is requested for check, extend its file-only contract while preserving single-file callers and its error/warning/info semantics; also define findings and failure handling.
+  3. Revisit directory payload validation in `gybis-allium-runtime-check`, which still uses `validate_json` without explicit multi-envelope framing. It was not modified in this session.
+  4. Carry forward internal contract/reference checks before packaging, deferred-REQ stage-accounting exercises, remaining Allium adapter fixture validation, and first real-project `gr-elicit` use.
+- **recover**: Read `gybis/.agents/skills/internal/gybis-allium-analyse/SKILL.md` at `75a9173` and run the analyse stream/consumer exercises in next[1] before extending adapter contracts further.
+- **repository_status**: `main` at `75a9173`, one commit ahead of the locally recorded `origin/main`, before the closeout commit. Only `mementum/state.md` was modified; closeout stages `mementum/` and commits it. No push requested.
