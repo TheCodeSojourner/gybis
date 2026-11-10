@@ -7,14 +7,17 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
 λ gybis-spec-propagate(x).
   purpose: Propagate architecture and specifications to implementation and test suite
   | input: architecture.md ∃, specs/**/*.allium ∃ ∧ valid | optional scope: {domain_concern | domain | all_specs} (default: all_specs)
-  | output: Implementation code and test suite generated, consistent, passing, and spec-covered
+  | output: Implementation code and test suite generated, consistent, passing, and supported by complete obligation evidence
   | interaction: autonomous
-  | gate: architecture.md ∃ ∧ specs/**/*.allium ∃ ∧ gybis-allium-gate = true ∧ strict_spec_coverage = true
+  | gate: architecture.md ∃ ∧ specs/**/*.allium ∃ ∧ gybis-allium-gate = true ∧ obligation_evidence_complete = true
 
 λ gybis-spec-propagate_loop_role(x).
   role: take_action(spec_to_tests)
   | meaning: project behavior from spec into executable test contract
-  | coverage_policy: every spec obligation must become a traceable test; uncovered obligations halt propagation
+  | evidence_policy: ∀ active_behavioral_obligation → map(concrete_verification_artifact ∧ specific_assertion_or_observation)
+    ∧ verification_evidence_relevant_to(obligation) ∧ ¬sufficiency(label ∨ file_match ∨ unrelated_assertion ∨ aggregate_gate_alone)
+    ∧ ¬meaningfully_testable(obligation) → document(reason ∧ applicable_alternative_verification)
+    ∧ unclassified_or_unmapped(obligation) → unresolved ∧ halt_completion
   | suggested_next: review_generated_artifacts → invoke(/gybis-spec-weed)
 
 λ gybis-spec-propagate_scope(x).
@@ -223,7 +226,7 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
   | obligation.category = transition_edge
     → if ∃ paired ∈ obligations : paired.category = transition_rejected ∧ paired.source_construct = obligation.source_construct
         then emit(combined_guard_test) asserting(declared_edge_reachable_via_some_rule ∧ rules_cannot_produce_off_graph_transitions)
-              with(traceable_ids = {obligation.id, paired.id})
+              with(evidence_mappings = {obligation → relevant_assertions, paired → relevant_assertions})
         else emit(rule_exercise_test) asserting(declared_edge_reachable_via_some_rule)
   | obligation.category = transition_rejected
     → if ∃ paired ∈ obligations : paired.category = transition_edge ∧ paired.source_construct = obligation.source_construct
@@ -268,9 +271,11 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
       architecture_context.conventions,
       architecture_context.disallowed_patterns
     )
-  | each_emitted_test: traceable_id ≔ obligation.id
-  | fallback: ¬recognised_category → emit(coverage_test) with(diagnostic_marker)
-  | strict_rule: emitted_tests must be traceable back to obligation.id; if not, halt("Spec coverage traceability lost")
+  | each_emitted_test: map(obligation → test_case ∧ relevant_assertion_or_observation)
+  | fallback: ¬recognised_category → record(unresolved_obligation ∧ evidence_needed)
+    ∧ ¬emit(generic_coverage_test_as_sufficient_evidence)
+  | strict_rule: complete_only_if(each_active_behavioral_obligation_has_relevant_evidence ∨ documented_nonapplicability_with_alternative_verification)
+    ∧ otherwise(halt("Spec obligation evidence is incomplete"))
 
 λ gybis-spec-propagate_synthesize_code(architecture_context, specifications, obligations).
   ∀ spec ∈ specifications:
@@ -289,7 +294,7 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
   | propagate(orientation_guidance, into={implementation_code, test_suite})
   | ∀ obligation ∈ obligations:
     invoke(gybis-spec-propagate_obligation_synthesis(obligation, architecture_context)) → test_fragment
-      where: test_fragment.traceable_id = obligation.id
+    | associate(test_fragment ∧ specific_assertions_or_observations, obligation) → evidence_mapping
     | constrain(test_fragment,
         architecture_context.paradigm_preference,
         architecture_context.value_oriented_techniques,
@@ -299,7 +304,8 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
       ) → styled_test
     | organize(styled_test, architecture_context.test_framework) → organized_test
     | collect(organized_test) → test_suite
-  | return(implementation_code = structured_implementation, test_suite = test_suite)
+    | collect(evidence_mapping) → evidence_registry
+  | return(implementation_code = structured_implementation, test_suite = test_suite, evidence_registry = evidence_registry)
 
 λ gybis-spec-propagate_write_implementation(implementation_code, test_suite).
   organize(implementation_code) → grouped_by_module
@@ -312,7 +318,7 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
     | write(test_path, test_module) → upsert
   | return(code_generated = true)
 
-λ gybis-spec-propagate_verify_implementation(architecture_context, specifications, obligations).
+λ gybis-spec-propagate_verify_implementation(architecture_context, specifications, obligations, test_suite, evidence_registry).
   verify(code_conforms_to(specifications)) → conformance_check ≔ result
   | verify(code_respects_architecture(architecture_context)) → architecture_check ≔ result
   | verify(code_respects_paradigm_preference(architecture_context.paradigm_preference)) → paradigm_check ≔ result
@@ -320,13 +326,19 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
   | verify(code_respects_data_techniques(architecture_context.data_oriented_techniques)) → data_check ≔ result
   | verify(code_avoids(architecture_context.disallowed_patterns)) → anti_pattern_check ≔ result
   | ∀ obligation ∈ obligations:
-    verify(∃ test ∈ test_suite, test.traceable_id = obligation.id) → obligation_covered
-    | collect(obligation_covered) → coverage
-  | obligations_coverage_check ≔ ∀ c ∈ coverage, c = true
-  | strict_spec_coverage_check ≔ obligations_coverage_check = true ∧ test_suite.contains_no_unmapped_generated_tests = true
-  | conformance_check = true ∧ architecture_check = true ∧ paradigm_check = true ∧ value_check = true ∧ data_check = true ∧ anti_pattern_check = true ∧ strict_spec_coverage_check = true
+    verify(∃ evidence_mapping ∈ evidence_registry, relevant_to(evidence_mapping, obligation)
+      ∧ concrete_artifact(evidence_mapping) ∧ specific_assertion_or_observation(evidence_mapping))
+      ∨ verify(∃ alternative_verification ∈ evidence_registry,
+        documented_nonapplicability(alternative_verification, obligation)
+          ∧ applicable_alternative_verification(alternative_verification))
+      → obligation_has_evidence
+    | collect(obligation_has_evidence) → evidence_coverage
+  | obligation_evidence_complete ≔ ∀ evidence_coverage, evidence_coverage = true
+    ∧ test_suite.contains_no_unmapped_generated_tests = true
+    ∧ no_unclassified_or_unmapped_obligations
+  | conformance_check = true ∧ architecture_check = true ∧ paradigm_check = true ∧ value_check = true ∧ data_check = true ∧ anti_pattern_check = true ∧ obligation_evidence_complete = true
     → return(verification = true)
-  | ¬(conformance_check ∧ architecture_check ∧ paradigm_check ∧ value_check ∧ data_check ∧ anti_pattern_check ∧ strict_spec_coverage_check)
+  | ¬(conformance_check ∧ architecture_check ∧ paradigm_check ∧ value_check ∧ data_check ∧ anti_pattern_check ∧ obligation_evidence_complete)
     → return(verification = false)
 
 λ gybis-spec-propagate_resolve_test_command(architecture_context).
@@ -351,10 +363,10 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
   | transition(READING_SPECS → PLANNING_OBLIGATIONS)
   | invoke(gybis-spec-propagate_normalize_obligations(specifications)) → obligations
   | transition(PLANNING_OBLIGATIONS → SYNTHESIZING_CODE)
-  | invoke(gybis-spec-propagate_synthesize_code(architecture_context, specifications, obligations)) → (implementation_code, test_suite)
+  | invoke(gybis-spec-propagate_synthesize_code(architecture_context, specifications, obligations)) → (implementation_code, test_suite, evidence_registry)
   | invoke(gybis-spec-propagate_write_implementation(implementation_code, test_suite)) → code_generated
   | transition(SYNTHESIZING_CODE → VERIFYING)
-  | invoke(gybis-spec-propagate_verify_implementation(architecture_context, specifications, obligations)) → verification
+  | invoke(gybis-spec-propagate_verify_implementation(architecture_context, specifications, obligations, test_suite, evidence_registry)) → verification
   | include(orientation_output: architecture_context.orientation_guidance)
   | verification = true
     ? (transition(VERIFYING → RUNNING_TESTS)
@@ -395,13 +407,16 @@ description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
 λ gybis-spec-propagate_regression_contract(x).
   invariant: architecture.md ∃ ∧ scope_files ∃ ∧ scope_files ⊆ specs/**/*.allium ∧ ¬modify(architecture.md ∨ specs/**/*.allium) throughout
   | invariant: implementation ¬∃ at INIT ∧ ∃ ∧ consistent_with(specs, arch) at completion
-  | invariant: ∀ obligation ∈ obligations, obligation.id ∈ test_suite.traceable_ids at completion
+  | invariant: ∀ active_behavioral_obligation ∈ obligations, ∃ relevant(concrete_verification_artifact ∧ specific_assertion_or_observation) at completion
+  | invariant: ∀ documented_nonapplicability, reason ∧ applicable_alternative_verification ∃ at completion
+  | invariant: ∀ unclassified_or_unmapped_obligation, completion = blocked
 
 λ gybis-spec-propagate_deliver(x).
-  report: {obligations_total, tests_generated, implementation_status}
+  report: {obligations_total, evidence_mappings, documented_nonapplicability, unresolved_obligations, implementation_status}
   | handoff: run /gybis-spec-weed to verify spec-code alignment
   | return(complete = true)
-  | invariant: ∀ spec_construct ∈ specs, spec_construct.covered_by_at_least_one_test = true at completion
-  | invariant: ∀ generated_test ∈ test_suite, generated_test.traceable_id ∈ obligations.ids at completion
+  | invariant: ∀ active_behavioral_obligation ∈ obligations, evidence_mapping ∨ documented_nonapplicability_with_alternative_verification at completion
+  | invariant: ∀ evidence_mapping, artifact_and_specific_assertion_or_observation_relevant_to(obligation) at completion
+  | invariant: unresolved_obligations = ∅ at completion
   | invariant: test_suite_passes = true at completion (strict gate)
   | invariant: ¬complete_when_tests_fail
