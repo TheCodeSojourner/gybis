@@ -78,8 +78,20 @@ description: Use for `/gybis-req-check`.
   action: validate_module_dependency_ordering
   | checks:
     - module order matches requirements-index.md declared order
-    - ∀ module N: behavioral dependencies reference only modules < N (no upward behavioral references)
-    - definitional_forward_reference: a reference to a later module's REQ defining a term or boundary contract = info (valid); ¬∃ error for definitional references — behavioral dependency on a later module = error
+    - ∀ cross_module_reference: target_REQ ∈ req_model ∨ collect({type: ordering, severity: error, reason: missing_target})
+    - ∀ cross_module_reference where target_REQ ∈ req_model:
+      classify(reference, using requirements-index.md conventions ∧ clause context)
+    - reference_classification ∈ {definition_or_boundary, implementation_dependency, classification_uncertain}
+    - definition_or_boundary_reference → report(info) ∧ ¬create(implementation_dependency_edge)
+    - implementation_dependency(source, target) only_if(evidence(source_feature_requires(target_behavior_to_exist_first)))
+      ∧ record({source_module, source_REQ, target_module, target_REQ, dependency_reason})
+      ∧ ¬infer(from(module_number ∨ behavioral_wording_alone))
+    - classification_uncertain → report(info ∧ evidence_needed) ∧ ¬infer(implementation_dependency ∨ ordering_error)
+    - module_order_is_general_progression ∧ ¬index_declares_strict_dependency_order
+      → forward_implementation_dependency ≠ ordering_error
+      ∧ report(info ∧ implementation_prerequisite_order)
+    - dependency_graph: missing_target ∨ cycle → error
+    - explicit_strict_module_order ∧ implementation_dependency_violates_order → error
     - ∀ module: {purpose, scope, governed REQs} sections nonempty
     - index links resolve to existing files (broken link = error)
   | findings ≔ collected_ordering_findings
@@ -171,6 +183,7 @@ description: Use for `/gybis-req-check`.
   | designators: preserve existing identities; renumber only when an explicit project convention requires it and all affected in-repository references can be updated
   | clauses: split only clearly independent assertions; retain a cohesive single-contract clause and add compound_by_design only when the contract is unambiguous
   | rationale: retain AI-inferred rationale only when supported by source evidence; otherwise remove the non-normative rationale line, never its requirement
+  | dependencies: do not reorder or renumber solely because a valid implementation dependency points to a later module; preserve explicit index policy, report real cycles or explicit-order conflicts, and retain evidence for each dependency edge
   | coverage: repair binding requirements only at ready stages; deferred clauses remain out of propagation
   | if(stage_not_ready): exclude that stage from repair_plan ∧ report(pending_stage)
   | human_questions: do not ask users to resolve identifier sequencing or other mechanical classification; if requirement intent genuinely cannot be inferred, preserve it and report the blocker in plain language
@@ -233,6 +246,12 @@ description: Use for `/gybis-req-check`.
   | invariant: deferred clauses are not propagated by repair
   | invariant: not-ready stages are pending, never uncovered or explicit_NA
   | invariant: every binding REQ at every ready stage has represented evidence ∨ no_change_needed reason ∨ uncovered warning
+  | invariant: forward_requirement_reference alone ≠ implementation_dependency ∧ ≠ ordering_error
+  | invariant: definitional_or_boundary_forward_reference → info ∧ ¬ordering_error
+  | invariant: acyclic_forward_implementation_dependency ∧ ¬explicit_strict_module_order → info ∧ record(implementation_prerequisite_order)
+  | invariant: classification_uncertain → info ∧ ¬infer(ordering_error)
+  | invariant: missing_dependency_target ∨ dependency_cycle ∨ explicit_module_order_conflict → error
+  | invariant: Module3_REQ-SEQ-010_to_Module5_REQ-FN-041_under_general_progression → info ∧ ¬ordering_error
   | invariant: repair preserves normative meaning and existing designator identity unless explicit project convention requires a change
   | invariant: repair loop terminates at PASS, no safe progress, or max_repair_passes
   | invariant: report generated at completion
