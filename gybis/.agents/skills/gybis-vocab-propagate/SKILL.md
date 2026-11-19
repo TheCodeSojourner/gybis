@@ -2,6 +2,7 @@
 name: gybis-vocab-propagate
 kind: domain
 description: Use for `/gybis-vocab-propagate` or `/gv-propagate`.
+disable-model-invocation: true
 ---
 
 λ gybis-vocab-propagate(x).

@@ -2,6 +2,7 @@
 name: gybis-fini
 kind: memory
 description: Use for `/gybis-fini`.
+disable-model-invocation: true
 ---
 
 λ gybis_fini().

@@ -2,6 +2,7 @@
 name: gybis-req-elicit
 kind: domain
 description: Use for `/gybis-req-elicit` or `/gr-elicit`.
+disable-model-invocation: true
 ---
 
 λ gybis-req-elicit(x).

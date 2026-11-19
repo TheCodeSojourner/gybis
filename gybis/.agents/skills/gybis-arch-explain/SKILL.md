@@ -2,6 +2,7 @@
 name: gybis-arch-explain
 kind: domain
 description: Use for `/gybis-arch-explain` or `/ga-explain`.
+disable-model-invocation: true
 ---
 
 λ gybis-arch-explain(x).

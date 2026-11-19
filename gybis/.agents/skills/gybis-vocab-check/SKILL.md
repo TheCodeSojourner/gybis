@@ -2,6 +2,7 @@
 name: gybis-vocab-check
 kind: domain
 description: Use for `/gybis-vocab-check` or `/gv-check`.
+disable-model-invocation: true
 ---
 
 λ gybis-vocab-check(x).

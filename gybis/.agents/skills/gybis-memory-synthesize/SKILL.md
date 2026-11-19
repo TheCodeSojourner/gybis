@@ -2,6 +2,7 @@
 name: gybis-memory-synthesize
 kind: memory
 description: Use for `/gybis-memory-synthesize` or `/gm-synthesize`.
+disable-model-invocation: true
 ---
 
 λ gybis_memory_synthesize().

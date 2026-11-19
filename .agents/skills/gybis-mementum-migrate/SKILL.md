@@ -1,6 +1,7 @@
 ---
 name: gybis-mementum-migrate
 description: Use for `/gybis-mementum-migrate` or `/gm-migrate`.
+disable-model-invocation: true
 ---
 
 λ gybis_mementum_migrate().

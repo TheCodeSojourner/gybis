@@ -2,6 +2,7 @@
 name: gybis-help
 kind: help
 description: Use for `/gybis-help`.
+disable-model-invocation: true
 ---
 
 Print the following table directly in your response as rendered markdown. Do not wrap the table in a code fence — output it as plain markdown so it renders as a proper table. Do not describe the table or its contents, just output the table itself.

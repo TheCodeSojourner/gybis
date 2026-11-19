@@ -2,6 +2,7 @@
 name: gybis-arch-weed
 kind: domain
 description: Use for `/gybis-arch-weed` or `/ga-weed`.
+disable-model-invocation: true
 ---
 
 λ gybis-arch-weed(x).

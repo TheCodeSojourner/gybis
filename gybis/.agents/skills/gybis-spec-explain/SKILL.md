@@ -2,6 +2,7 @@
 name: gybis-spec-explain
 kind: domain
 description: Use for `/gybis-spec-explain` or `/gs-explain`.
+disable-model-invocation: true
 ---
 
 λ gybis-spec-explain(input_type, input_args).

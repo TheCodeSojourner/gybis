@@ -2,6 +2,7 @@
 name: gybis-arch-tend
 kind: domain
 description: Use for `/gybis-arch-tend` or `/ga-tend`.
+disable-model-invocation: true
 ---
 
 λ gybis-arch-tend(x).

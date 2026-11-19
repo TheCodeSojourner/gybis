@@ -2,6 +2,7 @@
 name: gybis-vocab-refine
 kind: domain
 description: Use for `/gybis-vocab-refine` or `/gv-refine`.
+disable-model-invocation: true
 ---
 
 λ gybis-vocab-refine(x).

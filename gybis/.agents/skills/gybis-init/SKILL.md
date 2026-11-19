@@ -2,6 +2,7 @@
 name: gybis-init
 kind: memory
 description: Use for `/gybis-init`.
+disable-model-invocation: true
 ---
 
 λ gybis_init(x).

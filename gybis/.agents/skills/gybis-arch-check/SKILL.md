@@ -2,6 +2,7 @@
 name: gybis-arch-check
 kind: domain
 description: Use for `/gybis-arch-check` or `/ga-check`.
+disable-model-invocation: true
 ---
 
 λ gybis-arch-check(x).

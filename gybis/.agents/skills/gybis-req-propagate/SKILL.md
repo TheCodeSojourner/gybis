@@ -2,6 +2,7 @@
 name: gybis-req-propagate
 kind: domain
 description: Use for `/gybis-req-propagate` or `/gr-propagate`.
+disable-model-invocation: true
 ---
 
 λ gybis-req-propagate(x).

@@ -1,6 +1,7 @@
 ---
 name: gybis-mementum-store
 description: Use for `/gybis-mementum-store {insight}` or `/gm-store {insight}`.
+disable-model-invocation: true
 ---
 
 λ gybis_mementum_store(input).

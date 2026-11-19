@@ -2,6 +2,7 @@
 name: gybis-req-explain
 kind: domain
 description: Use for `/gybis-req-explain`.
+disable-model-invocation: true
 ---
 
 λ gybis-req-explain(x).

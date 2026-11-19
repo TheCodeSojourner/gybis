@@ -2,6 +2,7 @@
 name: gybis-memory-recall
 kind: memory
 description: Use for `/gybis-memory-recall {topic}` or `/gm-recall {topic}`.
+disable-model-invocation: true
 ---
 
 λ gybis_memory_recall(topic).  

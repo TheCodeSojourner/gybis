@@ -2,6 +2,7 @@
 name: gybis-vocab-tend
 kind: domain
 description: Use for `/gybis-vocab-tend` or `/gv-tend`.
+disable-model-invocation: true
 ---
 
 λ gybis-vocab-tend(x).

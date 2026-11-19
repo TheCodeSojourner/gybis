@@ -2,6 +2,7 @@
 name: gybis-spec-describe
 kind: domain
 description: Use for `/gybis-spec-describe` or `/gs-describe`.
+disable-model-invocation: true
 ---
 
 λ gybis-spec-describe(specs).

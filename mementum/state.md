@@ -1,3 +1,4 @@
+🌀 session-50 | 2026-11-17 gybis-init: orientation complete; session-49 follow-ups reviewed
 ✅ session-49 | 2026-11-07 gybis-allium-analyse stream contract updated (75a9173); check file/directory output reviewed; check skill unchanged
 ✅ session-48 | 2026-11-04 default ASD-STE100 prose guidance added to both gybis-init skills (c3289e0)
 🌀 session-47 | 2026-11-04 gybis-init: orientation complete; session-46 follow-ups reviewed
@@ -43,10 +44,10 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-11-07T14:43:05-07:00
-- **Sessions**: 49 (session-0 initialized through session-49 closeout)
-- **Last session ID**: session-49
-- **Status**: Session-49 closeout — bundled `internal/gybis-allium-analyse` stream parsing and aggregation update is committed as `75a9173`. Reviewed user-supplied check output: directory mode streams per-file objects; single-file mode matches the existing check skill's input contract. Check skill unchanged. Only this state record is being committed at closeout; real CLI fixture and end-to-end skill-runtime validation remain open.
+- **Last updated**: 2026-11-17T14:04:36-07:00
+- **Sessions**: 50 (session-0 initialized through session-50 orientation)
+- **Last session ID**: session-50
+- **Status**: Session-50 orientation — session-49 analyse-stream work and its outstanding validation are loaded. The analyse adapter requires real clean and failure-path fixture exercises before extension; real Allium fixture, deferred-REQ, internal contract, and first-use `gr-elicit` follow-ups remain open.
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
@@ -634,3 +635,26 @@ Renamed `mementum/memories/human-owned-stage-readiness.md` → `mementum/memorie
   4. Carry forward internal contract/reference checks before packaging, deferred-REQ stage-accounting exercises, remaining Allium adapter fixture validation, and first real-project `gr-elicit` use.
 - **recover**: Read `gybis/.agents/skills/internal/gybis-allium-analyse/SKILL.md` at `75a9173` and run the analyse stream/consumer exercises in next[1] before extending adapter contracts further.
 - **repository_status**: `main` at `75a9173`, one commit ahead of the locally recorded `origin/main`, before the closeout commit. Only `mementum/state.md` was modified; closeout stages `mementum/` and commits it. No push requested.
+
+## Session Orientation (2026-11-17, session-50)
+- **phase**: `/gybis-init` startup gate complete; no implementation task supplied.
+- **state_read**: `mementum/state.md`
+- **memories_read**:
+  - `mementum/memories/stage-readiness-result-normalization.md`
+  - `mementum/memories/allium-353-adapter-compatibility.md`
+  - `mementum/memories/local-root-skill-subset.md`
+- **knowledge_read**:
+  - `mementum/knowledge/requirements-layer.md`
+  - `mementum/knowledge/skill-contract-system.md`
+  - `gybis/.agents/skills/internal/gybis-allium-analyse/SKILL.md` (recovery context)
+- **searches_run**:
+  - Worktree status and recent mementum commit history
+  - `git diff --name-only 15c48cb..HEAD -- mementum/memories mementum/knowledge`
+  - `(?i)(stale|superseded|open question|open item|pending|TODO|dormant|unverified|remains unverified)` in `mementum/`
+  - `analyse|stream|deferred|Allium|open|unverified|remains` in mementum memories and knowledge
+- **open_questions_acknowledged**:
+  - Exercise `gybis-allium-analyse` with clean and nonempty multi-file streams, then malformed, truncated, missing-file, and duplicate-file streams; verify consumers stop on structured analysis failure.
+  - Revisit multi-envelope payload validation in `gybis-allium-runtime-check` when adapter validation resumes.
+  - Directory support for `gybis-allium-check` is not approved; any future extension must preserve single-file callers and define findings and failure semantics.
+  - Carry forward internal contract/reference checks, deferred-REQ stage-accounting exercises, remaining Allium adapter fixture validation, and a first real-project `gr-elicit` use.
+- **repository_status**: Worktree was clean before this orientation record; no memory or knowledge files changed since the session-49 closeout. This orientation modifies only `mementum/state.md`.

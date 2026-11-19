@@ -2,6 +2,7 @@
 name: gybis-arch-propagate
 kind: domain
 description: Use for `/gybis-arch-propagate` or `/ga-propagate`.
+disable-model-invocation: true
 ---
 
 λ gybis-arch-propagate(x).

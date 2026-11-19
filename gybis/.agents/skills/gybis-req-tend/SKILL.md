@@ -2,6 +2,7 @@
 name: gybis-req-tend
 kind: domain
 description: Use for `/gybis-req-tend` or `/gr-tend`.
+disable-model-invocation: true
 ---
 
 λ gybis-req-tend(x).
