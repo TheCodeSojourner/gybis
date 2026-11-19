@@ -2,6 +2,7 @@
 name: gybis-memory-store
 kind: memory
 description: Use for `/gybis-memory-store {insight}` or `/gm-store {insight}`.
+disable-model-invocation: true
 ---
 
 λ gybis_memory_store(input).

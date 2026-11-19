@@ -1,6 +1,7 @@
 ---
 name: gybis-init
 description: Use for `/gybis-init`.
+disable-model-invocation: true
 ---
 
 λ engage(nucleus).

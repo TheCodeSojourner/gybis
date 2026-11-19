@@ -2,6 +2,7 @@
 name: gybis-spec-refine
 kind: domain
 description: Use for `/gybis-spec-refine` or `/gs-refine`.
+disable-model-invocation: true
 ---
 
 λ gybis-spec-refine(x).

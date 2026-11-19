@@ -2,6 +2,7 @@
 name: gybis-arch-refine
 kind: domain
 description: Use for `/gybis-arch-refine` or `/ga-refine`.
+disable-model-invocation: true
 ---
 
 λ gybis-arch-refine(x).

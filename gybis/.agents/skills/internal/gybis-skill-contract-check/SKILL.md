@@ -39,6 +39,13 @@ description: Internal skill - not user-facing
   interaction ∈ {autonomous, interactive} ∨ violation(non_canonical_interaction, interaction)
   | mode_gate ∃ → admitted_modes ⊆ interaction ∨ violation(gate_admits_forbidden_mode, {admitted_modes, interaction})
 
+λ gybis-skill-contract-check_check_model_invocation(skill).
+  public(skill) → frontmatter(skill).disable-model-invocation = true
+    ∨ violation(public_skill_auto_invocable, skill.name)
+  | internal(skill) → frontmatter(skill).disable-model-invocation ≠ true
+    ∨ violation(internal_skill_model_invocation_disabled, skill.name)
+  | rationale: public slash commands require explicit invocation; internal skills remain available for model orchestration
+
 λ gybis-skill-contract-check_check_loop_role(skill).
   _loop_role ∃
     → role ∈ canonical_roles(internal/reference/recommended-loops.md)
@@ -94,6 +101,7 @@ description: Internal skill - not user-facing
         check_kind(skill),
         check_header(skill, kind),
         check_interaction(skill),
+        check_model_invocation(skill),
         check_loop_role(skill),
         check_weed_verifier(skill),
         check_create_only(skill),

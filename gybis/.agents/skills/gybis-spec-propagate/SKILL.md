@@ -2,6 +2,7 @@
 name: gybis-spec-propagate
 kind: domain
 description: Use for `/gybis-spec-propagate` or `/gs-propagate`.
+disable-model-invocation: true
 ---
 
 λ gybis-spec-propagate(x).

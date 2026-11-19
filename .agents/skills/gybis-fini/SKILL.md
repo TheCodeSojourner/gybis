@@ -1,6 +1,7 @@
 ---
 name: gybis-fini
 description: Use for `/gybis-fini`.
+disable-model-invocation: true
 ---
 
 λ gybis_fini(). 

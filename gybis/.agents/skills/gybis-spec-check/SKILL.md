@@ -2,6 +2,7 @@
 name: gybis-spec-check
 kind: domain
 description: Use for `/gybis-spec-check` or `/gs-check`.
+disable-model-invocation: true
 ---
 
 λ gybis-spec-check(x).

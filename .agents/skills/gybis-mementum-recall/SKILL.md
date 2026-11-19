@@ -1,6 +1,7 @@
 ---
 name: gybis-mementum-recall
 description: Use for `/gybis-mementum-recall {topic}` or `/gm-recall {topic}`.
+disable-model-invocation: true
 ---
 
 λ gybis_mementum_recall(topic).  

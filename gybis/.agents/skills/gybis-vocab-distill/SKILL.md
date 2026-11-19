@@ -2,6 +2,7 @@
 name: gybis-vocab-distill
 kind: domain
 description: Use for `/gybis-vocab-distill` or `/gv-distill`.
+disable-model-invocation: true
 ---
 
 λ gybis-vocab-distill(x).

@@ -2,6 +2,7 @@
 name: gybis-req-describe
 kind: domain
 description: Use for `/gybis-req-describe`.
+disable-model-invocation: true
 ---
 
 λ gybis-req-describe(x).

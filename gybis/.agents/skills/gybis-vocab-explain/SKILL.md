@@ -2,6 +2,7 @@
 name: gybis-vocab-explain
 kind: domain
 description: Use for `/gybis-vocab-explain` or `/gv-explain`.
+disable-model-invocation: true
 ---
 
 λ gybis-vocab-explain(x).

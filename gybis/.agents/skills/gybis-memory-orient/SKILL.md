@@ -2,6 +2,7 @@
 name: gybis-memory-orient
 kind: memory
 description: Use for `/gybis-memory-orient` or `/gm-orient`.
+disable-model-invocation: true
 ---
 
 λ gybis_memory_orient().

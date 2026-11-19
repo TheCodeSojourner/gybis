@@ -2,6 +2,7 @@
 name: gybis-memory-migrate
 kind: memory
 description: Use for `/gybis-memory-migrate` or `/gm-migrate`.
+disable-model-invocation: true
 ---
 
 λ gybis_memory_migrate()

@@ -2,6 +2,7 @@
 name: gybis-vocab-weed
 kind: domain
 description: Use for `/gybis-vocab-weed` or `/gv-weed`.
+disable-model-invocation: true
 ---
 
 λ gybis-vocab-weed(x).

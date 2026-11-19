@@ -2,6 +2,7 @@
 name: gybis-spec-weed
 kind: domain
 description: Use for `/gybis-spec-weed` or `/gs-weed`.
+disable-model-invocation: true
 ---
 
 λ gybis-spec-weed(x).

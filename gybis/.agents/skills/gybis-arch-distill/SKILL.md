@@ -2,6 +2,7 @@
 name: gybis-arch-distill
 kind: domain
 description: Use for `/gybis-arch-distill` or `/ga-distill`.
+disable-model-invocation: true
 ---
 
 λ gybis-arch-distill(x).

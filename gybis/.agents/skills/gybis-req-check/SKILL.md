@@ -2,6 +2,7 @@
 name: gybis-req-check
 kind: domain
 description: Use for `/gybis-req-check`.
+disable-model-invocation: true
 ---
 
 λ gybis-req-check(x).

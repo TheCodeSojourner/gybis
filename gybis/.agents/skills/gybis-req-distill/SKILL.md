@@ -2,6 +2,7 @@
 name: gybis-req-distill
 kind: domain
 description: Use for `/gybis-req-distill` or `/gr-distill`.
+disable-model-invocation: true
 ---
 
 λ gybis-req-distill(x).

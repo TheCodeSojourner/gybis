@@ -2,6 +2,7 @@
 name: gybis-spec-distill
 kind: domain
 description: Use for `/gybis-spec-distill` or `/gs-distill`.
+disable-model-invocation: true
 ---
 
 λ gybis-spec-distill(x).
