@@ -46,9 +46,9 @@
 
 ## Working Memory
 - **Last updated**: 2026-11-24
-- **Sessions**: 52 (session-0 initialized through session-52 orientation)
-- **Last session ID**: session-52
-- **Status**: Session-52 implementation — session-51 context and current worktree state are loaded. The requirements-architecture-boundary plan is implemented across Mementum knowledge, startup/recall orientation, full-repository orchestration skills, domain boundaries, and command documentation. Analyse-stream, Allium fixture, deferred-REQ, internal contract, and first-use `gr-elicit` follow-ups remain open.
+- **Sessions**: 53 (session-0 initialized through session-53 closeout)
+- **Last session ID**: session-53
+- **Status**: Session-53 closeout — current-plan plan-fidelity audit completed across unstaged/untracked distributed gybis-* skills. Check, repair, propagation, orientation, and Lambda procedures were reconciled; commit/push remain blocked until separate human approval.
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
@@ -741,3 +741,21 @@ Renamed `mementum/memories/human-owned-stage-readiness.md` → `mementum/memorie
 - Added architecture propagation requirements/vocabulary source context and specification source derivation checks.
 - Corrected refine/weed tool guards for low-risk and human-approved writes.
 - Fixed the contract checker’s spec-check exception so Allium-verifier skills are not treated as general deterministic/semantic repair skills.
+
+## Session Closeout (2026-11-24, session-53)
+- **task**: Analyze `current-plan.md` against every unstaged/untracked distributed `gybis-*` SKILL.md and correct plan-fidelity gaps.
+- **questions**:
+  - Commit/push approval remains required before Git actions.
+  - Exercise real Allium, deferred-REQ, internal-contract, and first-use `gr-elicit` follow-ups remain open.
+- **decisions**:
+  - `/gybis-check` stops downstream checks after an upstream failure and reports pending stages.
+  - Every check applies deterministic repairs automatically and prepares bounded semantic repairs for approval.
+  - Architecture propagation derives specs from applicable requirements, vocabulary, and architecture.
+  - Spec source derivation is checked alongside Allium validation.
+  - Refine and weed remain within their domain/adjacent-boundary tool guards.
+- **next**:
+  1. Run repository contract/reference and available test checks after human approval.
+  2. Exercise `example/` duplicate and terminology-drift fixtures.
+  3. Continue Allium stream, deferred-REQ, and first-use `gr-elicit` validation.
+- **recover**: Read `current-plan.md`, then inspect `gybis/.agents/skills/gybis-check/SKILL.md`, the four domain check skills, and `gybis/.agents/skills/internal/gybis-skill-contract-check/SKILL.md`.
+- **repository_status**: Worktree had no staged or modified gybis skill files at closeout inspection; `current-plan.md` and `example/` remained untracked. No commit or push was performed.
