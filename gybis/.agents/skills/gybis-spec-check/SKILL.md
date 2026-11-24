@@ -158,10 +158,25 @@ disable-model-invocation: true
   invoke(internal/gybis-allium-check(scope_files)) → result_check ≔ result
   | invoke(internal/gybis-allium-analyse(scope_root)) → result_analyse ≔ result
   | invoke(internal/gybis-allium-gate(scope_root)) → result_gate ≔ result
-  | result_check = zero_errors ∧ result_analyse = zero_issues ∧ result_gate = true
+  | invoke(gybis-spec-check_source_derivation(parse_specs(scope_files))) → derivation_result ≔ result
+  | derivation_result.errors = 0
+  | result_check = zero_errors ∧ result_analyse = zero_issues ∧ result_gate = true ∧ derivation_result.errors = 0
     → return(verification = true)
   | ¬(result_check ∧ result_analyse ∧ result_gate)
     → return(verification = false)
+
+λ gybis-spec-check_source_derivation(spec_model).
+  source_derivation_findings ≔ []
+  ∀ spec_entry ∈ spec_model:
+    entry.trace ∈ {requirements, vocabulary, architecture}
+      ∨ append(source_derivation_findings, {type: "source_derivation", severity: warning, message: "Specification obligation lacks a requirements/vocabulary/architecture source"})
+  | if(requirements/ ∃): every binding requirement with architecture-distinct effect or specification relevance must have resolvable spec evidence or an explicit no_change_needed reason
+  | if(vocabulary.md ∃): every canonical term must map unambiguously to lower-layer representation
+  | if(architecture.md ∃): every enforceable architecture constraint relevant to the spec must be represented or explicitly marked no-change-needed
+  | obligation coverage: Allium-generated obligations → test obligations ∋ 1:1 coverage
+  | findings ≔ source_derivation_findings
+  | errors ≔ count(findings where severity = error)
+  | return({status: errors = 0 ? "PASS" : "FAIL", errors, findings})
 
 λ gybis-spec-check_fixed_point_loop(state).
   state = ANALYZING_SET

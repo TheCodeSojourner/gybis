@@ -31,6 +31,17 @@ Reverse (brownfield): `spec-distill` → `arch-distill` → `vocab-distill` → 
 - Attribution footer per clause: `{source: stakeholder_decided | AI_researched_fact, decided_by, refs}`.
 - Requirements are binding by default. Only clauses in explicitly marked non-binding sections, deferred by stakeholder decision, are deferred; downstream absence never implies deferral.
 
+## Canonical layer model
+
+- Requirements are stakeholder-facing behavior and use exact canonical vocabulary terms.
+- Vocabulary contains canonical terms for user-facing concepts only.
+- Architecture complements requirements with engineering mechanisms, responsibilities, protocols, resource controls, tooling, structure, and component boundaries. It must not restate requirement behavior.
+- Specs derive from requirements, vocabulary, and applicable architecture constraints.
+- Tests cover 100% of Allium-generated specification obligations.
+- Code implements specs, follows architecture, and passes 100% of tests.
+- Lower layers may change spelling or representation, such as snake_case or PascalCase, only when meaning remains canonical and unambiguous.
+- Engineering choices that change observable behavior require an approved requirements change.
+
 ## Command family (`/gr-*`)
 
 | Command        | Role                                                                                                                  |
@@ -47,7 +58,7 @@ Reverse (brownfield): `spec-distill` → `arch-distill` → `vocab-distill` → 
 
 ## Boundaries (inherited gybis rules)
 
-- `req-check` is read-only until one explicit repair-plan approval, then may run a bounded, scoped repair loop through owning skills. Other semantic checks remain read-only; `spec-check` repairs only under the external Allium verifier.
+- `check` skills apply deterministic repairs automatically and prepare bounded semantic repairs for approval. `req-check` applies deterministic repairs automatically and runs semantic repairs only within one approved repair plan. `spec-check` repairs only under the external Allium verifier. `arch-check` and `vocab-check` keep repairs within their own artifacts, with semantic repairs approved before application.
 - `req-propagate` may bootstrap `vocabulary.md` when absent and append candidate terms; vocabulary skills own it after bootstrap.
 - Stage readiness is developer-owned. A binding REQ can lead downstream stages; a stage is ready when its artifact exists and its owner check reports no errors. Otherwise report `pending_stage`, not uncovered or deferred.
 - At each ready stage, every binding REQ is accounted for as `represented` with evidence, `no_change_needed` with a reason, or uncovered. Explicitly deferred REQs are excluded from propagation and coverage; no persistent ledger is created.

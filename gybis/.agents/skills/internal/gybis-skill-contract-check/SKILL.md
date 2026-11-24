@@ -20,11 +20,14 @@ description: Internal skill - not user-facing
 λ gybis-skill-contract-check_expected_kind(skill_name).
   matches(name, gybis-(arch|req|spec|vocab)-*) → domain
   | matches(name, gybis-memory-*) ∨ name ∈ {gybis-fini, gybis-init} → memory
+  | name ∈ {gybis-check, gybis-refine, gybis-weed} → domain
   | name = gybis-help → help
 
 λ gybis-skill-contract-check_action(skill_name).
   suffix ≔ strip_prefix(name, gybis-(arch|req|spec|vocab)-)
   | suffix ∈ {check, refine, tend, weed, distill, propagate, describe, explain, elicit}
+  | skill_name ∈ {gybis-check, gybis-refine, gybis-weed}
+    → suffix ≔ strip_prefix(skill_name, gybis-)
 
 λ gybis-skill-contract-check_check_kind(skill).
   declared ≔ frontmatter(skill).kind
@@ -56,6 +59,18 @@ description: Internal skill - not user-facing
   action(skill.name) = weed
     → ∀ artifact ∈ writable(skill.tool_guard): verifier ∃ for artifact
     ∨ violation(weeder_without_verifier, unverified_artifacts)
+
+λ gybis-skill-contract-check_check_check_repairs(skill).
+  action(skill.name) = check ∧ skill.name = gybis-spec-check
+    → body(skill) contains("verifier")
+      ∧ body(skill) contains("VERIFYING")
+      ∧ body(skill) contains("gybis-allium-gate")
+      ∨ violation(check_repair_policy_missing, skill.name)
+  | action(skill.name) = check
+    → body(skill) contains("deterministic")
+      ∧ body(skill) contains("semantic")
+      ∧ (body(skill) contains("re-run") ∨ body(skill) contains("VERIFYING"))
+      ∨ violation(check_repair_policy_missing, skill.name)
 
 λ gybis-skill-contract-check_create_only(skill_name).
   action(skill_name) = distill → true | rationale: distill always creates a layer from the layers below
@@ -89,7 +104,7 @@ description: Internal skill - not user-facing
   kind ≠ domain → true
   | -- describe/explain use _boundary() (singular, output-scoped) by design, not _boundaries()
     action(skill.name) ∈ {describe, explain} → _boundary() ∃ ∨ violation(output_boundary_missing, skill.name)
-  | -- all other domain skills need both blocks, including read-only ones (arch-check ∧ vocab-check carry them)
+  | -- all other domain skills need both blocks
     action(skill.name) ∉ {describe, explain} → _boundaries() ∃ ∧ _regression_contract() ∃
       ∨ violation(writing_skill_without_contract, {boundaries_present, regression_contract_present})
 
@@ -104,6 +119,7 @@ description: Internal skill - not user-facing
         check_model_invocation(skill),
         check_loop_role(skill),
         check_weed_verifier(skill),
+        check_check_repairs(skill),
         check_create_only(skill),
         check_absence_spelling(skill),
         check_reference_use(skill),

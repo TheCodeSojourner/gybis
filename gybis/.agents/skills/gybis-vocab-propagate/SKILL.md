@@ -70,6 +70,11 @@ disable-model-invocation: true
   action: synthesize_vsm_layers_from_requirements_and_vocabulary
   | step1: canonicalize_terms(binding_req_clauses, vocabulary_terms) → normalized_clauses
     -- vocabulary drives terminology: every term emitted into architecture.md uses its canonical form
+  | step0: architecture_complement_filter(normalized_clauses)
+    - architecture may add engineering mechanisms, responsibilities, protocols, resource controls, tooling, structure, and component boundaries
+    - architecture must not restate requirement behavior
+    - engineering choices that change observable behavior require an approved requirements update
+    - architecture-only terms remain outside vocabulary.md
   | step2: classify(normalized_clauses, vsm_layer) → layer_assignments
     - S5: identity, non-negotiable principles, policy boundaries
     - S4: adaptation, environmental response, learning

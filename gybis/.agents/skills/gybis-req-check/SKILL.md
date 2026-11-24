@@ -31,7 +31,7 @@ disable-model-invocation: true
   | precondition_holds: mode = interactive
 
 λ gybis-req-check_state_machine(state, action).
-  state ∈ {INIT, STARTUP_CHECKS, DESIGNATOR_VALIDATION, ORDERING_VALIDATION, CLAUSE_VALIDATION, COVERAGE_VALIDATION, TRACEABILITY_VALIDATION, GENERATING_REPORT, REPAIR_OFFER, REPAIR_PLANNING, APPLYING_REPAIRS, VERIFYING_REPAIRS, COMPLETE}
+  state ∈ {INIT, STARTUP_CHECKS, DESIGNATOR_VALIDATION, ORDERING_VALIDATION, CLAUSE_VALIDATION, COVERAGE_VALIDATION, TRACEABILITY_VALIDATION, GENERATING_REPORT, APPLYING_DETERMINISTIC_REPAIRS, REPAIR_OFFER, REPAIR_PLANNING, APPLYING_REPAIRS, VERIFYING_REPAIRS, COMPLETE}
   | INIT: repair_passes ≔ 0 ∧ repair_authorized ≔ false ∧ repair_progress ≔ true
   | transition(INIT → STARTUP_CHECKS) only_if(startup = true)
   | transition(STARTUP_CHECKS → DESIGNATOR_VALIDATION) only_if(startup_checks = true)
@@ -40,6 +40,9 @@ disable-model-invocation: true
   | transition(CLAUSE_VALIDATION → COVERAGE_VALIDATION) only_if(clause_checks_complete = true)
   | transition(COVERAGE_VALIDATION → TRACEABILITY_VALIDATION) only_if(coverage_checks_complete = true)
   | transition(TRACEABILITY_VALIDATION → GENERATING_REPORT) only_if(traceability_checks_complete = true)
+  | transition(GENERATING_REPORT → APPLYING_DETERMINISTIC_REPAIRS) only_if(report_generated = true ∧ deterministic_findings ∃)
+  | transition(APPLYING_DETERMINISTIC_REPAIRS → VERIFYING_REPAIRS) only_if(deterministic_repairs_complete = true)
+  | transition(VERIFYING_REPAIRS → REPAIR_PLANNING) only_if(report_status ≠ "PASS" ∧ semantic_findings ∃)
   | transition(GENERATING_REPORT → REPAIR_PLANNING) only_if(report_generated = true ∧ actionable_findings ∃)
   | transition(GENERATING_REPORT → COMPLETE) only_if(report_generated = true ∧ actionable_findings = ∅)
   | transition(REPAIR_PLANNING → COMPLETE) only_if(repair_plan_ready = false ∨ repair_plan.paths = ∅ ∨ repair_progress = false)
@@ -54,11 +57,13 @@ disable-model-invocation: true
 
 λ gybis-req-check_tool_guard(state, tool, path).
   allow(read(path))
+  | state = APPLYING_DETERMINISTIC_REPAIRS ∧ path ∈ deterministic_repair_paths
+    → allow(write(path)) only_if(change = deterministic)
   | state = APPLYING_REPAIRS ∧ human_approved = true ∧ path ∈ repair_plan.paths ∧ path ∈ approval_scope
     → allow(write(path))
   | otherwise → deny(write(path))
   | repair_plan.paths ⊆ {requirements/, vocabulary.md, architecture.md, specs/, test_paths}
-  | rationale: diagnosis stays read-only; writes require explicit approval and must be in the bounded repair plan
+  | rationale: deterministic repairs are automatic; semantic repairs require explicit approval and remain within the bounded repair plan
 
 λ gybis-req-check_pre_tool_check(state, tool, path).
   tool_guard(state, tool, path) = true ∨ halt("Tool not permitted in state " ⊕ state)
@@ -108,6 +113,9 @@ disable-model-invocation: true
     - deferred sections marked and non-binding — marker: section heading containing "(Deferred" or deferred blockquote opener
     - compound_by_design: marker must appear in the clause footer ∧ be declared by human approval via /gybis-req-tend (¬silent lint suppression)
     - rationale: lines are non-normative and optional — ¬error(absence); a rationale: line containing normative operators (∀/¬/∃) as obligations = error (rationale must record intent, not impose constraints)
+    - vocabulary: if vocabulary.md ∃, every user-facing term in the requirement must match a canonical vocabulary term exactly; synonym, spelling, acronym, or representation drift = error
+    - engineering concern: implementation mechanism, resource control, tooling choice, or component boundary = architecture concern unless the requirement demonstrably changes observable stakeholder behavior
+    - observable engineering choice: if an engineering choice changes observable behavior, route to /gybis-req-tend for explicit requirement approval
   | findings ≔ collected_clause_findings (atomicity/deferred = warning ∨ info; malformed lambda = error)
   | return(clause_checks_complete = true ∧ findings)
 
@@ -180,6 +188,10 @@ disable-model-invocation: true
 
 λ gybis-req-check_repair_policy(findings).
   action: build_conservative_repair_plan
+  | deterministic_findings ≔ findings where repair changes formatting, derived footers, duplicate whitespace, or another mechanically reversible representation without changing normative meaning
+  | semantic_findings ≔ findings where repair may change atomicity, designator identity, clause meaning, dependencies, attribution, or requirement disposition
+  | apply(deterministic_findings) automatically in state APPLYING_DETERMINISTIC_REPAIRS
+  | prepare(semantic_findings) as bounded repair_plan ∧ request(human approval)
   | authority: explicit project requirements and requirements-index.md > generic checker heuristics
   | designators: preserve existing identities; renumber only when an explicit project convention requires it and all affected in-repository references can be updated
   | clauses: split only clearly independent assertions; retain a cohesive single-contract clause and add compound_by_design only when the contract is unambiguous
@@ -233,17 +245,18 @@ disable-model-invocation: true
   | return(report_generated = true ∧ report)
 
 λ gybis-req-check_boundaries().
-  ¬ modify(unless human_approved = true ∧ state = APPLYING_REPAIRS)
-  | modify(only paths ∈ repair_plan.paths)
+  deterministic_repairs: modify mechanical requirements findings automatically
+  | semantic_repairs: modify only when human_approved = true ∧ state = APPLYING_REPAIRS ∧ path ∈ repair_plan.paths ∧ path ∈ approval_scope
   | ¬ modify(implementation ∨ upstream/ ∨ skill_files)
   | ¬ delete(requirements/)
 
 λ gybis-req-check_regression_contract(x).
   invariant: requirements/ ∃ throughout
-  | invariant: all diagnosis before approval is read-only
-  | invariant: no repair writes without human_approved = true
-  | invariant: all repair writes ⊆ repair_plan.paths
-  | invariant: all repair writes ⊆ approval_scope
+  | invariant: diagnosis is read-only until deterministic repair classification completes
+  | invariant: deterministic repairs require no semantic approval
+  | invariant: deterministic repair writes require change = deterministic
+  | invariant: semantic repair writes require human_approved = true
+  | invariant: semantic repair writes ⊆ repair_plan.paths ∧ approval_scope
   | invariant: deferred clauses are not propagated by repair
   | invariant: not-ready stages are pending, never uncovered or explicit_NA
   | invariant: every binding REQ at every ready stage has represented evidence ∨ no_change_needed reason ∨ uncovered warning

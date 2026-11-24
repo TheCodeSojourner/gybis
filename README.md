@@ -44,6 +44,8 @@ These operations form the core gybis convergence loop:
 - `tend` evolves one layer with explicit human intent and keeps the change localized.
 - `weed` reconciles drift between adjacent layers and the implementation so the system converges again.
 
+> **Full-Repository Commands:** `/gybis-check` executes domain checks in requirements → vocabulary → architecture → specs order. `/gybis-refine` executes domain refine skills in the same order. `/gybis-weed` executes adjacent-layer weed skills in requirements/vocabulary → vocabulary/architecture → architecture/specs → specs/tests/code order. Check stays within its own domain, tend changes only requested domain content, refine preserves meaning while optimizing structure or AI precision, and weed crosses only an approved adjacent boundary.
+
 They work top-down: requirements constrain vocabulary, vocabulary constrains architecture, architecture constrains specs, and specs constrain tests and code. `check` finds drift and structural issues, and its findings nominate the next move: `refine` polishes local structure, `tend` makes intended layer-local changes, and `weed` resolves disagreement when two artifacts no longer agree.
 
 | Operation | Purpose                                         | Human role                                               | Typical outcome                    |
@@ -85,7 +87,7 @@ Set this expectation before you start: the same gybis command, run twice against
 
 The command families behave differently on repeat:
 
-- `check`, `describe`, and `explain` are read-only with respect to your durable layers, so they can be rerun freely.
+- `check` applies deterministic repairs within its own domain, prepares bounded semantic repairs for approval, and re-runs the owning check. `describe` and `explain` read durable layers and emit response or markdown output only.
 - `distill` and `propagate` are bootstrap commands. They are gated on their target artifact *not* existing, so once the artifact exists a rerun halts by design instead of overwriting your work.
 - `refine`, `tend`, and `weed` are the iterative loops. They are gated on the artifact existing and are meant to be run repeatedly.
 
@@ -156,6 +158,14 @@ Requirements are the top layer of the stack: dependency-ordered module files con
 | `/gybis-spec-refine` (`/gs-refine`)                              | Refine specs structure & clarity                |
 | `/gybis-spec-tend` (`/gs-tend`)                                  | Update specs with impact analysis               |
 | `/gybis-spec-weed` (`/gs-weed`)                                  | Resolve divergence between specs and code       |
+
+### Full-Repository Commands
+
+| Command          | Description                                                                                           |
+| ---------------- | ----------------------------------------------------------------------------------------------------- |
+| `/gybis-check`   | Check requirements, vocabulary, architecture, and specs in layer order                                |
+| `/gybis-refine`  | Refine requirements, vocabulary, architecture, and specs in layer order                               |
+| `/gybis-weed`    | Weed requirements/vocabulary, vocabulary/architecture, architecture/specs, and specs/tests/code boundaries |
 
 ### Memory Commands (`/gm-*`)
 

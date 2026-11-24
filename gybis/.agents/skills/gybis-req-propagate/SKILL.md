@@ -64,6 +64,8 @@ disable-model-invocation: true
 
 λ gybis-req-propagate_match_spec_clauses(reqs, vocab_content, arch_content, spec_content, test_content, stage_checks).
   action: classify_requirement_scope_and_compute_per_stage_dispositions
+  | vocabulary_precision: requirement clause bodies use exact canonical terms from vocabulary.md; lower-layer spelling changes are representation-only and preserve meaning
+  | architecture_boundary: detect engineering-only content and route it to architecture or an approved requirements change without silently restating behavior
   | deferred_REQs ≔ clauses in explicitly marked non-binding sections
   | binding_REQs ≔ all clauses ∖ deferred_REQs
   | downstream_stages ≔ {vocabulary, architecture, specs, tests_and_implementation}

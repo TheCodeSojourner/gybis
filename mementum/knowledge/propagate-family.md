@@ -57,3 +57,13 @@ it, never from a layer above (`spec-distill` → `arch-distill` → `vocab-disti
 `seeded_from: requirements/`) and appends terms only when present. The invariant
 narrows from "only vocab skills write `vocabulary.md`" to "vocab skills own
 `vocabulary.md` after bootstrap".
+
+## Cross-domain responsibilities
+
+- Check validates and repairs only its own domain; it re-runs its owning check after repair.
+- Tend applies only an explicitly requested change in one domain and re-runs the owning check.
+- Refine optimizes one domain after integrity validation; user-facing requirements/vocabulary and AI-facing architecture/specs use their respective clarity/precision scopes.
+- Weed resolves only at adjacent boundaries: requirements/vocabulary, vocabulary/architecture, architecture/specs, and specs/tests/code.
+- Propagate moves top-down to the required lower layer; distill moves bottom-up to the owned higher layer.
+- Architecture entries link to supporting requirements only when a supporting requirement exists.
+- Architecture-only terms remain outside `vocabulary.md`.

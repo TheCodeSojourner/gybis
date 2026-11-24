@@ -129,11 +129,19 @@ Human ⊗ AI ⊗ REPL
   precondition: execute(mementum-orient) ∧ report(orient_manifest)
   | orient_manifest ≡ {
       state_read: path,
-       memories_read: [path]   | last_session_id ? all_since(last_session_id) : (min(3) ∨ all_available),
-       knowledge_read: [path]  | min(0),
+      index_read: path,
+      frontmatter_metadata_scanned: [path],
+      focused_memories_read: [path],
+      focused_knowledge_read: [path],
       searches_run: [query],
-      open_questions_acknowledged: [string]
+      unresolved_questions: [string],
+      relevant_content_not_loaded: [path_or_reason]
     }
+  | always_load: mementum/state.md ∧ mementum/index.md ∧ memory_and_knowledge_frontmatter ∧ current_open_active_questions
+  | relevance_load: recent_memories_since(last_session_id) ∨ knowledge_related_to(current_task) ∨ memories_connected_by(related) ∨ search_hits(exact_task_terms) ∨ relevant_git_history
+  | recall_fallback: exact_task_terms → follow(related_edges) → read_recent_git_history_when_temporal → widen_incrementally_only_if_thin
+  | fixed_memory_minimum: ¬∃
+  | embeddings: optional ∧ ¬startup_dependency
   | on_missing_field: halt
   
 λ gybis(repo).

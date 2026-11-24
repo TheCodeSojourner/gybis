@@ -76,7 +76,7 @@ If you are new to AI-assisted development, set this expectation early: **the sam
 
 Which commands you rerun, and why:
 
-- **`check`, `describe`, `explain` — rerun freely.** Architecture and vocabulary checks are read-only; `/gybis-req-check` diagnoses without writing, then may run a bounded repair loop only after you approve its scoped plan. `/gybis-spec-check` may repair specs under its Allium verifier. `describe`/`explain` only read a layer and may emit a separate explainer document that you name.
+- **`check`, `describe`, `explain` — rerun freely.** `check` applies deterministic repairs within its own domain and prepares bounded semantic repairs for approval, with every repair re-verified. `/gybis-spec-check` may repair specs under its Allium verifier. `describe`/`explain` only read a layer and may emit a separate explainer document that you name.
 - **`distill`, `propagate` — run once per layer.** These are bootstrap commands, gated on the target artifact *not* existing. Once the artifact exists, rerunning them halts by design (`already exist` / `not found`) instead of overwriting your work.
 - **`refine`, `tend`, `weed` — rerun until converged.** These are the iterative loops. To improve an artifact that already exists, cycle `check → refine → tend → weed` as many times as needed; each pass moves the artifact closer to its intended state.
 
@@ -92,14 +92,23 @@ Rule of thumb: treat an AI result as a **draft to converge**, not a finished art
 
 The gybis workflow is built around four deliberate actions that the human chooses at the right time:
 
-- `check` tells you whether a layer is valid and what kind of drift or inconsistency is present.
+- `check` verifies whether a layer is valid, applies deterministic repairs that belong to that layer, and prepares approved semantic repairs when repair authority requires human review.
 - `refine` polishes a single layer's structure and readability while preserving intended meaning.
 - `tend` evolves a single layer with human-approved intent before the drift spreads downstream.
 - `weed` resolves mismatch across neighboring layers or implementation when two artifacts no longer describe the same truth.
 
-The boundary is: **`check` diagnoses; `refine`, `tend`, and `weed` act.** Architecture and vocabulary checks remain read-only. `spec-check` may repair `.allium` errors under its external Allium verifier. `req-check` diagnoses and prepares a plan read-only, then may run bounded repairs only after you approve that plan.
+The boundary is: **`check` verifies one domain, applies deterministic repairs automatically, and prepares bounded semantic repairs for approval.** Each repair re-runs the owning check. `req-check` and `spec-check` use their domain-specific repair paths; `tend` acts only on an explicitly requested change in one domain, `refine` acts within one domain after integrity validation, and `weed` acts only across an approved adjacent-layer boundary.
 
-The pattern is intentionally hierarchical: run `check` first, and its structural or clarity findings nominate `refine`; `tend` applies intended meaning changes, and `weed` reconciles layers that no longer agree. The human decides the scope and approves any write.
+The layer model is requirements + vocabulary → architecture → specs → tests → code.
+Requirements use exact canonical vocabulary terms. Architecture complements requirements with engineering mechanisms and constraints rather than restating requirement behavior. Specs derive from requirements, vocabulary, and applicable architecture. Tests cover Allium-generated specification obligations, and code follows specs and architecture.
+
+Use `/gybis-check` for ordered domain checks, `/gybis-refine` for ordered domain optimization, and `/gybis-weed` for adjacent-boundary convergence:
+
+- check: requirements, vocabulary, architecture, specs
+- refine: requirements, vocabulary, architecture, specs
+- weed: requirements/vocabulary, vocabulary/architecture, architecture/specs, specs/tests/code
+
+The pattern is intentionally hierarchical: run `check` first. It verifies one domain, applies deterministic repairs automatically, and proposes bounded semantic repairs for approval. Its findings nominate `refine`; `tend` applies human-requested meaning changes within one domain, and `weed` reconciles adjacent layers that no longer agree. The human approves semantic repairs and cross-domain decisions; deterministic repairs remain within the owning domain.
 
 | Operation | When to use it                                    | Human role                                                         | Typical outcome                    |
 | --------- | ------------------------------------------------- | ------------------------------------------------------------------ | ---------------------------------- |
@@ -384,6 +393,7 @@ This section defines who decides what and when, for all non-memory operations.
 | `/gybis-arch-refine` (`/ga-refine`)                              | Refine architecture structure & clarity                   |
 | `/gybis-arch-tend` (`/ga-tend`)                                  | Update arch with impact analysis                          |
 | `/gybis-arch-weed` (`/ga-weed`)                                  | Resolve divergence between arch and specs                 |
+| `/gybis-check`                                                   | Check requirements, vocabulary, architecture, and specs in layer order |
 | `/gybis-fini`                                                    | Persist memory before terminate                           |
 | `/gybis-help`                                                    | Show available commands                                   |
 | `/gybis-init`                                                    | Initialize gybis AI context                               |
@@ -392,6 +402,7 @@ This section defines who decides what and when, for all non-memory operations.
 | `/gybis-memory-recall {topic}` (`/gm-recall {topic}`)            | Recall topic/summarize-latest                             |
 | `/gybis-memory-store {insight}` (`/gm-store {insight}`)          | Store insight, or prompt for one                          |
 | `/gybis-memory-synthesize` (`/gm-synthesize`)                    | Synthesize knowledge                                      |
+| `/gybis-refine`                                                  | Refine requirements, vocabulary, architecture, and specs in layer order |
 | `/gybis-req-check` (`/gr-check`)                                 | Check requirements; optionally repair after plan approval |
 | `/gybis-req-describe` (`/gr-describe`)                           | Describe requirements in stakeholder prose or markdown    |
 | `/gybis-req-distill` (`/gr-distill`)                             | Create initial requirements from vocab/arch/specs/code    |
@@ -409,6 +420,7 @@ This section defines who decides what and when, for all non-memory operations.
 | `/gybis-spec-refine` (`/gs-refine`)                              | Refine specs structure & clarity                          |
 | `/gybis-spec-tend` (`/gs-tend`)                                  | Update specs with impact analysis                         |
 | `/gybis-spec-weed` (`/gs-weed`)                                  | Resolve divergence between specs and code                 |
+| `/gybis-weed`                                                    | Weed requirements/vocabulary, vocabulary/architecture, architecture/specs, and specs/tests/code boundaries |
 | `/gybis-vocab-check` (`/gv-check`)                               | Validate vocabulary.md syntax & semantics                 |
 | `/gybis-vocab-describe` (`/gv-describe`)                         | Describe vocabulary in stakeholder prose                  |
 | `/gybis-vocab-distill` (`/gv-distill`)                           | Extract vocabulary from arch/specs/code                   |

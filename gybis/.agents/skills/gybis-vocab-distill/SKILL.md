@@ -169,6 +169,9 @@ disable-model-invocation: true
   | ¬ modify(specs/)
   | ¬ modify(implementation_root/)
   | ¬ delete(vocabulary.md)
+  | reject(architecture-only terms)
+  | keep only canonical user-facing concepts
+  | preserve systematic lower-layer representation without changing meaning
 
 λ gybis-vocab-distill_regression_contract(x).
   invariant: vocabulary.md ∃ at completion

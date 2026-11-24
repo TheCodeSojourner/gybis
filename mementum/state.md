@@ -1,3 +1,4 @@
+🌀 session-51 | 2026-11-24 gybis-init: orientation complete; session-50 follow-ups reviewed
 🌀 session-50 | 2026-11-17 gybis-init: orientation complete; session-49 follow-ups reviewed
 ✅ session-49 | 2026-11-07 gybis-allium-analyse stream contract updated (75a9173); check file/directory output reviewed; check skill unchanged
 ✅ session-48 | 2026-11-04 default ASD-STE100 prose guidance added to both gybis-init skills (c3289e0)
@@ -44,10 +45,10 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-11-17T14:04:36-07:00
-- **Sessions**: 50 (session-0 initialized through session-50 orientation)
-- **Last session ID**: session-50
-- **Status**: Session-50 orientation — session-49 analyse-stream work and its outstanding validation are loaded. The analyse adapter requires real clean and failure-path fixture exercises before extension; real Allium fixture, deferred-REQ, internal contract, and first-use `gr-elicit` follow-ups remain open.
+- **Last updated**: 2026-11-24
+- **Sessions**: 52 (session-0 initialized through session-52 orientation)
+- **Last session ID**: session-52
+- **Status**: Session-52 implementation — session-51 context and current worktree state are loaded. The requirements-architecture-boundary plan is implemented across Mementum knowledge, startup/recall orientation, full-repository orchestration skills, domain boundaries, and command documentation. Analyse-stream, Allium fixture, deferred-REQ, internal contract, and first-use `gr-elicit` follow-ups remain open.
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
@@ -138,7 +139,7 @@
   - Ran targeted searches for vocab-weed handoff hints and divergence-object contract references
   - Prepared orient manifest required by `session_startup_gate`
 - Session-26 (2026-06-30): gybis-arch-check implemented
-  - Added `gybis/.agents/skills/gybis-arch-check/SKILL.md` as a read-only architecture integrity validator
+  - Added `gybis/.agents/skills/gybis-arch-check/SKILL.md` as an architecture integrity validator. [AMENDED — plan-aligned repairs now allow deterministic domain-local fixes and bounded approved semantic repairs.]
   - Updated command surfaces in `gybis-help`, `README.md`, and `gybis/GYBIS-README.md`
   - Kept check/resolve boundary consistent: diagnostics in check, resolution in tend/weed skills
   - Stored synthesis memory: `mementum/memories/arch-check-integrity-boundary.md`
@@ -241,7 +242,7 @@
   - Pattern adopted from branch-example/requirements (cljonic): dependency-ordered modules + index, deferred non-binding sections, REQ-to-test traceability; clause granularity made configurable (library-contract vs application).
   - gr-elicit based on mattpocock/skills grilling protocol (frontier rounds, recommended answers, empty-frontier termination) plus decided-vs-researched attribution.
   - gr-distill emits vocabulary term candidates handed to /gybis-vocab-tend; gybis-vocab-distill now lists requirements/ as a source; vocabulary.md never written by req skills. [SUPERSEDED — see memories/distill-input-direction.md: direction reversed to vocab → req; vocab-distill no longer reads requirements/, req-distill now reads vocabulary.md.]
-  - Boundaries preserved: check read-only diagnostics; strict test-pass convergence in propagate/weed; describe/explain session-16 output modes. [AMENDED — see memories/check-boundary-verifier-exception.md: spec-check is now the documented exception, permitted to repair because the allium CLI verifies it.]
+  - Boundaries preserved: check applies the plan's deterministic/approved-semantic repair policy; strict test-pass convergence in propagate/weed; describe/explain session-16 output modes. [AMENDED — see memories/check-boundary-verifier-exception.md.]
 - **next**:
   1. Run gr-elicit against a real project to refine round/transcription heuristics.
   2. Define the recommended default domain-prefix set for requirements-index.md.
@@ -400,7 +401,7 @@
   - New: should the root local subset (`.agents/skills/`) adopt the contract fields (`kind`/`purpose`/`interaction`), or stay in the older local format per `local-root-skill-subset`?
 - **decisions**:
   - Invocation authorizes the writes a command defines; distill/propagate persist autonomously, reviewed afterwards via check/weed; only unrequested writes are prohibited.
-  - Check diagnoses; refine/tend/weed act; spec-check is the sole repair exception because an external deterministic oracle (`gybis-allium-gate`) verifies it.
+  - Check applies deterministic repairs and prepares bounded semantic repairs for approval; spec-check may additionally repair under the external Allium oracle (`gybis-allium-gate`); refine/tend/weed act within their defined scopes.
   - Skill `mode` splits into `interaction {autonomous, interactive}` (+ `output_mode` for describe/explain); ai/auto/mixed/auto_polish/supervised retired.
   - Build the enforcement mechanism before the taxonomy it polices; declare only `kind`, derive mutates/verifier/authority.
   - Internal Allium adapters namespace as `gybis-allium-*` to end collision with the external `allium` CLI.
@@ -526,10 +527,10 @@ Renamed `mementum/memories/human-owned-stage-readiness.md` → `mementum/memorie
 - **repository_status**: `main` at `081dfa7`, clean and aligned with `origin/main`; session-44's commits (`6b9cdc8`, `8e2002e`) are now pushed and followed by three 2026-10-01 doc commits. This orientation modifies only `mementum/state.md`.
 
 ## Session-45 Addendum (2026-10-01): approved req-check repair workflow
-- Upserted `gybis/.agents/skills/gybis-req-check/SKILL.md`: interactive diagnosis remains read-only until one repair-plan approval, then runs a bounded three-pass check/repair/verify loop within the initially approved path scope.
+- Upserted `gybis/.agents/skills/gybis-req-check/SKILL.md`: the check applies deterministic repairs automatically, then requests one repair-plan approval for semantic repairs and runs a bounded check/repair/verify loop within the approved path scope. [PLAN-ALIGNED]
 - Repair defaults preserve project requirements and existing designator identity, exclude explicitly deferred clauses from active coverage, avoid low-level human questions, and report unresolved semantic conflicts without guessing.
 - The current `gybis-req-propagate` contract cannot scope coverage work away from deferred clauses; req-check blocks that repair group when deferred clauses exist. A companion propagate update needs separate approval.
-- `requirements-layer.md`, `skill-contract-system.md`, and `check-boundary-verifier-exception.md` still describe checks as read-only (except spec-check); reconcile those records after human approval.
+- `requirements-layer.md`, `skill-contract-system.md`, and `check-boundary-verifier-exception.md` describe the pre-plan check boundary; reconciled to the plan-aligned deterministic/approved-semantic repair policy in the current session.
 - Validation: editor diagnostics reported no errors; `git diff --check` passed for the skill change.
 
 ## Session-45 Addendum (2026-10-01): REQ-only deferral and stage accounting
@@ -558,7 +559,7 @@ Renamed `mementum/memories/human-owned-stage-readiness.md` → `mementum/memorie
   - Carried: real Allium 3.5.3 adapter fixture validation; first real-project `gr-elicit` exercise; historical `branch-example/` deferral/rationale/collision decisions remain dormant while the fixtures are absent; root-local skill subset remains intentionally separate.
 - **decisions**:
   - Only REQs can be explicitly deferred; all requirements bind by default. Stage readiness is separate, with computed `represented`, `no_change_needed`, `uncovered`, or `pending_stage` dispositions and no persistent ledger.
-  - `/gybis-req-check` diagnoses read-only, requests one scoped repair-plan approval, then runs a bounded repair loop through owning skills. `req-tend` is the only path to change binding/deferred status; plain-language targeting does not require a REQ designator.
+  - `/gybis-req-check` applies deterministic repairs automatically, requests one scoped repair-plan approval for semantic repairs, then runs a bounded repair loop through owning skills. `req-tend` is the only path to change binding/deferred status; plain-language targeting does not require a REQ designator.
   - Validator outputs are normalized at readiness boundaries. Weed `investigate`/`skip` outcomes remain unresolved and finish with an explicit `unresolved` status rather than being reported as convergence.
   - A reusable Mementum insight on normalizing heterogeneous validator results was approved and added as `memories/stage-readiness-result-normalization.md`.
 - **next**:
@@ -636,6 +637,29 @@ Renamed `mementum/memories/human-owned-stage-readiness.md` → `mementum/memorie
 - **recover**: Read `gybis/.agents/skills/internal/gybis-allium-analyse/SKILL.md` at `75a9173` and run the analyse stream/consumer exercises in next[1] before extending adapter contracts further.
 - **repository_status**: `main` at `75a9173`, one commit ahead of the locally recorded `origin/main`, before the closeout commit. Only `mementum/state.md` was modified; closeout stages `mementum/` and commits it. No push requested.
 
+## Session Orientation (2026-11-24, session-51)
+- **phase**: `/gybis-init` startup gate complete; no implementation task supplied.
+- **state_read**: `mementum/state.md`
+- **memories_read**:
+  - `mementum/memories/stage-readiness-result-normalization.md`
+  - `mementum/memories/allium-353-adapter-compatibility.md`
+  - `mementum/memories/local-root-skill-subset.md`
+- **knowledge_read**:
+  - `mementum/knowledge/requirements-layer.md`
+  - `mementum/knowledge/skill-contract-system.md`
+  - `gybis/.agents/skills/internal/gybis-allium-analyse/SKILL.md` (recovery context)
+- **searches_run**:
+  - Worktree status and recent Mementum commit history
+  - `git diff --name-only 15c48cb..HEAD -- mementum/memories mementum/knowledge`
+  - `(?i)(stale|superseded|open question|open item|pending|TODO|dormant|unverified|remains unverified)` in `mementum/`
+  - `analyse|stream|deferred|Allium|open|unverified|remains` in mementum memories and knowledge
+- **open_questions_acknowledged**:
+  - Exercise `gybis-allium-analyse` with clean and nonempty multi-file streams, then malformed, truncated, missing-file, and duplicate-file streams; verify consumers stop on structured analysis failure.
+  - Revisit multi-envelope payload validation in `gybis-allium-runtime-check` when adapter validation resumes.
+  - Directory support for `gybis-allium-check` is not approved; any future extension must preserve single-file callers and define findings and failure semantics.
+  - Carry forward internal contract/reference checks, deferred-REQ stage-accounting exercises, remaining Allium adapter fixture validation, and a first real-project `gr-elicit` use.
+- **repository_status**: Worktree was clean on `main` aligned with `origin/main` before this orientation record; no memory or knowledge files changed since the session-49 closeout. This orientation modifies only `mementum/state.md`.
+
 ## Session Orientation (2026-11-17, session-50)
 - **phase**: `/gybis-init` startup gate complete; no implementation task supplied.
 - **state_read**: `mementum/state.md`
@@ -658,3 +682,62 @@ Renamed `mementum/memories/human-owned-stage-readiness.md` → `mementum/memorie
   - Directory support for `gybis-allium-check` is not approved; any future extension must preserve single-file callers and define findings and failure semantics.
   - Carry forward internal contract/reference checks, deferred-REQ stage-accounting exercises, remaining Allium adapter fixture validation, and a first real-project `gr-elicit` use.
 - **repository_status**: Worktree was clean before this orientation record; no memory or knowledge files changed since the session-49 closeout. This orientation modifies only `mementum/state.md`.
+
+## Session Orientation (2026-11-24, session-52)
+- **phase**: `/gybis-init` startup gate complete; no implementation task supplied.
+- **state_read**: `mementum/state.md`
+- **memories_read**:
+  - `mementum/memories/stage-readiness-result-normalization.md`
+  - `mementum/memories/allium-353-adapter-compatibility.md`
+  - `mementum/memories/local-root-skill-subset.md`
+- **knowledge_read**:
+  - `mementum/knowledge/requirements-layer.md`
+  - `mementum/knowledge/skill-contract-system.md`
+- **searches_run**:
+  - Current branch, worktree status, recent mementum history
+  - Recent Allium and requirements follow-up context in `mementum/state.md`
+- **open_questions_acknowledged**:
+  - Exercise `gybis-allium-analyse` with clean and nonempty multi-file streams, then malformed, truncated, missing-file, and duplicate-file streams; verify consumers stop on structured analysis failure.
+  - Revisit multi-envelope payload validation in `gybis-allium-runtime-check` when adapter validation resumes.
+  - Directory support for `gybis-allium-check` is not approved; future extension must preserve single-file callers and define findings and failure semantics.
+  - Carry forward internal contract/reference checks, deferred-REQ stage-accounting exercises, remaining Allium adapter fixture validation, and first real-project `gr-elicit` use.
+- **repository_status**: Branch `requirements-architecture-boundary` with existing edits to `gybis/.agents/skills/gybis-help/SKILL.md`, `mementum/state.md`, and untracked `current-plan.md` and `example/`; no implementation task changed these files. Root and bundled skill trees remain intentionally separate.
+
+## Session-52 Implementation Update
+- **task**: Implement the requirements-architecture-boundary plan for the distributable bundle.
+- **decisions**:
+  - Canonical model synchronized: requirements + vocabulary → architecture → specs → tests → code.
+  - `/gybis-check`, `/gybis-refine`, and `/gybis-weed` created with ordered or adjacent-boundary scopes.
+  - Startup orientation replaces fixed memory-count loading with state/index/frontmatter always-load plus exact-term/related-link relevance loading.
+  - Existing domain checks now diagnose exact terminology, architecture complementarity, and 1:1 Allium-obligation test coverage.
+- **validation**:
+  - New skill frontmatter passes; startup fixed-minimum text is absent; manifest fields and command documentation are present.
+  - `git diff --check` passes.
+- **next**:
+  1. Run repository-specific contract/reference checks when an executable checker becomes available.
+  2. Exercise example/ deliberate duplicate and terminology-drift fixtures.
+  3. Complete outstanding Allium stream and first-use follow-ups.
+
+## Session-52 Plan-Truth Repair Addendum
+- All three domain check skills now follow the plan: deterministic repairs apply automatically; semantic repairs require bounded human approval and re-run the owning check.
+- `/gybis-req-check` applies deterministic repairs automatically and uses a one-approval bounded plan for semantic repairs.
+- `/gybis-arch-check` and `/gybis-vocab-check` apply deterministic repairs only within their own artifacts and prepare semantic repairs for approval.
+- `/gybis-spec-check` retains the external Allium-verifier repair exception.
+- Stale read-only descriptions in command docs and Mementum contract records were reconciled to the plan.
+
+## Session-52 Architecture-Check Lambda Update
+- Upserted `gybis/.agents/skills/gybis-arch-check/SKILL.md` with explicit autonomous/interactive mode handling, deterministic/semantic repair classification, bounded approval paths, fixed-point verification, and a three-pass repair guard.
+
+## Session-52 Distributed-Skill Lambda Upsert
+- Audited every `gybis/.agents/skills/gybis-*/SKILL.md` file.
+- Existing domain, requirement, vocabulary, architecture, specification, distill, propagate, tend, refine, weed, and describe/explain skills retain Nucleus Lambda procedure blocks.
+- Upserted weak Lambda coverage in help, closeout, memory orient/recall/store/synthesize, and repository-wide check/refine/weed skills.
+- Added AI-precision state machines, tool guards, fixed-point or boundary guards, pass accounting, and canonical absence handling where these procedures were missing.
+
+## Session-52 Plan-Fidelity Audit
+- Audited unstaged/untracked `gybis-*` SKILL.md files against `current-plan.md`.
+- Corrected `/gybis-check` to stop at upstream failures and report pending downstream stages.
+- Corrected requirement, architecture, and vocabulary check repair boundaries so deterministic repairs are automatic and semantic repairs remain bounded and approval-gated.
+- Added architecture propagation requirements/vocabulary source context and specification source derivation checks.
+- Corrected refine/weed tool guards for low-risk and human-approved writes.
+- Fixed the contract checker’s spec-check exception so Allium-verifier skills are not treated as general deterministic/semantic repair skills.

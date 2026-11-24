@@ -5,6 +5,16 @@ description: Use for `/gybis-help`.
 disable-model-invocation: true
 ---
 
+λ gybis-help(x).
+  purpose: render the canonical skill command table without narrative or transformation
+  | input: none
+  | output: exact_rendered_markdown_table
+  | interaction: autonomous
+  | gate: table_present = true
+  | invariant: output = byte_exact(markdown_table_below)
+  | invariant: preamble = ∅ ∧ postamble = ∅ ∧ code_fence = ∅
+  | execute: print(markdown_table_below) → stdout
+
 Print the following table directly in your response as rendered markdown. Do not wrap the table in a code fence — output it as plain markdown so it renders as a proper table. Do not describe the table or its contents, just output the table itself.
 
 CRITICAL CONSTRAINTS:
@@ -22,6 +32,7 @@ CRITICAL CONSTRAINTS:
 | `/gybis-arch-propagate` (`/ga-propagate`) | Create initial specs from arch |
 | `/gybis-arch-tend` (`/ga-tend`) | Update arch with impact analysis |
 | `/gybis-arch-weed` (`/ga-weed`) | Resolve divergence between arch and specs |
+| `/gybis-check` | Execute req, vocab, arch, and spec checks in layer order |
 | `/gybis-fini` | Persist memory before terminate |
 | `/gybis-init` | Initialize gybis AI context |
 | `/gybis-memory-migrate` (`/gm-migrate`) | Migrate Mementum store to current format |
@@ -29,6 +40,7 @@ CRITICAL CONSTRAINTS:
 | `/gybis-memory-recall {topic}` (`/gm-recall {topic}`) | Recall topic/summarize-latest |
 | `/gybis-memory-store {insight}` (`/gm-store {insight}`) | Store insight |
 | `/gybis-memory-synthesize` (`/gm-synthesize`) | Synthesize knowledge |
+| `/gybis-refine` | Refine req, vocab, arch, and spec domains in layer order |
 | `/gybis-req-check` (`/gr-check`) | Check requirements and stage coverage; optional repair after plan approval |
 | `/gybis-req-describe` (`/gr-describe`) | Describe requirements in stakeholder prose |
 | `/gybis-req-distill` (`/gr-distill`) | Create initial requirements from vocab/arch/specs/code |
@@ -52,3 +64,4 @@ CRITICAL CONSTRAINTS:
 | `/gybis-vocab-propagate` (`/gv-propagate`) | Create initial architecture from req + vocab |
 | `/gybis-vocab-tend` (`/gv-tend`) | Update vocabulary with impact analysis |
 | `/gybis-vocab-weed` (`/gv-weed`) | Resolve divergence between vocab and downstream |
+| `/gybis-weed` | Weed adjacent domain boundaries in layer order |

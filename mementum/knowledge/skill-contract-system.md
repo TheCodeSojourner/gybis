@@ -55,7 +55,10 @@ Retired interaction tokens: `ai`, `auto`, `mixed`, `auto_polish`, `supervised`.
 
 `check` normally diagnoses; `refine`/`tend`/`weed` act. `spec-check` may repair
 autonomously only because a deterministic external oracle (`gybis-allium-gate`)
-must pass before COMPLETE. `req-check` is a separate human-authorized exception:
-it remains read-only through diagnosis and plan preparation, then may run a
-bounded repair loop after one explicit approval, within that approved scope and
-through the owning skills. `arch-check` and `vocab-check` remain read-only.
+must pass before COMPLETE. For every check skill, apply deterministic repairs
+automatically, prepare bounded semantic repairs for approval, re-run the owning
+check, and do not inspect nearby domains. `req-check` keeps semantic repairs
+within one approved repair plan and one explicit approval. It may also apply
+deterministic repairs automatically. `arch-check` and `vocab-check` apply
+deterministic repairs within their own artifact and require approval for
+semantic repairs.

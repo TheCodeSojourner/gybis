@@ -18,6 +18,10 @@ disable-model-invocation: true
   | verify(architecture.md ∃) ∨ halt("architecture.md not found")
   | verify(specs/**/*.allium ¬∃) ∨ halt("specs/**/*.allium already exist")
   | if(vocabulary.md ∃): preload(vocabulary.md) → vocab_terms ∧ vocab_loaded = true
+  | if(requirements/ ∃): preload(requirements/) → req_content ∧ req_loaded = true
+  | req_loaded = true ∧ binding_requirements_present(req_content) = true
+      ? verify(vocabulary_mapping(req_content, vocab_terms)) → req_vocab_mapping_valid
+      : req_vocab_mapping_valid ≔ true
   | transition(INIT → STARTUP_CHECKS)
 
 λ gybis-arch-propagate_mode(m).
@@ -65,7 +69,13 @@ disable-model-invocation: true
   | gaps: missing(programming_language_version ∨ paradigm_preference) → explicit_gap_report
   | orthogonality: error_model_style is a separate axis from FP/OOP orientation
 
-λ gybis-arch-propagate_translate_to_specs(architecture, vocab_loaded, vocab_terms).
+λ gybis-arch-propagate_translate_to_specs(architecture, vocab_loaded, vocab_terms, req_loaded, req_content).
+  | input_evidence: req_loaded = true → read(requirements/) → requirements_model
+  | input_evidence: vocabulary_model ≔ vocab_terms if vocab_loaded = true else ∅
+  | source_check: read(requirements/) if present
+  | source_check: retain only architecture constraints that affect interfaces, structure, implementation, or enforceable engineering constraints
+  | source_check: discard requirement restatement as duplicate behavior
+  | source_check: every retained directive has one canonical vocabulary mapping or an explicit architecture-only term mapping
   ∀ layer ∈ architecture.vsm_layers:
     ∀ principle ∈ architecture.principles(layer):
       normalized_principle ≔ principle
@@ -97,7 +107,7 @@ disable-model-invocation: true
 λ gybis-arch-propagate_core_op(x).
   transition(READING_ARCH → TRANSLATING)
   | invoke(gybis-arch-propagate_read_architecture) → architecture
-  | invoke(gybis-arch-propagate_translate_to_specs(architecture, vocab_loaded, vocab_terms)) → spec_directives
+  | invoke(gybis-arch-propagate_translate_to_specs(architecture, vocab_loaded, vocab_terms, req_loaded, req_content)) → spec_directives
   | transition(TRANSLATING → WRITING_SPECS)
   | invoke(gybis-arch-propagate_write_specs(spec_directives)) → specs_written
   | transition(WRITING_SPECS → VERIFYING)
