@@ -60,8 +60,8 @@ Reverse (brownfield): `spec-distill` → `arch-distill` → `vocab-distill` → 
 
 - `check` skills apply deterministic repairs automatically and prepare bounded semantic repairs for approval. `req-check` applies deterministic repairs automatically and runs semantic repairs only within one approved repair plan. `spec-check` repairs only under the external Allium verifier. `arch-check` and `vocab-check` keep repairs within their own artifacts, with semantic repairs approved before application.
 - `req-propagate` may bootstrap `vocabulary.md` when absent and append candidate terms; vocabulary skills own it after bootstrap.
-- Stage readiness is developer-owned. A binding REQ can lead downstream stages; a stage is ready when its artifact exists and its owner check reports no errors. Otherwise report `pending_stage`, not uncovered or deferred.
-- At each ready stage, every binding REQ is accounted for as `represented` with evidence, `no_change_needed` with a reason, or uncovered. Explicitly deferred REQs are excluded from propagation and coverage; no persistent ledger is created.
+- Stage readiness is developer-owned. A binding REQ can lead downstream stages; a stage is ready when its artifact exists and its owner check reports no errors. Otherwise report `pending_stage`, not uncovered.
+- At each ready stage, every binding REQ is accounted for as `represented` with evidence, `no_change_needed` with a reason, or uncovered. No persistent ledger is created.
 - Code/test-affecting commands require `test_suite_passes = true` before COMPLETE.
 - `describe`/`explain` use the session-16 output-mode convention.
 

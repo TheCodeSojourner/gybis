@@ -35,11 +35,10 @@ more durable than the layer below.
 Greenfield chain: `/gybis-req-elicit` → `/gybis-req-propagate` →
 `/gybis-vocab-propagate` → `/gybis-arch-propagate` → `/gybis-spec-propagate`.
 
-Only requirements may be explicitly deferred. `req-propagate` excludes those
-REQs from vocabulary seeding and downstream annotations. Binding REQs may lead
-later stages; absent or invalid downstream artifacts are reported as pending,
-not as implicit deferral. `vocab-propagate` likewise excludes deferred REQs
-when deriving the initial architecture.
+Every REQ recorded in `requirements/` is binding. `req-propagate` seeds vocabulary
+terms and computes dispositions for ready downstream stages. Absent or invalid
+downstream artifacts are reported as `pending_stage`, not as implicit deferral.
+`vocab-propagate` derives the initial architecture from all requirements.
 
 ## Direction symmetry
 
