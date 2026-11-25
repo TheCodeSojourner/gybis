@@ -29,6 +29,7 @@ CRITICAL CONSTRAINTS:
 | `/gybis-arch-describe` (`/ga-describe`) | Describe arch in stakeholder prose |
 | `/gybis-arch-distill` (`/ga-distill`) | Create initial arch from specs |
 | `/gybis-arch-explain` (`/ga-explain`) | Explain arch in dev prose |
+| `/gybis-arch-migrate` (`/ga-migrate`) | Migrate legacy architecture without requirement duplication |
 | `/gybis-arch-propagate` (`/ga-propagate`) | Create initial specs from arch |
 | `/gybis-arch-tend` (`/ga-tend`) | Update arch with impact analysis |
 | `/gybis-arch-weed` (`/ga-weed`) | Resolve divergence between arch and specs |

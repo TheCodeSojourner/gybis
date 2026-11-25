@@ -324,6 +324,7 @@ Requirements, vocabulary, and architecture describe system-level constraints tha
 
 - **Constrain top-down.** Architecture governs specification, tests, and code, not the reverse.
 - **Governance flow:** Requirements, vocabulary, architecture, specification, tests, and implementation must remain aligned.
+- **Legacy migration:** `/gybis-arch-migrate` (`/ga-migrate`) is a one-time interactive migration for existing architectures that duplicate requirements. It proposes exact architecture-only changes for approval and leaves requirements, vocabulary, specifications, tests, and implementation unchanged. Routine architecture evolution continues through `/gybis-arch-tend`, `/gybis-arch-refine`, `/gybis-arch-check`, and `/gybis-arch-weed`.
 
 ---
 
@@ -390,6 +391,7 @@ This section defines who decides what and when, for all non-memory operations.
 | `/gybis-arch-describe` (`/ga-describe`)                          | Describe arch in stakeholder prose or markdown            |
 | `/gybis-arch-distill` (`/ga-distill`)                            | Create initial arch from specs                            |
 | `/gybis-arch-explain` (`/ga-explain`)                            | Explain arch in dev prose or markdown                     |
+| `/gybis-arch-migrate` (`/ga-migrate`)                            | Migrate legacy architecture without requirement duplication |
 | `/gybis-arch-propagate` (`/ga-propagate`)                        | Create initial specs from arch                            |
 | `/gybis-arch-refine` (`/ga-refine`)                              | Refine architecture structure & clarity                   |
 | `/gybis-arch-tend` (`/ga-tend`)                                  | Update arch with impact analysis                          |

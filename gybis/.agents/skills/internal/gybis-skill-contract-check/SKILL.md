@@ -24,8 +24,8 @@ description: Internal skill - not user-facing
   | name = gybis-help → help
 
 λ gybis-skill-contract-check_action(skill_name).
-  suffix ≔ strip_prefix(name, gybis-(arch|req|spec|vocab)-)
-  | suffix ∈ {check, refine, tend, weed, distill, propagate, describe, explain, elicit}
+  suffix ≔ strip_prefix(skill_name, gybis-(arch|req|spec|vocab)-)
+  | suffix ∈ {check, refine, tend, weed, distill, propagate, migrate, describe, explain, elicit}
   | skill_name ∈ {gybis-check, gybis-refine, gybis-weed}
     → suffix ≔ strip_prefix(skill_name, gybis-)
 
