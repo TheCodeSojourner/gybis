@@ -1,3 +1,4 @@
+✅ session-60 | 2026-11-25 merged `feature/requirements-stage-dispositions` into `main` and deleted the feature branch
 ✅ session-59 | 2026-11-25 completed the consolidated `/gybis-arch-migrate` review and developer-prose summary
 ✅ session-58 | 2026-11-25 added the one-time `/gybis-arch-migrate` migration skill and synchronized command surfaces
 ✅ session-57 | 2026-11-25 README split and stage-disposition closeout; root README reduced, GYBIS-README retained as detailed usage guide
@@ -52,9 +53,9 @@
 
 ## Working Memory
 - **Last updated**: 2026-11-25
-- **Sessions**: 59 (session-0 initialized through session-59 closeout)
-- **Last session ID**: session-59
-- **Status**: Session-59 closeout — completed the consolidated `/gybis-arch-migrate` contract and developer-prose description. The skill uses span-level findings, separate approval groups, dry-run output, architecture-only writes, scope snapshots, terminal outcomes, idempotency, and renewed-approval-only correction handling. The `example/` directory remains untouched and untracked.
+- **Sessions**: 60 (session-0 initialized through session-60 closeout)
+- **Last session ID**: session-60
+- **Status**: Session-60 closeout — merged `feature/requirements-stage-dispositions` into `main` as merge commit `04d08ef2019e6050a12def3f673fd9236832f9cd`; the feature branch was deleted. The `example/` directory remains untouched and untracked.
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
@@ -818,3 +819,18 @@ Renamed `mementum/memories/human-owned-stage-readiness.md` → `mementum/memorie
   3. Leave `example/` untouched until the operator chooses to remove it.
 - **recover**: Read `mementum/knowledge/requirements-layer.md` and `mementum/memories/propagate-seed-then-own.md`; then inspect `gybis/.agents/skills/gybis-arch-migrate/SKILL.md`.
 - **repository_status**: The migration skill, command surfaces, documentation, and closeout state are prepared on branch `feature/requirements-stage-dispositions`. `example/` remains untracked and unchanged.
+
+## Session Closeout (2026-11-25, session-60)
+- **task**: Merge the requirements-stage-dispositions feature work into `main`, record the merge, and remove the feature branch.
+- **questions**:
+  - none blocking.
+  - Push approval remains separate.
+- **decisions**:
+  - `main` receives the merged feature history through merge commit `04d08ef2019e6050a12def3f673fd9236832f9cd`.
+  - `feature/requirements-stage-dispositions` is deleted after merge.
+  - `example/` remains untracked and untouched.
+- **next**:
+  1. Run post-merge focused contract and fixture checks.
+  2. Push `main` only after explicit approval.
+- **recover**: Read `mementum/state.md`, then verify `main` contains `/gybis-arch-migrate`, the updated requirements-family docs, and the merge commit.
+- **repository_status**: Feature work is merged into `main`. The feature branch remains present until the deletion operation completes; `example/` remains untracked.
