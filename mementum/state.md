@@ -1,3 +1,7 @@
+✅ session-57 | 2026-11-25 README split and stage-disposition closeout; root README reduced, GYBIS-README retained as detailed usage guide
+🌀 session-54 | 2026-11-24 gybis-init: orientation complete; session-53 closeout and open follow-ups reviewed
+🌀 session-56 | 2026-11-25 README split: root overview reduced; GYBIS-README is the detailed usage guide
+🌀 session-55 | 2026-11-25 requirements-stage-dispositions: removed requirement deferral status, aligned skills and Gybis documentation to pending-stage accounting
 🌀 session-51 | 2026-11-24 gybis-init: orientation complete; session-50 follow-ups reviewed
 🌀 session-50 | 2026-11-17 gybis-init: orientation complete; session-49 follow-ups reviewed
 ✅ session-49 | 2026-11-07 gybis-allium-analyse stream contract updated (75a9173); check file/directory output reviewed; check skill unchanged
@@ -45,10 +49,10 @@
 🌀 session-3 | 2026-05-15 skills table displayed, session-terminate attempted
 
 ## Working Memory
-- **Last updated**: 2026-11-24
-- **Sessions**: 53 (session-0 initialized through session-53 closeout)
-- **Last session ID**: session-53
-- **Status**: Session-53 closeout — current-plan plan-fidelity audit completed across unstaged/untracked distributed gybis-* skills. Check, repair, propagation, orientation, and Lambda procedures were reconciled; commit/push remain blocked until separate human approval.
+- **Last updated**: 2026-11-25
+- **Sessions**: 57 (session-0 initialized through session-57 closeout)
+- **Last session ID**: session-57
+- **Status**: Session-57 closeout — requirement stage-disposition changes and the README documentation split are committed on branch `feature/requirements-stage-dispositions`. Root README now provides repository, installation, maintainer, and upstream context; GYBIS-README remains the detailed usage guide. Commit/push approval for future work remains separate.
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
@@ -759,3 +763,19 @@ Renamed `mementum/memories/human-owned-stage-readiness.md` → `mementum/memorie
   3. Continue Allium stream, deferred-REQ, and first-use `gr-elicit` validation.
 - **recover**: Read `current-plan.md`, then inspect `gybis/.agents/skills/gybis-check/SKILL.md`, the four domain check skills, and `gybis/.agents/skills/internal/gybis-skill-contract-check/SKILL.md`.
 - **repository_status**: Worktree had no staged or modified gybis skill files at closeout inspection; `current-plan.md` and `example/` remained untracked. No commit or push was performed.
+
+## Session Closeout (2026-11-25, session-57)
+- **task**: Remove requirement-deferral semantics, align stage dispositions across requirements and vocabulary skills, split detailed Gybis usage from the root README, and preserve the README in its complementary scope.
+- **questions**:
+  - none blocking.
+- **decisions**:
+  - Every requirement recorded in `requirements/` remains binding.
+  - Missing or invalid downstream stages use `pending_stage`; they do not imply deferral or no-change status.
+  - Root README retains project identity, installation, upgrade summary, upstream derivation, versioning, license, and citations.
+  - GYBIS-README remains the single detailed usage and workflow guide.
+- **next**:
+  1. Run focused skill-contract and reference checks on the committed feature branch.
+  2. Exercise ready and pending-stage fixtures.
+  3. Review and push the feature branch only after explicit approval.
+- **recover**: Read `mementum/knowledge/requirements-layer.md`, `mementum/knowledge/propagate-family.md`, and `mementum/memories/requirements-layer-family.md`; then inspect commits b208ed3 and c6ebf49.
+- **repository_status**: Feature commits b208ed3 and c6ebf49 are present. `current-plan.md` and `example/` remain untracked; no unrelated source files were modified for this closeout.
