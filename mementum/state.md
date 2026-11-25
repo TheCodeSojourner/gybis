@@ -1,3 +1,5 @@
+✅ session-59 | 2026-11-25 completed the consolidated `/gybis-arch-migrate` review and developer-prose summary
+✅ session-58 | 2026-11-25 added the one-time `/gybis-arch-migrate` migration skill and synchronized command surfaces
 ✅ session-57 | 2026-11-25 README split and stage-disposition closeout; root README reduced, GYBIS-README retained as detailed usage guide
 🌀 session-54 | 2026-11-24 gybis-init: orientation complete; session-53 closeout and open follow-ups reviewed
 🌀 session-56 | 2026-11-25 README split: root overview reduced; GYBIS-README is the detailed usage guide
@@ -50,9 +52,9 @@
 
 ## Working Memory
 - **Last updated**: 2026-11-25
-- **Sessions**: 57 (session-0 initialized through session-57 closeout)
-- **Last session ID**: session-57
-- **Status**: Session-57 closeout — requirement stage-disposition changes and the README documentation split are committed on branch `feature/requirements-stage-dispositions`. Root README now provides repository, installation, maintainer, and upstream context; GYBIS-README remains the detailed usage guide. Commit/push approval for future work remains separate.
+- **Sessions**: 59 (session-0 initialized through session-59 closeout)
+- **Last session ID**: session-59
+- **Status**: Session-59 closeout — completed the consolidated `/gybis-arch-migrate` contract and developer-prose description. The skill uses span-level findings, separate approval groups, dry-run output, architecture-only writes, scope snapshots, terminal outcomes, idempotency, and renewed-approval-only correction handling. The `example/` directory remains untouched and untracked.
 
 ## Active Context
 - **Project**: gybis — Developer-Command-Driven AI-Assisted Spec-Driven Development (SDD) Stack
@@ -779,3 +781,40 @@ Renamed `mementum/memories/human-owned-stage-readiness.md` → `mementum/memorie
   3. Review and push the feature branch only after explicit approval.
 - **recover**: Read `mementum/knowledge/requirements-layer.md`, `mementum/knowledge/propagate-family.md`, and `mementum/memories/requirements-layer-family.md`; then inspect commits b208ed3 and c6ebf49.
 - **repository_status**: Feature commits b208ed3 and c6ebf49 are present. `current-plan.md` and `example/` remain untracked; no unrelated source files were modified for this closeout.
+
+## Session Closeout (2026-11-25, session-58)
+- **task**: Implement a project-independent, one-time `/gybis-arch-migrate` skill for removing requirement behavior duplicated inside existing architecture.
+- **questions**:
+  - none blocking.
+  - Commit/push approval remains required before Git actions.
+- **decisions**:
+  - Migration is interactive and approval-gated.
+  - The skill may write only `architecture.md`.
+  - Requirements, vocabulary, specifications, tests, implementation, and upstream artifacts remain unchanged.
+  - Exact, paraphrased, and conflicting requirement behavior is classified before a migration plan is proposed.
+  - Valid supporting requirement links are preserved; invalid or unresolved links are reported or removed only within approved architecture changes.
+- **next**:
+  1. Run focused skill-contract checks for the new migration skill.
+  2. Exercise synthetic fixtures for exact duplication, paraphrase, mechanism preservation, invalid links, and observable-behavior conflicts.
+  3. Leave `example/` untouched; remove it only if the operator chooses.
+- **recover**: Read `mementum/knowledge/requirements-layer.md` and `mementum/memories/propagate-seed-then-own.md`; then inspect `gybis/.agents/skills/gybis-arch-migrate/SKILL.md` and the architecture command surfaces.
+- **repository_status**: Added `gybis-arch-migrate`; updated the contract checker, help table, and GYBIS-README. `example/` remains untracked and unchanged.
+- **upsert**: Consolidated `/gybis-arch-migrate` with span-level findings, separate mutation/report/preserve operation sets, dry-run behavior, explicit terminal outcomes, per-action approval, scope snapshots, blocked-action reporting, idempotency, and renewed-approval-only correction handling.
+
+## Session Closeout (2026-11-25, session-59)
+- **task**: Finalize the architecture migration skill contract and summarize the developer-facing behavior.
+- **questions**:
+  - none blocking.
+  - Commit/push approval remains separate from this closeout.
+- **decisions**:
+  - `/gybis-arch-migrate` is one-time and interactive.
+  - Mutation authority is limited to `architecture.md`.
+  - Requirements, vocabulary, specifications, tests, implementation, upstream content, and Mementum remain unchanged.
+  - A repeated run reports `NO_DUPLICATION_FOUND` and makes no changes.
+  - Observable-behavior conflicts remain requirement-change questions, never silent architecture changes.
+- **next**:
+  1. Run focused skill-contract and reference checks.
+  2. Exercise synthetic duplicate, paraphrase, mechanism, link, and conflict fixtures.
+  3. Leave `example/` untouched until the operator chooses to remove it.
+- **recover**: Read `mementum/knowledge/requirements-layer.md` and `mementum/memories/propagate-seed-then-own.md`; then inspect `gybis/.agents/skills/gybis-arch-migrate/SKILL.md`.
+- **repository_status**: The migration skill, command surfaces, documentation, and closeout state are prepared on branch `feature/requirements-stage-dispositions`. `example/` remains untracked and unchanged.
