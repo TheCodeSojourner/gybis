@@ -18,7 +18,17 @@ Requirements are the top layer of the durability order (`req > vocab > arch > sp
 
 Do not let existing code or tests silently redefine behavioral truth. Use `/gybis-req-check` when the requirements inventory has drifted, and `/gybis-req-weed` when requirements and the layers below them no longer describe the same truth.
 
-Requirements are binding by default; defer one only through an explicitly marked section and a stakeholder decision. A requirement may lead vocabulary, architecture, specifications, tests, and code. `/gybis-req-check` reports a downstream stage as pending until its artifact exists and passes its owning check; it does not treat that absence as deferral or N/A. Its repair plan remains read-only until you approve it.
+Every requirement recorded in `requirements/` is binding. A stage is not a lifecycle status for the requirement. It is a downstream artifact layer:
+
+- vocabulary
+- architecture
+- specifications
+- tests and implementation
+- documentation
+
+`/gybis-req-check` reports every requirement as `represented`, `no_change_needed`, `pending_stage`, or `uncovered` at each applicable ready stage. A missing or invalid stage is `pending_stage`; it does not defer or exclude the requirement. `uncovered` means a ready stage lacks a distinct effect that the requirement should have in that layer.
+
+Vocabulary and requirements track together. `/gybis-req-propagate` may seed missing canonical terms, and `/gybis-vocab-tend` resolves terminology decisions. `/gybis-req-check` and `/gybis-req-weed` remain the follow-up tools for missing or conflicting downstream evidence.
 
 ## 3. Curate Vocabulary
 
@@ -27,6 +37,8 @@ Check whether the capability needs a durable cross-layer term in [vocabulary.md]
 Add a term (i.e., `/gybis-vocab-tend`) only when it is normative, reused across project layers, or ambiguous enough that future artifacts need one canonical name. Prefer canonical PascalCase terms so they can be reused consistently.
 
 Do not add incidental implementation details, tool names, one-off examples, or configuration knobs to the vocabulary. If the vocabulary is drifting or ambiguous, validate and repair it with `/gybis-vocab-check` and `/gybis-vocab-weed` before moving on.
+
+When requirements introduce canonical stakeholder-facing terms, the vocabulary stage should represent them. A missing or unresolved vocabulary stage is `pending_stage` or an actionable vocabulary gap, not evidence that the requirement is deferred.
 
 ## 4. Refine Architecture
 
@@ -51,6 +63,8 @@ Describe the behavior before implementing it. Define the smallest meaningful sli
 
 The specification is the behavioral truth for the slice. It should preserve existing behavior unless a change is explicitly intended. When the project is already carrying behavior, use `/gybis-arch-propagate`, `/gybis-spec-check`, and `/gybis-spec-tend` to keep the spec aligned to the actual system intent.
 
+Specifications derive executable obligations from requirements and architecture. Architecture supplies mechanisms and constraints; requirements remain the authority for observable behavior. Keep exact traceability between those layers rather than copying requirement prose into architecture.
+
 ## 6. Add Specification Tests
 
 Turn each specified behavior into focused executable evidence. Use both kinds of tests when appropriate:
@@ -59,6 +73,8 @@ Turn each specified behavior into focused executable evidence. Use both kinds of
 - Runtime tests for observable values, state transitions, boundaries, and rejection behavior.
 
 Cover the smallest useful cases first, then add empty, populated, boundary, and invalid cases required by the specification. Keep traceability identifiers aligned with specification obligations. A new or amended requirement designator that propagates into specifications normally requires corresponding test evidence. Use `/gybis-spec-propagate` to generate or update the initial test and code scaffolding for the current slice.
+
+A requirement can remain pending at tests, code, or documentation while earlier stages are complete. Report that status explicitly; do not describe missing downstream artifacts as deferral.
 
 ## 7. Implement the Minimum Code
 
@@ -91,6 +107,7 @@ A useful increment should leave the project more understandable, not merely more
 - [ ] One concrete, narrow capability selected.
 - [ ] Existing mementum and nearby artifacts recalled.
 - [ ] Governing requirement designators confirmed or amended.
+- [ ] Each ready downstream stage has a disposition: represented, no_change_needed, pending_stage, or uncovered.
 - [ ] Required vocabulary curated.
 - [ ] Architectural fit and scope confirmed.
 - [ ] Smallest behavioral specification written.

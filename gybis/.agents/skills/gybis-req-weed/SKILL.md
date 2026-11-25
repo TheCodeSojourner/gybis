@@ -66,15 +66,13 @@ disable-model-invocation: true
   no_change_decisions ≔ {}
   semantic_comparison_results ≔ compare_noncoverage_classes(req_content, vocab_content, arch_content, spec_content, test_content)
   coverage_gap_results ≔ ∅
-  deferred_REQs ≔ clauses in explicitly marked non-binding sections
-  binding_REQs ≔ all REQ clauses ∖ deferred_REQs
+  binding_REQs ≔ all REQ clauses
   | classes:
     - REQ_conflicts_arch: clause constraint absent/contradicted in architecture.md
     - REQ_conflicts_spec: clause contradicted by .allium behavior
     - REQ_conflicts_test: test assertion contradicts clause
     - REQ_uncovered: binding REQ has a distinct effect in a ready downstream stage but lacks representation there
     - REQ_pending_stage: downstream stage absent or has owning-check errors; informational, not a divergence
-    - deferred_REQ_has_downstream_content: a deferred REQ is referenced or enacted by a non-deferred downstream artifact
     - REQ_undefined_term: clause uses term not in vocabulary.md
     - REQ_non_canonical_term: clause uses non-canonical spelling of a defined term
     - downstream_conflicts_REQ: downstream artifact encodes behavior with no governing REQ
@@ -87,7 +85,6 @@ disable-model-invocation: true
     | otherwise → coverage_gap_results ≔ coverage_gap_results ∪ {{id: stable_id(REQ, stage, REQ_uncovered), type: REQ_uncovered, REQ, stage, reason: missing representation for a distinct effect}}
   | ∀ binding_REQ, not_ready_stage: disposition(REQ, stage) ≔ pending_stage
   | no_change_needed requires an evidence-based reason; do not infer from missing files or missing references
-  | deferred REQs are excluded from binding-REQ convergence, but downstream content referring to them is reported separately; lower-layer content is not implicitly deferred
   | rationale_exclusion: differing or missing rationale: lines across layers are ¬divergences — rationale records intent, not behavior; only normative clause text generates conflicts; never compare rationale text when scoring convergence
   | comparison_results ≔ semantic_comparison_results ∪ coverage_gap_results
   | ∀ comparison_result ∈ comparison_results: collect({id: stable_id(type, REQ, location, stage), type, REQ, location, stage, description, reason, negotiability}) → divergences
@@ -106,8 +103,6 @@ disable-model-invocation: true
     ? ask_human("The binding requirement " ⊕ plain_language_summary(REQ) ⊕ " has no evidence in ready stage " ⊕ stage ⊕ ". Choose [propagate/no_change_needed/investigate]. If no change is needed, give the reason.") → {decision, reason}
   | divergence.type = REQ_pending_stage
     ? report_pending_stage(REQ, stage) ∧ ¬collect_as_divergence
-  | divergence.type = deferred_REQ_has_downstream_content
-    ? ask_human("Deferred requirement " ⊕ plain_language_summary(REQ) ⊕ " has downstream content. Choose [req: make the requirement binding, arch/spec/test: remove or reconcile the downstream content, investigate, skip].") → decision
   | divergence.type = REQ_undefined_term ∨ REQ_non_canonical_term
     ? ask_human("REQ " ⊕ REQ ⊕ " term mismatch with vocabulary. Resolve as [req/investigate/skip]? (vocabulary changes go through /gybis-vocab-weed)") → decision
   | divergence.type = downstream_conflicts_REQ
@@ -119,16 +114,16 @@ disable-model-invocation: true
   | return({resolve_mode: decision, reason, stage, REQ})
 
 λ gybis-req-weed_correct(divergence, resolve_mode).
-  resolve_mode = req ∧ divergence.type ≠ deferred_REQ_has_downstream_content
+  resolve_mode = req
     ? (apply_divergence_direction_to_requirements(divergence) ∧ write(requirements/)
        → corrections_applied ∧ modified_artifacts ≔ modified_artifacts ∪ {requirements/})
-  | resolve_mode = arch ∧ divergence.type ≠ deferred_REQ_has_downstream_content
+  | resolve_mode = arch
     ? (apply_divergence_direction_to_architecture(divergence) ∧ write(architecture.md)
        → corrections_applied ∧ modified_artifacts ≔ modified_artifacts ∪ {architecture.md})
-  | resolve_mode = spec ∧ divergence.type ≠ deferred_REQ_has_downstream_content
+  | resolve_mode = spec
     ? (apply_divergence_direction_to_specs(divergence) ∧ write(specs/)
        → corrections_applied ∧ modified_artifacts ≔ modified_artifacts ∪ {specs/})
-  | resolve_mode = test ∧ divergence.type ≠ deferred_REQ_has_downstream_content
+  | resolve_mode = test
     ? (apply_divergence_direction_to_tests(divergence) ∧ write(test_paths)
        → corrections_applied ∧ modified_artifacts ≔ modified_artifacts ∪ {test_paths})
   | resolve_mode = propagate
@@ -137,10 +132,6 @@ disable-model-invocation: true
     ? (record({REQ, stage, reason}) in current_report_only only_if(reason ≠ ∅)
        ∧ resolved_divergence_ids ≔ resolved_divergence_ids ∪ {divergence.id}
        → corrections_applied)
-  | divergence.type = deferred_REQ_has_downstream_content ∧ resolve_mode = req
-    ? (request_binding_status_change via /gybis-req-tend → corrections_applied)
-  | divergence.type = deferred_REQ_has_downstream_content ∧ resolve_mode ∈ {spec, arch, test}
-    ? (remove_or_reconcile_downstream_content with human approval → corrections_applied)
   | resolve_mode = investigate
     ? (report divergence for later human investigation; no write)
   | resolve_mode = skip
@@ -153,7 +144,6 @@ disable-model-invocation: true
     - convergence_status = unresolved → list every investigate/skip decision; never describe the run as converged
     - every binding REQ at each ready stage has represented evidence or a reasoned no_change_needed disposition
     - not-ready stages are reported as pending, not as uncovered or explicitly_NA
-    - deferred REQs are excluded from binding-REQ checks; downstream references to them remain reconciled or unresolved
     - designator integrity preserved in requirements/
   | conditional_checks:
     - test_paths ∈ modified_artifacts → test_suite_passes = true
@@ -193,7 +183,6 @@ disable-model-invocation: true
   | invariant: convergence_status = converged → zero_divergences = true
   | invariant: investigate ∨ skip never satisfies zero_divergences
   | invariant: unresolved_decisions ∃ → convergence_status = unresolved
-  | invariant: deferred REQs are not treated as binding; lower-layer artifacts are not implicitly deferred
   | invariant: ready-stage REQ dispositions are evidence-backed; not-ready stages remain pending
   | invariant: designator integrity preserved in requirements/
   | invariant: test_paths ∈ modified_artifacts → test_suite_passes = true at completion
@@ -202,6 +191,5 @@ disable-model-invocation: true
   | invariant: all_modifications ⊆ {requirements/, architecture.md, specs/, test_paths}
 
 λ gybis-req-weed_deliver(x).
-  report: {divergences_found, resolutions_applied, unresolved_investigations, deferred_REQs_excluded, stage_dispositions, pending_stages, test_status, convergence_status ∈ {converged, unresolved}}
   | handoff: vocabulary term mismatches → /gybis-vocab-weed
   | return({complete: true, convergence_status})

@@ -34,7 +34,7 @@ See the [allium-tools repository](https://github.com/juxt/allium-tools) for inst
 2. **Bootstrap vocabulary:** Run `/gybis-req-propagate` to derive initial `vocabulary.md` from the requirement terms, then validate it with `/gybis-vocab-check`.
 3. **Bootstrap architecture:** Run `/gybis-vocab-propagate` to derive initial `architecture.md` from requirements and vocabulary, then validate it with `/gybis-arch-check`.
 4. **Derive specifications:** Run `/gybis-arch-propagate` to create specifications from architecture, then validate them with `/gybis-spec-check`.
-5. **Derive code and tests:** Run `/gybis-spec-propagate` to generate initial code and test stubs.
+5. **Derive code and tests:** Run `/gybis-spec-propagate` to generate implementation and tests for the specifications.
 
 Each propagate bootstraps a layer; the layer's own `/gybis-*-tend`, `/gybis-*-refine`, and `/gybis-*-weed` skills own it from then on.
 
@@ -65,9 +65,9 @@ In gybis, requirements, vocabulary, architecture, and specifications are durable
 
 gybis is command-driven guidance, not always-on process enforcement.
 
-- **Developer owns stage readiness:** The developer is responsible for deciding when each stage is ready (`requirements/requirements-*.md`, `vocabulary.md`, `architecture.md`, `specs/**/*.allium`, code/tests). A requirement remains binding while a downstream artifact is missing or has not passed its check; that stage is pending work, not deferred scope. Defer a requirement only by explicit stakeholder decision.
+- **User chooses stage readiness:** The user decides which stages are ready to receive a requirement. A requirement remains binding even when architecture, specifications, tests, code, or documentation have not yet adopted it. Gybis reports that work as `pending_stage`, not as withdrawn or deferred scope.
 - **Skills own requested transformation:** A skill executes the transformation it was invoked to do and enforces only execution-critical gates.
-- **Checks are deliberate tools:** `check` and `weed` commands are available to validate convergence when the developer chooses to run them.
+- **Checks are deliberate tools:** `check` commands validate completeness and consistency within an individual domain. `weed` commands resolve convergence and divergence across adjacent domains. Run them when you choose to validate or reconcile the relevant work.
 - **Tradeoff is explicit:** If preconditions are skipped, quality or convergence may degrade; this is a developer decision, not a hidden protocol failure.
 
 ## AI Is Nondeterministic: Expect to Rerun
@@ -77,7 +77,7 @@ If you are new to AI-assisted development, set this expectation early: **the sam
 Which commands you rerun, and why:
 
 - **`check`, `describe`, `explain` — rerun freely.** `check` applies deterministic repairs within its own domain and prepares bounded semantic repairs for approval, with every repair re-verified. `/gybis-spec-check` may repair specs under its Allium verifier. `describe`/`explain` only read a layer and may emit a separate explainer document that you name.
-- **`distill`, `propagate` — run once per layer.** These are bootstrap commands, gated on the target artifact *not* existing. Once the artifact exists, rerunning them halts by design (`already exist` / `not found`) instead of overwriting your work.
+- **Create-only `distill` and propagation commands — rerun only after checking their gates.** Brownfield distills and create-only propagate commands are gated on the target artifact not existing. `vocab-propagate` and `arch-propagate` halt rather than overwrite an existing target. `req-propagate` and `spec-propagate` can update or add to ready downstream scopes and may be rerun within their own strict verification loops.
 - **`refine`, `tend`, `weed` — rerun until converged.** These are the iterative loops. To improve an artifact that already exists, cycle `check → refine → tend → weed` as many times as needed; each pass moves the artifact closer to its intended state.
 
 How to tell a rerun helped:
@@ -148,7 +148,7 @@ Use this when you are building a new system and want durable constraints establi
 2. Run `/gybis-req-propagate` to derive initial `vocabulary.md` from the requirement terms, then validate it with `/gybis-vocab-check`.
 3. Run `/gybis-vocab-propagate` to derive initial `architecture.md` from requirements and vocabulary, then validate it with `/gybis-arch-check`.
 4. Run `/gybis-arch-propagate` to derive initial behavioral specifications, then validate them with `/gybis-spec-check`.
-5. Run `/gybis-spec-propagate` to derive initial code and test scaffolding.
+5. Run `/gybis-spec-propagate` to derive implementation and tests for the specifications.
 
 Outcome: the project starts from requirements, vocabulary, architecture, and specifications rather than implementation-first drift.
 
@@ -293,9 +293,10 @@ Outcome: each session leaves behind durable memory instead of losing project kno
 - **Layered system:** requirements > vocabulary > S5 > S4 > S3 > S2 > S1 > specs > tests > code — stricter, more durable layers constrain looser, more transient ones.
   Requirements, vocabulary, and S5..S1 are durable constraint layers. Together they constrain specifications, which then constrain tests, which then constrain code.
 - **No flat structures.** Everything has its place in the hierarchy.
-- **Top-down only, with no bypassing.** Higher layers constrain lower layers. Requirements > Vocabulary > Architecture (S5 ... S1) > Specs > Tests > Code. Lower layers never constrain higher layers.
-- **Violations halt.** Skipping or reversing a layer surfaces immediately and stops progress rather than proceeding silently.
-- **Drift surfaces automatically.** When code, tests, or behavior diverge from the durable constraints (requirements, vocabulary, architecture, specification), drift is detected, surfaced, and halted.
+- **Forward propagation is top-down.** Higher layers constrain lower layers: Requirements > Vocabulary > Architecture (S5 ... S1) > Specs > Tests > Code.
+- **Brownfield distillation is bottom-up.** Distill commands reconstruct durable layers from existing specs, implementation, architecture, vocabulary, and requirements evidence.
+- **Upstream failures stop ordered checks.** `/gybis-check` and `/gybis-weed` stop or report downstream work when a required upstream stage fails; this does not make gybis an always-on process enforcer.
+- **Drift is surfaced by deliberate validation.** Check and weed commands detect and report divergence when invoked. Gybis does not continuously monitor the repository.
 
 ### Requirements Layer
 
@@ -304,8 +305,8 @@ Requirements are the top layer of the stack and the durable record of stakeholde
 - **Canonical form:** Dependency-ordered module files under `requirements/` hold `REQ-<DOMAIN>-NNN` clauses in nucleus lambda notation, rendered for humans on demand by describe/explain.
 - **Constraint hierarchy:** Requirements constrain vocabulary, vocabulary constrains architecture, architecture constrains specifications, specifications constrain tests, and tests constrain code.
 - **Durability:** Requirements are the most durable layer. They are elicited from stakeholders with `/gybis-req-elicit` and amended with `/gybis-req-tend` before any downstream layer changes.
-- **Binding by default:** Every requirement is binding unless explicitly deferred by stakeholder decision. To defer one, run `/gybis-req-tend` and describe it in your own words, for example: `Defer the requirement about <brief behavior description> as non-binding future work because <reason>; move it into a marked deferred section.` You do not need to know its REQ designator; tend finds and summarizes the match, reports downstream impact, and asks for approval before applying the change. Missing or invalid downstream stages are reported as pending; they do not defer requirements or create uncovered failures.
-- **Stage accounting:** When a downstream stage is ready, `/gybis-req-check` reports each binding requirement as represented with evidence, no change needed with a reason, or uncovered. Deferred requirements are excluded from propagation; they are not converted to N/A.
+- **Binding requirements:** Every requirement recorded in `requirements/` is binding. Do not infer deferral from missing or incomplete downstream artifacts. Implementation timing and stage activation are separate from requirement status.
+- **Stage accounting:** `/gybis-req-check` reports every requirement at each downstream stage as `represented` with evidence, `no_change_needed` with a reason, `pending_stage` while the stage is absent or invalid, or `uncovered` when a ready stage lacks a distinct effect. Vocabulary and requirements track together.
 
 ### Vocabulary Layer
 

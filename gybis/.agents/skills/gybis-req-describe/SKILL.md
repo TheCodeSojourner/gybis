@@ -50,11 +50,9 @@ disable-model-invocation: true
   | structure: connected requirements → coherent narrative paragraphs, grouped by module in dependency order
   | ¬render(as per-requirement bullets ∨ clause-like entries ∨ designator-prefixed statements)
   | navigation: optional human-readable module headings; no `REQ-...` identifiers in headings or prose
-  | binding_default: requirements are binding unless they appear in an explicitly marked deferred section
+  | binding_default: every requirement in requirements/ is binding
   | rationale_rendering: when a clause carries a rationale: line, render it as "because: ..." following the requirement statement; when absent, omit silently (¬fabricate rationale from clause text)
   | attribution surfaced in prose: "decided by stakeholders" vs "derived from analysis"
-  | deferred sections labeled "planned future requirements (not currently binding)"
-  | ¬infer(deferral, missing_downstream_artifact ∨ implementation_not_started)
   | output: prose_rendered
 
 λ gybis-req-describe_deliver(prose_rendered, output_mode).

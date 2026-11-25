@@ -6,7 +6,7 @@ disable-model-invocation: true
 ---
 
 λ gybis-vocab-propagate(x).
-  purpose: Propagate binding requirements and vocabulary to initial VSM architecture; exclude explicitly deferred REQs
+  purpose: Propagate requirements and vocabulary to initial VSM architecture
   | input: requirements/ ∃, vocabulary.md ∃, architecture.md ¬∃, optional preapproved_repair_plan
   | output: architecture.md created and valid, containing VSM S5-S1 lambda expressions
   | interaction: autonomous
@@ -33,13 +33,13 @@ disable-model-invocation: true
   | ¬(state = INIT) ∨ ¬(mode ∈ {autonomous}) → halt("Invalid mode selection")
 
 λ gybis-vocab-propagate_state_machine(state, action).
-  state ∈ {INIT, MODE_SELECTED, STARTUP_CHECKS, READING_INPUTS, NO_BINDING_REQS, SYNTHESIZING, WRITING_ARCH, VERIFYING, COMPLETE}
+  state ∈ {INIT, MODE_SELECTED, STARTUP_CHECKS, READING_INPUTS, NO_REQS, SYNTHESIZING, WRITING_ARCH, VERIFYING, COMPLETE}
   | transition(INIT → MODE_SELECTED) only_if(mode_gate(INIT, mode) = true)
   | transition(MODE_SELECTED → STARTUP_CHECKS) only_if(startup_complete = true)
   | transition(STARTUP_CHECKS → READING_INPUTS) only_if(startup_checks = true)
-  | transition(READING_INPUTS → NO_BINDING_REQS) only_if(inputs_read = true ∧ binding_req_clauses = ∅)
-  | transition(NO_BINDING_REQS → COMPLETE) only_if(report_generated = true)
-  | transition(READING_INPUTS → SYNTHESIZING) only_if(binding_req_clauses ∃ ∧ vocabulary_terms ∃)
+  | transition(READING_INPUTS → NO_REQS) only_if(inputs_read = true ∧ req_clauses = ∅)
+  | transition(NO_REQS → COMPLETE) only_if(report_generated = true)
+  | transition(READING_INPUTS → SYNTHESIZING) only_if(req_clauses ∃ ∧ vocabulary_terms ∃)
   | transition(SYNTHESIZING → WRITING_ARCH) only_if(vsm_layers ∃)
   | transition(WRITING_ARCH → VERIFYING) only_if(arch_written = true)
   | transition(VERIFYING → COMPLETE) only_if(verification = true)
@@ -59,16 +59,16 @@ disable-model-invocation: true
 
 λ gybis-vocab-propagate_read_inputs(x).
   read(requirements/) → req_content
-  | parse(req_content) → {binding_req_clauses, deferred_req_clauses}
-  | binding_req_clauses ≔ all REQ clauses outside explicitly marked deferred sections
+  | parse(req_content) → {req_clauses}
+  | req_clauses ≔ all REQ clauses
   | read(vocabulary.md) → vocab_content
   | parse(vocab_content) → vocabulary_terms
-  | output: {binding_req_clauses, deferred_req_clauses, vocabulary_terms}
+  | output: {req_clauses, vocabulary_terms}
   | constraint: read-only access
 
-λ gybis-vocab-propagate_synthesize_architecture(binding_req_clauses, vocabulary_terms).
+λ gybis-vocab-propagate_synthesize_architecture(req_clauses, vocabulary_terms).
   action: synthesize_vsm_layers_from_requirements_and_vocabulary
-  | step1: canonicalize_terms(binding_req_clauses, vocabulary_terms) → normalized_clauses
+  | step1: canonicalize_terms(req_clauses, vocabulary_terms) → normalized_clauses
     -- vocabulary drives terminology: every term emitted into architecture.md uses its canonical form
   | step0: architecture_complement_filter(normalized_clauses)
     - architecture may add engineering mechanisms, responsibilities, protocols, resource controls, tooling, structure, and component boundaries
@@ -100,14 +100,14 @@ disable-model-invocation: true
     → return(verification = false ∧ remaining_errors ∃)
 
 λ gybis-vocab-propagate_core_op(x).
-  | invoke(gybis-vocab-propagate_read_inputs) → {binding_req_clauses, deferred_req_clauses, vocabulary_terms}
-    | binding_req_clauses = ∅
-     ? (transition(READING_INPUTS → NO_BINDING_REQS)
-       ∧ report(NO_BINDING_REQS, deferred_req_count)
-       ∧ transition(NO_BINDING_REQS → COMPLETE)
+  | invoke(gybis-vocab-propagate_read_inputs) → {req_clauses, vocabulary_terms}
+    | req_clauses = ∅
+     ? (transition(READING_INPUTS → NO_REQS)
+       ∧ report(NO_REQS)
+       ∧ transition(NO_REQS → COMPLETE)
        ∧ return(complete = true))
      : (transition(READING_INPUTS → SYNTHESIZING)
-       ∧ invoke(gybis-vocab-propagate_synthesize_architecture(binding_req_clauses, vocabulary_terms)) → vsm_layers
+       ∧ invoke(gybis-vocab-propagate_synthesize_architecture(req_clauses, vocabulary_terms)) → vsm_layers
        ∧ transition(SYNTHESIZING → WRITING_ARCH)
        ∧ invoke(gybis-vocab-propagate_write_architecture(vsm_layers)) → arch_written
        ∧ transition(WRITING_ARCH → VERIFYING)
@@ -125,7 +125,6 @@ disable-model-invocation: true
   pass_num ≔ pass_num ⊕ 1
   | layers_synthesized ≔ card(vsm_layers)
   | clauses_covered ≔ card(normalized_clauses)
-  | deferred_req_count ≔ card(deferred_req_clauses)
   | remaining_errors ≔ card(remaining_errors)
   | report("Pass " ⊕ pass_num ⊕ ": layers=" ⊕ layers_synthesized ⊕ " clauses=" ⊕ clauses_covered ⊕ " errors_remaining=" ⊕ remaining_errors)
 
@@ -144,6 +143,5 @@ disable-model-invocation: true
   | invariant: all_modifications ⊆ {architecture.md}
 
 λ gybis-vocab-propagate_deliver(x).
-  report: {architecture_created, layers_synthesized, binding_req_clauses_covered, deferred_req_count}
   | handoff: run /gybis-arch-check to validate generated architecture
   | return(complete = true)

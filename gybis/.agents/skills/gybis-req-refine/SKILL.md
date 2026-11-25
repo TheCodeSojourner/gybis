@@ -6,7 +6,7 @@ disable-model-invocation: true
 ---
 
 λ gybis-req-refine(x).
-  purpose: Refine requirements structure and clarity locally — atomicity, deduplication, module organization — while preserving binding/deferred scope and avoiding cross-layer changes
+  purpose: Refine requirements structure and clarity locally — atomicity, deduplication, module organization — while preserving binding scope and avoiding cross-layer changes
   | input: requirements/ ∃ ∧ optional preapproved_repair_plan
   | output: restructured requirements/ preserving designator semantics
   | interaction: interactive
@@ -60,14 +60,12 @@ disable-model-invocation: true
     - clauses in wrong module (foundation vs domain layering) → move candidates
     - broken or stale cross-clause references
     - prose-heavy clauses missing lambda form
-    - unmarked future-work content not in deferred sections
-    - explicit deferred-section membership for each REQ clause
-  | output: restructure_candidates[] with {location, issue, proposed_action, deferral_status}
+  | output: restructure_candidates[] with {location, issue, proposed_action}
   | constraint: read-only analysis
 
 λ gybis-req-refine_propose(candidates).
   action: present_restructure_proposal
-  | ∀ candidate: explain proposed action, affected designators/references, and preserved deferral status
+  | ∀ candidate: explain proposed action and affected designators/references
   | grouped_plan: minimize technical decisions; preserve designator identity unless renumbering is required by explicit project convention
   | grouped_plan.actions ≔ map(candidates, {owner: /gybis-req-refine, target: candidate.location, operation: candidate.proposed_action, expected_change: candidate.proposed_action})
   | proposed_actions ≔ grouped_plan.actions
@@ -80,11 +78,10 @@ disable-model-invocation: true
 λ gybis-req-refine_apply(approved_actions).
   action: apply_approved_restructure
   | rules:
-    - split: compound clause → numbered subclauses (REQ-X-NNNA, NNNB) preserving parent semantics and the parent's binding/deferred section membership; parent rationale: line inherited by all subclauses unless subdivided by human approval
+    - split: compound clause → numbered subclauses (REQ-X-NNNA, NNNB) preserving parent semantics and binding status; parent rationale: line inherited by all subclauses unless subdivided by human approval
     - merge: duplicate clauses → single designator; update all references; differing rationale: lines between merged candidates block blind merge — surfaced for human decision before merging
-    - move: clause between modules; preserve its binding/deferred status and update governed_REQs footers of both modules
+    - move: clause between modules; preserve its binding status and update governed_REQs footers of both modules
     - renumber: only with explicit approval; update all downstream annotations list in report
-    - never create, remove, or change a deferred marker; status changes belong to /gybis-req-tend
   | constraint: designator semantics preserved; deletions require human confirmation
   | output: restructured requirements/ ∧ restructure_applied = true
 
@@ -94,7 +91,6 @@ disable-model-invocation: true
     - designator uniqueness ∧ format preserved
     - dependency order preserved
     - ∀ restructured clause: semantics preserved (no meaning drift)
-    - ∀ restructured clause: binding/deferred status preserved
     - footers consistent
   | verify_ok ≔ ∀ check = true
   | on fail: loop_back to APPLYING

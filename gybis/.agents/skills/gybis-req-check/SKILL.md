@@ -110,13 +110,12 @@ disable-model-invocation: true
     - ∀ clause: normative operator present (∀/¬/∧ preferred/∃ permitted) — rationale: lines excluded from this check
     - atomicity: one assertion per designator (compound clause = warning) — granularity-aware: compound clause whose footer declares `compound_by_design: true` and whose conjuncts all serve one operator's contract = info; compound clause mixing unrelated assertions = warning regardless of granularity
     - quantifiers bound (∀ has domain; ¬ has scope)
-    - deferred sections marked and non-binding — marker: section heading containing "(Deferred" or deferred blockquote opener
     - compound_by_design: marker must appear in the clause footer ∧ be declared by human approval via /gybis-req-tend (¬silent lint suppression)
     - rationale: lines are non-normative and optional — ¬error(absence); a rationale: line containing normative operators (∀/¬/∃) as obligations = error (rationale must record intent, not impose constraints)
     - vocabulary: if vocabulary.md ∃, every user-facing term in the requirement must match a canonical vocabulary term exactly; synonym, spelling, acronym, or representation drift = error
     - engineering concern: implementation mechanism, resource control, tooling choice, or component boundary = architecture concern unless the requirement demonstrably changes observable stakeholder behavior
     - observable engineering choice: if an engineering choice changes observable behavior, route to /gybis-req-tend for explicit requirement approval
-  | findings ≔ collected_clause_findings (atomicity/deferred = warning ∨ info; malformed lambda = error)
+  | findings ≔ collected_clause_findings (atomicity = warning ∨ info; malformed lambda = error)
   | return(clause_checks_complete = true ∧ findings)
 
 λ gybis-req-check_normalize_stage_result(stage, artifact_present, owner_result).
@@ -150,8 +149,7 @@ disable-model-invocation: true
 λ gybis-req-check_coverage_validation(req_model, downstream).
   action: validate_requirement_coverage_status
   | stage_results ≔ invoke(gybis-req-check_assess_stage_readiness(downstream))
-  | deferred_REQs ≔ clauses in explicitly marked non-binding sections
-  | binding_REQs ≔ all REQ clauses ∖ deferred_REQs
+  | binding_REQs ≔ all REQ clauses
   | downstream_stages ≔ {vocabulary, architecture, specs, tests_and_implementation}
   | stage_ready(stage) ≡ stage_results[stage].artifact_present = true ∧ stage_results[stage].valid = true
   | ∀ REQ ∈ binding_REQs, stage ∈ downstream_stages:
@@ -160,8 +158,6 @@ disable-model-invocation: true
     evidence(stage, REQ) ∃ → disposition(REQ, stage) ≔ represented
     | no_distinct_layer_effect(stage, REQ) → disposition(REQ, stage) ≔ no_change_needed ∧ require(reason)
     | otherwise → collect({type: "uncovered_REQ", REQ, stage, severity: warning})
-  | deferred REQs: exclude from downstream coverage findings and repair candidates; report count as info
-  | rationale: stage absence or invalidity is pending, not failure or deferral; binding requirements may lead downstream artifacts
   | return(coverage_checks_complete = true ∧ findings)
 
 λ gybis-req-check_traceability_validation(req_model).
@@ -169,7 +165,7 @@ disable-model-invocation: true
   | checks:
     - ∀ module: governed_REQs footer matches clauses actually present
     - footer_derivation: governed_REQs footers MUST be derivable from clauses present — a footer that requires hand-maintenance to be correct = warning (regenerate from clauses)
-    - ∀ module: downstream_artifact references resolvable or explicitly deferred
+    - ∀ module: downstream_artifact references are resolvable or reported as pending_stage
     - ∀ clause with attribution: source ∈ {stakeholder_decided, AI_researched_fact}
     - ∀ clause with rationale: {rationale_source: origin_artifact | AI_inferred} declared when rationale present ∧ AI_inferred rationale in stakeholder_decided clause = warning (requires human approval via /gybis-req-tend)
   | findings ≔ collected_traceability_findings
@@ -197,7 +193,7 @@ disable-model-invocation: true
   | clauses: split only clearly independent assertions; retain a cohesive single-contract clause and add compound_by_design only when the contract is unambiguous
   | rationale: retain AI-inferred rationale only when supported by source evidence; otherwise remove the non-normative rationale line, never its requirement
   | dependencies: do not reorder or renumber solely because a valid implementation dependency points to a later module; preserve explicit index policy, report real cycles or explicit-order conflicts, and retain evidence for each dependency edge
-  | coverage: repair binding requirements only at ready stages; deferred clauses remain out of propagation
+  | coverage: account for all requirements at ready stages and report not-ready stages as pending_stage
   | if(stage_not_ready): exclude that stage from repair_plan ∧ report(pending_stage)
   | human_questions: do not ask users to resolve identifier sequencing or other mechanical classification; if requirement intent genuinely cannot be inferred, preserve it and report the blocker in plain language
   | repair_plan: exact_actions[{owner, target, operation, expected_change}] ∧ paths ⊆ writable_repair_scope ∧ preserve(normative_meaning)
@@ -257,7 +253,6 @@ disable-model-invocation: true
   | invariant: deterministic repair writes require change = deterministic
   | invariant: semantic repair writes require human_approved = true
   | invariant: semantic repair writes ⊆ repair_plan.paths ∧ approval_scope
-  | invariant: deferred clauses are not propagated by repair
   | invariant: not-ready stages are pending, never uncovered or explicit_NA
   | invariant: every binding REQ at every ready stage has represented evidence ∨ no_change_needed reason ∨ uncovered warning
   | invariant: forward_requirement_reference alone ≠ implementation_dependency ∧ ≠ ordering_error

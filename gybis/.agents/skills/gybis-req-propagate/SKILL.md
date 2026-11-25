@@ -44,7 +44,7 @@ disable-model-invocation: true
   | transition(ANNOTATION_TEST_RUNNING, test_suite_passes = false ∧ test_paths ∈ modified_artifacts) → ANNOTATING_SPECS_TESTS (failure_driven_loop_back)
   | transition(ANNOTATION_TEST_RUNNING, test_suite_passes = false ∧ test_paths ∉ modified_artifacts ∧ test_stage_not_ready) → BOOTSTRAPPING_VOCAB
   | on_loop_back: loop_count ≔ loop_count ⊕ 1
-  | transition(BOOTSTRAPPING_VOCAB, vocabulary_seeded ∨ vocabulary_extended ∨ no_binding_REQs ∨ no_candidates ∨ no_vocabulary_change ∨ vocabulary_stage_pending) → DETECTING_ARCH_DELTAS
+  | transition(BOOTSTRAPPING_VOCAB, vocabulary_seeded ∨ vocabulary_extended ∨ no_REQs ∨ no_candidates ∨ no_vocabulary_change ∨ vocabulary_stage_pending) → DETECTING_ARCH_DELTAS
   | transition(DETECTING_ARCH_DELTAS, delta_report_complete) → COMPUTING_STAGE_DISPOSITIONS
   | transition(COMPUTING_STAGE_DISPOSITIONS, dispositions_complete) → VERIFYING
   | transition(VERIFYING, verify_ok) → COMPLETE
@@ -66,8 +66,7 @@ disable-model-invocation: true
   action: classify_requirement_scope_and_compute_per_stage_dispositions
   | vocabulary_precision: requirement clause bodies use exact canonical terms from vocabulary.md; lower-layer spelling changes are representation-only and preserve meaning
   | architecture_boundary: detect engineering-only content and route it to architecture or an approved requirements change without silently restating behavior
-  | deferred_REQs ≔ clauses in explicitly marked non-binding sections
-  | binding_REQs ≔ all clauses ∖ deferred_REQs
+  | binding_REQs ≔ all clauses
   | downstream_stages ≔ {vocabulary, architecture, specs, tests_and_implementation}
   | ∀ stage ∈ downstream_stages: readiness(stage) ≔ stage_checks[stage].artifact_present = true ∧ stage_checks[stage].valid = true
   | ready_stages ≔ {stage | stage_checks[stage].artifact_present = true ∧ stage_checks[stage].valid = true}
@@ -79,11 +78,11 @@ disable-model-invocation: true
     | otherwise → disposition(REQ, stage) ≔ uncovered ∧ collect({REQ, stage, coverage_gap})
   | ∀ uncovered REQ in ready specs/tests stages: map_existing_targets_or_report_gap; never invent behavior
   | output: {REQ → downstream_targets} ∧ {REQ, stage → disposition}
-  | dispositions ∈ {represented, no_change_needed, pending_stage, uncovered, deferred}
+  | dispositions ∈ {represented, no_change_needed, pending_stage, uncovered}
   | no_change_needed requires a concise, layer-specific reason; do not infer from missing artifacts
   | rationale_exclusion: coverage matching operates on the lambda clause body only — rationale: lines are never coverage targets, never annotated, never counted as assertions
   | accounting_convergence: every binding REQ × downstream_stage receives a disposition; uncovered remains a visible warning, not a fabricated completion
-  | deferred REQs are excluded from propagation candidates and reported separately; ¬convert(deferred → explicit_NA)
+  | all binding REQs remain propagation candidates for ready stages; pending stages receive pending_stage dispositions
 
 λ gybis-req-propagate_assess_stage_readiness(x).
   action: assess_existing_downstream_stages
@@ -156,8 +155,8 @@ disable-model-invocation: true
 
 λ gybis-req-propagate_seed_vocab_candidates(reqs, coverage_map).
   action: bootstrap_vocabulary_from_requirement_terms
-  | source: terms used in binding REQ clause bodies lacking canonical definitions — rationale: lines and deferred REQs excluded from term extraction
-  | if(binding_REQs = ∅): return(vocabulary_seeded = false ∧ no_binding_REQs = true) ∧ ¬write(vocabulary.md)
+  | source: terms used in all binding REQ clause bodies lacking canonical definitions — rationale: lines are excluded from term extraction
+  | if(binding_REQs = ∅): return(vocabulary_seeded = false ∧ no_REQs = true) ∧ ¬write(vocabulary.md)
   | if(candidates = ∅): return(vocabulary_seeded = false ∧ no_candidates = true) ∧ ¬write(vocabulary.md)
   | if(vocabulary.md ¬∃ ∧ candidates ∃):
     synthesize_bootstrap(vocabulary.md, candidates) → seeded_vocabulary
@@ -190,7 +189,6 @@ disable-model-invocation: true
   | invoke(gybis-req-propagate_refresh_modified_stage_readiness(modified_artifacts))
   | invoke(gybis-req-propagate_match_spec_clauses(reqs, vocab_content, arch_content, spec_content, test_content, stage_checks)) → final_stage_dispositions
   | checks:
-    - ∀ deferred REQ: excluded_from_propagation = true
     - ∀ binding REQ ∧ ready_stage: disposition ∈ {represented, no_change_needed, uncovered} with evidence ∨ reason
     - ∀ binding REQ ∧ not_ready_stage: disposition = pending_stage
     - uncovered dispositions remain visible in coverage_gaps; do not loop or claim them resolved
@@ -198,7 +196,7 @@ disable-model-invocation: true
     - modified test_paths ∃ → test_suite_passes = true
     - modified specs/ ∃ → gybis-allium-gate = true
     - vocabulary_seeded = true → gybis-vocab-check.errors = 0
-    - (vocabulary.md ∃ ∧ stage_checks.vocabulary.errors = 0 ∧ existing canonical terms preserved) ∨ no_binding_REQs = true ∨ no_candidates = true ∨ vocabulary_stage_pending = true
+    - (vocabulary.md ∃ ∧ stage_checks.vocabulary.errors = 0 ∧ existing canonical terms preserved) ∨ no_REQs = true ∨ no_candidates = true ∨ vocabulary_stage_pending = true
   | verify_ok ≔ ∀ check = true
   | on issues: loop_back
 
@@ -221,7 +219,6 @@ disable-model-invocation: true
   | ¬ overwrite(existing_canonical_terms in vocabulary.md)
 
 λ gybis-req-propagate_regression_contract(x).
-  invariant: explicit deferred REQs are excluded from downstream work
   | invariant: every binding REQ has a computed disposition per ready stage
   | invariant: not-ready stages remain pending; never coerce them to uncovered or explicit_NA
   | invariant: no_change_needed requires a reason and is not inferred from absence alone
@@ -233,6 +230,5 @@ disable-model-invocation: true
   | invariant: all_modifications ⊆ {vocabulary.md, specs/, test_paths}
 
 λ gybis-req-propagate_deliver(x).
-  report: {deferred_REQs_excluded, vocabulary_seeded, reqs_annotated, per_stage_dispositions, pending_stages, coverage_gaps, arch_deltas, test_status}
   | handoff: vocabulary conflicts → /gybis-vocab-tend; unresolved conflicts → /gybis-req-weed
   | return(complete = true)

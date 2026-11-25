@@ -95,7 +95,7 @@ disable-model-invocation: true
   | semantic_checks:
     - user_facing_scope: every canonical term represents a shared stakeholder-facing concept; implementation-only classes, protocols, tooling, and resource controls = architecture-only and must not be canonical terms
     - lower_layer_representation: spelling changes such as snake_case or PascalCase are systematic representations, not semantic vocabulary changes
-    - requirements_precision: if requirements/ ∃, canonical term names used in binding clauses must match vocabulary entries exactly; deprecated synonyms and unregistered variants = drift
+    - requirements_precision: if requirements/ ∃, canonical term names used in every requirement clause must match vocabulary entries exactly; deprecated synonyms and unregistered variants = drift
     - architecture_precision: architecture-only terms must remain outside vocabulary.md; ambiguous mappings across requirements, architecture, and specs = drift
     - related_association_model: Related is non-directional association
       | reciprocal_links_detected > 0

@@ -6,7 +6,7 @@ disable-model-invocation: true
 ---
 
 λ gybis-req-tend(x).
-  purpose: Apply layer-local requirement updates from plain-language requests, including explicit binding/deferred status changes, with impact analysis and human approval
+  purpose: Apply layer-local requirement updates from plain-language requests, with stage-impact analysis and human approval
   | input: requirements/ ∃ ∧ (plain_language_change_request ∨ optional preapproved_change_plan)
   | output: updated requirements/{index, module files} with downstream impact report
   | interaction: interactive
@@ -59,12 +59,10 @@ disable-model-invocation: true
   | precondition: targets_resolved = true
   | ∀ REQ ∈ resolved_targets:
     downstream ≔ {spec clauses annotated with REQ, tests referencing REQ, arch constraints tracing to REQ, vocab terms distilled from REQ}
-  | if(change_request changes binding/deferred status):
-    readiness ≔ assess({vocabulary, architecture, specs, tests_and_implementation})
-    | impact_report includes per-stage {ready ∨ pending_stage, represented_evidence ∨ no_change_needed_reason ∨ propagation_required}
+  | readiness ≔ assess({vocabulary, architecture, specs, tests_and_implementation})
+  | impact_report includes per-stage {ready ∨ pending_stage, represented_evidence ∨ no_change_needed_reason ∨ propagation_required}
   | impact_report ≔ {REQs_touched, modules_affected, downstream_artifacts_affected, per_stage_impact, severity}
   | rationale_in_scope: a change touching only a clause's rationale: line is a semantic change — rationale is part of clause identity for impact analysis; human approval required
-  | status_change: identify exact clauses and all downstream artifacts affected by changing binding/deferred status
   | constraint: read-only analysis; downstream artifacts diagnosed, not modified
   | output: impact_report → human
 
@@ -91,8 +89,7 @@ disable-model-invocation: true
     - footer_derivation: governed_REQs footers are regenerated from the clauses actually present after every change — never hand-edited
     - attribution updated: {source, decided_by, timestamp}
     - rationale updates: rationale: line changes update attribution {decided_by, timestamp}; AI-inferred rationale in a stakeholder_decided clause requires explicit human approval of the rationale text
-    - binding/deferred status changes only when explicitly named in the human-approved change_request; deferred clauses move into an explicitly marked non-binding section, restored binding clauses move out of it
-    - never infer deferral from absent downstream artifacts, an open question, or an investigate/skip divergence outcome
+    - never infer a requirement stage status from absent downstream artifacts, an open question, or an investigate/skip divergence outcome
     - preapproved plan scope is exact; do not expand it or request duplicate approval for actions already authorized
   | constraint: no upward behavioral module references introduced
   | collision_resolution: when check reports duplicate designators across modules, present the menu for human decision:
@@ -106,8 +103,8 @@ disable-model-invocation: true
     - designator uniqueness preserved
     - dependency order preserved
     - footers consistent with clauses
-    - every deferred REQ remains in an explicitly marked non-binding section; every binding REQ remains outside such sections
-    - impact_report items either addressed or explicitly deferred
+    - every REQ remains binding in requirements/
+    - impact_report items are either addressed or reported as pending_stage
   | verify_ok ≔ ∀ check = true
   | on fail: loop_back to APPLYING
 
@@ -131,7 +128,6 @@ disable-model-invocation: true
   invariant: designator uniqueness preserved
   | invariant: dependency order preserved
   | invariant: module footers consistent with clauses
-  | invariant: impact_report items addressed ∨ explicitly deferred
   | invariant: all_modifications ⊆ requirements/
 
 λ gybis-req-tend_deliver(x).
