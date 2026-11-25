@@ -833,4 +833,4 @@ Renamed `mementum/memories/human-owned-stage-readiness.md` → `mementum/memorie
   1. Run post-merge focused contract and fixture checks.
   2. Push `main` only after explicit approval.
 - **recover**: Read `mementum/state.md`, then verify `main` contains `/gybis-arch-migrate`, the updated requirements-family docs, and the merge commit.
-- **repository_status**: Feature work is merged into `main`. The feature branch remains present until the deletion operation completes; `example/` remains untracked.
+- **repository_status**: Feature work is merged into `main`. `feature/requirements-stage-dispositions` was deleted after merge; `example/` remains untracked and untouched.
