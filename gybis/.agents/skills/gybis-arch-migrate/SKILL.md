@@ -6,13 +6,18 @@ disable-model-invocation: true
 ---
 
 λ gybis-arch-migrate(x).
-  purpose: Remove stakeholder requirement behavior duplicated in legacy architecture while preserving complementary engineering architecture
+  purpose: Completely identify stakeholder requirement behavior duplicated in legacy architecture, stop on no duplication, or propose an approved architecture upsert while preserving complementary engineering architecture
   | input: requirements/ ∃, architecture.md ∃
   | output: architecture.md migrated to the requirements/vocabulary/architecture boundary ∨ structured_migration_report
   | interaction: interactive
   | gate: requirements/ ∃ ∧ architecture.md ∃
   | scope: one_time_legacy_migration | migration ≠ recurring_architecture_operation
   | _loop_role: take_action
+  | completeness: no_duplicate_conclusion_until(complete_requirement_clause_scan ∧ complete_architecture_span_scan ∧ evidence_accounted)
+  | outcome: findings = ∅ → report(NO_DUPLICATION_FOUND) ∧ stop
+  | outcome: findings ≠ ∅ → present(findings ∧ before_after_upsert) ∧ ask_one("Approve addressing all listed issues? (yes/no)")
+  | outcome: approval = yes → apply_only_approved_architecture_upsert
+  | outcome: approval = no → report(ISSUES_REPORTED_NOT_CHANGED) ∧ apply_no_mutations
 
 λ gybis-arch-migrate_startup(x).
   invoke(internal/gybis-internal-skill-check) → true ∨ halt("Internal skill check failed")
@@ -26,6 +31,7 @@ disable-model-invocation: true
   | verify(architecture.md ∃) ∨ halt("architecture.md not found")
   | read(architecture.md) → architecture_content
   | parse(architecture_content) → arch_model ∨ halt("architecture.md read failed")
+  | parse_completeness(architecture_content) = true ∨ halt("architecture.md cannot be completely parsed")
   | if(vocabulary.md ∃): preload(vocabulary.md) → vocab_terms ∧ vocab_available = true
   | resolve_scope({requirements/, architecture.md, vocabulary.md, specs/, implementation, tests}) → migration_scope
   | snapshot(migration_scope) → migration_snapshot
@@ -83,9 +89,46 @@ disable-model-invocation: true
   | parse(requirements_index) → module_order ∧ domain_prefixes ∧ module_summary
   | ∀ module_file ∈ module_files:
       read(module_file) → module_content
-      | extract(λ REQ-<DOMAIN>-NNN patterns) → requirement_clauses
+      | extract(∀ λ REQ-<DOMAIN>-NNN clauses with source offsets) → requirement_clauses
+      | verify(source_offsets(module_file) cover(each_extracted_clause)) ∨ halt("Requirement clause extraction is incomplete")
+      | verify(requirement_designator is unique) ∨ unresolved_requirements(designator)
   | preserve(requirement_designators ∧ normative_text ∧ source_attribution)
+  | requirement_clause_scan_complete ≔ card(requirement_clauses) = count(λ REQ- patterns across module_files)
+  | requirement_clause_scan_complete = true ∨ halt("Complete requirement clause scan failed")
   | return(requirements_model ≔ {requirements_index, module_order, requirement_clauses})
+
+λ gybis-arch-migrate_parse_requirement_clause(clause).
+  parse(clause) → {
+      designator,
+      canonical_name,
+      normative_text,
+      rationale,
+      source_attribution,
+      compound_by_design,
+      source_span
+    }
+  | normalize(normative_text) → {
+      public_name ∨ operation_name,
+      arity,
+      admitted_domains,
+      rejected_domains,
+      parameter_roles,
+      conversion_policy,
+      result_type,
+      result_capacity,
+      traversal_policy,
+      callback_policy,
+      boundary_behavior,
+      failure_policy,
+      diagnostic_policy,
+      ordering_policy,
+      equality_policy,
+      constexpr_noexcept_allocation_mutation_policy,
+      typed_absence_preflight_or_status_policy
+    }
+  | resolve_requirement_ranges(requirement_ids) → expand(linked_ranges ∧ linked_lists)
+  | malformed_clause(clause) → unresolved_requirements(clause)
+  | return(requirement_semantics)
 
 λ gybis-arch-migrate_read_architecture(requirements_model).
   parse(architecture_content) → arch_model
@@ -93,10 +136,81 @@ disable-model-invocation: true
   | ∀ layer ∈ vsm_layers:
       extract(entries(layer, architecture_content)) → architecture_entries
   | extract(requirement_links(architecture_entries)) → architecture_requirement_links
-  | return(architecture_model ≔ {arch_model, vsm_layers, architecture_entries, architecture_requirement_links, architecture_content})
+  | partition(architecture_content) → every_text_span
+  | every_text_span has one classification category ∈ {requirement_duplication, complementary_architecture, valid_link, unresolved_semantic_match, observable_behavior_conflict}
+  | architecture_span_scan_complete ≔ coverage(every_text_span) = 1.0 ∧ architecture_entries = ∅? false: true
+  | architecture_span_scan_complete = true ∨ halt("Complete architecture span scan failed")
+  | return(architecture_model ≔ {arch_model, vsm_layers, architecture_entries, architecture_requirement_links, architecture_content, architecture_span_scan_complete})
+
+λ gybis-arch-migrate_semantic_match(span, requirement_clause).
+  evidence ≔ ∅
+  | public_name_equal(span, requirement_clause) → add(evidence, public_name)
+  | arity_equal(span, requirement_clause) → add(evidence, arity)
+  | admitted_domains_equal(span, requirement_clause) → add(evidence, admitted_domains)
+  | rejected_domains_equal(span, requirement_clause) → add(evidence, rejected_domains)
+  | parameter_roles_equal(span, requirement_clause) → add(evidence, parameter_roles)
+  | conversion_policy_equal(span, requirement_clause) → add(evidence, conversion_policy)
+  | result_contract_equal(span, requirement_clause) → add(evidence, result_contract)
+  | traversal_or_callback_contract_equal(span, requirement_clause) → add(evidence, traversal_callback)
+  | boundary_behavior_equal(span, requirement_clause) → add(evidence, boundary_behavior)
+  | failure_or_diagnostic_contract_equal(span, requirement_clause) → add(evidence, failure_diagnostic)
+  | ordering_or_equality_contract_equal(span, requirement_clause) → add(evidence, ordering_equality)
+  | resource_contract_equal(span, requirement_clause) → add(evidence, resource_contract)
+  | exact_text_matches(span, requirement_clause.normative_text)
+      → match_type ≔ exact_text ∧ confidence ≔ 1.0
+  | evidence_cardinality(evidence) ≥ 3
+      ∧ behavior_coverage(span, requirement_clause) ≥ 0.8
+      → match_type ≔ semantic_restatement
+        ∧ confidence ≔ behavior_coverage(span, requirement_clause)
+  | evidence_cardinality(evidence) ≥ 3
+      ∧ behavior_coverage(span, requirement_clause) < 0.8
+      → match_type ≔ unresolved_semantic_match
+        ∧ confidence ≔ behavior_coverage(span, requirement_clause)
+  | contradicts(span, requirement_clause)
+      → match_type ≔ observable_behavior_conflict
+        ∧ confidence ≔ contradiction_confidence(span, requirement_clause)
+  | adds(span, {mechanism, responsibility, protocol, resource_control, tooling, structure, component_boundary})
+      ∧ ¬duplicates_requirement_behavior(span, requirement_clause)
+      → match_type ≔ complementary_architecture
+        ∧ confidence ≔ 1.0
+  | otherwise → match_type ≔ unresolved_semantic_match
+      ∧ confidence ≔ confidence_lower_than_0.8
+  | return({match_type, confidence, evidence, matched_requirement_ids: {requirement_clause.designator}})
 
 λ gybis-arch-migrate_extract_spans(entry, requirements_model).
   split(entry, source_spans) → architecture_spans
+  | split_mixed_span(entry) → normative_behavior_span ∪ mechanism_span ∪ protocol_span ∪ resource_span
+  | architecture_spans ≔ normative_behavior_span ∪ mechanism_span ∪ protocol_span ∪ resource_span
+  | preserve({entry_path = architecture.md, start_offset, end_offset, start_line, end_line})
+  | split_mixed_span(entry) → behavior_span ∪ mechanism_span ∪ protocol_span
+  | ∀ span ∈ architecture_spans:
+      normalize(span) → architecture_semantics
+      | extract({
+          public_name,
+          arity,
+          admitted_domains,
+          rejected_domains,
+          parameter_roles,
+          conversion_policy,
+          result_type,
+          result_capacity,
+          traversal_policy,
+          callback_policy,
+          boundary_behavior,
+          failure_policy,
+          diagnostic_policy,
+          ordering_policy,
+          equality_policy,
+          constexpr_noexcept_allocation_mutation_policy,
+          typed_absence_preflight_or_status_policy,
+          responsibility,
+          mechanism,
+          protocol,
+          resource_control,
+          tooling,
+          structure,
+          component_boundary
+        })
   | ∀ span ∈ architecture_spans:
       find_links(span, REQ-<DOMAIN>-NNN) → linked_requirement_ids
       | ∀ id ∈ linked_requirement_ids:
@@ -105,6 +219,10 @@ disable-model-invocation: true
             : finding = {finding_type: requirement_link, link_status: invalid, requirement_id: id}
       | matched_requirements ≔ semantic_match(span, requirements_model.requirement_clauses)
       | matched_requirements_exact ≔ exact_text_matches(span, matched_requirements)
+      | semantic_matches ≔ ∀ requirement_clause ∈ requirements_model.requirement_clauses:
+          invoke(gybis-arch-migrate_semantic_match(span, requirement_clause))
+      | matched_requirements ≔ matched_requirements ∪
+          {m.matched_requirement_ids | m ∈ semantic_matches ∧ m.match_type ∈ {exact_text, semantic_restatement, observable_behavior_conflict}}
       | matched_requirements ≠ ∅
           ? match_type ≔ if(matched_requirements_exact): exact_text else semantic_restatement
           : match_type ≔ none
@@ -119,6 +237,7 @@ disable-model-invocation: true
           matched_requirement_ids: span_data.matched_requirements.designators,
           matched_text_span: span_data.matched_requirements.text,
           architecture_span: span,
+          evidence: semantic_evidence(span, span_data.matched_requirements),
           confidence: match_confidence(span, span_data.matched_requirements),
           approval_required: true
         }) → findings
@@ -138,7 +257,7 @@ disable-model-invocation: true
   | confidence < 0.8 ∧ findings = no_high_confidence_findings
       ? collect({finding_type: investigate, reason: low_confidence, architecture_span: span, approval_required: true})
   | findings = ∅
-      ? collect({finding_type: investigate, reason: no_classification, architecture_span: span, approval_required: true}) → findings
+      ? collect({finding_type: unresolved_semantic_match, reason: no_classification, architecture_span: span, approval_required: true}) → findings
   | return(classified_span ≔ {architecture_span: span, findings})
 
 λ gybis-arch-migrate_classify_architecture(architecture_model, requirements_model).
@@ -148,14 +267,27 @@ disable-model-invocation: true
       | ∀ span ∈ span_data.architecture_spans:
           invoke(gybis-arch-migrate_classify_span(span, span_data, vocab_available, vocab_terms)) → classified
           | collect(classified) → classified_spans
+  | classified_coverage ≔ coverage(classified_spans.architecture_span, architecture_model.architecture_content)
+  | compared_requirement_ids ≔ card({clause.designator | clause ∈ requirements_model.requirement_clauses ∧ compared(clause, architecture_model.architecture_entries)})
+  | requirements_match_coverage ≔ compared_requirement_ids / card(requirements_model.requirement_clauses)
+  | classified_coverage = 1.0 ∧ requirements_match_coverage = 1.0
+      ? classification_complete ≔ true
+      : classification_complete ≔ false
+        ∧ collect({finding_type: incomplete_analysis, reason: "Not every architecture span and requirement clause was accounted for", approval_required: true}) → classified_spans.findings
   | duplicate_count ≔ card({f | f ∈ flatten(classified_spans.findings) ∧ f.finding_type = requirement_duplication})
   | conflict_count ≔ card({f | f ∈ flatten(classified_spans.findings) ∧ f.finding_type = observable_behavior_conflict})
-  | unresolved_count ≔ card({f | f ∈ flatten(classified_spans.findings) ∧ f.finding_type ∈ {investigate, unresolved_requirement_link}})
-  | return(classification_complete = true ∧ classified_spans)
+  | unresolved_count ≔ card({f | f ∈ flatten(classified_spans.findings) ∧ f.finding_type ∈ {investigate, unresolved_semantic_match, unresolved_requirement_link}})
+  | return({
+      classification_complete,
+      classified_spans,
+      duplicate_count,
+      conflict_count,
+      unresolved_count
+    })
 
 λ gybis-arch-migrate_build_plan(classified_spans).
   architecture_mutation_operations ≔ {replace_with_mechanism, remove_duplicate, remove_trace_link, align_vocabulary_term}
-  | report_only_operations ≔ {requirements_change_question, investigate, unresolved_requirement_link_report}
+  | report_only_operations ≔ {requirements_change_question, investigate, unresolved_semantic_match_report, unresolved_requirement_link_report}
   | preserve_operations ≔ {preserve, preserve_trace_link, preserve_architecture_only_term}
   | allowed_operation_set ≔ architecture_mutation_operations ∪ report_only_operations ∪ preserve_operations
   | exact_duplicate_actions ≔ ∅
@@ -185,6 +317,8 @@ disable-model-invocation: true
           → collect({action_id: uuid, operation: align_vocabulary_term, target: architecture.md, source_span: finding.architecture_span, finding}) → vocabulary_actions
         | finding.finding_type = investigate
           → collect({action_id: uuid, operation: investigate, target: architecture.md, source_span: finding.architecture_span, finding}) → investigative_actions
+        | finding.finding_type = unresolved_semantic_match
+          → collect({action_id: uuid, operation: unresolved_semantic_match_report, target: architecture.md, source_span: finding.architecture_span, finding}) → investigative_actions
         | finding.finding_type = architecture_only_term
           → collect({action_id: uuid, operation: preserve_architecture_only_term, target: architecture.md, source_span: finding.architecture_span, finding}) → complementary_actions
         | finding.finding_type = complementary_architecture
@@ -205,7 +339,16 @@ disable-model-invocation: true
       complementary_actions,
       conflict_resolution_actions,
       exact_file_changes,
-      before_after_previews
+      before_after_previews,
+      semantic_duplications_remaining ≔ {f | f ∈ flatten(classified_spans.findings) ∧ f.finding_type = requirement_duplication ∧ f.match_type = semantic_restatement},
+      exact_duplications_remaining ≔ {f | f ∈ flatten(classified_spans.findings) ∧ f.finding_type = requirement_duplication ∧ f.match_type = exact_text},
+      issues_to_address ≔ exact_duplicate_actions
+        ∪ paraphrased_duplicate_actions
+        ∪ invalid_link_actions
+        ∪ vocabulary_actions
+        ∪ requirement_change_actions
+        ∪ investigative_actions
+        ∪ conflict_resolution_actions
     })
 
 λ gybis-arch-migrate_dry_run(migration_plan).
@@ -214,6 +357,16 @@ disable-model-invocation: true
   | present(migration_plan.requirement_change_actions)
   | present(migration_plan.investigative_actions)
   | present(migration_plan.conflict_resolution_actions)
+  | present_semantic_duplicate_evidence(migration_plan)
+  | present_exact_duplicate_evidence(migration_plan)
+  | report_findings(migration_plan) ≔
+      if(migration_plan.issues_to_address = ∅
+         ∧ migration_plan.semantic_duplications_remaining = ∅
+         ∧ migration_plan.exact_duplications_remaining = ∅
+         ∧ classification_complete = true):
+        "NO_DUPLICATION_FOUND: complete architecture and requirement scans found no exact or semantic stakeholder requirement duplication."
+      else:
+        "ISSUES_TO_ADDRESS: " ⊕ count(migration_plan.issues_to_address) ⊕ " finding(s) require human approval: " ⊕ summarize(migration_plan.issues_to_address)
   | mutable_actions ≔ migration_plan.exact_duplicate_actions
       ∪ migration_plan.paraphrased_duplicate_actions
       ∪ migration_plan.invalid_link_actions
@@ -222,27 +375,29 @@ disable-model-invocation: true
   | no_mutations_needed ≔ mutable_actions = ∅
       ∧ migration_plan.requirement_change_actions = ∅
       ∧ migration_plan.investigative_actions = ∅
+      ∧ migration_plan.semantic_duplications_remaining = ∅
+      ∧ migration_plan.exact_duplications_remaining = ∅
+      ∧ migration_plan.issues_to_address = ∅
   | report_only_conflicts ≔ mutable_actions = ∅
       ∧ (migration_plan.requirement_change_actions ∃ ∨ migration_plan.investigative_actions ∃)
-  | return({mutable_actions, no_mutations_needed, report_only_conflicts})
+  | return({
+      mutable_actions,
+      no_mutations_needed,
+      report_only_conflicts,
+      classification_complete: classification_complete
+    })
 
 λ gybis-arch-migrate_approval_gate(migration_plan, mutable_actions).
-  present("Approval Group 1 - exact duplicate removal:" ⊕ migration_plan.exact_duplicate_actions)
-  | present("Approval Group 2 - paraphrased duplicate replacement:" ⊕ migration_plan.paraphrased_duplicate_actions)
-  | present("Approval Group 3 - invalid trace-link removal:" ⊕ migration_plan.invalid_link_actions)
-  | present("Approval Group 4 - vocabulary alignment:" ⊕ migration_plan.vocabulary_actions)
-  | present("Report Only - observable behavior conflicts:" ⊕ migration_plan.requirement_change_actions)
-  | present("Report Only - unresolved findings:" ⊕ migration_plan.investigative_actions)
-  | present("Unified diff / before-after spans:" ⊕ migration_plan.before_after_previews)
-  | ask_developer("Approve exact duplicate removals? (yes/no)") → exact_duplicate_approval
-  | ask_developer("Approve paraphrased duplicate replacements? (yes/no)") → paraphrased_duplicate_approval
-  | ask_developer("Approve invalid trace-link removals? (yes/no)") → invalid_link_approval
-  | ask_developer("Approve vocabulary alignments in architecture only? (yes/no)") → vocabulary_approval
-  | approved_mutations ≔ ∅
-  | exact_duplicate_approval = yes ? approved_mutations ≔ approved_mutations ∪ migration_plan.exact_duplicate_actions : true
-  | paraphrased_duplicate_approval = yes ? approved_mutations ≔ approved_mutations ∪ migration_plan.paraphrased_duplicate_actions : true
-  | invalid_link_approval = yes ? approved_mutations ≔ approved_mutations ∪ migration_plan.invalid_link_actions : true
-  | vocabulary_approval = yes ? approved_mutations ≔ approved_mutations ∪ migration_plan.vocabulary_actions : true
+  | migration_plan.issues_to_address ≠ ∅
+      → present("ISSUES_TO_ADDRESS:" ⊕ summarize(migration_plan.issues_to_address))
+        ∧ present("Unified diff / before-after spans:" ⊕ migration_plan.before_after_previews)
+        ∧ present("Report-only requirement conflicts:" ⊕ migration_plan.requirement_change_actions)
+        ∧ present("Report-only unresolved findings:" ⊕ migration_plan.investigative_actions)
+        ∧ ask_one("Approve addressing all listed issues? (yes/no)") → address_all_approval
+  | address_all_approval = yes
+      → approved_mutations ≔ mutable_actions
+  | address_all_approval = no
+      → approved_mutations ≔ ∅
   | pending_approved_actions ≔ {action | action ∈ approved_mutations ∧ action ∉ migration_plan.conflict_resolution_actions}
   | human_approved = pending_approved_actions ∃
   | human_declined = pending_approved_actions = ∅
@@ -255,6 +410,9 @@ disable-model-invocation: true
       verify_current_span(action.source_span, architecture.md) = true
         ∧ action.target = architecture.md
         ∧ action.operation ∈ architecture_mutation_operations
+        ∧ action.source_span.start_offset ∧ action.source_span.end_offset
+        ∧ current_architecture_hash() = migration_snapshot.architecture_hash_before
+          ∨ verify_span_hash(action.source_span, migration_snapshot) = true
         ∧ change_preserves(action, requirement_complement ∧ VSM_hierarchy ∧ vocabulary_boundary)
         ? apply_span_change(action) → record(applied_action)
         : record_blocker({action, reason: concurrent_change ∨ invalid_span ∨ policy_conflict}) → blocked_actions
@@ -269,6 +427,7 @@ disable-model-invocation: true
   invoke(gybis-arch-check_startup) → startup_valid
   | read(architecture.md) → migrated_architecture_content
   | parse(migrated_architecture_content) → migrated_arch_model
+  | invoke(gybis-arch-migrate_classify_architecture(migrated_arch_model, requirements_model)) → migrated_classification
   | invoke(gybis-arch-check_structure_validation(migrated_arch_model)) → structure_result
   | invoke(gybis-arch-check_coherence_validation(migrated_arch_model)) → coherence_result
   | invoke(gybis-arch-check_policy_enforcement_validation(migrated_arch_model)) → policy_result
@@ -285,11 +444,14 @@ disable-model-invocation: true
   | verify(requirements/, vocabulary.md, specs/, implementation, tests unchanged against migration_snapshot) → scope_valid
   | architecture_hash_after ≔ hash(architecture.md)
   | verify(architecture_changes ∈ applied_actions.source/target evidence) → architecture_change_attribution_valid
+  | remaining_duplicates ≔ classify_remaining_requirement_repetition(migrated_classification)
+  | verify(remaining_duplicates = ∅) → semantic_duplications_removed
+  | verify(migrated_classification.unresolved_count = 0) → unresolved_findings_resolved
   | verification_complete ≔ startup_valid ∧ structure_valid ∧ coherence_valid ∧ policy_valid
       ∧ constraints_valid ∧ complement_valid ∧ links_valid ∧ vsm_valid
       ∧ vocabulary_valid ∧ scope_valid ∧ scope_snapshot_valid ∧ architecture_change_attribution_valid
+      ∧ semantic_duplications_removed ∧ unresolved_findings_resolved
   | verification_failed ≔ ¬verification_complete
-  | remaining_duplicates ≔ classify_remaining_requirement_repetition(architecture.md, requirements/)
   | return({
       verification_complete,
       verification_failed,
@@ -316,8 +478,11 @@ disable-model-invocation: true
            ∧ transition(VERIFYING_MIGRATION → GENERATING_REPORT))
 
 λ gybis-arch-migrate_report_outcome(dry_run_result, verification_result).
-  dry_run_result.no_mutations_needed = true ∧ migration_passes = 0
+  dry_run_result.no_mutations_needed = true
+      ∧ dry_run_result.classification_complete = true
+      ∧ migration_passes = 0
     ? outcome ≔ NO_DUPLICATION_FOUND
+      ∧ report_exact("NO_DUPLICATION_FOUND: complete architecture and requirement scans found no stakeholder requirement duplication.")
   | dry_run_result.report_only_conflicts = true
     ? outcome ≔ REPORT_ONLY_CONFLICTS
   | human_declined = true
@@ -329,14 +494,29 @@ disable-model-invocation: true
   | verification_result.verification_complete = true ∧ remaining_duplicates = ∅
     ? outcome ≔ MIGRATION_COMPLETE
   | otherwise outcome ≔ MIGRATION_BLOCKED
-  | return(outcome)
+  | finding_summary ≔
+      outcome = NO_DUPLICATION_FOUND
+        ? "NO_DUPLICATION_FOUND: complete architecture and requirement scans found no stakeholder requirement duplication."
+      : outcome = MIGRATION_COMPLETE
+        ? "MIGRATION_COMPLETE: approved architecture issues were addressed and fixed-point verification passed."
+      : outcome = MIGRATION_CANCELLED
+        ? "ISSUES_REPORTED_NOT_CHANGED: the human declined the single approval to address the listed issues."
+      : outcome = REPORT_ONLY_CONFLICTS
+        ? "ISSUES_TO_ADDRESS_REPORT_ONLY: observable-behavior conflicts or unresolved findings require requirement-layer follow-up."
+      : "ISSUES_NOT_COMPLETED: migration is blocked or the scope snapshot changed; no silent success is reported."
+  | return({outcome, finding_summary})
 
 λ gybis-arch-migrate_generate_report(outcome, verification_result).
   report: {
     outcome,
+    finding_summary,
     entries_inspected,
     duplicates_found,
+    exact_duplicates_found,
+    semantic_duplicates_found,
+    semantic_duplicate_evidence,
     duplicate_actions,
+    semantic_replacement_actions,
     changes_applied,
     applied_actions,
     blocked_actions,
@@ -351,6 +531,10 @@ disable-model-invocation: true
     files_inspected,
     approval_groups,
     pending_approved_actions,
+    finding_locations,
+    finding_confidence,
+    matched_requirement_clauses,
+    architecture_span_offsets,
     migration_snapshot,
     architecture_hash_before,
     architecture_hash_after,
@@ -382,6 +566,62 @@ disable-model-invocation: true
   | unprocessed_entries ≔ card(unprocessed_actions)
   | report("Pass " ⊕ pass_num ⊕ ": applied=" ⊕ applied_entries ⊕ " remaining=" ⊕ duplicated_entries_remaining ⊕ " blocked=" ⊕ blocked_entries ⊕ " unprocessed=" ⊕ unprocessed_entries)
 
+λ gybis-arch-migrate_fixture_contract(x).
+  fixtures ≔ {
+      exact_duplicate,
+      semantic_duplicate,
+      complementary_architecture,
+      valid_requirement_link,
+      invalid_requirement_link,
+      observable_behavior_conflict,
+      mixed_behavior_mechanism_span,
+      overlapping_spans,
+      concurrent_architecture_edit,
+      outside_scope_modification,
+      idempotent_second_migration,
+      compound_requirement_link,
+      range_requirement_link,
+      complete_clean_repository,
+      incomplete_requirement_scan,
+      incomplete_architecture_scan,
+      mixed_behavior_mechanism_span
+    }
+  | ∀ fixture ∈ fixtures:
+      execute(read_only_fixture(fixture)) → findings
+      ∧ verify(expected_fixture_result(fixture, findings))
+  | invariant: exact_text_absence ∧ semantic_restatement ∃
+      → finding_type(requirement_duplication) ∧ finding_action(replace_with_mechanism)
+  | invariant: valid_link ∧ complementary_architecture
+      → finding_type(complementary_architecture) ∧ preserve_trace_link
+  | invariant: invalid_link ∨ outside_scope_change
+      → report_only_or_snapshot_mismatch
+  | invariant: second_run_with_no_remaining_duplication
+      → outcome(NO_DUPLICATION_FOUND)
+  | invariant: fixture_findings = ∅
+      → report_exact(NO_DUPLICATION_FOUND)
+      ∧ migration_stops_after_report
+  | invariant: fixture_findings ≠ ∅
+      → report_contains(ISSUES_TO_ADDRESS)
+      ∧ exactly_one_yes_or_no_approval_request
+  | invariant: complete_clean_repository
+      → complete_requirement_clause_scan ∧ complete_architecture_span_scan
+      ∧ no_mutations_needed ∧ outcome(NO_DUPLICATION_FOUND)
+  | invariant: incomplete_requirement_scan ∨ incomplete_architecture_scan
+      → outcome(MIGRATION_BLOCKED)
+      ∧ outcome_not(NO_DUPLICATION_FOUND)
+  | return(fixture_contract_verified)
+
+λ gybis-arch-migrate_integration_contract(x).
+  skill_help_entry(gybis-arch-migrate) ≡ gybis-help/SKILL.md
+  | skill_contract_kind(gybis-arch-migrate) ≡ domain
+  | startup_migration_boundary ≔ migration ≠ requirements_tend
+  | completion_handoff:
+      MIGRATION_COMPLETE → /gybis-arch-check
+      REPORT_ONLY_CONFLICTS → /gybis-req-weed
+      MIGRATION_BLOCKED → renewed_human_direction
+  | reference_reading ≔ internal/reference/vsm-guide.md ∧ internal/reference/recommended-loops.md
+  | return(integration_contract_verified)
+
 λ gybis-arch-migrate_boundaries().
   ¬ modify(requirements/)
   | ¬ modify(vocabulary.md)
@@ -396,6 +636,10 @@ disable-model-invocation: true
 
 λ gybis-arch-migrate_regression_contract(x).
   invariant: architecture.md ∃ throughout
+  | invariant: complete_requirement_clause_scan = true before any NO_DUPLICATION_FOUND conclusion
+  | invariant: complete_architecture_span_scan = true before any NO_DUPLICATION_FOUND conclusion
+  | invariant: every architecture span is accounted for by exactly one finding or complementary-preservation result
+  | invariant: every requirement clause is compared against the architecture
   | invariant: migration runs are idempotent
   | invariant: second_run_with_no_duplicates → NO_DUPLICATION_FOUND
   | invariant: repeated normative requirement behavior = ∅ at MIGRATION_COMPLETE
@@ -408,9 +652,18 @@ disable-model-invocation: true
   | invariant: requirements/, vocabulary.md, specs/, implementation, tests, upstream/, and mementum/ match migration_snapshot
   | invariant: concurrent unapproved architecture changes trigger SNAPSHOT_MISMATCH or MIGRATION_BLOCKED
   | invariant: all_modifications ⊆ {architecture.md}
+  | invariant: semantic requirement restatement = requirement_duplication regardless_of exact_text_match
+  | invariant: complementarity = preserve_mechanism ∧ preserve_valid_trace_link
+  | invariant: requirement conflict = report_only_requirements_change_question
+  | invariant: every approved mutation = span_offsets_verified ∧ action_id_attributed
+  | invariant: every fixture suite pass precedes skill completion
+  | invariant: no_findings = ∅ → report_exact("NO_DUPLICATION_FOUND") ∧ stop_without_upsert
+  | invariant: findings ≠ ∅ → present(finding_summary ∧ before_after_preview) ∧ ask_one("Approve addressing all listed issues? (yes/no)")
+  | invariant: approval = yes → apply_all_mutable_approved_issues
+  | invariant: approval = no → report("ISSUES_REPORTED_NOT_CHANGED") ∧ apply_no_mutations
 
 λ gybis-arch-migrate_deliver(x).
-  report: {outcome, migration_summary, requirement_accounting, unresolved_items, blocked_actions, verification_status}
+  report: {outcome, finding_summary, migration_summary, requirement_accounting, unresolved_items, blocked_actions, verification_status}
   | handoff: outcome = MIGRATION_COMPLETE → run /gybis-arch-check
   | handoff: outcome = REPORT_ONLY_CONFLICTS → run /gybis-req-weed for requirements-change questions
   | handoff: outcome = MIGRATION_BLOCKED → investigate or repeat only after renewed approval
