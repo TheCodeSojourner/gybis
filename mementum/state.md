@@ -834,3 +834,21 @@ Renamed `mementum/memories/human-owned-stage-readiness.md` → `mementum/memorie
   2. Push `main` only after explicit approval.
 - **recover**: Read `mementum/state.md`, then verify `main` contains `/gybis-arch-migrate`, the updated requirements-family docs, and the merge commit.
 - **repository_status**: Feature work is merged into `main`. `feature/requirements-stage-dispositions` was deleted after merge; `example/` remains untracked and untouched.
+
+## Session Closeout (2026-11-25, session-61)
+- **task**: Answer whether architecture and vocabulary should use requirement-like indexed module structures for context management.
+- **questions**:
+  - none blocking.
+  - No skill or documentation implementation was requested in this session.
+- **decisions**:
+  - Architecture and vocabulary can grow large enough to benefit from modular structures.
+  - Recommended architecture layout: `architecture/architecture-index.md` plus `architecture-{module}.md` modules, preserving the global S5 > S4 > S3 > S2 > S1 hierarchy and requirement links.
+  - Recommended vocabulary layout: `vocabulary/vocabulary-index.md` plus `vocabulary-{domain}.md` modules, preserving global canonical-term uniqueness and cross-domain relationships.
+  - Single-file `architecture.md` and `vocabulary.md` representations remain valid for small projects and as migration compatibility targets.
+  - Modular directories improve AI context management by loading the index and relevant modules first, while global integrity checks can follow every module through the index.
+- **next**:
+  1. Decide whether to implement dual-format resolution and compatibility for `architecture.md`/`architecture/` and `vocabulary.md`/`vocabulary/`.
+  2. If implementation proceeds, update every architecture/vocabulary skill gate, tool guard, parser, writer, and migration surface consistently.
+  3. Add migration and context-selection fixtures before treating the module layouts as canonical.
+- **recover**: Read `mementum/state.md`, then inspect the architecture and vocabulary check, propagate, tend, refine, weed, and describe/explain skill contracts.
+- **repository_status**: No files were changed during this closeout. `main` remains clean of implementation changes; `example/` remains untracked and untouched.
